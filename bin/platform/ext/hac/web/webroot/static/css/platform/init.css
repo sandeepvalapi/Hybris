@@ -1,0 +1,40 @@
+label {
+	font-weight: normal;
+}
+
+#projectData dl {
+	margin-top: 15px;
+	margin-left: 50px;
+}
+#sqlScripts {
+	float: right;
+	position: relative;
+	top: -8px;
+}
+
+.buttonExecute {
+	margin-top: 15px;
+}
+
+.extensionBox {
+	padding: 5px;
+	margin: 5px 0;
+	background-color: rgba(0, 0, 0, 0.1);
+	-moz-border-radius: 5px; /* Firefox */
+	-webkit-border-radius: 5px; /* Safari, Chrome */
+	border-radius: 5px; /* CSS3 */
+}
+
+.active {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.inactive {
+	background-color: rgba(0, 0, 0, 0.05);
+	opacity: 0.5;
+}
+
+.required {
+    color: #bd3a19;
+    font-weight: bold;
+}

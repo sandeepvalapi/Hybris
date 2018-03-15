@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="checkOrder" name="payment-process-test" processClass="de.hybris.platform.orderprocessing.model.OrderProcessModel">
+
+	<action id="checkOrder" bean="test.checkOrderAction">
+		<transition name="OK" to="checkAuthorizeOrderPayment"/>
+		<transition name="NOK" to="error"/>
+	</action>
+
+	<action id="checkAuthorizeOrderPayment" bean="test.checkAuthorizeOrderPaymentAction">
+		<transition name="OK" to="cancelOrder"/>
+		<transition name="NOK" to="notifyCustomer"/>
+	</action>
+
+	<action id="cancelOrder" bean="test.cancelWholeOrderAuthorizationAction">
+		<transition name="OK" to="notifyCustomer"/>
+		<transition name="NOK" to="error"/>
+	</action>
+
+	<action id="notifyCustomer" bean="test.notifyCustomerAboutFraudAction">
+		<transition name="OK" to="failed"/>
+		<transition name="NOK" to="error"/>
+	</action>
+
+	<end id="error" state="ERROR">All went wrong.</end>
+	<end id="failed" state="FAILED">Order not placed.</end>
+	
+</process>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!-- Data source -->
+    <bean id="dataSource" class="de.hybris.platform.spring.DataSourceFactoryBean"/>
+
+    <bean id="jdbcTemplate" class="de.hybris.platform.jdbcwrapper.HybrisJdbcTemplate" />
+
+    <!-- Model persistence layer -->
+    <bean id="defaultPersistenceTypeService"
+          class="de.hybris.platform.servicelayer.internal.model.extractor.impl.DefaultPersistenceTypeService"/>
+
+    <bean id="batchCollectorFactory" class="de.hybris.platform.directpersistence.impl.BatchCollectorFactory">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="oracleBatchSize" value="${direct.persistence.jdbc.oracle.batch.size}"/>
+    </bean>
+
+    <bean id="recordVisitorFactory" class="de.hybris.platform.directpersistence.record.visitor.RecordVisitorFactory" />
+
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="txManager"/>
+    </bean>
+
+    <alias name="defaultWritePersistenceGateway" alias="writePersistenceGateway"/>
+    <bean id="defaultWritePersistenceGateway"
+          class="de.hybris.platform.directpersistence.impl.DefaultWritePersistenceGateway">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="recordVisitorFactory" ref="recordVisitorFactory"/>
+        <property name="transactionTemplate" ref="transactionTemplate"/>
+        <property name="batchCollectorFactory" ref="batchCollectorFactory"/>
+        <property name="localizationService" ref="localizationService"/>
+        <property name="cacheInvalidator" ref="cacheInvalidator" />
+    </bean>
+
+    <alias name="defaultSLDItemDAO" alias="sldItemDAO" />
+    <bean id="defaultSLDItemDAO" class="de.hybris.platform.directpersistence.read.DefaultSLDItemDAO">
+        <property name="clusterService" ref="clusterService"/>
+        <property name="tenantService" ref="tenantService"/>
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <alias name="defaultSLDRelationDAO" alias="sldRelationDAO" />
+    <bean id="defaultSLDRelationDAO" class="de.hybris.platform.directpersistence.read.DefaultSLDRelationDAO">
+        <lookup-method name="lookupTypeService" bean="typeService" />
+        <property name="modelResolver" ref="modelResolver"/>
+    </bean>    
+
+    <alias name="defaultSLDDataContainerProvider" alias="sldDataContainerProvider" />
+    <bean id="defaultSLDDataContainerProvider" class="de.hybris.platform.directpersistence.cache.DefaultSLDDataContainerProvider">
+        <property name="sldItemDAO" ref="sldItemDAO"/>
+    </bean>
+
+    <!-- Transaction support -->
+    <bean id="txManager" class="de.hybris.platform.spring.HybrisTransactionManager"/>
+
+    <!-- Sample: We want to make the foo service object transactional -->
+    <!-- <bean id="fooService" class="x.y.service.DefaultFooService"/> <tx:advice id="txAdvice" transaction-manager="txManager"> <tx:attributes>
+        <tx:method name="get*" read-only="true"/> <tx:method name="*"/> </tx:attributes> </tx:advice> <aop:config> <aop:pointcut id="fooServiceOperation"
+        expression="execution(* x.y.service.FooService.*(..))"/> <aop:advisor advice-ref="txAdvice" pointcut-ref="fooServiceOperation"/> </aop:config> -->
+
+    <bean id="failureInterceptor" class="de.hybris.platform.aop.ConcurrentOperationFailureInterceptor" >
+        <property name="maxRetries" value="5"/>
+        <property name="modelService" ref="modelService" />
+    </bean>
+    <aop:config proxy-target-class="true">
+        <aop:aspect id="failureInterceptorAspect" ref="failureInterceptor">
+            <aop:pointcut id="retryAnnotated"
+                          expression="@annotation(retryConcurrentModification)"/>
+            <aop:around pointcut-ref="retryAnnotated" method="performOperation" arg-names="retryConcurrentModification"/>
+        </aop:aspect>
+    </aop:config>
+
+	<!-- JDBC Links handling -->
+	<bean id="linkOperationFactory" class="de.hybris.platform.persistence.links.ConfigurableLinkOperationFactory">
+		<constructor-arg>
+			<list>
+				<ref bean="jdbcLinkOperationFactory"/>
+				<ref bean="jaloLinkOperationFactory"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="jaloLinkOperationFactory" class="de.hybris.platform.persistence.links.jalo.JaloLinkOperationFactory"/>
+	
+	<bean id="jdbcLinkOperationFactory" class="de.hybris.platform.persistence.links.jdbc.JdbcLinkOperationFactory">
+		<constructor-arg ref="dmlLinkOperationExecutor"/>
+	</bean>
+	
+	<bean id="dmlLinkOperationExecutor" class="de.hybris.platform.persistence.links.jdbc.dml.DmlLinkOperationExecutor">
+		<constructor-arg ref="transactionAwareModificationContextFactory"/>
+		<constructor-arg ref="jdbcRelationSearcher"/>
+		<constructor-arg ref="transactionTemplate"/>
+	</bean>
+	
+	<bean id="transactionAwareModificationContextFactory" class="de.hybris.platform.persistence.links.jdbc.dml.context.TransactionAwareModificationContextFactory">
+		<constructor-arg ref="defaultWritePersistenceGateway"/>
+	</bean>
+	<bean id="jdbcRelationSearcher" class="de.hybris.platform.persistence.links.jdbc.dml.relation.JdbcRelationSearcher">
+		<constructor-arg ref="jdbcTemplate"/>
+	</bean>
+
+	<bean id="SLDUnsafeTypesProviderBuilder" class="de.hybris.platform.directpersistence.SLDUnsafeTypesProviderBuilder"/>
+
+	<alias name="defaultJaloAccessorsService" alias="jaloAccessorsService"/>
+	<bean id="defaultJaloAccessorsService" class="de.hybris.platform.directpersistence.impl.DefaultJaloAccessorsService">
+	        <property name="SLDUnsafeTypesProviderBuilder" ref="SLDUnsafeTypesProviderBuilder"/>
+	</bean>
+	
+	<!-- SelHealingService -->
+
+	<alias alias="selfHealingService" name="defaultSelfHealingService" />
+	<bean id="defaultSelfHealingService" class="de.hybris.platform.directpersistence.selfhealing.impl.DefaultSelfHealingService">
+		<property name="writePersistenceGateway" ref="defaultWritePersistenceGateway" />
+	</bean>
+
+</beans>

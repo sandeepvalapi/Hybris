@@ -1,0 +1,577 @@
+# -------------------------------------------;
+# --- create system;
+# -------------------------------------------;
+# make sure to fail on first error!;
+#% impex.setDumpingAllowed( false );
+# -------------------------------------------;
+
+$systemName=SampleClassification;
+$systemVersion=1.0;
+
+INSERT_UPDATE ClassificationSystem; id[unique=true]; name[lang=de]; name[lang=en];
+; $systemName ; Beispiel-Klassifikationssystem ; Sample ClassificationSystem;
+
+INSERT_UPDATE ClassificationSystemversion; catalog(id)[unique=true] ; version[unique=true] ; active ; writeprincipals(uid); languages(isocode); inclPacking[virtual=true,default=true]; inclDuty[virtual=true,default=true]; inclFreight[virtual=true,default=true]; inclAssurance[virtual=true,default=true]
+; $systemName ; $systemVersion ; true ; employeegroup;de,en;
+
+
+# -------------------------------------------
+# --- create classes
+# -------------------------------------------
+# electronics
+# +-hardware
+# | +-cpu
+# | +-memory
+# | +-boards
+# | +-graphic
+# | +-photography
+# +-software
+#   +-antivirus
+#   +-operating
+# -------------------------------------------
+
+$sysVer=catalogVersion(catalog(id[default=$systemName]),version[default=$systemVersion]);
+$superClass=superCategories(code,$sysVer);
+
+INSERT_UPDATE ClassificationClass; code[unique=true]; $superClass; name[lang=de]; name[lang=en]; hmcXML; $sysVer[virtual=true,unique=true] 
+; electronics ; ; Elektronische Geräte ; Electronical Goods;
+; hardware ; electronics ; Hardware ; Hardware;
+; cpu ; hardware ; Prozessoren ; CPU;
+; memory ; hardware ; Speicher ; Memory;
+; boards ; hardware ; Mainboards ; Mainboards;
+; graphics ; hardware ; Grafikkarten; Graphic cards;
+; photography ; hardware ; Digital-Fotografie ;Digital photography;"<?xml version=""1.0"" encoding=""ISO-8859-1""?>
+<configuration xmlns=""hybris.de/schemas/hmc/generic""
+                     xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+                     xsi:schemaLocation=""hybris.de/schemas/hmc/generic hmc.xsd"">
+   <type name=""Product"" mode=""append"">
+      <organizer>
+         <editor>
+            <tab name=""tab.product.properties"" position=""0"" mode=""append"">
+               <section name=""section.catalog_and_validity"" mode=""append"">
+                  <columnlayout leftwidth=""370"" rightwidth=""370"">
+                     <row>
+                        <customchip classname=""de.hybris.platform.catalog.hmc.ClassificationAttributeChip"">
+                           <parameter key=""name"" value=""SampleClassification/1.0/photography/sensor""/>
+                           <parameter key=""width"" value=""224""/>
+                        </customchip>
+                        <customchip classname=""de.hybris.platform.catalog.hmc.ClassificationAttributeChip"">
+                           <parameter key=""name"" value=""SampleClassification/1.0/photography/display""/>
+                           <parameter key=""width"" value=""224""/>
+                        </customchip>
+                     </row>
+                     <row>
+                        <customchip classname=""de.hybris.platform.catalog.hmc.ClassificationAttributeChip"">
+                           <parameter key=""name"" value=""SampleClassification/1.0/photography/type""/>
+                           <parameter key=""width"" value=""224""/>
+                        </customchip>
+                        <customchip classname=""de.hybris.platform.catalog.hmc.ClassificationAttributeChip"">
+                           <parameter key=""name"" value=""SampleClassification/1.0/photography/resolutions""/>
+                           <parameter key=""width"" value=""224""/>
+                        </customchip>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+</configuration>";
+; software ; electronics ; Software ; Software;
+; antivirus ; software ; Anti-Virus Software ; Anti-Virus Software;
+; operating ; software ; Betriebssysteme ; Operating Systems;
+
+# assign visibility to all customer;
+
+UPDATE ClassificationClass; $sysVer[virtual=true,unique=true] ; code[unique=true]; allowedPrincipals(uid);
+; electronics ; customergroup ;
+
+# -------------------------------------------;
+# --- create units;
+# -------------------------------------------;
+
+$sysVer=systemVersion(catalog(id[default=$systemName]),version[default=$systemVersion]);
+
+INSERT_UPDATE ClassificationAttributeUnit; code[unique=true]; symbol ; unitType; conversionFactor; name[lang=de] ; name[lang=en]; $sysVer[virtual=true,unique=true]
+; sec ; sec ; time;86400; Sekunde ; Second;
+; minute ; m ; time;1440; Minute ; Minute;
+; hour ; h ; time;24; Stunde ; Hour;
+; day ; d ; time ;1; Tag ; Day;
+
+; bit ; bit ; dataSize ;8388608; Bit ; Bit
+; byte ; byte ; dataSize ;1048576; Bit ; Bit
+; kb ; KB ; dataSize;1024; Kilobyte ; Kilobyte
+; mb ; MB ; dataSize;1; Megabyte ; Megabyte
+; gb ; GB ; dataSize;0,000976563; Gigabyte ; Gigabyte
+
+; kg ; kg ; weight;1000; Kilogramm ; Kilogram
+; g ; g ; weight;1000000; Gramm ; Gram
+; t ; t ; weight;1;  Tonne ; Ton
+
+; v ; V ; voltage;1; Volt ; Volt
+
+; mhz ; MHz ; clockSpeed ;1000; Megahertz ; Megahertz
+; ghz ; GHz ; clockSpeed ;1; Gigahertz ; Gigahertz
+
+; mb/s ; MB/s ; transferRate;1; Megabyte/s ; Megabyte/s
+; gb/s ; GB/s ; transferRate;1; Gigabyte/s ; Gigabyte/s
+
+; mm ; mm ; length;1000000; Millimeter ; Millimeter
+; cm ; cm ; length;100000; Zentimeter ; Centimeter
+; m ; m ; length;1000; Meter ; Meter
+; km ; km ; length;1; Kilometer ; Kilometer
+
+; c ; °C ; temperatureCelsius ; 1 ; Grad Celcius ; Degree Celcius
+; f ; °F ; temperatureFahrenheit ; 1 ; Grad Fahrenheit ; Degree Fahrenheit
+; cm³ ; cm³ ; volume ; 0,001; Kubikzentimeter; Cubic Centimeters
+; iso ; ISO ; standard ; 1 ; ; ;
+; asa ; ASA ; standard ; 1 ; ; ;
+
+# -------------------------------------------;
+# --- create values;
+# -------------------------------------------;
+
+INSERT_UPDATE ClassificationAttributeValue;code[unique=true]; name[lang=de]; name[lang=en]; $sysVer[virtual=true,unique=true];
+
+;S_370;Sockel 370;Socket 370; ;
+;S_478;Sockel 478;Socket 478 ;
+;S_754;Sockel 754;Socket 754 ;
+;S_939;Sockel 939;Socket 939 ;
+;S_AM2;Sockel AM2;Socket AM2 
+;S_A;Sockel A;Socket A
+;S_478M; Sockel 478M ; Socket 478M
+;S_479M_FC-BGA;Sockel 479M FC-BGA;Socket 479M FC-BGA
+;S_479M_FC-PGA;Sockel 479M FC-PGA;Socket 479M FC-PGA
+;S_479Y;Sockel 479Y;Socket 479Y
+;S_603;Sockel 603;Socket 603
+;S_604;Sockel 604;Socket 604
+;S_771;Sockel 771;Socket 771
+;S_940;Sockel 940;Socket 940
+;MEM_DDR;DDR; DDR
+;MEM_DDR2; DDR2; DDR2
+;MEM_SDRAM; SDRAM ; SDRAM
+;MEM_RDRAM; RDRAM ; RDRAM
+;MEM_PS2; PS/2 ; PS/2
+;CL2; CL2 ;CL2
+;CL2,5 ;CL2,5;CL2,5
+;CL3; CL3 ; Cl3
+;USB20; USB 2.0; USB 2.0
+;USB11; USB 1.1; USB 1.1
+;Serial_ATA; Serial ATA; Serial ATA
+;IDE ; IDE ; IDE
+;UDMA133; Ultra DMA 133; Ultra DMA 133
+;L10; 10 MBit; 10 MBit
+;L100; 100 MBit; 100 Mbit
+;L1G ; 1 GBit; 1 GBit
+;P_COMPACT; Digitale Kompaktkamera; Digital compact camera
+;P_SLR; Digitale Spiegelreflexkamera ; Digital SLR
+
+# -------------------------------------------;
+# --- create attributes;
+# -------------------------------------------;
+
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']);
+
+INSERT_UPDATE ClassificationAttribute;code[unique=true];name[lang=de]; name[lang=en]; defaultAttributeValues(code,$sysVer);$sysVer[virtual=true,unique=true]
+# general attributes;
+; weight ; Gewicht ; Weight;
+; dimensions ; Abmessungen ; Dimensions;
+; empty 
+
+
+# hardware;
+; warranty ; Garantie; Warranty;
+; shipmentIncludes; Lieferumfang ; Included in shipment;
+
+# cpu;
+; clockSpeed ; Taktfrequenz ; Speed;
+; fsbSpeed ; FSB ; FSB;
+; socket ; Sockel ; Socket ; S_370,S_478, S_754, S_939, S_AM2, S_A, S_478M, S_479M_FC-BGA, S_479M_FC-PGA, S_479Y, S_603, S_604, S_771, S_940;
+; core ; CPU-Kern ; Core;
+; cache ; Cache ; Cache;
+
+# memory;
+# ; clockSpeed ; Taktfrequenz ; Speed // use from above;
+; type ; Typ ; Type;
+; capacity ; Kapazität ; Memory size;
+; timing ; Timing ; Timing ;CL2, CL2\,5 , CL3
+; voltage ; Spannung ; Voltage;
+; manufacturerNr ; Herstellernummer ; Manufacturer nr;
+
+# boards;
+# ; socket // use from above;
+; processor ; Prozessor ; Processor;
+; chipset ; Chipsatz ; Chipset;
+; slots ; Steckplätze ; Slots;
+; agpSupported ; APG  Standards ; AGP Standards;
+; pciSupported ; PCI Standards ; PCI Standards;
+; maxMemory ; Maximale Speichermenge ; Maximum memory;
+; memoryType ; Speicherart ; Memory type;
+; memorySlots ; Speichersockel ; Memory slots;
+; ideType ; IDE Controller Typ ; IDE controller type ; IDE
+; ideSpec ; IDE Protokolle ; IDE protocols ; UDMA133
+; ideSpeed ; IDE Geschwindikeit ; IDE speed;
+; sataType; SATA Contoller Typ ; SATA controller type; Serial_ATA
+; sataSpec ; SATA Protokolle ; SATA protocols;
+; sataSpeed; SATA Geschwindigkeit ; SATA speed;
+; sataRaid ; SATA RAID Level ; SATA RAID levels;
+; usbType ; USB Controller Typ ; USB controller type;
+; usbPorts ; USB Anschlüsse ; USB Ports;
+; i1394Ports; Firewire Anschlüsse ; Firewire ports;
+; i1394Speed; Firewire Geschwindigkeit; Firewire speed;
+; gfxChip ; On-Board Grafikchip ; On-Board Graphics chip;
+; gfxMemory ; On-Board Grafikspeicher ; On-Board graphics memory;
+; sndChip ; On-Board Shoundchip ; On-Board sound chip;
+; lanSpeed ; LAN Geschwindigkeit ; LAN speed ; L10, L100, L1G
+
+# graphics;
+# type ; // use from above;
+# agpSupported // use from above;
+; chip ; Grafikchip ; Graphics chip
+; memory ; Speicher ; Memory
+; ramdac ; RAMDAC ; RAMDAC
+; resolutions ; Auflösungen ; Resolutions
+; drivers ; Treiber ; Drivers
+; biosDate ; BIOS Datum ; BIOS Date
+
+# photography;
+# ; type ; Typ ; Type // use from above
+; sensor ; Bildsensor ; Sensor
+# ; resolutions ; // use from above;
+; zoomOpt ; Zoom (optisch); Zoom (optical)
+; zoomDgt ; Zoom (digital); Zoom (digital)
+; display; Display ; Display
+; focalDistance ; Brennweite ; Focal distance
+; shutterSpeed ; Verschlusszeit ; Shutter speed
+; isoSpeed ; Lichtempfindlichkeit ; ISO speed
+; batchShot ; Serienbildaufnahme ; Serial shot mode
+; video ; Videoaufnahme ; Video recording
+; print ; Druckfunktion ; Print
+; microIncl ; Mikrofon integriert ; Microfone integrated
+; interfaceUSB ; USB Anschluss ; USB interface
+; interfaceI1394 ; Firewire Anschluss ; Firewire interface
+; pictBridge ; Pict Bridge ; Pict Bridge
+; slotSD_MMC ; Steckplatz SD/MMC ; Slot SD/MMC
+; slotCF ; Steckplatz CF ; Slot CF
+; slotXD ; Steckplatz xD ; Slot xD
+; slotMemSt ; Steckplatz Memory Stick ; Slot Memory Stick
+; docking ; Lade-/Dockingstation ; Docking station
+; body ; Gehäuse ; Body
+; whitebalance ; Weissabgleich; White balance
+; colorDepth ; Farbtiefe ; Color depth
+
+# software;
+; manufacturerURL ; Hersteller-Website ; Manufacturer website
+
+# -------------------------------------------;
+# --- assign attributes;
+# -------------------------------------------;
+
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']);
+$class=classificationClass(ClassificationClass.code,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']));
+$attribute=classificationAttribute(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']));
+# ---------------------------------------------------------;
+
+INSERT_UPDATE ClassAttributeAssignment; $class[unique=true]; $attribute[unique=true] ;attributeType(code[default=string]) ; position ; unit(code,$sysVer) ;searchable[default=false]; listable[default=false] ;comparable[default=true]; multiValued[default=false] ; range[default=false] ; attributeValues(code,$sysVer); $sysVer[virtual=true,unique=true]
+
+# general attributes;
+; electronics ; weight ; number ;0; g ;; ;
+; electronics ; dimensions ; string ;1;
+; electronics ; empty ; string ;2;
+
+# hardware;
+; hardware ; warranty ; string ;0;
+; hardware ; shipmentIncludes ; string ;1;
+
+# cpu;
+; cpu ; clockSpeed ; number ;0; ghz ;true;true;
+; cpu ; fsbSpeed ; number ;1; mhz;true;
+; cpu ; socket ; enum ;2;;true;true;
+; cpu ; core ; string ;3;
+; cpu ; cache ; number ;4; kb;true;
+
+# memory;
+; memory ; clockSpeed ; number ;0; mhz;true;
+; memory ; type ;enum ;1; ;true;true;; ; ; MEM_DDR, MEM_DDR2, MEM_SDRAM, MEM_RDRAM, MEM_PS2
+; memory ; capacity ; number ;2; mb;true;true;
+; memory ; timing ; enum ;3;;true;
+; memory ; voltage ; number ;4; v;true;
+; memory ; manufacturerNr ; string;5;
+
+# boards;
+; boards ; socket ; string ;0; ;true;true;
+; boards ; processor ; string ;1; ;;;; true;
+; boards ; chipset ; string ;2;;true;true;
+; boards ; slots ; string ;3; ;
+; boards ; agpSupported ; string ;4;;true;
+; boards ; pciSupported ; string;5;;true;
+; boards ; maxMemory ; number ;6; gb;true;true
+; boards ; memoryType ; string;7;;true;
+; boards ; memorySlots ; number ;8;
+; boards ; ideType ; enum;9;;true;
+; boards ; ideSpec ; enum;10;
+; boards ; ideSpeed ; number ;11; gb/s;
+; boards ; sataType ; enum;12;;true;
+; boards ; sataSpec ; string;13;
+; boards ; sataSpeed ; number ;14; gb/s;
+; boards ; sataRaid ; string;15;
+; boards ; usbType ;string;16;;true;
+; boards ; usbPorts ; number;17;
+; boards ; i1394Ports ; number;18;
+; boards ; i1394Speed ; number ;19; mb/s;
+; boards ; gfxChip ; string;20;;true;
+; boards ; gfxMemory ; number ;21; mb;true;
+; boards ; sndChip ; string;22;
+; boards ; lanSpeed ; enum;23;
+
+# graphics;
+; graphics ; type ; string ;0;;true;true
+; graphics ; agpSupported ; string;1;;true;
+; graphics ; chip ; string;2;;true;true;
+; graphics ; memory ; number ;3; mb;true;true;
+; graphics ; ramdac ; string;4;
+; graphics ; resolutions ; string ;5; ;;;; true;
+; graphics ; drivers ; string;6;
+; graphics ; biosDate ; date;7;
+
+# photography;
+; photography ; type ; enum ;0; ;true;;; ; ; P_COMPACT, P_SLR
+; photography ; sensor ; string;1;;true;true;
+; photography ; resolutions; string ;2; ;;;; true;
+; photography ; zoomOpt ; number;3;;true;
+; photography ; zoomDgt ; number;4;
+; photography ; display ; string;5;;true;true;
+; photography ; focalDistance ; number ;6; mm;;;; true ; true
+; photography ; shutterSpeed ; number ;7; sec ;;;; true ; true
+; photography ; isoSpeed ; number ;8; ;true;;; true ; false
+; photography ; batchShot ; boolean;9;
+; photography ; whitebalance ; string;10;
+; photography ; colorDepth ; number ;11; bit;
+; photography ; video ; boolean;12;;true;
+; photography ; print ; boolean;13;;true;
+; photography ; microIncl ; boolean;14;
+; photography ; interfaceUSB ; string;15;;true;
+; photography ; interfaceI1394 ; boolean;16;;true;
+; photography ; pictBridge ; boolean;17;
+; photography ; slotSD_MMC ; boolean;18;
+; photography ; slotCF ; boolean;19;
+; photography ; slotXD ; boolean;20;
+; photography ; slotMemSt ; boolean;21;
+; photography ; docking ; string;22;;true
+; photography ; body ; string;23;
+
+# software;
+; software ; manufacturerURL ; string;0;
+
+UPDATE ClassAttributeAssignment; $class[unique=true]; $attribute[unique=true] ;attributeType(code[default=string]) ; localized
+; cpu ; clockSpeed ; number ; true
+
+UPDATE ClassAttributeAssignment; $class[unique=true]; $attribute[unique=true]; formatDefinition
+; photography ; shutterSpeed ; "#0.######"
+
+# -------------------------------------------;
+# --- assign products to classes;
+# -------------------------------------------;
+
+$catVer=catalogVersion(version[default='Online'],catalog(id[default='hwcatalog']));
+$clSysVer=catalogVersion(version[default='$systemVersion'],catalog(id[default='$systemName']));
+
+$YCL=system='$systemName',version='$systemVersion',translator=de.hybris.platform.catalog.jalo.classification.impex.ClassificationAttributeTranslator;
+
+# -------------------------------------;
+# hardware classified products;
+# 1. assign class to category HW1200(Fotografie) so that all ;
+#    contained products are automatically classified as such;
+UPDATE Category; $catVer[virtual=true,unique=true]; code[unique=true]; supercategories(code,$clSysVer)[mode=append];
+; HW1200 ; photography;
+; HW2100 ; cpu;
+; HW2200 ; boards;
+; HW2300 ; graphics;
+
+# 2. now add some classification attributes;
+# photography;
+UPDATE Product; code[unique=true]; @type[$YCL];@sensor[$YCL];@resolutions[$YCL];@zoomOpt[$YCL];@zoomDgt[$YCL];@display[$YCL];@focalDistance[$YCL];@shutterSpeed[$YCL,numberformat=#0.000000];@isoSpeed[$YCL];@batchShot[$YCL];@whitebalance[$YCL];@colorDepth[$YCL];@video[$YCL];@print[$YCL];@microIncl[$YCL];@interfaceUSB[$YCL];@interfaceI1394[$YCL];@pictBridge[$YCL];@slotSD_MMC[$YCL];@slotCF[$YCL];@slotXD[$YCL];@slotMemSt[$YCL];@docking[$YCL];@body[$YCL];@weight[$YCL];@dimensions[$YCL];@warranty[$YCL];@shipmentIncludes[$YCL]; $catVer[virtual=true,unique=true]
+
+# make sure that each product exists, otherwise skip line;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.catalog.jalo.CatalogManager cm = de.hybris.platform.catalog.jalo.CatalogManager.getInstance();
+if( cm.getCatalog(""hwcatalog"").getCatalogVersion(""Online"").getProduct(code) == null )
+{
+line.clear();
+System.out.println(""no product ""+code+"" available - skipped classification"" );
+}
+";
+
+# ;sample;(type) ; (sensor) ; (resolutions); (zoomOpt) ; (zoomDgt) ; (display) ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; 
+
+;HW1240-1732;P_COMPACT;6.2 Megapixel;2864 x 2160;3;3;"1.8""";              "39,117"; "0\,0005,16"; "100,200,400"; true; "auto, daylight, cloudy, tungsten, fluorescent, manual";        8;   true ; true; true;  true; false; true; true;  false;false; false; Inkl. Docking Station; silver; "200"; "100 x 35 x 60 mm";"1 Jahr Bring-In (Details siehe Hersteller-Web-Site)  <a href=""www.hp.com/de"">HP.de</a>"; Docking Station
+;HW1240-1733;P_COMPACT;5.1 Megapixel;2668 x 1970;5;8;"2.0""";              "36,180"; "0\,0005,15"; "50,100,200,400"; true; "auto, daylight, cloudy, tungsten, fluorescent, manual";        8;   true ; true; true;  true; false; true; true;  false;false; false; Inkl. Docking Station; silver; "170"; "91 x 30 x 57 mm";; 
+;HW1210-3411;P_COMPACT;5.0 Megapixel;2592 x 1944;3;4;"2.5""";              "35,105"; "0\,0006,15"; "50,100,200,400"; true; "auto, daylight, cloudy, tungsten, fluorescent, manual";        8;   true ; true; true;  true; false; true; true;  false;false; false; ; silver; "130"; "86 x 53 x 21 mm";"1 Year Bring-In (see manufacturer's website for details)  <a href=""http://www.canon.com/"">canon.com</a>"; 
+;HW1230-0200;P_COMPACT;7.2 Megapixel;2592 x 1944;3;6;"2.0""";              "38,114"; "0\,0005,30"; "100,200,400"; true; "auto, daylight, cloudy, tungsten, fluorescent, manual";        8;   true ; true; true;  true; false; true; true;  false;false; false; Inkl. Docking Station; silver; "180"; "104 x 51 x 28 mm";"2 Years Bring-In (see manufacturer's website for details) <a href=""www.sony.co.uk/"">sony.co.uk</a>"; 
+;HW1210-3412;P_COMPACT;7.1 Megapixel;3072 x 2304;3;4;"2.5""";              "37,111"; "0\,0005,15"; "50,100,200,400"; true; "auto, daylight, cloudy, tungsten, fluorescent, manual";        8;   true ; true; true;  true; false; true; true;  false;false; false; ; silver; "170"; "90 x 57 x 27 mm";"1 Year Bring-In (see manufacturer's website for details)  <a href=""http://www.canon.com/"">canon.com</a>"; 
+;HW1210-3422;P_COMPACT;5.0 Megapixel;2592 x 1944;0;6;"1.5""";              "39";     "0\,0006,15"; "50,100,200,400"; true; "auto, daylight, cloudy, tungsten, fluorescent, manual";        8;   true ; true; true;  true; false; true; true;  false;false; false; ; silver; "100"; "90 x 47 x 18 mm";"1 Year Bring-In (see manufacturer's website for details)  <a href=""http://www.canon.com/""canon.com</a>"; 
+;HW1220-0011;P_COMPACT;5.1 Megapixel;2560 x 1920;3;4;"2.0""";              "38,114"; "0\,0005,4"; "50,100,200,400"; true; "auto, daylight, cloudy, tungsten, fluorescent, manual";        8;   true ; true; true;  true; false; true; true;  false;false; false; Inkl. Docking Station; silver; "135"; "102 x 51 x 22 mm";"1 Year Bring-In (see manufacturer's website for details)"; 
+;HW1210-0400;P_SLR;   10.2 Megapixel;3888 x 2592;;;"2.5""";"27,88";  "0\,00025,30"; "100,200,400,800,1600,3200,6400"; true; "auto, daylight, cloudy, tungsten, fluorescent, flash, manual"; 12; false; true; false; true; false; true; false; true; false; false; ; black; "778"; "127 x 94 x 65 mm";"2 Years Bring-In (see manufacturer's website for details) <a href=""http://www.canon.com/"">canon.com</a>"; 
+;HW1230-0001;P_SLR;  12.24 Megapixel;4288 x 2865;;;"2.5""";"27,128"; "0\,000125,30";"100,200,400,800,1600"; true; "auto, daylight, cloudy, tungsten, fluorescent, flash, manual"; 12; false; true; false; true; false; true; false; true; false; false; ; black; "510"; "142 x 105 x 80 mm";"2 Years Bring-In (see manufacturer's website for details) <a href=""http://www.sony.com/"">sony.com</a>"; 
+
+# cpu/processors;
+
+UPDATE Product; code[unique=true]; @clockSpeed[$YCL,lang=de];@clockSpeed[$YCL,lang=en];@fsbSpeed[$YCL];@socket[$YCL];@core[$YCL];@cache[$YCL];@warranty[$YCL];@shipmentIncludes[$YCL];@weight[$YCL];@dimensions[$YCL];$catVer[virtual=true,unique=true]
+
+# make sure that each product exists, otherwise skip line;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.catalog.jalo.CatalogManager cm = de.hybris.platform.catalog.jalo.CatalogManager.getInstance();
+if( cm.getCatalog(""hwcatalog"").getCatalogVersion(""Online"").getProduct(code) == null )
+{
+line.clear();
+System.out.println(""no product ""+code+"" available - skipped classification"" );
+}
+";
+
+;HW2120-0341;2;2;1000;S_939;Venice (90nm, revised Winchester Core);512;3 Year Limited Warranty;;500;5 x 5 cm
+;HW2110-0012;2.53;2.53;533;S_478;Prescott;256;3 Year Limited Warranty;Boxed item incl. cooler;480;5.3 x 5.3 cm
+;HW2110-0029;3.4;3.4;800;S_478;Prescott;1024;5-Year Limited Warranty;Boxed item incl. cooler;500;5 x 5 cm
+;HW2110-0027;3.8;3.8;800;S_478;Prescott;2048;5-Year Limited Warranty;Boxed item incl. cooler;480;5 x 5 cm
+;HW2110-0019;3;3;800;S_754;Venice;1024;3-Year Limited Warranty;Boxed item incl. cooler;510;5.1 x 5.1 cm
+
+# mainboards;
+
+# 1st set of classification attributes
+
+UPDATE Product; code[unique=true]; @socket[$YCL];@processor[$YCL];@chipset[$YCL];@slots[$YCL];@agpSupported[$YCL];@pciSupported[$YCL];@maxMemory[$YCL];@memoryType[$YCL];@memorySlots[$YCL];$catVer[virtual=true,unique=true]
+
+# make sure that each product exists, otherwise skip line;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.catalog.jalo.CatalogManager cm = de.hybris.platform.catalog.jalo.CatalogManager.getInstance();
+if( cm.getCatalog(""hwcatalog"").getCatalogVersion(""Online"").getProduct(code) == null )
+{
+line.clear();
+System.out.println(""no product ""+code+"" available - skipped classification"" );
+}
+";
+
+;HW2200-0561;S_370; "Intel CeleronD Prozessor 325,Intel PentiumD Prozessor 830" ; Intel 865PE chipset        ; "1x PCI Express x16, 2x PCI Express x1, 4x PCI"                       ; "AGP 8x/4x";"PCI Express x16" ; 4 ; "DDR 400/333/266" ; 2
+;HW2200-0623;S_478; "Intel PentiumD Prozessor 830,Intel Pentium4 Prozessor 670" ; Intel 945G Express chipset ; "1x PCI Express x16, 1x PCI Express x1, 2x PCI, 4x SATA (3.0 GBit/s)" ; "AGP 8x/4x";"PCI Express x1"  ; 2 ; "DDR 333/266"     ; 2
+;HW2200-0812;S_754; "Intel Pentium4 Prozessor 551,Intel Pentium4 Prozessor 670" ; Intel 865PE chipset        ; "1x PCI Express x16, 2x PCI Express x1, 4x PCI"                       ; "AGP 4x";"PCI Express x16"    ; 4 ; "DDR2 667/533"    ; 3
+;HW2200-0521;S_478; "Intel Pentium4 Prozessor 670,Intel CeleronD Prozessor 325" ; Intel 945G Express chipset ; "1x PCI Express x16, 1x PCI Express x1, 2x PCI, 4x SATA (3.0 GBit/s)" ; "AGP 4x";"PCI Express x1"     ; 4 ; "DDR 400/333/266" ; 4
+;HW2200-0878;S_754; "AMD Athlon 64"                                             ; Intel 945G Express Chipset ; "1x PCI Express x16, 1x PCI Express x1, 2x PCI, 4x SATA (3.0 GBit/s)" ; "AGP 8x/4x";"PCI Express x16" ; 4 ; "DDR2 667/533"    ; 4
+
+# 2nd set of classification attributes
+
+UPDATE Product; code[unique=true];@ideType[$YCL];@ideSpec[$YCL];@ideSpeed[$YCL];@sataType[$YCL];@sataSpec[$YCL];@sataSpeed[$YCL];@sataRaid[$YCL];@usbType[$YCL];@usbPorts[$YCL];@i1394Ports[$YCL];@i1394Speed[$YCL];$catVer[virtual=true,unique=true]
+
+# make sure that each product exists, otherwise skip line;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.catalog.jalo.CatalogManager cm = de.hybris.platform.catalog.jalo.CatalogManager.getInstance();
+if( cm.getCatalog(""hwcatalog"").getCatalogVersion(""Online"").getProduct(code) == null )
+{
+line.clear();
+System.out.println(""no product ""+code+"" available - skipped classification"" );
+}
+";
+
+;HW2200-0561; IDE      ; UDMA133  ; 1        ;    ;     ;  ;  ; USB 2.0 ; 4 ; 0 ; 
+;HW2200-0623; IDE      ; UDMA133  ; 1        ;    ;     ;  ;  ; USB 2.0 ; 4 ; 2 ; 400
+;HW2200-0812;  ;  ;  ; Serial_ATA ; SATA150     ; 1,5      ; 1        ; USB 2.0 ; 6 ; 1 ; 400
+;HW2200-0521;  ;  ;  ; Serial_ATA ; SATA300/150 ; 3        ; 1        ; USB 2.0 ; 6 ; 0 ; 
+;HW2200-0878;  ;  ;  ; Serial_ATA ; SATA300/150 ; 3        ; 5        ; USB 2.0 ; 4 ; 2 ; 800
+
+# 3rd set of classification attributes
+
+UPDATE Product; code[unique=true];@gfxChip[$YCL];@gfxMemory[$YCL];@sndChip[$YCL];@lanSpeed[$YCL];@weight[$YCL];@dimensions[$YCL];@warranty[$YCL];@shipmentIncludes[$YCL];$catVer[virtual=true,unique=true]
+
+# make sure that each product exists, otherwise skip line;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.catalog.jalo.CatalogManager cm = de.hybris.platform.catalog.jalo.CatalogManager.getInstance();
+if( cm.getCatalog(""hwcatalog"").getCatalogVersion(""Online"").getProduct(code) == null )
+{
+line.clear();
+System.out.println(""no product ""+code+"" available - skipped classification"" );
+}
+";
+
+;HW2200-0561; Integrated Intel Graphics Media Accelerator 950 ; 64       ; 8-channel sound on board ; L100 ; 320 ; 305 × 244 mm ; 1 Year Bring-In ; 2x IDE Cable
+;HW2200-0623;                                         ;  ; 6-channel sound on board ; L10  ; 340 ; 305 × 244 mm ; 3 Year Bring-In ; 
+;HW2200-0812; Integrated Intel Graphics Media Accelerator 950 ; 64       ; 8-channel sound on board ; L1G  ; 380 ; 305 × 244 mm ; 3 Year Bring-In ; 1x IDE Cable
+;HW2200-0521;                                         ;  ; 8-channel sound on board ; L1G  ; 320 ; 305 × 244 mm ; 1 Year Bring-In ; 
+;HW2200-0878; Integrated Intel Graphics Media Accelerator 950 ; 128      ; 6-channel sound on board ; L1G  ; 380 ; 305 × 244 mm ; 1 Year Bring-In ; 2x IDE Cable
+
+
+
+# graphic cards
+
+# 1st set of classification attributes
+
+UPDATE Product; code[unique=true];@type[$YCL];@agpSupported[$YCL];@chip[$YCL];@memory[$YCL];@ramdac[$YCL];@resolutions[$YCL];$catVer[virtual=true,unique=true]
+
+# make sure that each product exists, otherwise skip line;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.catalog.jalo.CatalogManager cm = de.hybris.platform.catalog.jalo.CatalogManager.getInstance();
+if( cm.getCatalog(""hwcatalog"").getCatalogVersion(""Online"").getProduct(code) == null )
+{
+line.clear();
+System.out.println(""no product ""+code+"" available - skipped classification"" );
+}
+";
+
+;HW2300-2356; PCI Express ;   ; GeForce 6600GT  ; 128 ; 400 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024"
+;HW2300-3843; PCI Express ;   ; GeForce MX 4000 ; 128 ; 200 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200"
+;HW2300-4121; PCI Express ;   ; GeForce MX 4000 ;  64 ; 200 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200,2048x1536"
+;HW2310-1001; AGP         ; AGP 8x/4x ; GeForce MX 4000 ; 256 ; 400 MHz RAMDAC      ; "640x480,800x600,1024x768,1152x864,1280x1024"
+;HW2310-1002; AGP         ; AGP 8x/4x ; GeForce 6600GT  ; 256 ; 600 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200"
+;HW2310-1003; PCI Express ;   ; GeForce 6600GT  ; 512 ; 600 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200"
+;HW2310-1004; PCI Express ;   ; GeForce 6600GT  ; 512 ; 600 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200,2048x1536"
+;HW2310-1005; AGP         ; AGP 4x    ; GeForce 6600GT  ; 128 ; 400 MHz RAMDAC      ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200,2048x1536"
+;HW2310-1006; AGP         ; AGP 4x    ; GeForce MX 4000 ; 128 ; 200 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024"
+;HW2310-1007; PCI Express ;   ; GeForce MX 4000 ; 256 ; 400 MHz RAMDAC      ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200,2048x1536"
+;HW2320-1008; PCI Express ;   ; Radeon X800     ;  64 ; 600 MHz RAMDAC      ; "640x480,800x600,1024x768,1152x864,1280x1024"
+;HW2320-1009; AGP         ; AGP 8x/4x ; Radeon X1800    ; 512 ; 400 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050"
+;HW2320-1010; AGP         ; AGP 8x/4x ; Radeon X1800    ; 256 ; 200 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050"
+;HW2320-1011; AGP         ; AGP 4x    ; Radeon 9600XT   ; 128 ; 400 MHz dual RAMDAC ; "640x480,800x600,1024x768,1152x864,1280x1024,1400x1050,1600x1200"
+
+# 2nd set of classification attributes
+
+UPDATE Product; code[unique=true];@drivers[$YCL];@biosDate[$YCL,dateformat=dd.MM.yyyy];@weight[$YCL];@dimensions[$YCL];@warranty[$YCL];@shipmentIncludes[$YCL];$catVer[virtual=true,unique=true]
+
+# make sure that each product exists, otherwise skip line;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.catalog.jalo.CatalogManager cm = de.hybris.platform.catalog.jalo.CatalogManager.getInstance();
+if( cm.getCatalog(""hwcatalog"").getCatalogVersion(""Online"").getProduct(code) == null )
+{
+line.clear();
+System.out.println(""no product ""+code+"" available - skipped classification"" );
+}
+";
+
+;HW2300-2356; "Windows 2000/XP, Windows Vista"                ; 10.10.2007; 230 ; 170 x 75 mm ; 1 Year Bring-In ; "S-Video cable, DVI Cable"
+;HW2300-3843; "Windows 98/ME, Windows 2000/XP"                ; 13.01.2008; 300 ; 180 x 80 mm ; 3 Year Bring-In ; "CD-ROM, DVI-to-VGA adapter, S-Video cable, DVI Cable"
+;HW2300-4121; "Windows 98/ME, Windows 2000/XP"                ; 31.12.2007; 300 ; 180 x 80 mm ; 3 Year Bring-In ; "CD-ROM, S-Video cable, VGA Cable"
+;HW2310-1001; "Windows 98/ME, Windows 2000/XP, Windows Vista" ; 22.03.2008; 320 ; 180 x 80 mm ; 3 Year Bring-In ; "CD-ROM, DVI-to-VGA adapter, S-Video cable, DVI Cable"
+;HW2310-1002; "Windows 98/ME, Windows 2000/XP"                ; 26.09.2007; 230 ; 170 x 85 mm ; 1 Year Bring-In ; "CD-ROM, DVI-to-VGA adapter, S-Video cable, DVI Cable"
+;HW2310-1003; "Windows 2000/XP, Windows Vista"                ; 31.12.2007; 230 ; 170 x 75 mm ; 1 Year Bring-In ; "CD-ROM, S-Video cable, VGA Cable"
+;HW2310-1004; "Windows 98/ME, Windows 2000/XP, Windows Vista" ; 13.01.2008; 320 ; 180 x 80 mm ; 3 Year Bring-In ; "S-Video cable, DVI Cable"
+;HW2310-1005; "Windows 98/ME, Windows 2000/XP, Windows Vista" ; 26.09.2007; 320 ; 185 x 85 mm ; 1 Year Bring-In ; "CD-ROM, DVI-to-VGA adapter, S-Video cable, DVI Cable"
+;HW2310-1006; "Windows 2000/XP, Windows Vista"                ; 31.12.2007; 300 ; 185 x 75 mm ; 3 Year Bring-In ; "CD-ROM, DVI-to-VGA adapter, S-Video cable, DVI Cable"
+;HW2310-1007; "Windows 98/ME, Windows 2000/XP"                ; 26.09.2007; 300 ; 175 x 75 mm ; 1 Year Bring-In ; "CD-ROM, S-Video cable, VGA Cable"
+;HW2320-1008; "Windows 98/ME, Windows 2000/XP, Windows Vista" ; 31.12.2007; 280 ; 170 x 85 mm ; 3 Year Bring-In ; "CD-ROM, DVI-to-VGA adapter, S-Video cable, DVI Cable"
+;HW2320-1009; "Windows 2000/XP, Windows Vista"                ; 26.09.2007; 230 ; 185 x 80 mm ; 1 Year Bring-In ; "CD-ROM, DVI-to-VGA adapter, S-Video cable, DVI Cable"
+;HW2320-1010; "Windows 2000/XP, Windows Vista"                ; 10.10.2007; 300 ; 170 x 80 mm ; 1 Year Bring-In ; "S-Video cable, DVI Cable"
+;HW2320-1011; "Windows 98/ME, Windows 2000/XP, Windows Vista" ; 13.01.2008; 280 ; 175 x 80 mm ; 3 Year Bring-In ; "S-Video cable, DVI Cable"
+
+# -------------------------------------------;
+# only usable with printdemo extension ;
+# -------------------------------------------;
+#;HW1251-1000;P_COMPACT ;5.0 Megapixel; ; ; ; ;35, 70; ; ; ; ; ; ; ; ; ; ; ; ; ; ;true; ; ; ;0.136;Breite: 112mm\, Höhe: 50mm\, Tiefe: 38mm; ; 
+#;HW1251-0001;P_SLR;5.5 Megapixel;2.560 x 1.920,1.600 x 1.200,1.280 x 960,1.024 x 768,640 x 480;;;"1.8"""; ; ;60, 4000E-1;  ; ; ; ; ; ; ;USB 2.0;true; ; ;true; ; ; ; ;0.660;Breite: 141 mm x Höhe: 104 mm x Tiefe: 81 mm; ; 
+# -------------------------------------------;
+# test test test;
+#;HW1251-1xyz;P_COMPACT ;5.0 Megapixel; ; ; ; ;35, 70; ; ; ; ; ; ; ; ; ; ; ; ; ; ;true; ; ; ;0.136;Breite: 112mm\, Höhe: 50mm\, Tiefe: 38mm; ;
+
+#% beforeEach:end;

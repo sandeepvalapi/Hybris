@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<impex>
+	<formats>
+		<header code="XYZ" type="Product">
+			<attributes>
+				<attribute type="Product" qualifier="code"/>
+				<attribute type="Product" qualifier="catalogVersion">
+					<translation>
+						<attribute type="CatalogVersion" qualifier="version">
+							<params>
+								<param name="default">staged</param>
+							</params>
+						</attribute>
+						<attribute type="CatalogVersion" qualifier="catalog">
+							<translation>
+								<attribute type="Catalog" qualifier="id">
+									<params>
+										<param name="default">Clothes</param>
+									</params>
+								</attribute>
+							</translation>
+						</attribute>
+					</translation>
+				</attribute>
+				<attribute qualifier="supercategories">
+					<translation>
+						<attribute qualifier="code"/>
+						<attribute qualifier="catalogVersion">
+							<translation>
+								<attribute qualifier="version">
+									<params>
+										<param name="default">staged</param>
+									</params>
+								</attribute>
+								<attribute qualifier="catalog">
+									<translation>
+										<attribute qualifier="id">
+											<params>
+												<param name="default">Clothes</param>
+											</params>
+										</attribute>
+									</translation>
+								</attribute>
+							</translation>
+						</attribute>
+					</translation>
+				</attribute>
+			</attributes>
+			<params>
+				<param name="juhu">trallala</param>
+			</params>
+			<constraints>
+				<unique-key>
+					<attribute qualifier="code"/>
+					<attribute qualifier="catalogVersion"/>
+				</unique-key>
+			</constraints>
+		</header>
+	</formats>
+	
+	<items>
+		<item format="XYZ" mode="INSERT_UPDATE" type="MyProduct">
+			<attribute qualifier="code"> 
+				test 
+			</attribute>
+			<attribute qualifier="name" language="de">
+				name_de
+			</attribute>
+			<attribute qualifier="name" language="en">
+				name_en
+			</attribute>
+			<attribute qualifier="supercategories">
+				<collection type="list">
+					<value>hw4711:staged:online</value>
+					<value>hw4712:staged:online</value>
+					<value>hw4713:staged:online</value>
+					<value>hw4715:staged:online</value>
+				</collection>
+			</attribute>
+		</item>
+
+		<xyz mode="INSERT_UPDATE" type="MyProduct">
+			<code> test </code>
+			<name language="de"> name_de </name>
+			<name language="en"> name_en </name>
+			<supercategories>
+				<collection type="list">
+					<value>hw4711:staged:online</value>
+					<value>hw4712:staged:online</value>
+					<value>hw4713:staged:online</value>
+					<value>hw4715:staged:online</value>
+				</collection>
+			</supercategories>
+			<daterange>
+				<start>...</start>
+				<end>...</end>
+			</daterange>
+		</xyz>
+
+		<order mode="INSERT_UPDATE" >
+			<code> test </code>
+			<entries>
+				<collection type="sorted_list">
+					<value>
+						<orderentry mode="insert_update">
+							<positionnumber> 12</position_number>
+						</orderentry>
+					</value>
+					<value>
+						<orderentry mode="insert_update">
+							<positionnumber> 12</position_number>
+						</orderentry>
+					</value>
+					<value>
+						<orderentry mode="insert_update">
+							<positionnumber> 12</position_number>
+						</orderentry>
+					</value>
+					<value>
+						<orderentry mode="insert_update">
+							<positionnumber> 12</position_number>
+						</orderentry>
+					</value>
+					<value>
+						<orderentry mode="insert_update">
+							<positionnumber> 12</position_number>
+						</orderentry>
+					</value>
+				</collection>
+			</entries>
+		</order>
+	</items>
+	
+</impex>

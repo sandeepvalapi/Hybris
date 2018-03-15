@@ -1,0 +1,3 @@
+INSERT_UPDATE Media; code[unique=true]; @media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+#; impex; http://www.heise.de/icons/ho/heise.gif
+#;impex2; file:c:\Windows\Rhododendron.bmp

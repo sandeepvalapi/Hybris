@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           ">
+<!--
+   <context:component-scan base-package="de.hybris.platform.regioncache" />
+-->
+
+   <bean name="EHCacheRegion1" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="DefaultRegion" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes">
+			<array>
+				<value>__ALL_TYPES__</value>
+				<value>__NO_QUERY__</value>
+			</array>
+		</property>
+   </bean>
+   
+   <bean name="EHCacheRegion2" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="SearchRegion1" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes">
+			<array>
+				<value>__QUERY_CACHE__</value>
+			</array>
+		</property>
+   </bean>
+   
+   <bean name="EHCacheRegion3" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="SearchRegion2" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes">
+			<array>
+				<value>__QUERY_CACHE__</value>
+			</array>
+		</property>
+   </bean>
+
+	<bean name="CacheRegionResolver" class="de.hybris.platform.regioncache.region.HintedCacheRegionResolver" scope="singleton">
+		<constructor-arg name="cacheRegionProvider" ref="cacheRegionProvider"/>
+	</bean>
+   
+    <bean name="CacheController" class="de.hybris.platform.regioncache.DefaultCacheController" >
+	</bean>
+	
+	<bean name="cacheConfiguration" class="de.hybris.platform.regioncache.DefaultCacheConfiguration" >
+		<constructor-arg name="regions">
+			<ref bean="testRegionsList"/>
+		</constructor-arg>
+		
+		<constructor-arg name="invalidationFilters">
+			<null/>
+		</constructor-arg>
+		
+		<constructor-arg name="resolvers">
+			<list>
+				<ref bean="CacheRegionResolver"/>	
+			</list>
+		</constructor-arg>		
+	</bean>
+	
+	<bean id="testRegionsList" class="java.util.ArrayList">
+	    <constructor-arg>
+			<list>
+				<ref bean="EHCacheRegion1"/>
+				<ref bean="EHCacheRegion2"/>
+				<ref bean="EHCacheRegion3"/>	
+			</list>
+	    </constructor-arg>
+	</bean>	
+	
+	<bean name="cacheRegionProvider" class="de.hybris.platform.regioncache.region.impl.DefaultCacheRegionProvider" >
+		<constructor-arg name="cacheRegions" ref="testRegionsList" />
+	</bean>	
+	
+</beans>           

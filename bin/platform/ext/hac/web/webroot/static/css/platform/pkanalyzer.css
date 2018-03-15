@@ -1,0 +1,7 @@
+button {
+	float: none;
+}
+
+#binaryRepresentationPane {
+	overflow: auto;
+}

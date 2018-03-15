@@ -1,0 +1,10 @@
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;employeegroup;;;;;;;;
+;;;;C2LItem;+;-;-;-;-
+;;;;Employee;+;+;-;-;-
+;;;;EnumerationValue;+;-;-;-;-
+;;;;Item;-;-;-;-;-
+;;;;LuceneIndex;+;-;-;-;-
+;;;;RemoveItemsCronJob;+;+;+;-;-
+;;;;RemoveItemsJob;+;-;-;-;-
+;;;;RemoveItemsWizard;+;+;+;-;-

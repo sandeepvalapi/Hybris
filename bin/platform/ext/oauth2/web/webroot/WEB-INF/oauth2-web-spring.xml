@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	   xmlns:sec="http://www.springframework.org/schema/security"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	          http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+       http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="de.hybris.platform.oauth2" />
+	<mvc:default-servlet-handler />
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="false">
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter" p:writeAcceptCharset="false" />
+			<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+			<bean class="org.springframework.security.oauth2.http.converter.jaxb.JaxbOAuth2AccessTokenMessageConverter" />
+			<bean class="org.springframework.security.oauth2.http.converter.jaxb.JaxbOAuth2ExceptionMessageConverter" />
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	<oauth:authorization-server client-details-service-ref="oauthClientDetails"
+								token-services-ref="oauthTokenServices" token-endpoint-url="/oauth/token"
+								authorization-endpoint-url="/oauth/authorize"
+								user-approval-page="forward:/oauth/confirm_access">
+		<oauth:authorization-code authorization-code-services-ref="oauthAuthorizationCode" />
+		<oauth:implicit />
+		<oauth:refresh-token />
+		<oauth:client-credentials />
+		<oauth:password />
+	</oauth:authorization-server>
+	
+	<oauth:resource-server 	id="resourceServerFilter"
+							token-services-ref="oauthTokenServices"
+							entry-point-ref="oauthAuthenticationEntryPoint" />
+
+
+	<alias name="defaultOauthAuthenticationEntryPoint" alias="oauthAuthenticationEntryPoint" />
+	<bean id="defaultOauthAuthenticationEntryPoint"
+		  class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint"
+		  p:realmName="hybris" p:typeName="Bearer" p:exceptionRenderer-ref="oauth2ExceptionRender" />
+
+	<alias name="defaultClientAuthenticationManager" alias="clientAuthenticationManager" />
+	<sec:authentication-manager id="defaultClientAuthenticationManager">
+		<sec:authentication-provider user-service-ref="oauthClientDetailsUserService">
+			<sec:password-encoder ref="clientSecretEncoder" />
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+
+	<authentication-manager id="authenticationManager" xmlns="http://www.springframework.org/schema/security">
+		<authentication-provider ref="wsAuthenticationProvider" />
+	</authentication-manager>
+
+	<bean id="clientCredentialsTokenEndpointFilter"
+		  class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter"
+		  p:authenticationManager-ref="clientAuthenticationManager"
+		  p:authenticationEntryPoint-ref="oauthAuthenticationEntryPoint" p:filterProcessesUrl="/oauth/token" />
+	<bean id="fixation"
+		  class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy" />
+
+	<sec:http pattern="/oauth/token" create-session="stateless" entry-point-ref="oauthAuthenticationEntryPoint"
+			  authentication-manager-ref="clientAuthenticationManager" use-expressions="false">
+		<sec:csrf disabled="true"/>
+		<sec:intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" requires-channel="${webservicescommons.required.channel:https}"/>
+		<sec:anonymous enabled="false" />
+		<sec:port-mappings>
+			<sec:port-mapping http="#{configurationService.configuration.getInt('tomcat.http.port',9091)}"
+							  https="#{configurationService.configuration.getInt('tomcat.ssl.port',9092)}" />
+			<sec:port-mapping http="#{configurationService.configuration.getInt('embeddedserver.http.port',9091)}"
+							  https="#{configurationService.configuration.getInt('embeddedserver.ssl.port',9092)}" />
+		</sec:port-mappings>
+		<sec:http-basic entry-point-ref="oauthAuthenticationEntryPoint" />
+		<sec:custom-filter ref="clientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER" />
+		<sec:access-denied-handler ref="oauthAccessDeniedHandler" />
+		<sec:headers>
+			<sec:frame-options disabled="true"/>
+		</sec:headers>
+	</sec:http>
+
+	<bean id="whoAmIaccessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased"
+		xmlns="http://www.springframework.org/schema/beans">
+		<constructor-arg>
+			<list>
+				<bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter" />
+				<bean class="org.springframework.security.access.vote.RoleVoter" />
+				<bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<sec:http pattern="/oauth/whoami" create-session="never"
+		entry-point-ref="oauthAuthenticationEntryPoint"
+		access-decision-manager-ref="whoAmIaccessDecisionManager" use-expressions="false">
+		<sec:anonymous enabled="false" />
+		<sec:intercept-url pattern="/oauth/whoami" access="IS_AUTHENTICATED_FULLY"
+			method="GET" requires-channel="${webservicescommons.required.channel:https}" />
+		<sec:custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+		<sec:access-denied-handler ref="oauthAccessDeniedHandler" />
+	</sec:http>
+
+	<sec:http disable-url-rewriting="true" use-expressions="false">
+		<sec:csrf disabled="true"/>
+		<sec:access-denied-handler error-page="/login.jsp?authorization_error=true"/>
+		<sec:intercept-url pattern="/oauth/**" access="IS_AUTHENTICATED_FULLY"
+						   requires-channel="${webservicescommons.required.channel:https}" />
+		<sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<sec:port-mappings>
+			<sec:port-mapping http="#{configurationService.configuration.getInt('tomcat.http.port',9091)}"
+							  https="#{configurationService.configuration.getInt('tomcat.ssl.port',9092)}" />
+			<sec:port-mapping http="#{configurationService.configuration.getInt('embeddedserver.http.port',9091)}"
+							  https="#{configurationService.configuration.getInt('embeddedserver.ssl.port',9092)}" />
+		</sec:port-mappings>
+		<sec:form-login authentication-failure-url="/login.jsp?authentication_error=true" default-target-url="/index.jsp"
+						login-page="/login.jsp" login-processing-url="/login.do" />
+		<sec:logout logout-success-url="/index.jsp" logout-url="/logout.do" />
+		<sec:anonymous />
+		<sec:session-management session-authentication-strategy-ref="fixation" />
+		<sec:headers>
+			<sec:frame-options disabled="true"/>
+		</sec:headers>
+	</sec:http>
+
+	<bean id="oauth2SecurityFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="corsFilter" />
+				<ref bean="log4jFilter" />
+				<bean class="de.hybris.platform.oauth2.filter.SessionInvalidateFilter">
+					<constructor-arg>
+						<set>
+							<value>.*/oauth/token</value>
+						</set>
+					</constructor-arg>
+				</bean>
+				<ref bean="tenantActivationFilter" />
+				<ref bean="sessionFilter" />
+				<ref bean="springSecurityFilterChain" />
+			</list>
+		</constructor-arg>
+	</bean>
+	<bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans>

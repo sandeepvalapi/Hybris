@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias alias="categoryService" name="defaultCategoryService" />
+	<bean id="defaultCategoryService" class="de.hybris.platform.category.impl.DefaultCategoryService" parent="abstractBusinessService">
+		<property name="categoryDao" ref="categoryDao" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="categoryPrincipalStrategy" ref="categoryPrincipalStrategy" />
+	</bean>
+
+	<bean id="categoryDao" class="de.hybris.platform.category.daos.impl.DefaultCategoryDao" parent="abstractItemDao" />
+
+	<alias alias="categoryPrincipalStrategy" name="defaultCategoryPrincipalStrategy" />
+	<bean id="defaultCategoryPrincipalStrategy" class="de.hybris.platform.category.strategies.impl.DefaultCategoryPrincipalStrategy" />
+
+	<!-- Interceptors -->
+	<bean id="categoryRemovalValidator" class="de.hybris.platform.category.interceptors.CategoryRemovalValidator">
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+
+	<bean id="categoryRemovalValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="categoryRemovalValidator" />
+		<property name="typeCode" value="Category" />
+	</bean>
+
+	<bean id="categoryPrepareInterceptor" class="de.hybris.platform.category.interceptors.CategoryPrepareInterceptor">
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+
+	<bean id="categoryPrepareinterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="categoryPrepareInterceptor" />
+		<property name="typeCode" value="Category" />
+	</bean>
+
+	<!-- Dynamic attributes for CategoryModel -->
+	<bean id="categoryAllSubcategories" class="de.hybris.platform.category.attribute.CategoryAllSubcategories">
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+
+	<bean id="categoryAllSupercategories" class="de.hybris.platform.category.attribute.CategoryAllSupercategories">
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+
+</beans>

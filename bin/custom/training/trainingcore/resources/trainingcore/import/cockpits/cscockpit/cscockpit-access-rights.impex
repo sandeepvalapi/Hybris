@@ -1,0 +1,140 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import Access Rights for CS Cockpit
+# 
+$START_USERRIGHTS
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+
+
+##
+## customerservicegroup access rights
+##
+UserGroup;customerservicegroup;employeegroup;;;;;;;
+# Corrections for other groups;;;;;;;;;
+
+#;;;;RelationAttributeDescriptor;+;-;-;-;-
+#;;;;ComposedType.code;+;-;-;-;-
+#;;;;ComposedType.name;+;-;-;-;-
+#;;;;AttributeDescriptor.qualifier;+;-;-;-;-
+#;;;;AttributeDescriptor.name;+;-;-;-;-
+;;;;Website;-;-;-;-;-
+;;;;AbstractCMSItem;-;-;-;-;-
+
+# Access Rights for Voucher Extension;;;;;;;;
+;;;;DateRestriction;+;+;+;+
+;;;;NewCustomerRestriction;+;+;+;+
+;;;;OrderRestriction;+;+;+;+
+;;;;ProductCategoryRestriction;+;+;+;+
+;;;;ProductQuantityRestriction;+;+;+;+
+;;;;ProductRestriction;+;+;+;+
+;;;;PromotionVoucher;+;+;+;+
+;;;;RegularCustomerOrderQuantityRestriction ;+;+;+;+
+;;;;RegularCustomerOrderTotalRestriction;+;+;+;+
+;;;;Restriction;+;+;+;+
+;;;;RestrictionCollection;+;+;+;+
+;;;;SerialVoucher;+;+;+;+
+;;;;UserRestriction;+;+;+;+
+;;;;Voucher;+;+;+;+
+;;;;VoucherCollection;+;+;+;+
+;;;;VoucherInvalidation;+;+;+;+
+
+# Access Rights for DeliveryModes;;;;;;;;
+;;;;ZoneDeliveryModeValue;+;;;
+;;;;DeliveryMode;+;;;
+
+# Access Rights for Products & Catalog;;;;;;;;
+;;;;Category;+;;;
+;;;;Media;+;;;
+;;;;MediaContainer;+;;;
+;;;;MediaContext;+;;;
+;;;;MediaFormat;+;;;
+;;;;MediaFormatMapping;+;;;
+;;;;PriceRow;+;;;
+;;;;Product;+;;;
+;;;;ProductDiscountGroup;+;;;
+;;;;ProductTaxGroup;+;;;
+;;;;Unit;+;;;
+;;;;Tax;+;;;
+;;;;variantType;+;;;
+;;;;Keyword;+;;;
+;;;;AbstractDiscountRow;+;;;
+;;;;ProductFeature;+;;;
+;;;;Catalog;+;;;
+;;;;CatalogVersion;+;;;
+;;;;ProductReference;+;;;
+
+# Access Rights for Customers & Orders;;;;;;;;;;
+;;;;AbstractOrder;+;+;+;+
+;;;;AbstractOrderEntry;+;+;+;+
+;;;;AbstractOrderProcessingStep;+;+;;
+;;;;OrderProcessingContainer;+;+;;
+;;;;OrderProcessingBatchJob;+;+;;
+;;;;UserDiscountGroup;+;;;
+;;;;UserPriceGroup;+;;;
+;;;;UserTaxGroup;+;;;
+;;;;Customer;+;+;+;+
+;;;;Address;+;+;+;+
+;;;;PaymentMode;+;;;
+;;;;PaymentInfo;+;+;+;+
+;;;;Format;+;;;
+;;;;Agreement;+;+;+;+
+;;;;Title;+;;;
+;;;;Company;+;+;+;+
+;;;;UserGroup;+;;;
+;;;;Principal.writableCatalogVersions;-;-;;
+;;;;Principal.allWriteableCatalogVersions;-;;;
+;;;;Discount;+;;;
+
+
+
+##
+## csagentgroup access rights
+##
+CsAgentGroup;csagentgroup;;;;;;;;
+;;;;Consignment;+;+;+;+
+;;;;ConsignmentEntry;+;+;+;+
+;;;;OrderModificationRecord;+;+;+;+
+;;;;OrderEntryModificationRecordEntry;+;+;+;+
+;;;;OrderCancelRecordEntry;+;+;+;+
+;;;;OrderEntryCancelRecordEntry;+;+;+;+
+;;;;OrderHistoryEntry;+;+;+;+
+;;;;ReturnRequest;+;+;+;+
+;;;;ReturnEntry;+;+;+;+
+;;;;RefundEntry;+;+;+;+
+;;;;ReplacementEntry;+;+;+;+
+;;;;AbstractPromotion;+;;;
+;;;;PromotionResult;+;;;
+;;;;PromotionOrderEntryConsumed;+;;;
+;;;;PaymentTransaction;+;;;
+;;;;PaymentTransactionEntry;+;;;
+;;;;Principal;+;+;;
+;;;;User;+;+;;
+;;;;Customer;+;+;+;
+;;;;Title;+;+;+;
+;;;;Country;+;+;+;
+;;;;ComposedType;+;;;
+
+;;;;CsTicketPriority;+;;;
+;;;;CsTicketCategory;+;;;
+;;;;CsTicketState;+;;;
+;;;;CsInterventionType;+;;;
+;;;;CsEventReason;+;;;
+;;;;CsResolutionType;+;;;
+;;;;CsEmailRecipients;+;;;
+;;;;CsAgentGroup;+;;;
+
+;;;;CsTicket;+;+;+;
+;;;;CsTicketEvent;+;;+;
+
+;;;;BaseStore;+;;;
+
+$END_USERRIGHTS

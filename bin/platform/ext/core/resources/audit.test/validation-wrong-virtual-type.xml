@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<audit-report-config name="PRODUCT">
+    <given-root-type>User</given-root-type>
+    <types>
+        <type code="User" displayName="User">
+            <atomic-attributes>
+				<atomic-attribute qualifier="uid"/>
+				<atomic-attribute qualifier="name"/>
+				<atomic-attribute qualifier="description"/>
+            </atomic-attributes>
+			<virtual-attributes>
+				<virtual-attribute expression="owner" type="AddressFail" many="true" displayName="owned addresses"/>
+			</virtual-attributes>
+        </type>
+		<type code="AddressFail">
+			<atomic-attributes>
+				<atomic-attribute qualifier="streetname" displayName="street"/>
+				<atomic-attribute qualifier="appartment" displayName="appartment"/>
+			</atomic-attributes>
+		</type>
+    </types>
+</audit-report-config>

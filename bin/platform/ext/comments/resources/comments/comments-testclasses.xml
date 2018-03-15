@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testclasses><comments><testclass>de.hybris.platform.comments.daos.CommentDaoTest</testclass><testclass>de.hybris.platform.comments.ProvePRI1838Test</testclass><testclass>de.hybris.platform.comments.jalo.CommentsTest</testclass><testclass>de.hybris.platform.comments.CommentServiceTest</testclass></comments></testclasses>

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+    <bean id="localizedConstraintsRegistry" class="de.hybris.platform.validation.localized.LocalizedConstraintsRegistry">
+        <property name="constraintService" ref="constraintService"/>
+		<property name="constraintValidator" ref="constraintModelValidator"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+    </bean>
+
+	<!-- service and its dependencies -->
+	<alias name="defaultValidationService" alias="validationService"/>
+	<bean name="defaultValidationService" class="de.hybris.platform.validation.services.impl.DefaultValidationService" parent="abstractBusinessService">
+		<property name="constraintsExtractor" ref="constraintsExtractor"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="constraintDao" ref="constraintDao" />
+        <property name="localizedConstraintsRegistry" ref="localizedConstraintsRegistry"/>
+        <property name="violationFactory" ref="constraintViolationFactory"/>
+	</bean>
+
+	<alias name="defaultConstraintService" alias="constraintService"/>
+	<bean name="defaultConstraintService" class="de.hybris.platform.validation.services.impl.DefaultConstraintService">
+		<property name="constraintDao" ref="constraintDao" />
+	</bean>
+
+	<bean id="constraintDao" class="de.hybris.platform.validation.daos.impl.DefaultConstraintDao" parent="abstractItemDao"/>
+
+    <bean name="constraintViolationFactory" class="de.hybris.platform.validation.services.impl.DefaultConstraintViolationFactory">
+        <property name="modelService" ref="modelService" />
+        <property name="typeService" ref="typeService" />
+        <property name="i18nService" ref="i18nService"/>
+        <property name="bundleProvider" ref="resourceBundleProvider"/>
+    </bean>
+
+	<bean id="constraintModelValidator" class="de.hybris.platform.validation.localized.ConstraintModelValidator"/>
+
+	<bean id="constraintsExtractor" class="de.hybris.platform.validation.extractor.impl.DefaultConstraintsExtractor">
+		<property name="constraintService" ref="constraintService"/>
+		<property name="constraintMappingsTypeConverter" ref="constraintMappingsTypeConverter" />
+		<property name="skipOnErrorConstraintMappingsTypeConverter" ref="skipOnErrorConstraintMappingsTypeConverter" />
+		<property name="constraintModelValidator" ref="constraintModelValidator" />
+	</bean>
+
+	<bean id="abstractConstraintConverter" class="de.hybris.platform.validation.extractor.impl.AbstractConstraintToBeanTypeConverter" abstract="true">
+		<property name="ignoredAnnotationMethods">
+			<set>
+				<value>message</value>
+				<value>payload</value>
+				<value>groups</value>
+			</set>
+		</property>
+		<property name="groupsConverter" ref="constraintGroupsToGroupsTypeConverter"/>
+		<property name="severityConverter" ref="severityToPayloadTypeConverter"/>
+	</bean>
+
+	<bean id="constraintMappingsTypeConverter" class="de.hybris.platform.validation.extractor.impl.ConstraintsToConstraintMappingsTypeConverter">
+		<property name="converters">
+			<list>
+				<ref bean="attributeConstraintToBeanTypeConverter"/>
+				<ref bean="typeConstraintToBeanTypeConverter"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="skipOnErrorConstraintMappingsTypeConverter" parent="constraintMappingsTypeConverter">
+		<property name="skipOnError" value="true"/>
+	</bean>
+
+	<bean id="constraintGroupsToGroupsTypeConverter" class="de.hybris.platform.validation.extractor.impl.ConstraintGroupsToGroupsTypeConverter">
+		<property name="constraintDao" ref="constraintDao" />
+	</bean>
+
+	<bean id="severityToPayloadTypeConverter" class="de.hybris.platform.validation.extractor.impl.SeverityToPayloadTypeConverter" />
+
+	<bean id="attributeConstraintToBeanTypeConverter" class="de.hybris.platform.validation.extractor.impl.AttributeConstraintToBeanTypeConverter" parent="abstractConstraintConverter">
+		<property name="fieldConverter" ref="attributeConstraintToFieldTypeConverter"/>
+		<property name="getterConverter" ref="attributeConstraintToGetterTypeConverter"/>
+	</bean>
+
+	<bean id="attributeConstraintToFieldTypeConverter" class="de.hybris.platform.validation.extractor.impl.AttributeConstraintToFieldTypeConverter" />
+
+	<bean id="attributeConstraintToGetterTypeConverter" class="de.hybris.platform.validation.extractor.impl.AttributeConstraintToGetterTypeConverter" />
+
+	<bean id="typeConstraintToBeanTypeConverter" class="de.hybris.platform.validation.extractor.impl.TypeConstraintToBeanTypeConverter" parent="abstractConstraintConverter" />
+
+	<bean id="resourceBundleProvider" class="de.hybris.platform.validation.messages.impl.DefaultResourceBundleProvider"/>
+
+	<bean name="thresholdFilter" class="de.hybris.platform.validation.services.impl.DefaultSeverityThresholdAwareCheckerImpl">
+		<property name="thresholdLevel" ><value>de.hybris.platform.validation.payloads.Error</value></property>
+		<property name="severitiesOrder">
+			<list>
+				<value>de.hybris.platform.validation.payloads.Info</value>
+				<value>de.hybris.platform.validation.payloads.Warn</value>
+				<value>de.hybris.platform.validation.payloads.Error</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Interceptors -->
+	<bean id="validationInterceptor" class="de.hybris.platform.validation.interceptors.ValidationInterceptor">
+		<property name="validationService" ref="validationService" />
+		<property name="thresholdChecker"  ref="thresholdFilter"/>
+	</bean>
+
+	<bean id="validationInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="validationInterceptor" />
+		<property name="typeCode" value="Item" />
+	</bean>
+
+	<bean id="abstractConstraintDuplicateValidator" class="de.hybris.platform.validation.interceptors.AbstractConstraintUniqueValidator">
+		<property name="constraintService" ref="constraintService" />
+	</bean>
+
+	<bean id="abstractConstraintValidationMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="abstractConstraintDuplicateValidator"/>
+		<property name="typeCode" value="AbstractConstraint"/>
+	</bean>
+
+	<bean id="typeConstraintValidator" class="de.hybris.platform.validation.interceptors.TypeConstraintValidator">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="typeConstraintPreparer" class="de.hybris.platform.validation.interceptors.TypeConstraintPreparer">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="typeConstraintPreparerMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="typeConstraintPreparer"/>
+		<property name="typeCode" value="TypeConstraint"/>
+	</bean>
+
+	<bean id="typeConstraintValidatorMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="typeConstraintValidator"/>
+		<property name="typeCode" value="AbstractConstraint"/>
+	</bean>
+
+    <bean id="validateLocalizedConstraintInterceptor" class="de.hybris.platform.validation.interceptors.ValidateLocalizedConstraintInterceptor"/>
+
+    <bean id="validateLocalizedConstraintMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor"  ref="validateLocalizedConstraintInterceptor"/>
+        <property name="typeCode" value="AttributeConstraint"/>
+    </bean>
+	<!--  xor mapping constraint -->
+
+	<bean id="xorConstraintValidator" class="de.hybris.platform.validation.interceptors.XorNullReferenceConstraintValidator"/>
+
+	<bean id="xorNullConstraintValidatorMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="xorConstraintValidator"/>
+		<property name="typeCode" value="XorNullReferenceConstraint"/>
+		<!-- property name="replacedInterceptors" ref="MandatoryAttributesValidator"/-->
+	</bean>
+
+	<!-- dynamic constraint  -->
+	<bean id="dynamicConstraintValidator" class="de.hybris.platform.validation.interceptors.DynamicConstraintValidator" />
+
+	<bean id="dynamicConstraintValidatorMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="dynamicConstraintValidator"/>
+		<property name="typeCode" value="DynamicConstraint"/>
+	</bean>
+
+	<bean id="attributeConstraintValidator" class="de.hybris.platform.validation.interceptors.AttributeConstraintValidator">
+		<property name="typeService" ref="typeService"/>
+        <property name="annotationsMappingRegistry" ref="annotationsMappingRegistry"/>
+    </bean>
+
+	<bean id="attributeConstraintValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="attributeConstraintValidator"/>
+		<property name="typeCode" value="AttributeConstraint"/>
+	</bean>
+
+	<bean id="attributeConstraintPreparer" class="de.hybris.platform.validation.interceptors.AttributeConstraintPreparer">
+		<property name="modelService" ref="modelService" />
+		<property name="typeService" ref="typeService" />
+	</bean>
+	<bean id="attributeConstraintPreparerMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="attributeConstraintPreparer"/>
+		<property name="typeCode" value="AttributeConstraint"/>
+	</bean>
+
+	<bean id="constraintGroupPrepareInterceptor" class="de.hybris.platform.validation.interceptors.ConstraintGroupPrepareInterceptor" />
+
+	<bean id="constraintGroupPreparerMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="constraintGroupPrepareInterceptor"/>
+		<property name="typeCode" value="ConstraintGroup"/>
+	</bean>
+	
+	<bean id="constraintGroupLoadInterceptor" class="de.hybris.platform.validation.interceptors.ConstraintGroupLoadInterceptor">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="constraintGroupLoadInterceptorMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="constraintGroupLoadInterceptor"/>
+		<property name="typeCode" value="ConstraintGroup"/>
+	</bean>
+	
+	<bean id="constraintGroupRemoveInterceptor" class="de.hybris.platform.validation.interceptors.ConstraintGroupRemoveInterceptor" />
+
+	<bean id="constraintGroupRemoveInterceptorMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="constraintGroupRemoveInterceptor"/>
+		<property name="typeCode" value="ConstraintGroup"/>
+	</bean>
+
+	<bean id="abstractConstraintValidator" class="de.hybris.platform.validation.interceptors.AbstractConstraintValidator">
+		<property name="validationService" ref="validationService" />
+	</bean>
+
+	<bean id="abstractConstraintValidatorMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="abstractConstraintValidator"/>
+		<property name="typeCode" value="AbstractConstraint"/>
+	</bean>
+	
+	<bean id="constraintGroupInterfaceNameValidator" class="de.hybris.platform.validation.interceptors.ConstraintGroupInterfaceNameValidator">
+		<property name="constraintDao" ref="constraintDao" />
+	</bean>
+
+	<bean id="constraintGroupInterfaceNameValidatorMapping"  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor"  ref="constraintGroupInterfaceNameValidator"/>
+		<property name="typeCode" value="ConstraintGroup"/>
+	</bean>
+	
+	<bean id="validationDataSetup" class="de.hybris.platform.validation.datasetup.ValidationDataSetup">
+		<property name="modelService" ref="modelService" />
+		<property name="validationService" ref="validationService" />
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<!--  COVERAGE -->
+	
+	<alias alias="coverageCalculationService" name="defaultCoverageCalculationService"/>
+	<bean id="defaultCoverageCalculationService" class="de.hybris.platform.validation.coverage.impl.DefaultCoverageCalculationService">
+		<property name="strategyRegistry" ref="coverageCalculationStrategyRegistry"/>
+	</bean>
+	 
+	<alias name="defaultDomainStrategiesList" alias="domainStrategiesList"/> 
+	<util:list id="defaultDomainStrategiesList" value-type="de.hybris.platform.validation.coverage.strategies.impl.CoverageCalculationStrategyMapping">
+		<ref bean="coverageCalculationDefaultDomainMapping" />
+	</util:list>
+	 
+	<alias alias="coverageCalculationStrategyRegistry" name="defaultCoverageCalculationStrategyRegistry"/>
+	<bean id="defaultCoverageCalculationStrategyRegistry" class="de.hybris.platform.validation.coverage.strategies.impl.DefaultCoverageCalculationStrategyRegistry">
+	 	<property name="domainStrategies" ref="domainStrategiesList"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias alias="coverageCalculationDefaultDomainMapping" name="defaultCoverageCalculationDefaultDomainMapping"/>
+	<bean id="defaultCoverageCalculationDefaultDomainMapping" class="de.hybris.platform.validation.coverage.strategies.impl.CoverageCalculationStrategyMapping">
+	 	<property name="domainID" value="default"/>
+		<property name="strategyMap">
+			<map merge="true">
+				<entry key="Item" value-ref="validationCoverageCalculationStrategy"/>
+			</map>
+		</property> 		
+	</bean>
+		
+	<alias alias="validationCoverageCalculationStrategy" name="defaultValidationCoverageCalculationStrategy"/>
+	<bean id="defaultValidationCoverageCalculationStrategy" 
+				class="de.hybris.platform.validation.coverage.strategies.impl.ValidationBasedCoverageCalculationStrategy">
+		<property name="validationService" ref="validationService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="coverageConstraintGroupDao" ref="coverageConstraintGroupDao"/>
+		<property name="sortProperties" value="true"/>
+	</bean>
+
+	<alias alias="coverageConstraintGroupDao" name="defaultCoverageConstraintGroupDao"/>
+	<bean id="defaultCoverageConstraintGroupDao" 
+				class="de.hybris.platform.validation.coverage.daos.impl.DefaultCoverageConstraintGroupDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+    <!-- Attribute annotation mapping registry -->
+    <bean id="annotationsMappingRegistry" class="de.hybris.platform.validation.annotations.mapping.AnnotationsMappingRegistry" />
+
+    <!-- Dynamic attributes -->
+    <bean id="abstractConstraintNeedReloadAttributeHandler" class="de.hybris.platform.validation.model.AbstractConstraintNeedReloadAttributeHandler">
+        <property name="validationService" ref="validationService"/>
+    </bean>
+
+</beans>

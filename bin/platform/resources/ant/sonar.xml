@@ -1,0 +1,605 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="project.sonar" xmlns:sonar="antlib:org.sonar.ant">
+
+	<!-- the next line is added allow eclipse resolving the 'platformhome' property. 
+		It is not needed for the normal build process, since platformhome is always 
+		set from the outside. -->
+	<property name="platformhome" location="../.." />
+	<property name="log.path" location="${platformhome}/../../log" />
+	
+	<taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+		<classpath>
+			<path path="${platformhome}/resources/ant/sonar/lib/sonarqube-ant-task-2.5.jar" />
+		</classpath>
+	</taskdef>
+	
+	<var name="modules" value=""/>
+	
+	<macrodef name="sonar">
+			<attribute name="extensions" />
+			<sequential>
+				<property name="sonar.language" value="java"/>
+				<property name="sonar.excludedExtensions" value="" />
+
+				<propertyregex property="sonar.extensions.clean" input="@{extensions}" regexp=";" replace="," global="true" defaultValue="@{extensions}" />
+				<propertyregex property="sonar.excludedExtensions.clean" input="${sonar.excludedExtensions}" regexp=";" replace="," global="true" defaultValue="${sonar.excludedExtensions}" />
+				
+				<var name="isexcluded" value="" />
+				<var name="affectedextensions" value="" />
+				
+				<for list="${sonar.extensions.clean}" param="extname" delimiter=",">
+					<sequential>
+						<for list="${sonar.excludedExtensions.clean}" param="excludedextensions" delimiter=",">
+							<sequential>
+								<if>
+									<equals arg1="@{extname}" arg2="@{excludedextensions}" />
+									<then>
+										<var name="isexcluded" value="true" />
+									</then>
+								</if>
+							</sequential>
+						</for>
+						<if>
+							<equals arg1="${isexcluded}" arg2="true" />
+							
+							<then>
+								<var name="isexcluded" value="false" />
+							</then>
+							<else>
+								<if>
+									<equals arg1="${affectedextensions}" arg2="" />
+									<then>
+										<var name="affectedextensions" value="@{extname}" />
+									</then>
+									<else>
+										<var name="affectedextensions" value="${affectedextensions},@{extname}" />
+									</else>
+								</if>
+							</else>
+						</if>
+					</sequential>
+				</for>
+
+				<if>
+					<equals arg1="${sonar.language}" arg2="java" />
+					<then>
+						<sonarmultiJAVA modules="${affectedextensions}" />
+					</then>
+					<elseif>
+						<equals arg1="${sonar.language}" arg2="xml" />
+						<then>
+							<sonarmultiXML modules="${affectedextensions}" />
+						</then>
+					</elseif>
+					<else>
+						<echo message="The language ${sonar.language} is not supported! Supported: java, xml" />
+					</else>
+				</if>
+				
+				<sonar:sonar/>
+				
+			</sequential>		
+		</macrodef>
+	
+	<!-- Start this if you want to check one specific extension -->
+	<macrodef name="sonarsingle">
+		<attribute name="extensions" />
+		<sequential>
+			<property name="sonar.language" value="java"/>
+			
+			<if>
+				<equals arg1="${sonar.language}" arg2="java" />
+				<then>
+					<sonarsingleJAVA extensions="@extensions" />
+				</then>
+				<elseif>
+					<equals arg1="${sonar.language}" arg2="xml" />
+					<then>
+						<sonarsingleXML extensions="@extensions" />
+					</then>
+				</elseif>
+				<else>
+					<fail message="The language ${sonar.language} is not supported. Supported: java, xml" />
+				</else>
+			</if>
+			
+			<sonar:sonar/>
+			
+		</sequential>
+	</macrodef>
+	
+	<!-- sonar single java -->
+	<macrodef name="sonarsingleJAVA">
+		<attribute name="extensions"/>
+		<sequential>
+			<property name="sonar.extensions" value="@{extensions}" />
+			<property name="sonar.sourceEncoding" value="UTF-8"/>
+			<property name="sonar.projectName" value="${sonar.extensions} EC-Module"/>
+			<property name="sonar.projectKey" value="${sonar.extensions}key" />
+			<property name="sonar.projectVersion" value="1.0" />
+			
+
+			<propertyregex property="sonar.extensions.clean" input="${sonar.extensions}" regexp=";" replace="," global="true" defaultValue="${sonar.extensions}" />
+							
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- Executing sonar" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- sonar.extensions        : ${sonar.extensions.clean}" />
+			<echo level="info" message="- sonar.jdbc.url        : ${sonar.jdbc.url}" />
+			<echo level="info" message="- sonar.projectName        : ${sonar.projectName} EC-Module" />
+			<echo level="info" message="- sonar.project.key        : ${sonar.projectKey}" />
+			<echo level="info" message="- sonar.project.version        : ${sonar.projectVersion}" />
+			<echo level="info" message="- sonar.language        : ${sonar.language}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+			
+			<var name="isSingle" value="false" />
+
+			<for list="${sonar.extensions.clean}" param="extension" delimiter=",">
+				<sequential>
+					<if>
+						<equals arg1="${isSingle}" arg2="true" />
+						<then>
+							<fail message="Only one extension allowed." />
+						</then>
+						<else>
+							<var name="isSingle" value ="true" />
+						</else>
+					</if>
+
+					<!-- source -->
+					<if>
+						<available file="${ext.@{extension}.path}/src" type="dir" />
+						<then>
+							<if>
+								<available file="${ext.@{extension}.path}/gensrc" type="dir" />
+								<then>
+									<property name="sonar.sources" location="${ext.@{extension}.path}/src,${ext.@{extension}.path}/gensrc"/>
+								</then>
+								<else>
+									<property name="sonar.sources" location="${ext.@{extension}.path}/src"/>
+								</else>
+							</if>
+						</then>
+						<elseif>
+							<available file="${ext.@{extension}.path}/web/src" type="dir" />
+							<then>
+								<if>
+									<available file="${ext.@{extension}.path}/web/gensrc" type="dir" />
+									<then>
+										<property name="sonar.sources" location="${ext.@{extension}.path}/web/src,${ext.@{extension}.path}/web/gensrc"/>
+									</then>
+									<else>
+										<property name="sonar.sources" location="${ext.@{extension}.path}/web/src"/>
+									</else>
+								</if>
+							</then>
+						</elseif>
+					</if>
+					
+					<!-- test source -->
+					<if>
+						<available file="${ext.@{extension}.path}/testsrc" type="dir" />
+						<then>
+							<property name="sonar.tests" location="${ext.@{extension}.path}/testsrc"/>
+						</then>
+					</if>
+				
+					<!-- binaries -->
+					
+					<var name="requiredcp" value="" />
+										
+					<!-- set classes/bin folder for required extensions-->
+					<for list="${all.required.extensions.for.@{extension}}" param="reqextname">			  
+						<sequential>
+							<if>
+								<available file="${ext.@{reqextname}.path}/classes" type="dir" />
+							<then>	
+								<var name="requiredcp" value="${requiredcp},${ext.@{reqextname}.path}/classes" />
+							</then>
+							</if>
+							<if>
+								<available file="${ext.@{reqextname}.path}/bin" type="dir" />
+							<then>	
+								<var name="requiredcp" value="${requiredcp},${ext.@{reqextname}.path}/bin" />
+							</then>
+							</if>
+						</sequential>  
+					</for>
+				
+					<path id='sonar.libraries.classpath'>
+						<fileset erroronmissingdir="false" dir="${ext.@{extension}.path}/lib">
+							<include name="**/*.jar" />
+						</fileset>
+						<fileset erroronmissingdir="false" dir="${ext.@{extension}.path}/web/webroot/WEB-INF/lib">
+							<include name="**/*.jar" />
+						</fileset>
+						<fileset dir="${platformhome}/lib/">
+							<include name="**/*.jar" />
+						</fileset>
+						<fileset dir="${platformhome}/bootstrap/bin/">
+							<include name="**/*.jar" />
+						</fileset>
+						<fileset dir="${bundled.tomcat.home}/lib/">
+							<include name="**/*.jar" />
+						</fileset>
+						<fileset dir="${platformhome}/resources/configtemplates/develop/licence/">
+							<include name="**/*.jar" />
+						</fileset>					
+					</path>
+				
+					<var name="reqextname.lib.path" value="" />
+											
+					<!-- get all jars from required extensions -->
+					<for list="${all.required.extensions.for.@{extension}}" param="reqextname" delimiter=",">
+						<sequential>
+							<if>
+								<!-- Test if lib folder exists... -->
+								<available file="${ext.@{reqextname}.path}/lib" type="dir" />
+								<then>
+									<!-- ... and has content -->
+									<if>
+										<length length="0" when="greater">
+						                       <fileset dir="${ext.@{reqextname}.path}/lib" followsymlinks="false"/>
+						                 </length>
+										<then>	
+											<var name="reqextname.lib.path" value="${reqextname.lib.path},${ext.@{reqextname}.path}/lib/*.jar" />
+										</then>
+									</if>
+								</then>
+							</if>
+							
+							<if>
+								<!-- Test if web lib folder exists... -->
+								<available file="${ext.@{reqextname}.path}/web/webroot/WEB-INF/lib" type="dir" />
+								<then>
+									<!-- ... and has content -->
+									<if>
+										<length length="0" when="greater">
+						                       <fileset dir="${ext.@{reqextname}.path}/web/webroot/WEB-INF/lib" followsymlinks="false"/>
+						                 </length>
+										<then>
+											<var name="reqextname.lib.path" value="${reqextname.lib.path},${ext.@{reqextname}.path}/web/webroot/WEB-INF/lib/*.jar" />
+										</then>
+									</if>
+								</then>
+							</if>
+						
+						</sequential>
+					</for>
+				
+				
+				<!-- Standard classpath -->
+				<pathconvert property="standart.@{extension}.cp" refid="sonar.libraries.classpath" pathsep=","/>
+			
+				<!-- libraries from required extensions classpath -->
+				<property name="sonar.java.libraries" value="${standart.@{extension}.cp},${reqextname.lib.path}" />
+						
+				<!-- put binaries from this extension and required extensions togetter and set property-->
+				<if>
+					<available file="${ext.@{extension}.path}/classes" type="dir" />
+					<then>	
+						<property name="sonar.java.binaries" value="${ext.@{extension}.path}/classes,${requiredcp}" />
+					</then>
+					<elseif>
+						<available file="${ext.@{extension}.path}/web/webroot/WEB-INF/classes" type="dir" />
+						<then>
+							<property name="sonar.java.binaries" value="${ext.@{extension}.path}/web/webroot/WEB-INF/classes,${requiredcp}" />
+						</then>
+					</elseif>
+				</if>
+					
+				</sequential>
+			</for>
+		
+		</sequential>
+	</macrodef>
+	
+	<!-- sonar single xml -->
+	<macrodef name="sonarsingleXML">
+		<attribute name="extensions"/>
+		<sequential>
+			<property name="sonar.extensions" value="@{extensions}" />
+			<property name="sonar.sourceEncoding" value="UTF-8"/>
+			<property name="sonar.projectName" value="${sonar.extensions}XML"/>
+			<property name="sonar.projectKey" value="${sonar.extensions}XMLkey" />
+			<property name="sonar.projectVersion" value="1.0" />
+
+			<propertyregex property="sonar.extensions.clean" input="${sonar.extensions}" regexp=";" replace="," global="true" defaultValue="${sonar.extensions}" />
+							
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- Executing sonar" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- sonar.extensions        : ${sonar.extensions.clean}" />
+			<echo level="info" message="- sonar.jdbc.url        : ${sonar.jdbc.url}" />
+			<echo level="info" message="- sonar.projectName        : ${sonar.projectName}" />
+			<echo level="info" message="- sonar.project.key        : ${sonar.projectKey}" />
+			<echo level="info" message="- sonar.project.version        : ${sonar.projectVersion}" />
+			<echo level="info" message="- sonar.language        : ${sonar.language}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+			
+			<var name="isSingle" value="false" />
+
+			<for list="${sonar.extensions.clean}" param="extension" delimiter=",">
+				<sequential>
+					<if>
+						<equals arg1="${isSingle}" arg2="true" />
+						<then>
+							<fail message="Only one extension allowed." />
+						</then>
+						<else>
+							<var name="isSingle" value ="true" />
+						</else>
+					</if>
+
+					<!-- XML source -->
+					<if>
+						<available file="${ext.@{extension}.path}/resources" type="dir" />
+						<then>
+							<property name="sonar.sources" location="${ext.@{extension}.path}/resources"/>
+						</then>
+					</if>
+				</sequential>
+			</for>		
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="sonarmultiJAVA">
+		<attribute name="modules"/>
+			<sequential>
+				<property name="sonar.extensions" value="@{modules}" />
+				<property name="sonar.sourceEncoding" value="UTF-8"/>
+				<property name="sonar.projectName" value="Superproject"/>
+				<property name="sonar.projectKey" value="superprojectkey" />
+				<property name="sonar.projectVersion" value="1.0" />
+				
+				<echo level="info" message=" " />
+				<echo level="info" message="*************************************************" />
+				<echo level="info" message="- Executing sonar" />
+				<echo level="info" message="-------------------------------------------------" />
+				<echo level="info" message="- sonar.extensions        : ${sonar.extensions}" />
+				<echo level="info" message="- sonar.jdbc.url        : ${sonar.jdbc.url}" />
+				<echo level="info" message="- sonar.projectName        : ${sonar.projectName}" />
+				<echo level="info" message="- sonar.project.key        : ${sonar.projectKey}" />
+				<echo level="info" message="- sonar.project.version        : ${sonar.projectVersion}" />
+				<echo level="info" message="- sonar.excludedExtensions        : ${sonar.excludedExtensions.clean}" />
+				<echo level="info" message="- sonar.language        : ${sonar.language}" />
+				<echo level="info" message="*************************************************" />
+				<echo level="info" message=" " />
+			
+				<var name="modulerelative" value="" />
+
+				<for list="@{modules}" param="extname" delimiter=",">
+					<sequential>
+						<!-- Only modules with src folder -->
+						<if>
+							<or>
+								<available file="${ext.@{extname}.path}/src" type="dir" />
+								<available file="${ext.@{extname}.path}/web/src" type="dir" />
+							</or>
+							<then>
+							<!-- generate modules for sonar -->
+							<property name="@{extname}.relative" value ="${ext.@{extname}.path}" relative="true"/>
+							<var name="modulerelative" value="${modulerelative}${@{extname}.relative}," />
+							
+							<!-- settings for each module -->
+							<property name="${@{extname}.relative}.sonar.projectName" value="@{extname}"/>
+							<property name="${@{extname}.relative}.sonar.projectKey" value="@{extname}" />
+							<property name="${@{extname}.relative}.sonar.projectVersion" value="1.0" />
+		
+							<!-- set src for each module folder -->
+							<if>
+								<available file="${ext.@{extname}.path}/src" type="dir" />
+								<then>
+									<if>
+										<available file="${ext.@{extname}.path}/gensrc" type="dir" />
+										<then>
+											<property name="${@{extname}.relative}.sonar.sources" value="src,gensrc" />
+										</then>
+										<else>
+											<property name="${@{extname}.relative}.sonar.sources" value="src" />
+										</else>
+									</if>
+								</then>
+								<elseif>
+									<available file="${ext.@{extname}.path}/web/src" type="dir" />
+									<then>
+										<if>
+											<available file="${ext.@{extname}.path}/web/gensrc" type="dir" />
+										
+											<then>
+												<property name="${@{extname}.relative}.sonar.sources" value="web/src,web/gensrc" />
+											</then>
+											<else>
+												<property name="${@{extname}.relative}.sonar.sources" value="web/src" />
+											</else>
+										</if>	
+									</then>
+								</elseif>
+							</if>
+								
+							<!-- test source -->
+							<if>
+								<available file="${ext.@{extname}.path}/testsrc" type="dir" />
+								<then>
+									<property name="${@{extname}.relative}.sonar.tests" location="${ext.@{extname}.path}/testsrc"/>
+								</then>
+							</if>
+
+							<!-- set classes/bin folder for required extensions-->
+							<var name="requiredcp" value="" />
+						
+							<for list="${all.required.extensions.for.@{extname}}" param="reqextname">			  
+								<sequential>
+									<if>
+										<available file="${ext.@{reqextname}.path}/classes" type="dir" />
+									<then>	
+										<var name="requiredcp" value="${requiredcp},${ext.@{reqextname}.path}/classes" />
+									</then>
+									</if>
+									<if>
+										<available file="${ext.@{reqextname}.path}/bin" type="dir" />
+									<then>	
+										<var name="requiredcp" value="${requiredcp},${ext.@{reqextname}.path}/bin" />
+									</then>
+									</if>
+								</sequential>  
+							</for>
+								
+							<path id='sonar.libraries.classpath'>
+								<fileset erroronmissingdir="false" dir="${@{extname}.relative}/lib">
+									<include name="**/*.jar" />
+								</fileset>
+								<fileset erroronmissingdir="false" dir="${@{extname}.relative}/web/webroot/WEB-INF/lib">
+									<include name="**/*.jar" />
+								</fileset>
+								<fileset dir="${platformhome}/lib/">
+									<include name="**/*.jar" />
+								</fileset>
+								<fileset dir="${platformhome}/bootstrap/bin/">
+									<include name="**/*.jar" />
+								</fileset>
+								<fileset dir="${bundled.tomcat.home}/lib/">
+									<include name="**/*.jar" />
+								</fileset>
+								<fileset dir="${platformhome}/resources/configtemplates/develop/licence/">
+									<include name="**/*.jar" />
+								</fileset>					
+							</path>
+								
+							<!-- get all jars from required extensions -->
+							<var name="reqextname.lib.path" value="" />
+							
+							<for list="${all.required.extensions.for.@{extname}}" param="reqextname" delimiter=",">
+								<sequential>
+									<if>
+										<!-- Test if lib folder exists... -->
+										<available file="${ext.@{reqextname}.path}/lib" type="dir" />
+										<then>
+											<!-- ... and has content -->
+											<if>
+												<length length="0" when="greater">
+								                       <fileset dir="${ext.@{reqextname}.path}/lib" followsymlinks="false"/>
+								                 </length>
+												<then>	
+													<var name="reqextname.lib.path" value="${reqextname.lib.path},${ext.@{reqextname}.path}/lib/*.jar" />
+												</then>
+											</if>
+										</then>
+									</if>
+									
+									<if>
+										<!-- Test if web lib folder exists... -->
+										<available file="${ext.@{reqextname}.path}/web/webroot/WEB-INF/lib" type="dir" />
+										<then>
+											<!-- ... and has content -->
+											<if>
+												<length length="0" when="greater">
+								                       <fileset dir="${ext.@{reqextname}.path}/web/webroot/WEB-INF/lib" followsymlinks="false"/>
+								                 </length>
+												<then>
+													<var name="reqextname.lib.path" value="${reqextname.lib.path},${ext.@{reqextname}.path}/web/webroot/WEB-INF/lib/*.jar" />
+												</then>
+											</if>
+										</then>
+									</if>
+								</sequential>
+							</for> 	
+							
+							<!-- Standard classpath -->
+							<pathconvert property="standart.@{extname}.cp" refid="sonar.libraries.classpath" pathsep=","/>
+						
+							<!-- libraries from required extensions classpath -->
+							<property name="${@{extname}.relative}.sonar.java.libraries" value="${standart.@{extname}.cp},${reqextname.lib.path}" />
+					
+							<!-- put binaries from this extension and required extensions togetter and set property-->
+							<if>
+								<available file="${@{extname}.relative}/classes" type="dir" />
+								<then>	
+									<property name="${@{extname}.relative}.sonar.java.binaries" value="classes,${requiredcp}" />
+								</then>
+								<elseif>
+									<available file="${@{extname}.relative}/web/webroot/WEB-INF/classes" type="dir" />
+									<then>
+										<property name="${@{extname}.relative}.sonar.java.binaries" value="web/webroot/WEB-INF/classes,${requiredcp}" />
+									</then>	
+								</elseif>
+							</if>
+							</then>
+						</if>
+					</sequential>
+				</for>
+					
+			<property name="sonar.modules" value="${modulerelative}" />
+				
+			</sequential>
+		</macrodef>
+	
+	<macrodef name="sonarmultiXML">
+		<attribute name="modules"/>
+			<sequential>
+				<property name="sonar.extensions" value="@{modules}" />
+				<property name="sonar.sourceEncoding" value="UTF-8"/>
+				<property name="sonar.projectName" value="SuperprojectXML"/>
+				<property name="sonar.projectKey" value="superprojectXMLkey" />
+				<property name="sonar.projectVersion" value="1.0" />
+				
+				<echo level="info" message=" " />
+				<echo level="info" message="*************************************************" />
+				<echo level="info" message="- Executing sonar" />
+				<echo level="info" message="-------------------------------------------------" />
+				<echo level="info" message="- sonar.extensions        : ${sonar.extensions}" />
+				<echo level="info" message="- sonar.jdbc.url        : ${sonar.jdbc.url}" />
+				<echo level="info" message="- sonar.projectName        : ${sonar.projectName}" />
+				<echo level="info" message="- sonar.project.key        : ${sonar.projectKey}" />
+				<echo level="info" message="- sonar.project.version        : ${sonar.projectVersion}" />
+				<echo level="info" message="- sonar.excludedExtensions        : ${sonar.excludedExtensions.clean}" />
+				<echo level="info" message="- sonar.language        : ${sonar.language}" />
+				<echo level="info" message="*************************************************" />
+				<echo level="info" message=" " />
+			
+				<var name="modulerelative" value="" />
+
+				<for list="@{modules}" param="extname" delimiter=",">
+					<sequential>
+						<!-- Only modules with resources folder -->
+						<if>
+							<available file="${ext.@{extname}.path}/resources" type="dir" />
+							<then>
+								
+								<!-- generate modules for sonar -->
+								<property name="@{extname}.relative" value ="${ext.@{extname}.path}" relative="true"/>
+								<var name="modulerelative" value="${modulerelative}${@{extname}.relative}," />
+								
+								<!-- settings for each module -->
+								<property name="${@{extname}.relative}.sonar.projectName" value="@{extname}XML"/>
+								<property name="${@{extname}.relative}.sonar.projectKey" value="@{extname}XMLkey" />
+								<property name="${@{extname}.relative}.sonar.projectVersion" value="1.0" />
+								
+								<!-- path to xml files -->
+								<property name="${@{extname}.relative}.sonar.sources" value="${ext.@{extname}.path}/resources" />
+									
+							</then>
+						</if>
+					</sequential>
+				</for>
+					
+			<property name="sonar.modules" value="${modulerelative}" />
+		
+		</sequential>
+	</macrodef>
+
+</project>

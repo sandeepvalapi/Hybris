@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd                               
+		   http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd"     >
+
+	
+	<util:map  id="creationRegistry"  key-type="jaava.lang.String" value-type="de.hybris.platform.spring.ctx.TestRegistrableSingletonBean"  />
+	
+	<bean id="lazyInitDefaultBean" class="de.hybris.platform.spring.ctx.TestRegistrableSingletonBean" lazy-init="default">
+		<property name="creationCalls" ref="creationRegistry" />
+	</bean>
+	
+	<bean id="lazyInitTrueBean" class="de.hybris.platform.spring.ctx.TestRegistrableSingletonBean" lazy-init="true">
+		<property name="creationCalls" ref="creationRegistry" />
+	</bean>
+	
+	<bean id="lazyInitFalseBean" class="de.hybris.platform.spring.ctx.TestRegistrableSingletonBean" lazy-init="false">
+		<property name="creationCalls" ref="creationRegistry" />
+	</bean>
+	
+</beans>

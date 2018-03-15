@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+    
+  <tlib-version>1.2</tlib-version>
+  <short-name>hac</short-name>
+  
+  <tag>
+    <name>boolean</name>
+    <description>Renders img tag with boolean representation of state attribute.</description>
+    <tag-class>de.hybris.platform.hac.taglib.BooleanRepresentationTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>state</name>
+      <required>true</required>
+      <type>boolean</type>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+  
+  <tag>
+  	 <name>tenantBadge</name>
+  	 <description>Renders tenant badge</description>
+  	 <tag-class>de.hybris.platform.hac.taglib.TenantBadgeTag</tag-class>
+  	 <body-content>empty</body-content>
+  </tag>
+  
+  <tag>
+    <name>input-file</name>
+    <description>Renders skinnable input type file.</description>
+    <tag-class>de.hybris.platform.hac.taglib.InputFileTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>name</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>elementId</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>label</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>  
+  
+  <tag>
+    <name>warning</name>
+    <description>Renders warning message block with custom content.</description>
+    <tag-class>de.hybris.platform.hac.taglib.WarningTag</tag-class>
+    <body-content>scriptless</body-content>
+    <attribute>
+      <name>additionalCssClass</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+  </tag>
+    
+  <tag>
+    <name>note</name>
+    <description>Renders note message block with custom content.</description>
+    <tag-class>de.hybris.platform.hac.taglib.NoteTag</tag-class>
+    <body-content>scriptless</body-content>
+    <attribute>
+      <name>additionalCssClass</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+    
+  <tag>
+    <name>tip</name>
+    <description>Renders tip message block with custom content.</description>
+    <tag-class>de.hybris.platform.hac.taglib.TipTag</tag-class>
+    <body-content>scriptless</body-content>
+    <attribute>
+      <name>additionalCssClass</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+  </tag>
+    
+  <tag>
+    <name>info</name>
+    <description>Renders info message block with custom content.</description>
+    <tag-class>de.hybris.platform.hac.taglib.InfoTag</tag-class>
+    <body-content>scriptless</body-content>
+    <attribute>
+      <name>additionalCssClass</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+  </tag>
+    
+  <tag>
+    <name>topmenu-item</name>
+    <description>Renders topmenu item element (tab).</description>
+    <tag-class>de.hybris.platform.hac.taglib.TopMenuItemTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>label</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+    <attribute>
+      <name>id</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+  </tag>
+    
+  <tag>
+    <name>submenu-item</name>
+    <description>Renders submenu item element.</description>
+    <tag-class>de.hybris.platform.hac.taglib.SubMenuItemTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>label</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+    <attribute>
+      <name>href</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+    <attribute>
+      <name>id</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+  </tag>  
+  
+  <tag>
+    <name>tabbed-menu</name>
+    <description>Renders hAC top toolbar.</description>
+    <tag-class>de.hybris.platform.hac.taglib.HacTabbedMenuTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+    	<name>subtabCssClass</name>
+    	<required>false</required>
+		<rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+</taglib>

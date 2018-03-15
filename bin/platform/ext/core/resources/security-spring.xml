@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias alias="authenticationService" name="defaultAuthenticationService"/>
+	<bean id="defaultAuthenticationService" parent="abstractBusinessService" class="de.hybris.platform.servicelayer.security.auth.impl.DefaultAuthenticationService">
+		<property name="userService" ref="userService"/>
+		<property name="passwordEncoderService" ref="passwordEncoderService" />
+	</bean>
+
+	<bean id="userToAuthenticationConverter" class="de.hybris.platform.servicelayer.security.spring.DefaultUserToAuthenticationConverter">
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="hybrisAuthenticationProvider" class="de.hybris.platform.servicelayer.security.spring.HybrisAuthenticationProvider" abstract="true">
+		<property name="authenticationService" ref="authenticationService"/>
+		<property name="userToAuthenticationConverter" ref="userToAuthenticationConverter"/>
+	</bean>
+	
+	<bean id="hybrisAccessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased" abstract="true">
+		<property name="allowIfAllAbstainDecisions" value="false" />
+		<constructor-arg>
+			<list>
+				<bean id="notInitializedVoter" class="de.hybris.platform.spring.security.voter.HybrisNotInitializedVoter" />
+				<bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter" />
+				<bean id="hybrisVoter" class="de.hybris.platform.servicelayer.security.spring.vote.HybrisNotAnonymousVoter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="hybrisPasswordCallback" class="de.hybris.platform.servicelayer.security.auth.impl.HybrisPasswordCallback">
+		<property name="authenticationService" ref="authenticationService"/>
+		<property name="userToAuthenticationConverter" ref="userToAuthenticationConverter"/>
+	</bean>
+
+</beans>

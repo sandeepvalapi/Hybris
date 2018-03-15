@@ -1,0 +1,418 @@
+
+<Server port="-1" shutdown="SHUTDOWN">
+
+  <Listener className="org.apache.catalina.core.JasperListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener" rmiRegistryPortPlatform="9003" rmiServerPortPlatform="9004" />
+
+
+  <GlobalNamingResources>
+
+		<!-- If you want to use the jndi database resource please set db.pool.fromJNDI property and uncomment following block.
+			 Furthermore you have to copy the related jdbc library from platform/lib/dbdriver to the tomcat/lib folder -->
+		<!-- <Resource 	name="hybrisDS"
+ 						auth="Container"
+ 						type="javax.sql.DataSource"
+              		maxActive="90"
+              		maxIdle="90"
+              		maxWait="10000"
+              		testWhileIdle="true"
+						timeBetweenEvictionRunsMillis="10000"
+						minEvictableIdleTimeMillis="300000"
+						numTestsPerEvictionRun="100"
+						testOnBorrow="true"
+						testOnReturn="true"
+						whenExhaustedAction="1"
+              		username="sa"
+             		password=""
+              		driverClassName="org.hsqldb.jdbcDriver"
+              		url="jdbc:hsqldb:file:/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/data/hsqldb/mydb;shutdown=true;hsqldb.tx=MVCC" />
+        -->
+
+		<!-- If you want to use a mail JNDI resource please set mail.fromJNDI property and uncomment following block.
+		     Furthermore you have to copy the mail library from ext/core/lib to tomcat/lib -->
+		<!-- <Resource 	name="mail/Session" auth="Container"
+		        		type="javax.mail.Session"
+		        		mail.transport.protocol="smtp"
+		        		mail.smtp.host="${mail.smtp.server}"
+		        		mail.smtp.from="test@hybris.de"
+		        		description="Global E-Mail Resource"
+		    		/>-->
+
+  </GlobalNamingResources>
+
+
+  <Service name="Catalina" >
+
+	<Executor     name="hybrisExecutor"
+			        namePrefix="hybrisHTTP"
+			        maxThreads="200"
+			        minSpareThreads="40"
+			        maxIdleTime="10000"/>
+
+    <Connector port="9001"
+			   maxHttpHeaderSize="8192"
+			   maxPostSize="4194304"
+               maxThreads="200"
+               protocol="org.apache.coyote.http11.Http11Protocol"
+               executor="hybrisExecutor"
+               enableLookups="false"
+               acceptCount="100"
+               connectionTimeout="20000"
+               URIEncoding="UTF-8"
+               disableUploadTimeout="true" />
+
+    <Connector port="9002"
+			   maxHttpHeaderSize="8192"
+			   maxPostSize="4194304"
+               maxThreads="150"
+               protocol="org.apache.coyote.http11.Http11Protocol"
+               executor="hybrisExecutor"
+               enableLookups="false"
+               acceptCount="100"
+               connectionTimeout="20000"
+               disableUploadTimeout="true"
+               URIEncoding="UTF-8"
+               SSLEnabled="true"
+					scheme="https"
+					secure="true"
+					clientAuth="false"
+   				sslProtocol = "TLS"
+   				keystoreFile="${catalina.home}/lib/keystore"
+   				keystorePass="123456"
+                />
+
+    <!--
+    This might evaluate into 
+    <Connector protocol="AJP/1.3" port="8009" proxyPort="${proxy.http.port}" redirectPort="${proxy.ssl.port}" useIPVHosts="${tomcat.ajp.useipv}" />  
+    where the tomcat.ajp.port is mandatory property to render this connector. 
+     --> 
+		<Connector  protocol="AJP/1.3"  URIEncoding="UTF-8"  port="8009" />
+	
+
+    <Engine name="Catalina" defaultHost="localhost">
+
+			<Valve 	className="org.apache.catalina.valves.AccessLogValve"
+             		directory="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/log/tomcat"
+	      		 	prefix="access."
+        	   		suffix=".log"
+	      		 	pattern="combined"
+          />
+
+      <Host 	name="localhost"
+      			appBase="webapps"
+		       	unpackWARs="false"
+		       	autoDeploy="false">
+		       	
+		        <Valve className="org.apache.catalina.valves.ErrorReportValve" 
+		               showReport="false" 
+		               showServerInfo="false"/>
+
+			<!-- 'testweb' extension's context for tenant 'junit' -->
+			<Context path="/test" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/testweb/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'mediaweb' extension's context for tenant 'master' -->
+			<Context path="/medias" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/mediaweb/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'maintenanceweb' extension's context for tenant 'master' -->
+			<Context path="/maintenance" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/maintenanceweb/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'processing' extension's context for tenant 'master' -->
+			<Context path="/processing" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/processing/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'oauth2' extension's context for tenant 'master' -->
+			<Context path="/authorizationserver" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/oauth2/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'oauth2' extension's context for tenant 'junit' -->
+			<Context path="/authorizationserver_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/oauth2/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'hac' extension's context for tenant 'master' -->
+			<Context path="" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/hac/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'hac' extension's context for tenant 'junit' -->
+			<Context path="/hac_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform/ext/hac/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'embeddedserver' extension's context for tenant 'master' -->
+			<Context path="/embeddedserver" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-platform-optional/embeddedserver/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'tomcatembeddedserver' extension's context for tenant 'master' -->
+			<Context path="/tomcatembeddedserver" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-platform-optional/tomcatembeddedserver/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'virtualjdbc' extension's context for tenant 'master' -->
+			<Context path="/virtualjdbc" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-platform-optional/virtualjdbc/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'backoffice' extension's context for tenant 'master' -->
+			<Context path="/backoffice" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-backoffice/backoffice/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'groovynature' extension's context for tenant 'master' -->
+			<Context path="/groovynature" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-platform-optional/groovynature/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'admincockpit' extension's context for tenant 'master' -->
+			<Context path="/admincockpit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-cockpit/admincockpit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'productcockpit' extension's context for tenant 'master' -->
+			<Context path="/productcockpit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-content/productcockpit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'reportcockpit' extension's context for tenant 'master' -->
+			<Context path="/reportcockpit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-cockpit/reportcockpit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'mobileservices' extension's context for tenant 'master' -->
+			<Context path="/text" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-channel/mobileservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'cscockpit' extension's context for tenant 'master' -->
+			<Context path="/cscockpit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-channel/cscockpit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'acceleratorservices' extension's context for tenant 'master' -->
+			<Context path="/acceleratorservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-accelerator/acceleratorservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'acceleratorservices' extension's context for tenant 'junit' -->
+			<Context path="/acceleratorservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-accelerator/acceleratorservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'cmscockpit' extension's context for tenant 'master' -->
+			<Context path="/cmscockpit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-content/cmscockpit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'previewwebservices' extension's context for tenant 'master' -->
+			<Context path="/previewwebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/previewwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'previewwebservices' extension's context for tenant 'junit' -->
+			<Context path="/previewwebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/previewwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'smartedit' extension's context for tenant 'master' -->
+			<Context path="/smartedit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-content/smartedit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'personalizationwebservices' extension's context for tenant 'master' -->
+			<Context path="/personalizationwebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/personalizationwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'personalizationwebservices' extension's context for tenant 'junit' -->
+			<Context path="/personalizationwebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/personalizationwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'orbeonweb' extension's context for tenant 'master' -->
+			<Context path="/orbeon" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-commerce/orbeonweb/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'xyformsweb' extension's context for tenant 'master' -->
+			<Context path="/xyformsweb" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-commerce/xyformsweb/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'consignmenttrackingmock' extension's context for tenant 'master' -->
+			<Context path="/consignmenttrackingmock" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-commerce/consignmenttrackingmock/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'cmssmartedit' extension's context for tenant 'master' -->
+			<Context path="/cmssmartedit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-smartedit/cmssmartedit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'permissionswebservices' extension's context for tenant 'master' -->
+			<Context path="/permissionswebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/permissionswebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'permissionswebservices' extension's context for tenant 'junit' -->
+			<Context path="/permissionswebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/permissionswebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'smarteditwebservices' extension's context for tenant 'master' -->
+			<Context path="/smarteditwebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/smarteditwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'smarteditwebservices' extension's context for tenant 'junit' -->
+			<Context path="/smarteditwebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/smarteditwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'personalizationsmartedit' extension's context for tenant 'master' -->
+			<Context path="/personalizationsmartedit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-content/personalizationsmartedit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'personalizationsearchsmartedit' extension's context for tenant 'master' -->
+			<Context path="/personalizationsearchsmartedit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-content/personalizationsearchsmartedit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'personalizationpromotionssmartedit' extension's context for tenant 'master' -->
+			<Context path="/personalizationpromotionssmartedit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-content/personalizationpromotionssmartedit/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'cmswebservices' extension's context for tenant 'master' -->
+			<Context path="/cmswebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/cmswebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'cmswebservices' extension's context for tenant 'junit' -->
+			<Context path="/cmswebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/cmswebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'cmssmarteditwebservices' extension's context for tenant 'master' -->
+			<Context path="/cmssmarteditwebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/cmssmarteditwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'cmssmarteditwebservices' extension's context for tenant 'junit' -->
+			<Context path="/cmssmarteditwebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/cmssmarteditwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'yprofileeventtrackingws' extension's context for tenant 'master' -->
+			<Context path="/yprofileeventtrackingws" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-integration/profile/yprofileeventtrackingws/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'assistedservicewebservices' extension's context for tenant 'master' -->
+			<Context path="/assistedservicewebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-commerce/assistedservicewebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'assistedservicewebservices' extension's context for tenant 'junit' -->
+			<Context path="/assistedservicewebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-commerce/assistedservicewebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'ycommercewebservices' extension's context for tenant 'master' -->
+			<Context path="/rest" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-template/ycommercewebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'ycommercewebservices' extension's context for tenant 'junit' -->
+			<Context path="/rest_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-template/ycommercewebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'adaptivesearchwebservices' extension's context for tenant 'master' -->
+			<Context path="/adaptivesearchwebservices" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/adaptivesearchwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'adaptivesearchwebservices' extension's context for tenant 'junit' -->
+			<Context path="/adaptivesearchwebservices_junit" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-webservices/adaptivesearchwebservices/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'trainingstorefront' extension's context for tenant 'master' -->
+			<Context path="/trainingstorefront" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/custom/training/trainingstorefront/web/webroot" useHttpOnly="true">
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+			<!-- 'mcc' extension's context for tenant 'master' -->
+			<Context path="/mcc" docBase="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/ext-cockpit/mcc/web/webroot" >
+				<Manager pathname="" />
+				<Loader platformHome="/Users/svalapi/Documents/HYBRISCOMM6600P_2-70003031/hybris/bin/platform" className="de.hybris.tomcat.HybrisWebappLoader" deployName="default" />
+			</Context>
+
+
+      </Host>
+
+    </Engine>
+
+  </Service>
+
+</Server>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [y] hybris Platform Copyright (c) 2017 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+<process xmlns="http://www.hybris.de/xsd/processdefinition"
+	start="actionWithoutClusterNodeOrGrouDefined" name="nodeGroupBindingWithDefaultGroup" defaultNodeGroup="defaultGroup">
+
+	<action id="actionWithoutClusterNodeOrGrouDefined" bean="noAction">
+		<transition name="OK" to="actionWithClusterNodeDefined" />
+	</action>
+
+	<action id="actionWithClusterNodeDefined" bean="noAction" node="666">
+		<transition name="OK" to="actionWithClusterGroupDefined" />
+	</action>
+	
+	<action id="actionWithClusterGroupDefined" bean="noAction" nodeGroup="actionGroup">
+		<transition name="OK" to="actionWithClusterGroupAndNodeDefined" />
+	</action>
+	
+	<action id="actionWithClusterGroupAndNodeDefined" bean="noAction" node="666" nodeGroup="actionGroup">
+		<transition name="OK" to="notify" />
+	</action>
+
+	<notify id="notify" then="wait">
+		<userGroup name="test">
+			<locmessage name="test" language="lng" />
+		</userGroup>
+	</notify>
+
+	<wait id="wait" then="success">
+		<event>SomethingToHappen</event>
+	</wait>
+	
+	<end id="success" state="SUCCEEDED">Everything was fine</end>
+</process>

@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- 
+
+XXXX
+
+ -->
+<project name="project.removeWith50">
+
+	<!-- collects all localization files and build complete locale file placed in temp/localization/ -->
+	<!-- update for 3.1 and later: if localization files starts with locale the extensionname will be added -->
+	<macrodef name="locale">
+		<sequential>
+			<!-- first, delete all files (size 0) -->
+			<delete dir="${HYBRIS_TEMP_DIR}/localization" />			
+			<!-- then do the stuff -->
+			<foreachext>
+				<do>
+					<if>
+						<not>
+						    <isset property="ext.@{extname}.warextension" />
+						</not>
+						<then>
+							<for param="localefilepath">
+								<path>
+									<fileset dir="${ext.@{extname}.path}">
+										<include name="resources/localization/locales*" />
+									</fileset>
+								</path>
+								<sequential>
+									<ybasename property="locale_file_name" file="@{localefilepath}" />
+									<echo>
+*** 3.1 UPDATE ***
+Moving @{localefilepath}
+    to ${ext.@{extname}.path}/resources/localization/@{extname}-${locale_file_name}
+									</echo>
+
+									<move file="@{localefilepath}" tofile="${ext.@{extname}.path}/resources/localization/@{extname}-${locale_file_name}" />
+								</sequential>
+							</for>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<!-- update for 3.1 and later: the extension name is added to the items.xml  -->
+	<macrodef name="three_one_update_items_xml">
+		<attribute name="path" />
+		<attribute name="destiny" />
+		<sequential>
+			<echo>
+*** 3.1 UPDATE ***
+moving @{path}
+	to @{destiny}
+			</echo>
+			<move file="@{path}" overwrite="true" tofile="@{destiny}" />
+		</sequential>
+	</macrodef>
+
+
+	<!-- update for 3.1 and later: the ressources/jar folder is copied into the ressources folder -->
+	<!-- also: changes extensionname.advanced-deployment.xml to extensionname-advanced-deployment.xml -->
+	<macrodef name="three_one_update_jar">
+		<attribute name="jarpath" />
+		<attribute name="destiny" />
+		<sequential>
+			<echo>
+*** 3.1 UPDATE ***
+Starting with 3.1, the 'resources' folder is loaded by the classloader, not the 'resources/jar'.
+NOTE: Make sure to update your eclipse build classpath of the given project to include 'resources' as
+external class folder.
+
+moving all files from @{jarpath}
+to @{destiny}
+
+			</echo>
+			<move todir="@{destiny}">
+				<fileset dir="@{jarpath}">
+					<include name="**" />
+				</fileset>
+			</move>
+			<delete dir="@{jarpath}" failonerror="false" />
+
+			<!--advanced-deployment..-->
+			<!-- this doesn't work anyway because <gensource/> is called before -->
+			<move failonerror="false" file="${ext.@{extname}.path}/resources/@{extname}.advanced-deployment.xml" tofile="${ext.@{extname}.path}/resources/@{extname}-advanced-deployment.xml" />
+		</sequential>
+	</macrodef>
+
+
+</project>

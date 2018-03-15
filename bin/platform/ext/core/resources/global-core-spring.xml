@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd" default-lazy-init="true">
+
+    <bean id="tenantFactory" class="de.hybris.platform.servicelayer.internal.service.TenantFactory"/>
+
+
+    <context:annotation-config/>
+    <bean id="org.springframework.context.annotation.internalCommonAnnotationProcessor"
+          class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor">
+        <property name="fallbackToDefaultTypeMatch" value="false"/>
+    </bean>
+
+	<bean id="scope.hybris.request" class="de.hybris.platform.spring.HybrisRequestScope" />
+
+	<!--
+		Registering the hybris scopes: "tenant" ... This is the custom hybris
+		scope that manages the lifetime of a "tenant". If you do not deal with
+		tenants ("multimandantenfähigkeit"), then there is no need to
+		understand what this is for. "thread" ... technical scope used for
+		service layer internals only !!!
+	-->
+	<bean id="hybrisScopeConfigurer" class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="yrequest" value-ref="scope.hybris.request" />
+				<!-- entry key="tenant" >
+					<bean class="de.hybris.platform.spring.TenantScope" />
+				</entry-->
+			</map>
+		</property>
+	</bean>
+		
+
+	
+	<!-- Property support -->
+	<alias name="globalHybrisProperties" alias="hybrisProperties"/>
+	<bean id="globalHybrisProperties" class="de.hybris.platform.servicelayer.config.impl.HybrisPropertiesFactory" scope="singleton"/>
+	
+	<alias name="globalPropertyPlaceholderConfigurer" alias="platformPropertyPlaceHolder"/>
+	<bean id="globalPropertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" scope="singleton">
+  		<property name="properties" ref="hybrisProperties"/>
+  		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+  		<property name="order" value="-10"/>
+	</bean>
+</beans>           

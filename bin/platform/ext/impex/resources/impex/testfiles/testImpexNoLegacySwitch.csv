@@ -1,0 +1,11 @@
+INSERT_UPDATE Title;code[unique=true]
+;foo
+#% boolean isUsingSLHandler =  impex.getImportProcessor().getHandlerForLine(impex.getCurrentValueLine()) instanceof de.hybris.platform.servicelayer.impex.impl.SLImpexImportCUDHandler;
+#% if: isUsingSLHandler;
+;barSL
+#% endif:
+#% if:  !isUsingSLHandler;
+;barJalo
+#% endif:
+
+

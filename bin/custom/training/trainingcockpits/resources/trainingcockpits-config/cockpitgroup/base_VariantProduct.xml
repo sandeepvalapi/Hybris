@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="base.xsd">
+	<search>
+		<search-properties>
+			<property qualifier="Product.code"/>
+			<property qualifier="Product.name"/>
+			<property qualifier="Product.description"/>
+		</search-properties>
+		<sort-properties>
+			<property qualifier="Item.modifiedtime"/>
+			<property qualifier="Item.pk"/>
+			<property qualifier="Product.code"/>
+			<property qualifier="Product.name"/>
+			<property qualifier="Product.description"/>
+		</sort-properties>
+	</search>
+	
+	<label spring-bean="productLabelProvider"/>
+	
+	<initial-properties source-object-template="Product">
+		<property-mapping source="src.catalogVersion" target="VariantProduct.catalogVersion"/>
+		<property-mapping source="src" target="VariantProduct.baseProduct"/>
+	</initial-properties>
+</base>

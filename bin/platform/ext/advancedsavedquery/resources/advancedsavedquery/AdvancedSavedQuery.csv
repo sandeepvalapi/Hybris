@@ -1,0 +1,42 @@
+"# Create AdvancedSavedQuery named ""SearchCustomerQuery"" and add search parameters for the customer's name and some (delivery-)address attributes";;;;;;;
+
+
+INSERT_UPDATE AdvancedSavedQuery;code[unique=true];resulttype(code);query;name[lang=de];name[lang=en];description[lang=de];description[lang=en]
+;SearchCustomerQuery;Customer;SELECT {c.pk} FROM {$$$ AS c JOIN Address AS a ON {c:defaultShipmentAddress}={a:pk}} WHERE <param>;Erweiterte Kundensuche;Extended Customer Search;Kundensuche nach Name, PLZ, Land und/oder Email Adresse der Standard Lieferadresse.;Search for customers by name, postal code, country and/or email of their default shipping addresses.
+
+INSERT_UPDATE WherePart;savedQuery(code)[unique=true];replacePattern[unique=true];and
+;SearchCustomerQuery;<param>;true
+
+#All AdvancedSavedQuerySearchParameter types are partof attributes of the WherePart type and have no combinations of unique attributes.
+#However, here it is assumed that you do not have to paramaters with same [typedSearchParameter,comparator] combination, like [AbstractOrder.code, equals] in [WHERE code='a' and code='b'],
+#so these attributes are defined unique and an update of these parameters is possible.
+#If you have the case where you want to use same combination twice a time, you have to use INSERT mode.
+
+INSERT_UPDATE ComposedTypeAdvancedSavedQuerySearchParameter;wherePart(savedQuery(code),replacePattern)[unique=true];comparator(itemType(code),code)[unique=true];joinAlias;emptyHandling(itemType(code),code);typedSearchParameter(enclosingType(code), qualifier)[unique=true];;
+;SearchCustomerQuery:<param>;AdvancedQueryComparatorEnum:contains;c;EmptyParamEnum:ignore;Customer:name
+
+
+INSERT_UPDATE TypedAdvancedSavedQuerySearchParameter;wherePart(savedQuery(code),replacePattern);comparator(itemType(code),code)[unique=true];joinAlias;emptyHandling(itemType(code),code);typedSearchParameter(enclosingType(code), qualifier)[unique=true];enclosingType(code)[forceWrite=true];
+;SearchCustomerQuery:<param>;AdvancedQueryComparatorEnum:contains;a;EmptyParamEnum:ignore;Address:postalcode;Address;
+;SearchCustomerQuery:<param>;AdvancedQueryComparatorEnum:equals;a;EmptyParamEnum:ignore;Address:country;Address;
+;SearchCustomerQuery:<param>;AdvancedQueryComparatorEnum:equals;a;EmptyParamEnum:ignore;Address:email;Address;
+
+
+"# Create AdvancedSavedQuery named ""OrderQuery"" and add search parameters for the user, status, code and several date attributes (modified and creation date ranges)"
+
+INSERT_UPDATE AdvancedSavedQuery;code[unique=true];resulttype(code);query;name[lang=de];name[lang=en];description[lang=de];description[lang=en]
+;OrderQuery;Order;SELECT {o.pk} FROM {$$$ AS o LEFT JOIN User AS u ON {o.user}={u:pk} } WHERE <param>;Erweiterte Bestellungssuche;Extended Order Search;Bestellungssuche nach Status, Bestellnr., Daten und Besteller.;Search for orders by status, order number, dates and user.
+
+INSERT_UPDATE WherePart;savedQuery(code)[unique=true];replacePattern[unique=true];and
+;OrderQuery;<param>;true
+
+
+
+INSERT_UPDATE ComposedTypeAdvancedSavedQuerySearchParameter;wherePart(savedQuery(code),replacePattern)[unique=true];comparator(itemType(code),code)[unique=true];joinAlias;emptyHandling(itemType(code),code);typedSearchParameter(enclosingType(code), qualifier)[unique=true];name[lang=de];name[lang=en]
+;OrderQuery:<param>;AdvancedQueryComparatorEnum:equals;o;EmptyParamEnum:ignore;AbstractOrder:status;Status;Status
+;OrderQuery:<param>;AdvancedQueryComparatorEnum:contains;o;EmptyParamEnum:ignore;AbstractOrder:code;Bestellnr.;Order Nr.
+;OrderQuery:<param>;AdvancedQueryComparatorEnum:gtandequals;o;EmptyParamEnum:ignore;AbstractOrder:date;Erzeugt nach;Created after
+;OrderQuery:<param>;AdvancedQueryComparatorEnum:ltandequals;o;EmptyParamEnum:ignore;AbstractOrder:date;Erzeugt vor;Created before
+;OrderQuery:<param>;AdvancedQueryComparatorEnum:gtandequals;o;EmptyParamEnum:ignore;AbstractOrder:modifiedtime;Geändert nach;Modified after
+;OrderQuery:<param>;AdvancedQueryComparatorEnum:ltandequals;o;EmptyParamEnum:ignore;AbstractOrder:modifiedtime;Geändert vor;Modified before
+;OrderQuery:<param>;AdvancedQueryComparatorEnum:equals;o;EmptyParamEnum:ignore;AbstractOrder:user;Besteller;User

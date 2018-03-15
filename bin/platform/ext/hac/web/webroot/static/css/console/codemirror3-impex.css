@@ -1,0 +1,16 @@
+/**
+* ImpEx Codemirror Theme
+*/
+.cm-s-default .cm-impex_cmd {color: #22F; font-weight: bold;}
+.cm-s-default .cm-impex_modifier {color: #FF00FF;}
+.cm-s-default .cm-impex_var {color: #00BFFF;}
+.cm-s-default .cm-impex_comment {color: #a50;}
+.cm-s-default .cm-impex_string {color: #292;}
+.cm-s-default .cm-impex_atomic {color: #7401DF;}
+.cm-s-default .cm-impex_attr_valid {color: #01DF01;}
+.cm-s-default .cm-impex_attr_invalid {color: #F00; text-decoration: underline;}
+.cm-s-default .cm-impex_attr_special {color: #01DF01; font-style: italic;}
+.cm-s-default .cm-impex_type_valid {color: #01DF01; font-weight: bold;}
+.cm-s-default .cm-impex_type_invalid {color: #F00; text-decoration: underline;}
+.cm-s-default .cm-impex_dataseparator {color: #FE9A2E;}
+.cm-s-default .cm-impex_document_id {color: #FF8686;}

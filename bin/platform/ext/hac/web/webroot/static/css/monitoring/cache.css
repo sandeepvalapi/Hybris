@@ -1,0 +1,11 @@
+.dataTables_info,.dataTables_paginate {
+	margin-top: 10px;
+}
+
+.dataTables_wrapper {
+	min-height: 0;
+}
+
+.sidebar-headline {
+	margin-bottom: 15px;
+}

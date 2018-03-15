@@ -1,0 +1,13 @@
+$catalogversion=catalogversion(catalog(id[default='scriptsCatalog']),version[default='Staged'])[unique=true,default='scriptsCatalog:Staged']
+$supercategories=supercategories(code,catalogversion(catalog(id),version));
+
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;
+;scriptsCatalog;Scripts Catalog;true
+;fooCatalog;Scripts Catalog;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;
+;scriptsCatalog;Online;true;
+;scriptsCatalog;Staged;true;
+;fooCatalog;Online;true;
+;fooCatalog;Staged;true;

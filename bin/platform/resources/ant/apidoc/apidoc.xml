@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="project.apidoc">
+	<macrodef name="apidoc" description="creates apidoc of the given extensions">
+		<attribute name="extensions" />
+		<attribute name="working.directory" default="${HYBRIS_TEMP_DIR}/apidoc" />
+		<attribute name="create.zip" default="false" />
+		<attribute name="source.zip" default="${platformhome}/sources.zip" />
+		<attribute name="title" default="hybris Commerce Suite" />
+		<attribute name="zip.name" default="apidoc" />
+		<attribute name="zip.file" default="${HYBRIS_TEMP_DIR}/apidoc/@{zip.name}-${hybris.build.version}.zip" />
+		<attribute name="verbose" default="false" />
+		<attribute name="packages" default="*" />
+		<sequential>
+			<!-- setting defaults (can be overwritten via -D) -->
+			<property name="apidoc.extensions" value="@{extensions}" />
+			<property name="apidoc.working.directory" value="@{working.directory}" />
+			<property name="apidoc.create.zip" value="@{create.zip}" />
+			<property name="apidoc.title" value="@{title}" />
+			<property name="apidoc.zip.name" value="@{zip.name}" />
+			<property name="apidoc.zip.file" value="@{zip.file}" />
+			<property name="apidoc.verbose" value="@{verbose}" />
+			<property name="apidoc.source.zip" value="@{source.zip}" />
+			<if>
+				<isset property="packages"/>
+				<then>
+					<property name="apidoc.packages" value="${packages}" />
+				</then>
+				<else>
+					<property name="apidoc.packages" value="@{packages}" />
+				</else>
+			</if>
+			<!-- clean up -->
+			<propertyregex property="apidoc.extensions.clean" input="${apidoc.extensions}" regexp=";" replace="," global="true" defaultValue="${apidoc.extensions}" />
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- Creating API Doc" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- apidoc.extensions :        ${apidoc.extensions.clean}" />
+			<echo level="info" message="- apidoc.working.directory : ${apidoc.working.directory}" />
+			<echo level="info" message="- apidoc.create.zip :        ${apidoc.create.zip}" />
+			<echo level="info" message="- apidoc.title :             ${apidoc.title}" />
+			<echo level="info" message="- apidoc.verbose :           ${apidoc.verbose}" />
+			<echo level="info" message="- apidoc.zip.name :          ${apidoc.zip.name}" />
+			<echo level="info" message="- apidoc.zip.file :          ${apidoc.zip.file}" />
+			<echo level="info" message="- apidoc.packages :          ${apidoc.packages}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+			<delete dir="${apidoc.working.directory}" failonerror="true" />
+			<mkdir dir="${apidoc.working.directory}" />
+			<if>
+				<available file="${apidoc.source.zip}" />
+				<then>
+					<unzip src="${apidoc.source.zip}" dest="${apidoc.working.directory}/sources" />
+				</then>
+				<else>
+					<antcall target="sourcezip">
+						<param name="sourcezip.create.zip" value="false" />
+						<param name="sourcezip.temp.dir" value="${apidoc.working.directory}/sources" />
+						<param name="include.bootstrap.sources" value="true" />
+					</antcall>
+				</else>
+			</if>
+			<if>
+				<not>
+					<equals arg1="" arg2="${apidoc.extensions.clean}" />
+				</not>
+				<then>
+					<property name="apidoc.additional.links" value="" />
+					<copy file="${platformhome}/resources/ant/apidoc/overview.html" tofile="${platformhome}/resources/ant/apidoc/overview_final.html" overwrite="true" failonerror="true" />
+					<replace file="${platformhome}/resources/ant/apidoc/overview_final.html" token="&lt;!--ADDITIONALS--&gt;" value="${apidoc.additional.links}" />
+					<!-- generate classpath for additional folders -->
+					<mkdir dir="${apidoc.working.directory}/classes" />
+					<copyClasses fromDir="${platformhome}/bootstrap/classes/" todir="${apidoc.working.directory}/classes/" />
+					<copyClasses fromDir="${platformhome}/bootstrap/modelclasses/" todir="${apidoc.working.directory}/classes/" />
+					<copyClasses fromDir="${platformhome}/bootstrap/gensrc/" toDir="${apidoc.working.directory}/sources/" mask="**/*.java" />
+					<echo message="generate classpath for additional folders, e.g. web-inf/lib folders" />
+					<foreachextparallel>
+						<do>
+							<copyClasses fromDir="${ext.@{extname}.path}/gensrc/" toDir="${apidoc.working.directory}/sources/" mask="**/*.java" />
+							<copyClasses fromDir="${ext.@{extname}.path}/custom/src/" toDir="${apidoc.working.directory}/sources/" mask="**/*.java" />
+							<copyClasses fromDir="${ext.@{extname}.path}/web/gensrc/" toDir="${apidoc.working.directory}/sources/" mask="**/*.java" />
+							<copyClasses fromDir="${ext.@{extname}.path}/classes/" toDir="${apidoc.working.directory}/classes/" />
+							<copyClasses fromDir="${ext.@{extname}.path}/antclasses/" toDir="${apidoc.working.directory}/classes/" />
+							<copyClasses fromDir="${ext.@{extname}.path}/modelclasses/" toDir="${apidoc.working.directory}/classes/" />
+							<copyClasses fromDir="${ext.@{extname}.path}/testclasses/" toDir="${apidoc.working.directory}/classes/" />
+							<copyClasses fromDir="${ext.@{extname}.path}/tomcatclasses/" toDir="${apidoc.working.directory}/classes/" />
+							<copyClasses fromDir="${ext.@{extname}.path}/hmc/classes/" toDir="${apidoc.working.directory}/classes/" />
+							<copyClasses fromDir="${ext.@{extname}.path}/backoffice/classes/" toDir="${apidoc.working.directory}/classes/" />
+							<addToClasspath classpathproperty="build.additional.classpath" path="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+							<addToClasspath classpathproperty="build.additional.classpath" path="${ext.@{extname}.path}/web/testclasses" />
+							<addFilesToClasspath classpathproperty="build.additional.classpath" path="${ext.@{extname}.path}">
+								<pattern>
+									<include name="**/*.jar" />
+									<exclude name="**/doc/sources/*.jar" />
+									<exclude name="**/doc/javadoc/*.jar" />
+								</pattern>
+							</addFilesToClasspath>
+						</do>
+					</foreachextparallel>
+					<addToClasspath classpathproperty="build.additional.classpath" path="${apidoc.working.directory}/classes/" />
+					<addFilesToClasspath classpathproperty="build.additional.classpath" path="${platformhome}">
+						<pattern>
+							<include name="**/*.jar" />
+							<exclude name="**/doc/sources/*.jar" />
+							<exclude name="**/doc/javadoc/*.jar" />
+						</pattern>
+					</addFilesToClasspath>
+					<echo message="Executing javadoc ant target" />
+					<!-- generate apidoc -->
+					<javadoc additionalparam="-Xdoclint:none" destdir="${apidoc.working.directory}/final" version="true" author="false" use="true" windowtitle="${apidoc.title} ${hybris.build.version}" overview="${platformhome}/resources/ant/apidoc/overview_final.html" doctitle="&lt;h2&gt;${apidoc.title} ${hybris.build.version}&lt;/h2&gt;" bottom="&lt;i&gt;Copyright &#xA9; 2017 SAP SE. All Rights Reserved.&lt;/i&gt;" maxmemory="4000m" useexternalfile="true" failonerror="false" charset="UTF-8" encoding="UTF-8" verbose="true" sourcepath="${apidoc.working.directory}/sources" packagenames="${apidoc.packages}">
+						<arg value="-J-Xmx4G" />
+						<link href="${j2se.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/download.oracle.com/javase/8/docs/api/package-list"/>
+						<link href="${j2ee.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/download.oracle.com/javaee/7/api/package-list"/>
+						<link href="${commons-collections.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/commons.apache.org/proper/commons-collections/javadocs/api-release/package-list"/>
+						<link href="${lucene.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/lucene.apache.org/core/2_9_4/api/all/package-list"/>
+						<link href="${zk.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/8.0.2.1/zk/package-list"/>
+						<link href="${zul.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/3.0.4/zul/package-list"/>
+						<link href="${zkex.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/3.0.4/zkex/package-list"/>
+						<link href="${zhtml.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/3.0.4/zhtml/package-list"/>
+						<link href="${zml.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/3.0.4/zml/package-list"/>
+						<link href="${zkplus.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/3.0.4/zkplus/package-list"/>
+						<link href="${zcommon.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/3.0.4/zcommon/package-list"/>
+						<link href="${zweb.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/www.zkoss.org/javadoc/3.0.4/zweb/package-list"/>
+						<link href="${spring.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/docs.spring.io/spring/docs/4.2.7.RELEASE/javadoc-api/package-list"/>
+						<link href="${spring-security.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/docs.spring.io/spring-security/site/docs/4.0.4.RELEASE/apidocs/package-list"/>
+						<link href="${spring-integration.api.link}" offline="${apidoc.packagelist.offline}" packagelistLoc="${apidoc.packagelist.location}/docs.spring.io/spring-integration/docs/4.2.8.RELEASE/api/package-list"/>
+						<tag description="Spring Bean ID: " name="spring.bean" />
+						<tag description="Ant Task: " name="ant.task" />
+						<!-- needed only if source zip was created with platformwebservices as binary extension -->
+						<!-- fileset dir="${platformhome}/../bin/ext-platform-optional/platformwebservices/web">
+							<include name="**/*.java"  />
+						</fileset-->
+						<!-- needed only if source zip was created with include.bootstrap.sources parameter set to false -->
+						<!-- fileset dir="${platformhome}/bootstrap/gensrc">
+							<include name="**/*.java"  />
+						</fileset-->
+					</javadoc>
+				</then>
+				<else>
+					<ech level="warning" message="No extensions given!" />
+				</else>
+			</if>
+			<callback extname="hmc" target="xsddoc" />
+			<callback extname="core" target="xsddoc" />
+			<copy file="${ext.hmc.path}/doc/hmc-xsd.html" todir="${apidoc.working.directory}/final/de/hybris/platform/hmc/resources" failonerror="false" />
+			<copy file="${ext.core.path}/doc/items-xsd.html" todir="${apidoc.working.directory}/final/de/hybris/platform/core/resources" failonerror="false" />
+			<copy file="${ext.core.path}/doc/extensioninfo-xsd.html" todir="${apidoc.working.directory}/final/de/hybris/platform/core/resources" failonerror="false" />
+			<copy file="${ext.core.path}/doc/extensions-xsd.html" todir="${apidoc.working.directory}/final/de/hybris/platform/core/resources" failonerror="false" />
+			<if>
+				<istrue value="${apidoc.create.zip}" />
+				<then>
+					<zip destfile="${apidoc.zip.file}">
+						<fileset dir="${apidoc.working.directory}/final" />
+					</zip>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	<macrodef name="addToClasspath">
+		<attribute name="classpathProperty" />
+		<attribute name="path" />
+		<attribute name="path.type" default="dir" />
+		<sequential>
+			<if>
+				<available file="@{path}" type="@{path.type}" />
+				<then>
+					<if>
+						<isset property="@{classpathProperty}" />
+						<then>
+							<if>
+								<istrue value="${apidoc.verbose}" />
+								<then>
+									<echo message="Adding to classpath : @{path}" />
+								</then>
+							</if>
+							<var name="@{classpathProperty}" value="${@{classpathProperty}};@{path}" />
+						</then>
+						<else>
+							<var name="@{classpathProperty}" value="@{path}" />
+						</else>
+					</if>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	<macrodef name="addFilesToClasspath">
+		<attribute name="classpathProperty" />
+		<attribute name="path" />
+		<element name="pattern" />
+		<sequential>
+			<if>
+				<available file="@{path}" type="dir" />
+				<then>
+					<for param="file">
+						<fileset dir="@{path}">
+							<pattern />
+						</fileset>
+						<sequential>
+							<addToClasspath classpathproperty="@{classpathProperty}" path="@{file}" path.type="file" />
+						</sequential>
+					</for>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	<macrodef name="copyClasses">
+		<attribute name="fromDir" />
+		<attribute name="toDir" />
+		<attribute name="mask" default="**/*.class" />
+		<sequential>
+			<if>
+				<available file="@{fromDir}" />
+				<then>
+					<copy todir="@{toDir}">
+						<fileset dir="@{fromDir}" includes="@{mask}" />
+					</copy>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+</project>

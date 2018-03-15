@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<wizard-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="wizard-config.xsd"
+               showPrefilledValues="true" selectMode="true" createMode="true" displaySubtypes="true">
+	<displayed-properties>
+		<group qualifier="General" visible="true" initially-opened="true">
+			<label key="cockpit.config.label.General" />
+			<property qualifier="CMSItem.name"/>
+			<property qualifier="CMSItem.uid"/>
+			<property qualifier="ContentPage.label"/>
+			<property qualifier="AbstractPage.masterTemplate"/>
+		</group>
+		<group qualifier="Other" visible="true" initially-opened="false">
+			<label key="cockpit.config.label.Other" />
+			<property qualifier="AbstractPage.masterTemplate"/>
+			<property qualifier="CMSItem.catalogVersion"/>
+			<property qualifier="CMSItem.uid"/>
+			<property qualifier="AbstractPage.defaultPage" visible="false">
+				<parameter name="defaultValue" value="true" /> 
+			</property>
+			<property qualifier="contentpage.description"/>
+			<property qualifier="contentpage.keywords"/>
+		</group>
+	</displayed-properties>
+</wizard-config>
+
+

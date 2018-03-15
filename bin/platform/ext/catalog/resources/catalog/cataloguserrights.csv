@@ -1,0 +1,11 @@
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;employeegroup;;;;;;;;
+;;;;Catalog;+;-;-;-;-
+;;;;CatalogVersion;+;-;-;-;-
+;;;;CompareCatalogVersionWizard;-;-;-;-;-
+;;;;ProductReference;+;+;+;+;-
+;;;;SynchronizeCatalogVersionWizard;-;-;-;-;-
+;;;;SyncItemJob;+;-;-;-;-
+
+$END_USERRIGHTS;;;;;;;;;

@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="project.pmd">
+
+	<!-- the next line is added allow eclipse resolving the 'platformhome' property. 
+		It is not needed for the normal build process, since platformhome is always 
+		set from the outside. -->
+	<property name="platformhome" location="../.." />
+	<property name="log.path" location="${platformhome}/../../log" />
+
+	<macrodef name="initpmd" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+		<sequential>
+		
+			<path id="pmd.classpath">
+			    <fileset dir="${platformhome}/resources/ant/lib">
+			        <include name="*.jar"/>
+			    </fileset>
+				 <fileset dir="${bundled.tomcat.home}/lib/">
+					<include name="*.jar"/>
+				</fileset>
+				<path path="${build.classpath}" />
+			</path>
+
+			<taskdef name="pmdtask" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath"/>
+
+			<if>
+				<not>
+					<available file="${log.path}/pmd" type="dir" />
+				</not>
+				<then>
+					<mkdir dir="${log.path}/pmd" />
+					<mkdir dir="${log.path}/pmd/pmdwrapper" />
+				</then>
+				<else>
+					<delete dir="${log.path}/pmd" />
+					<mkdir dir="${log.path}/pmd" />
+					<mkdir dir="${log.path}/pmd/pmdwrapper" />
+				</else>
+			</if>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="pmd_start">
+		<attribute name="extensions" />
+		<attribute name="ruleset" default="${platformhome}/ruleset.xml" />
+        
+        
+        <sequential>	
+            <initpmd />
+			<property name="pmd.extensions" value="@{extensions}" />
+			<property name="pmd.ruleset" value="@{ruleset}" />
+			<property name="pmd.subdir" value="" />
+			<property name="pmd.excluded" value="" />
+			<property name="pmd.minimum.priority" value="2" />
+
+			<propertyregex property="pmd.extensions.clean" input="${pmd.extensions}" regexp=";" replace="," global="true" defaultValue="${pmd.extensions}" />
+			<propertyregex property="pmd.excluded.clean" input="${pmd.excluded}" regexp=";" replace="," global="true" defaultValue="${pmd.excluded}" />
+
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- Executing PMD" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- pmd.extensions        : ${pmd.extensions.clean}" />
+			<echo level="info" message="- pmd.ruleset      			: ${pmd.ruleset}" />
+			<echo level="info" message="- pmd.subdir			    : ${pmd.subdir}" />
+			<echo level="info" message="- pmd.excluded		    : ${pmd.excluded}" />
+			<echo level="info" message="- pmd.minimum.priority	    : ${pmd.minimum.priority}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<var name="isexcluded" value="false" />
+
+			<for list="${pmd.extensions.clean}" param="extname" delimiter=",">
+				<sequential>
+					<for list="${pmd.excluded.clean}" param="excludedextensions" delimiter=",">
+						<sequential>
+							<if>
+								<equals arg1="@{extname}" arg2="@{excludedextensions}" />
+								<then>
+									<var name="isexcluded" value="true" />
+								</then>
+							</if>
+						</sequential>
+					</for>
+					<if>
+						<equals arg1="${isexcluded}" arg2="true" />
+						<then>
+							<var name="isexcluded" value="false" />
+						</then>
+						<else>
+							<pmd_logic directory="${ext.@{extname}.path}" subdirectory="${pmd.subdir}" ruleset="${pmd.ruleset}" />
+						</else>
+					</if>
+				</sequential>
+			</for>
+			<!-- activate this with ant 1.9.1 and put the junit-*.jar to the resources/ant/lib folder
+			<junitWrapper />
+			-->
+		</sequential>
+	</macrodef>
+
+	<macrodef name="pmd_logic">
+		<attribute name="directory" />
+		<attribute name="subdirectory" />
+		<attribute name="ruleset" />
+
+		<sequential>
+			<echo message="Test PMD" />
+
+			<if>
+				<equals arg1="@{subdirectory}" arg2="" />
+				<then>
+					<pmd_test directory="@{directory}" ruleset="@{ruleset}" />
+				</then>
+				<else>
+					<if>
+						<available file="@{directory}/@{subdirectory}" />
+						<then>
+							<echo message="The folder @{directory}/@{subdirectory} will be tested instead of @{directory}" />
+							<pmd_test directory="@{directory}/@{subdirectory}" ruleset="@{ruleset}" />
+						</then>
+						<else>
+							<pmd_test directory="@{directory}" ruleset="@{ruleset}" />
+						</else>
+					</if>
+				</else>
+			</if>
+			<echo level="info" message="##########################################" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="pmd_test" description="Tests the given source code with the PMD rules.">
+		<attribute name="directory" />
+		<attribute name="ruleset" />
+		<sequential>
+			<var name="directory.name" unset="true" />
+			<basename property="directory.name" file="@{directory}" />
+			<echo level="info" message="##########################################" />
+			<echo level="info" message="Testing folder : ${directory.name}" />
+			<echo message="@{ruleset}" />
+
+			<if>
+				<available file="@{ruleset}" />
+				<then>
+					<pmdtask shortFilenames="false" rulesetfiles="@{ruleset}" minimumPriority="${pmd.minimum.priority}" failOnRuleViolation="false" encoding="UTF-8">
+						<formatter type="net.sourceforge.pmd.renderers.HTMLRenderer" toFile="${log.path}/pmd/pmd_${directory.name}.html"/>
+						<formatter type="net.sourceforge.pmd.renderers.XMLRenderer" toFile="${log.path}/pmd/pmd_${directory.name}.xml" />
+						<fileset dir="@{directory}">
+							<include name="**/*.java"/>
+						</fileset>
+					</pmdtask>	
+				</then>
+				<else>
+					<pmdtask shortFilenames="false" rulesetfiles="${platformhome}/resources/ant/pmd/pmdsettings.xml" minimumPriority="${pmd.minimum.priority}" failOnRuleViolation="false" encoding="UTF-8">
+						<formatter type="net.sourceforge.pmd.renderers.HTMLRenderer" toFile="${log.path}/pmd/pmd_${directory.name}.html"/>
+						<formatter type="net.sourceforge.pmd.renderers.XMLRenderer" toFile="${log.path}/pmd/pmd_${directory.name}.xml" />
+						<fileset dir="@{directory}">
+							<include name="**/*.java"/>
+						</fileset>
+					</pmdtask>	
+				</else>
+			</if>
+			<echo message="Checking hybris custom rules" />
+			<pmdtask shortFilenames="false" rulesetfiles="${platformhome}/resources/ant/pmd/hybriscustomrules.xml" minimumPriority="${pmd.minimum.priority}" failOnRuleViolation="false" encoding="UTF-8">
+				<formatter type="net.sourceforge.pmd.renderers.HTMLRenderer" toFile="${log.path}/pmd/pmd_${directory.name}_hybrisrules.html"/>
+				<formatter type="net.sourceforge.pmd.renderers.XMLRenderer" toFile="${log.path}/pmd/pmd_${directory.name}_hybrisrules.xml" />
+				<fileset dir="@{directory}">
+					<include name="**/*.java"/>
+				</fileset>
+			</pmdtask>		
+			
+			<xslt in="${log.path}/pmd/pmd_${directory.name}.xml" style="${platformhome}/resources/ant/pmd/xslt/wz-pmd-report.xslt" out="${log.path}/pmd/nicehtml/pmd_${directory.name}.html" />	
+            
+            <xslt in="${log.path}/pmd/pmd_${directory.name}.xml" style="${platformhome}/resources/ant/pmd/xslt/pmd-to-junit.xslt" out="${log.path}/test-reports/junit_${directory.name}.xml">
+            	<param name="extension" expression="${directory.name}" />
+            </xslt>
+            
+            <xslt in="${log.path}/pmd/pmd_${directory.name}_hybrisrules.xml" style="${platformhome}/resources/ant/pmd/xslt/pmd-to-junit.xslt" out="${log.path}/test-reports/junit_${directory.name}_hybrisrules.xml" />
+			
+			<echo level="info" message="Folder complete : ${directory.name}" />
+			<echo level="info" message="##########################################" />
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="junitWrapper">
+		<sequential>
+			<junit>
+				<classpath>
+					<!--Add junit-*.jar here -->
+					<path path="${build.classpath}" />
+				</classpath>
+				
+				<sysproperty key="log.path" value="${log.path}" />
+				<formatter type="xml" />
+				<test name="de.hybris.bootstrap.pmd.tests.PmdTests" todir="${log.path}/pmd/pmdwrapper" />
+				
+			</junit>
+		</sequential>
+	</macrodef>
+
+</project>

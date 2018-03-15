@@ -1,0 +1,19 @@
+das|ist|ein|header
+eine|Daten|zeile
+noch|eine|Daten|zeile
+"ein paar sonderzeichen:"|äöüß|""""|\\
+
+eine|Daten|zeile|nach|einer|"Leer zeile"
+#eine|asukommentierte|Daten|zeile
+
+#eine normale auskommentierte Zeile
+%eine andere normale auskommentierte Zeile
+
+
+€
+
+
+
+
+eine|Daten|zeile|"nach viel platz"
+

@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+--><!--
+ All hybris buildcallbacks.xml macrodefinitions:
+
+ Build/Documentation
+
+	 before/after ant macro "clean"
+		 <macrodef name="trainingstorefront_before_clean"/>
+		 <macrodef name="trainingstorefront_after_clean"/>
+
+	 before/after ant macro "build"
+		 <macrodef name="trainingstorefront_before_build"/>
+		 <macrodef name="trainingstorefront_after_build"/>
+
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="trainingstorefront_before_compile_core">
+		 <macrodef name="trainingstorefront_after_compile_core">
+
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="trainingstorefront_before_compile_web" />
+		 <macrodef name="trainingstorefront_after_compile_web" />
+
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="trainingstorefront_before_compile_hmc" />
+		 <macrodef name="trainingstorefront_after_compile_hmc" />
+
+ Preparing extension
+
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)
+		 <macrodef name="trainingstorefront_only_once_prepare"/>
+
+ Creating ear module/production
+
+	 before/after ant macro "ear"
+		 <macrodef name="trainingstorefront_before_ear"/>
+		 <macrodef name="trainingstorefront_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="trainingstorefront_before_production" />
+		 <macrodef name="trainingstorefront_after_production" />
+
+ JUnit Test
+
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="trainingstorefront_before_yunitinit" />
+		 <macrodef name="trainingstorefront_after_yunitinit" />
+
+	 before/after ant macro "yunit"
+		 <macrodef name="trainingstorefront_before_yunit" />
+		 <macrodef name="trainingstorefront_after_yunit" /> 
+
+ Distribution package
+
+	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="trainingstorefront_after_dist"/>
+		 <macrodef name="trainingstorefront_before_dist"/>
+
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="trainingstorefront_before_dist_copy"/>
+		 <macrodef name="trainingstorefront_after_dist_copy"/>
+
+--><project name="trainingstorefront_buildcallbacks">
+	<property location="${ext.trainingstorefront.path}/web/webroot/WEB-INF/lib/less-rhino-1.7.3.js" name="tool.less"/>
+	<property location="${ext.trainingstorefront.path}/web/webroot/WEB-INF/lib/lessc-rhino-1.7.3.js" name="tool.lessc"/>
+	<property location="${platformhome}/resources/ant/lib/rhino-1.7.7.jar" name="tool.rhino"/>
+	<property location="${ext.trainingstorefront.path}" name="ext.trainingstorefront.mapperToPath"/>
+	<property name="wro.addons.template.path" value="${ext.trainingstorefront.path}/wro_addons_template.xml"/>
+	<property name="wro.addons.dest.path" value="${ext.trainingstorefront.path}/resources/wro_addons.xml"/>
+	<property name="wro.group.node" value="&lt;groups xmlns=&quot;http://www.isdc.ro/wro&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.isdc.ro/wro wro.xsd&quot;&gt;"/>
+
+	<if>
+		<os family="windows"/>
+	    <then>
+	        <propertyregex global="true" input="${ext.trainingstorefront.path}" override="yes" property="ext.trainingstorefront.mapperToPath" regexp="\\" replace="/"/>
+	    </then>
+	</if>
+
+	<!-- The following macros and targets are used to create a new responsive theme based on an existing one (i.e. alpha or lambda) -->
+	<target description="Adds a new responsive theme based on an existing responsive source theme" name="trainingstorefront_responsive_theme_setup">
+		<trainingstorefront_responsive_theme_setup/>
+	</target>
+
+	<macrodef name="trainingstorefront_check_responsive_theme_setup_parameters">
+		<sequential>
+			<var name="themeSetupCommand" value="ant trainingstorefront_responsive_theme_setup -DsourceThemeCode=code1 -DtargetThemeCode=code2"/>
+
+			<!-- check if sourceThemeCode is set -->
+			<if>
+				<not>
+					<isset property="sourceThemeCode"/>
+				</not>
+				<then>
+					<input addproperty="sourceThemeCode">Please enter the code of the responsive source theme</input>
+				</then>
+			</if>
+
+			<!-- check if sourceThemeCode is not empty -->
+			<if>
+				<and>
+					<equals arg1="${sourceThemeCode}" arg2=""/>
+				</and>
+				<then>
+					<fail message="Source theme's code cannot be empty. Enter correct code or set 'sourceThemeCode' in command line : ${themeSetupCommand}"/>
+				</then>
+			</if>
+
+			<if>
+				<not>
+					<available file="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/${sourceThemeCode}"/>
+				</not>
+				<then>
+					<fail message="Source theme must be an existing responsive theme."/>
+				</then>
+			</if>
+
+			<!-- check if targetThemeCode is set -->
+			<if>
+				<not>
+					<isset property="targetThemeCode"/>
+				</not>
+				<then>
+					<input addproperty="targetThemeCode">Please enter the code of the new responsive theme.</input>
+				</then>
+			</if>
+
+			<!-- check if targetThemeCode is not empty -->
+			<if>
+				<and>
+					<equals arg1="${targetThemeCode}" arg2=""/>
+				</and>
+				<then>
+					<fail message="New theme's code cannot be empty. Enter correct code or set 'targetThemeCode' in command line : ${themeSetupCommand}"/>
+				</then>
+			</if>
+
+			<if>
+				<available file="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/${targetThemeCode}"/>
+				<then>
+					<fail message="New theme seems to already exist."/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="trainingstorefront_responsive_theme_setup">
+		<sequential>
+			<trainingstorefront_check_responsive_theme_setup_parameters/>
+			<trainingstorefront_sync_responsive_theme isThemeSync="false" sourceCode="${sourceThemeCode}" targetCode="${targetThemeCode}"/>
+			<xmltask dest="${ext.trainingstorefront.path}/web/webroot/WEB-INF/wro.xml" omitHeader="true" source="${ext.trainingstorefront.path}/web/webroot/WEB-INF/wro.xml">
+				<remove path="/*[local-name()='groups']/*[local-name()='group'][@name='${targetThemeCode}_responsive']"/>
+				<insert path="/*[local-name()='groups']">
+					<![CDATA[
+						<group name="${targetThemeCode}_responsive" xmlns="http://www.isdc.ro/wro">
+							<css>/_ui/responsive/theme-${targetThemeCode}/css/style.css</css>
+						</group>
+					]]>
+				</insert>
+			</xmltask>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="trainingstorefront_sync_responsive_theme">
+		<attribute name="sourceCode"/>
+		<attribute name="targetCode"/>
+		<attribute default="true" name="isThemeSync"/>
+		<sequential>
+			<if>
+				<available file="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/@{sourceCode}" type="dir"/>
+				<then>
+					<touchFutureTimestamp distDir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/@{targetCode}"/>
+					<sync todir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/@{targetCode}">
+						<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/@{sourceCode}" erroronmissingdir="false"/>
+					</sync>
+				</then>
+			</if>
+
+			<property name="theme.img.key.list" value="img.favIcon,img.iconArrowCategoryTile,img.missingProductImage.responsive.product,img.missingProductImage.responsive.thumbnail,img.missingProductImage.responsive.cartIcon,img.missingProductImage.responsive.styleSwatch,img.spinner"/>
+			<propertyregex input="${theme.img.key.list}" property="theme.img.regexp" regexp="," replace="=|"/>
+
+			<copy overwrite="true" todir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/messages">
+				<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/messages" includes="theme-@{sourceCode}-desktop_*.properties"/>
+				<regexpmapper from="theme-(.*)-desktop_(.*).properties" to="theme-@{targetCode}-desktop_\2.properties"/>
+				<filterchain>
+					<filterreader classname="org.apache.tools.ant.filters.LineContainsRegExp">
+						<param type="regexp" value="${theme.img.regexp}="/>
+					</filterreader>
+					<filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
+						<param name="begintoken" type="tokenchar" value="/"/>
+						<param name="endtoken" type="tokenchar" value="/"/>
+						<param name="desktop" type="token" value="/responsive/"/>
+					</filterreader>
+					<filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
+						<param name="begintoken" type="tokenchar" value="/"/>
+						<param name="endtoken" type="tokenchar" value="/"/>
+						<param name="theme-@{sourceCode}" type="token" value="/theme-@{targetCode}/"/>
+					</filterreader>
+				</filterchain>
+			</copy>
+
+			<for param="messageResource">
+				<path>
+					<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/messages" includes="theme-@{targetCode}-desktop_*.properties"/>
+				</path>
+				<sequential>
+					<loadproperties srcFile="@{messageResource}"/>
+					<for list="${theme.img.key.list}" param="imageFileKey">
+						<sequential>
+							<propertycopy from="@{imageFileKey}" name="theme.@{imageFileKey}"/>
+							<if>
+								<istrue value="@{isThemeSync}"/>
+								<then>
+									<propertyregex input="${@{imageFileKey}}" override="true" property="@{imageFileKey}" regexp="/responsive/" replace="/desktop/"/>
+								</then>
+							</if>
+							<propertyregex input="${@{imageFileKey}}" override="true" property="@{imageFileKey}" regexp="/theme-@{targetCode}/" replace="/theme-@{sourceCode}/"/>
+							<echo>copy from: ${@{imageFileKey}} to: ${theme.@{imageFileKey}}</echo>
+
+							<copy failonerror="false" file="${ext.trainingstorefront.path}/web/webroot${@{imageFileKey}}" quiet="true" tofile="${ext.trainingstorefront.path}/web/webroot${theme.@{imageFileKey}}"/>
+
+							<var name="theme.@{imageFileKey}" unset="true"/>
+							<var name="@{imageFileKey}" unset="true"/>
+						</sequential>
+					</for>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+	<!-- end of macros & targets for creating a new responsive theme -->
+
+	<macrodef name="trainingstorefront_lesscss">
+		<sequential>
+			<copy todir="${ext.trainingstorefront.path}/web/webroot/_ui/responsive/">
+					<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/" includes="themes/*"/>
+					<regexpmapper from="themes/(.*)" handledirsep="yes" to="theme-\1/css"/>
+			</copy>
+			<apply dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/" executable="java" failonerror="true" force="true" parallel="false">
+				<!-- Give the input bundle of less files-->
+				<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/">
+					<include name="**/style.less"/>
+				</fileset>
+				<arg value="-jar"/>
+				<arg path="${tool.rhino}"/>
+				<arg value="-f"/>
+				<arg path="${tool.less}"/>
+				<arg path="${tool.lessc}"/>
+				<srcfile/>
+				<!-- Output the compiled css file with corresponding name -->
+				<regexpmapper from="(.*)/less/(.*)\.less$$" handledirsep="yes" to="${ext.trainingstorefront.mapperToPath}/web/webroot/_ui/responsive/theme-\1/css/\2.css"/>
+				<targetfile/>
+			</apply>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="trainingstorefront_movelibs">
+		<sequential>
+			<copy todir="${ext.trainingstorefront.path}/web/webroot/_ui/responsive/common/bootstrap">
+				<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/lib/bootstrap-3.3.7" includes="**"/>
+			</copy>
+			<copy overwrite="true" todir="${ext.trainingstorefront.path}/web/webroot/_ui/responsive/common/js">
+				<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/lib/common" includes="**"/>
+			</copy>
+			<copy overwrite="true" todir="${ext.trainingstorefront.path}/web/webroot/_ui/responsive/common/js">
+				<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/lib/ybase-0.1.0/js" includes="**"/>
+			</copy>
+			<copy todir="${ext.trainingstorefront.path}/web/webroot/_ui/responsive/">
+				<fileset dir="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/" includes="themes/**/fonts/*"/>
+				<regexpmapper from="themes/(.*)/fonts/(.*)" handledirsep="yes" to="theme-\1/fonts/\2"/>        
+			</copy>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="trainingstorefront_generatevariables">
+		<sequential>
+			<uptodate property="updates" targetfile="${ext.trainingstorefront.path}/resources/generateVariables.properties" value="true">
+				<srcfiles file="${ext.trainingstorefront.path}/web/webroot/WEB-INF/tags/shared/variables/generatedVariables.tag"/>
+				<srcfiles file="${ext.trainingstorefront.path}/web/webroot/_ui/shared/js/generatedVariables.js"/>
+				<srcfiles file="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/shared/less/generatedVariables.less"/>
+			</uptodate>
+			<if>
+				<equals arg1="${updates}" arg2="true"/>
+				<then>
+					<concat destfile="${ext.trainingstorefront.path}/web/webroot/WEB-INF/tags/shared/variables/generatedVariables.tag" overwrite="no">
+						<string>&lt;%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %&gt;
+</string>
+						<filelist dir="${ext.trainingstorefront.path}/resources" files="generateVariables.properties"/>
+					</concat>
+
+					<replaceregexp byline="true" file="${ext.trainingstorefront.path}/web/webroot/WEB-INF/tags/shared/variables/generatedVariables.tag" match="^(?!&lt;%@)(.*)=(.*)" replace="&lt;c:set var=&quot;\1&quot; value=&quot;\2&quot; scope=&quot;session&quot;/&gt;"/>
+
+					<concat destfile="${ext.trainingstorefront.path}/web/webroot/_ui/shared/js/generatedVariables.js" overwrite="yes">
+						<filelist dir="${ext.trainingstorefront.path}/resources" files="generateVariables.properties"/>
+					</concat>
+
+					<replaceregexp byline="true" file="${ext.trainingstorefront.path}/web/webroot/_ui/shared/js/generatedVariables.js" match="(.*)=(.*)" replace="var \1=&quot;\2&quot;;"/>
+
+					<concat destfile="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/shared/less/generatedVariables.less" overwrite="no">
+						<filelist dir="${ext.trainingstorefront.path}/resources" files="generateVariables.properties"/>
+					</concat>
+					
+					<replaceregexp byline="true" file="${ext.trainingstorefront.path}/web/webroot/WEB-INF/_ui-src/shared/less/generatedVariables.less" match="(.*)=(.*)" replace="@\1:\2;"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="trainingstorefront_after_build">
+		<sequential>
+			<echo message="trainingstorefront_after_build"/>
+			<impexGenerate extname="trainingstorefront"/>
+			<containsExact separator=";" string="${extension.names}" substring="addonsupport">
+				<do>
+					<var name="addonTestsrcDirs" value=""/>
+					<sequential>
+						<foreachext>
+							<do>
+								<sequential>
+									<for delimiter=";" list="${addon.folder}" param="addOnFile">
+										<sequential>
+											<if>
+												<available file="${ext.@{extname}.path}/acceleratoraddon/@{addOnFile}"/>
+												<then>
+													<copyAddOnToExtension addonextension="@{extname}" addonresource="@{addOnFile}" target="trainingstorefront"/>
+												</then>
+											</if>
+										</sequential>
+									</for>
+									<if>
+										<available file="${ext.trainingstorefront.path}/web/addontestsrc/@{extname}"/>
+										<then>
+											<if>
+												<equals arg1="${addonTestsrcDirs}" arg2=""/>
+												<then>
+													<var name="addonTestsrcDirs" value="addontestsrc/@{extname}"/>
+												</then>
+												<else>
+													<var name="addonTestsrcDirs" value="${addonTestsrcDirs},addontestsrc/@{extname}"/>
+												</else>
+											</if>
+										</then>
+									</if>
+								</sequential>
+								<generate_wro_addons_xml extname="@{extname}"/>
+							</do>
+						</foreachext>
+
+			            <!-- Create TestClasses Files -->
+						<if>
+							<not>
+								<equals arg1="${addonTestsrcDirs}" arg2=""/>
+							</not>
+							<then>
+					            <outofdate>
+					                <sourcefiles>
+					                    <fileset dir="${ext.trainingstorefront.path}">
+					                        <include name="web/addontestsrc/**"/>
+					                    </fileset>
+					                </sourcefiles>
+					                <targetfiles path="${HYBRIS_TEMP_DIR}/touch/trainingstorefront_addontestsrctouch"/>
+					                <sequential>
+					                    <mkdir dir="${ext.trainingstorefront.path}/resources/trainingstorefront"/>
+					                    <testClassesScanner extension="trainingstorefront" fileExtensions="java,groovy,${ext.trainingstorefront.native.file.extension}" testSourceFolders="testsrc,${ext.trainingstorefront.additional.testsrc.dir},${addonTestsrcDirs}"/>
+					                    <mkdir dir="${HYBRIS_TEMP_DIR}/touch"/>
+					                    <touch file="${HYBRIS_TEMP_DIR}/touch/trainingstorefront_addontestsrctouch"/>
+					                </sequential>
+					            </outofdate>
+							</then>
+						</if>
+					</sequential>
+				</do>
+			</containsExact>
+			<trainingstorefront_compileuisrc_executor/>
+			<create_empty_wro_addons_xml/>
+			<fix_root_node_for_wro_addons_xml/>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="trainingstorefront_before_build">
+		<sequential>
+			<echo message="trainingstorefront_before_build"/>
+			<trainingstorefront_generatevariables/>
+			<delete_wro_addons_xml/>
+			<foreachext>
+				<do>
+					<if>
+						<available file="${ext.@{extname}.path}/commonweb"/>
+						<then>
+							<echo message="Found commonweb extension:  @{extname}"/>
+							<copyCommonWebToExtension commonwebextension="@{extname}" commonwebresource="/src" target="trainingstorefront"/>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+
+
+	</macrodef>
+
+
+	<macrodef name="delete_wro_addons_xml">
+		<sequential>
+			<if>
+        		<available file="${wro.addons.dest.path}"/>
+				<then>
+					<delete failonerror="false" file="${wro.addons.dest.path}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="create_empty_wro_addons_xml">
+		<sequential>
+			<if>
+				<not>
+	        		<available file="${wro.addons.dest.path}"/>
+				</not>
+	        	<then>
+	        		<echo> *** ${wro.addons.dest.path} not found, creating an empty one from the template... ***</echo>
+	        		<copy file="${wro.addons.template.path}" tofile="${wro.addons.dest.path}"/>
+        		</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="generate_wro_addons_xml">
+		<attribute name="extname"/>
+		<sequential>
+			<if>
+	        	<available file="${ext.@{extname}.path}/project.properties"/>
+	        	<then>
+	        		<echo>generate_wro_addons_xml for @{extname}</echo>
+	        		<property file="${ext.@{extname}.path}/project.properties"/>
+	        		<if>
+	            		<equals arg1="${trainingstorefront.wro4jconfigscan.@{extname}}" arg2="true"/>
+	            		<then>
+	            			<echo>trainingstorefront.wro4jconfigscan.@{extname}: ${trainingstorefront.wro4jconfigscan.@{extname}}</echo>
+	            			<if>
+	            				<!-- if key doesn't exist in project.properties, the key itself is returned, so we need to escape 'arg2' -->
+			            		<equals arg1="${@{extname}.javascript.paths.desktop}" arg2="$${@{extname}.javascript.paths.desktop}"/>
+			            		<then>
+			            			<var name="jsPathsDesktop" value=""/>
+		            			</then>
+	            				<else>
+	            					<var name="jsPathsDesktop" value="${@{extname}.javascript.paths.desktop}"/>
+	            				</else>
+	            			</if>
+	            			<if>
+			            		<equals arg1="${@{extname}.javascript.paths.responsive}" arg2="$${@{extname}.javascript.paths.responsive}"/>
+			            		<then>
+			            			<var name="jsPathsResponsive" value=""/>
+		            			</then>
+	            				<else>
+	            					<var name="jsPathsResponsive" value="${@{extname}.javascript.paths.responsive}"/>
+	            				</else>
+	            			</if>
+	            			<if>
+			            		<equals arg1="${@{extname}.css.paths.desktop}" arg2="$${@{extname}.css.paths.desktop}"/>
+			            		<then>
+			            			<var name="cssPathsDesktop" value=""/>
+		            			</then>
+	            				<else>
+	            					<var name="cssPathsDesktop" value="${@{extname}.css.paths.desktop}"/>
+	            				</else>
+	            			</if>
+	            			<if>
+			            		<equals arg1="${@{extname}.css.paths.responsive}" arg2="$${@{extname}.css.paths.responsive}"/>
+			            		<then>
+			            			<var name="cssPathsResponsive" value=""/>
+		            			</then>
+	            				<else>
+	            					<var name="cssPathsResponsive" value="${@{extname}.css.paths.responsive}"/>
+	            				</else>
+	            			</if>
+	            			<create_wro_addons_xml cssPathsDesktop="${cssPathsDesktop}" cssPathsResponsive="${cssPathsResponsive}" extname="@{extname}" jsPathsDesktop="${jsPathsDesktop}" jsPathsResponsive="${jsPathsResponsive}"/>
+	            		</then>
+	        		</if>
+	       		</then>
+           	</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="create_wro_addons_xml">
+		<attribute name="extname"/>
+		<attribute name="jsPathsDesktop"/>
+		<attribute name="jsPathsResponsive"/>
+		<attribute name="cssPathsDesktop"/>
+		<attribute name="cssPathsResponsive"/>
+		
+		<sequential>
+			<var name="addonPath" value="/_ui/addons/@{extname}"/>
+			<echo>create_wro_addons_xml for @{extname}</echo>
+			<if>
+	        	<available file="${wro.addons.template.path}"/>
+	        	<then>
+	        		<create_empty_wro_addons_xml/>
+	        		<xmltask destbuffer="buffer" omitHeader="true" source="${wro.addons.dest.path}"/>
+	        		<xmltask dest="${wro.addons.dest.path}" omitHeader="true" sourcebuffer="buffer">
+						<call path="/groups/group">
+							<param name="uiexperience" path="@name"/>
+							<actions>
+								<!-- ### responsive ### -->
+								<if>
+									<equals arg1="@{uiexperience}" arg2="addons_responsive"/>
+									<then>
+										<echo> &gt;&gt;&gt; Adding resources for @{uiexperience}</echo>
+										<for delimiter=";" list="@{jsPathsResponsive}" param="jsfile">
+											<sequential>
+												<xmltask destbuffer="buffer" sourcebuffer="buffer">
+													<insert path="/groups/group[@name='addons_responsive']">
+														<![CDATA[
+															<js>${addonPath}@{jsfile}</js>
+														]]>
+													</insert>
+												</xmltask>
+											</sequential>
+										</for>
+										<for delimiter=";" list="@{cssPathsResponsive}" param="cssfile">
+											<sequential>
+												<xmltask destbuffer="buffer" sourcebuffer="buffer">
+													<insert path="/groups/group[@name='addons_responsive']">
+														<![CDATA[
+															<css>${addonPath}@{cssfile}</css>
+														]]>
+													</insert>
+												</xmltask>
+											</sequential>
+										</for>
+									</then>
+								</if>
+								<!-- ### desktop ### -->
+								<if>
+									<equals arg1="@{uiexperience}" arg2="addons_desktop"/>
+									<then>
+										<echo> &gt;&gt;&gt; Adding resources for @{uiexperience}</echo>
+										<for delimiter=";" list="@{jsPathsDesktop}" param="jsfile">
+											<sequential>
+												<xmltask destbuffer="buffer" sourcebuffer="buffer">
+													<insert path="/groups/group[@name='addons_desktop']">
+														<![CDATA[
+															<js>${addonPath}@{jsfile}</js>
+														]]>
+													</insert>
+												</xmltask>
+											</sequential>
+										</for>
+										<for delimiter=";" list="@{cssPathsDesktop}" param="cssfile">
+											<sequential>
+												<xmltask destbuffer="buffer" sourcebuffer="buffer">
+													<insert path="/groups/group[@name='addons_desktop']">
+														<![CDATA[
+															<css>${addonPath}@{cssfile}</css>
+														]]>
+													</insert>
+												</xmltask>
+											</sequential>
+										</for>
+									</then>
+								</if>
+							</actions>
+						</call>
+					</xmltask>
+			    	<xmltask dest="${wro.addons.dest.path}" omitHeader="true" outputter="simple:3" sourcebuffer="buffer"/>
+        		</then>
+				<else>
+					<echo message="-----------WARNING----------- : Could not find template wro file = ${wro.addons.template.path}..."/>
+				</else>
+			</if>
+			
+		</sequential>
+    </macrodef>
+
+	<macrodef name="fix_root_node_for_wro_addons_xml">
+		<sequential>
+			<replaceregexp file="${wro.addons.dest.path}" match="&lt;groups&gt;" replace="${wro.group.node}"/>
+		</sequential>
+	</macrodef>
+
+	<!-- 
+		Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+
+		${ear.path}: 			path to ear
+	 -->
+	<macrodef name="trainingstorefront_after_clean">
+		<sequential>
+			<!-- Addon folders in storefronts are always cleaned (even if there is no addonsupport on localextension list) -->
+			<addonclean/>
+			<commonwebclean/>
+			<delete_wro_addons_xml/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="trainingstorefront_compileuisrc_executor">
+		<sequential>
+			<trainingstorefront_lesscss/>
+			<trainingstorefront_movelibs/>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="touchFutureTimestamp">
+		<attribute name="distDir"/>
+		<sequential>
+			<property name="tstamp.pattern" value="MM/dd/yyyy HH:mm a"/>
+			<tstamp>
+				<format pattern="${tstamp.pattern}" property="tstamp.now"/>
+			</tstamp>
+			<touch>
+				<fileset dir="@{distDir}" erroronmissingdir="false">
+					<date datetime="${tstamp.now}" pattern="${tstamp.pattern}" when="after"/>
+					<type type="file"/>
+				</fileset>
+			</touch>
+		</sequential>
+	</macrodef>
+
+	<target description="compile the _ui-src folder in _ui" name="trainingstorefront_compileuisrc">
+		<trainingstorefront_compileuisrc_executor/>
+	</target>
+</project>

@@ -1,0 +1,41 @@
+<audit-report-config name="merge-origin">
+    <given-root-type>UserGroup</given-root-type>
+    <types>
+        <type code="User">
+            <atomic-attributes>             
+                <atomic-attribute qualifier="customerID" displayName="customerID"/>                
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="defaultPaymentAddress" displayName="defaultPaymentAddress"
+                                     type="Address"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="user" type="AbstractContactInfo" many="true" displayName="contactInfos"/>                
+            </virtual-attributes>
+            <relation-attributes>
+                <relation-attribute relation="PrincipalGroupRelation" displayName="PrincipalGroupRelation" many="true"
+                                    type="UserGroup"/>
+            </relation-attributes>
+        </type>        
+        <type code="UserGroup">
+            <atomic-attributes>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="locName" displayName="locName"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="uid" displayName="uid"/>
+            </atomic-attributes>
+        </type>
+        <type code="AbstractContactInfo" displayName="AbstractContactInfo">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="phoneNumber" displayName="phoneNumber"/>
+                <atomic-attribute qualifier="type" displayName="type"/>
+            </atomic-attributes>
+        </type>
+          <type code="Address" displayName="Address">
+            <atomic-attributes>
+                <atomic-attribute qualifier="appartment" displayName="appartment"/>                
+            </atomic-attributes>            
+        </type>
+    </types>
+</audit-report-config>

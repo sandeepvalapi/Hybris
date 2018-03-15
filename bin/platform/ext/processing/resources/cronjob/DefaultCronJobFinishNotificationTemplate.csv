@@ -1,0 +1,12 @@
+# needed for backward compatibility
+REMOVE Media;code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true]
+;DefaultCronJobFinishNotificationTemplate_de;text/plain;DefaultCronJobFinishNotificationTemplate_de.vm;jar:/cronjob/DefaultCronJobFinishNotificationTemplate_de.vm;
+;DefaultCronJobFinishNotificationTemplate_en;text/plain;DefaultCronJobFinishNotificationTemplate_en.vm;jar:/cronjob/DefaultCronJobFinishNotificationTemplate_en.vm;
+
+# These have to be catalog unaware
+INSERT_UPDATE  CatalogUnawareMedia;code[unique=true]; mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];
+;DefaultCronJobFinishNotificationTemplate_de;text/plain;DefaultCronJobFinishNotificationTemplate_de.vm;jar:/cronjob/DefaultCronJobFinishNotificationTemplate_de.vm;
+;DefaultCronJobFinishNotificationTemplate_en;text/plain;DefaultCronJobFinishNotificationTemplate_en.vm;jar:/cronjob/DefaultCronJobFinishNotificationTemplate_en.vm;
+
+INSERT_UPDATE RendererTemplate;code[unique=true,allownull=true];contextClass;description[lang=de];description[lang=en];content(code)[lang=de];content(code)[lang=en];outputMimeType;rendererType(code,itemtype(code))[allownull=true];
+;DefaultCronJobFinishNotificationTemplate;de.hybris.platform.cronjob.jalo.CronJobNotificationTemplateContext;Benachrichtigungs-Vorlage f�r das Emailrendering nach Beendigung eines CronJobs;Notification template for rendering email after finished CronJob;DefaultCronJobFinishNotificationTemplate_de;DefaultCronJobFinishNotificationTemplate_en;text/plain;velocity:RendererTypeEnum;

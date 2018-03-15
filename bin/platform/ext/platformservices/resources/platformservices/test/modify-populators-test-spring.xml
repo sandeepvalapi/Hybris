@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- Load the ModifyPopulatorListBeanPostProcessor that looks for ModifyPopulatorList beans. -->
+	<bean class="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessor"/>
+	<!-- Abstract bean used as a parent for beans that modify a populator list. -->
+	<bean id="modifyPopulatorList" class="de.hybris.platform.converters.impl.ModifyPopulatorList"
+			abstract="true"/>
+
+	<bean id="populatorA" class="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.APopulator" />
+	<bean id="populatorB" class="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.BPopulator" />
+	<bean id="populatorC" class="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.CPopulator" />
+	<bean id="populatorD" class="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.DPopulator" />
+
+
+	<!-- base converter -->
+	<bean id="baseConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.Data" />
+		<property name="populators">
+			<list>
+				<ref bean="populatorA" />
+				<ref bean="populatorB" />
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="baseConverter" />
+		<property name="add" ref="populatorA" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="baseConverter" />
+		<property name="add" ref="populatorC" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="baseConverter" />
+		<property name="remove" ref="populatorB" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="baseConverter" />
+		<property name="remove" ref="populatorD" />
+	</bean>
+
+	<!-- base converter from list -->
+	
+	<bean id="populatorList" class="de.hybris.platform.converters.impl.DefaultPopulatorList" >
+		<property name="populators">
+			<list>
+				<ref bean="populatorA" />
+				<ref bean="populatorB" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="listConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.Data" />
+		<property name="populators" ref="populatorList" />		
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="populatorList" />
+		<property name="add" ref="populatorA" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="populatorList" />
+		<property name="add" ref="populatorC" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="populatorList" />
+		<property name="remove" ref="populatorB" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="populatorList" />
+		<property name="remove" ref="populatorD" />
+	</bean>
+
+	<!-- converter with parent -->
+	<bean id="withoutParentConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.Data" />
+		<property name="populators">
+			<list>
+				<ref bean="populatorA" />
+			</list>
+		</property>
+	</bean>
+	
+	
+	<bean id="withParentConverter" parent="withoutParentConverter" abstract="true">
+		<property name="populators" >
+			<list  merge="true">
+				<ref bean="populatorC" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="withGrantParentConverter" parent="withParentConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="populatorD" />
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="withoutParentConverter" />
+		<property name="remove" ref="populatorA" />
+	</bean>
+
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="withoutParentConverter" />
+		<property name="add" ref="populatorB" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="withGrantParentConverter" />
+		<property name="remove" ref="populatorD" />
+	</bean>
+
+	<!-- converter with aliases -->
+
+	<alias name="aliasedConverterId" alias="idAlias"/>
+	<alias name="namedAlias" alias="aliasedAlias"/>
+	<alias name="aliasedConverterName" alias="namedAlias"/>
+	<bean id="aliasedConverterId" name="aliasedConverterName" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.Data" />
+		<property name="populators">
+			<list>
+				<ref bean="populatorA" />
+				<ref bean="populatorB" />
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="namedAlias" />
+		<property name="add" ref="populatorA" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="idAlias" />
+		<property name="add" ref="populatorC" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="aliasedAlias" />
+		<property name="remove" ref="populatorB" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="aliasedConverterName" />
+		<property name="remove" ref="populatorD" />
+	</bean>
+
+
+	<!-- converter with modify hierarchy-->
+	<bean id="simpleConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.Data" />
+		<property name="populators">
+			<list>
+				<ref bean="populatorA" />
+				<ref bean="populatorB" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="mergedConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.Data" />
+		<property name="populators">
+			<list>
+				<ref bean="populatorA" />
+				<ref bean="populatorB" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="modifyBase" parent="modifyPopulatorList">
+		<property name="list" ref="simpleConverter" />
+		<property name="add" ref="populatorC" />
+	</bean>
+
+	<bean parent="modifyBase">
+		<property name="list" ref="mergedConverter" />
+		<property name="remove" ref="populatorA" />
+	</bean>
+
+
+	<!-- converter with aliases and parents -->
+	<alias name="aliasedWithoutParentConverter" alias="parentAlias1"/>
+	<bean id="aliasedWithoutParentConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessorTest.Data" />
+		<property name="populators">
+			<list>
+				<ref bean="populatorA" />
+			</list>
+		</property>
+	</bean>
+	
+	
+	<alias name="aliasedWithParentConverter" alias="parentAlias2"/>
+	<bean id="aliasedWithParentConverter" parent="aliasedWithoutParentConverter" abstract="true">
+		<property name="populators" >
+			<list>
+				<ref bean="populatorC" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="aliasedWithGrantParentConverter" alias="parentAlias3"/>
+	<bean id="aliasedWithGrantParentConverter" parent="aliasedWithParentConverter">
+		<property name="populators">
+			<list>
+				<ref bean="populatorD" />
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="parentAlias1" />
+		<property name="remove" ref="populatorA" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="parentAlias1" />
+		<property name="add" ref="populatorB" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="parentAlias3" />
+		<property name="add" ref="populatorC" />
+	</bean>
+
+</beans>

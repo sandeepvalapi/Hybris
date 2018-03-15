@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<list-view unassigned-group-name="Other">
+	<group name="General">
+		<property qualifier="Customer.name" visible="true" />
+        <property qualifier="Customer.uid" visible="true" />
+		<property qualifier="User.logindisabled" visible="true" />
+		<property qualifier="User.authorizedToUnlockPages" visible="true" />
+		<property qualifier="User.ldapaccount" visible="true" />
+		<property qualifier="Customer.type" visible="true" />
+	</group>
+</list-view>

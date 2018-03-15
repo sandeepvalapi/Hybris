@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="core_buildcallbacks" >
+
+	<!-- create documentation of hmc.xsd -->
+	<target name="xsddoc">
+		<callback extname="core" target="xsddoc"/>
+	</target>
+	
+	<macrodef name="core_xsddoc">
+		<sequential>
+			<mkdir dir="${ext.core.path}/doc" />
+			<echo message="Generating items.xsd documentation..." />
+			<xslt in="${ext.core.path}/../../resources/schemas/items.xsd" out="${ext.core.path}/doc/items-xsd.html" style="${platformhome}/resources/xsl/xsd-doc.xsl" force="true"/>
+			<echo message="Generating extensioninfo.xsd documentation..." />
+			<xslt in="${ext.core.path}/../../resources/schemas/extensioninfo.xsd" out="${ext.core.path}/doc/extensioninfo-xsd.html" style="${platformhome}/resources/xsl/xsd-doc.xsl" force="true"/>
+			<echo message="Generating extensions.xsd documentation..." />
+			<xslt in="${ext.core.path}/../../resources/schemas/extensions.xsd" out="${ext.core.path}/doc/extensions-xsd.html" style="${platformhome}/resources/xsl/xsd-doc.xsl" force="true"/>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="core_after_compile_core">
+		<sequential>
+			<if>
+				<istrue value="${ext.core.extension.coremodule.sourceavailable}" />
+				<then>
+					<mkdir dir="${ext.core.path}/classes/META-INF/services"  />
+					<echo
+						file="${ext.core.path}/classes/META-INF/services/org.glassfish.jersey.client.spi.DefaultSslContextProvider"
+						message="de.hybris.platform.core.ssl.JerseyClientDefaultSslContextProvider"
+						append="false" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	
+
+</project>

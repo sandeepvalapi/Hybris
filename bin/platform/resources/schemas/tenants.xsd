@@ -1,0 +1,41 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="tenants">
+    	<xs:annotation>
+			<xs:documentation>Contains all system slave tenants configuration</xs:documentation>
+		</xs:annotation>
+        <xs:complexType>      
+          <xs:sequence>
+            <xs:element name="tenant" type="tenant" maxOccurs="unbounded" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+     <xs:complexType name="tenant">
+    	<xs:annotation>
+			<xs:documentation>Contains single system slave tenant specific configuration which are :its unique identifier, collection of parameters specific only for this tenant.</xs:documentation>
+		</xs:annotation>
+        <xs:sequence>
+            <xs:element name="param" type="param" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="param">
+   		<xs:annotation>
+			<xs:documentation>Contains single parameter specific for wrapping tenant. Single parameter is key, value pair. Both are string literals, key should be unique to avoid overwriting.</xs:documentation>
+		</xs:annotation>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute type="xs:string" name="name" use="required"/>
+          </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

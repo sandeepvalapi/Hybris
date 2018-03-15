@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<content-editor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="content-editor.xsd"
+                hideEmpty="true" hideReadOnly="true" groupCollections="false">
+	<template>
+	<![CDATA[
+		<table width="100%" style="margin:0px;padding:0px">
+			<tbody>
+				<tr>
+					<td colspan="2"><div style="height:6px"/></td>
+				</tr>
+				<tr>
+					<td style="width:900px"><cockpit code="property" value="CMSTabParagraphComponent.title"/></td>
+					<td><div style="height:6px"/></td>
+				</tr>
+				<tr>
+					<td style="width:900px"><cockpit code="property" value="CMSTabParagraphComponent.content"/></td>
+					<td><div style="height:6px"/></td>
+				</tr>
+			</tbody>
+		</table>
+	]]>
+	</template>
+	<custom-editors>
+		<property qualifier="CMSTabParagraphComponent.content" editorCode="wysiwyg">
+			<parameter>
+				<name>inline</name>
+				<value>true</value>
+			</parameter>
+			<parameter>
+				<name>fckToolbarConfiguration</name>
+				<value>
+					<!--[['Bold', 'Italic','Underline','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','-','OrderedList','UnorderedList','-','Outdent','Indent','-','Table'],'/',['FontName','FontSize','TextColor','-','Source']] -->
+					[['Bold','Underline','-','OrderedList','UnorderedList','-','Table'],'/',['FontSize','-','Source']]
+				</value>
+			</parameter>
+			<parameter>
+				<name>editorWidth</name>
+				<value>650px</value>
+			</parameter>
+			<parameter>
+				<name>editorHeight</name>
+				<value>300px</value>
+			</parameter>
+			<parameter>
+				<name>labelWidth</name>
+				<value>80px</value>
+			</parameter>
+		</property>
+	</custom-editors>
+</content-editor>

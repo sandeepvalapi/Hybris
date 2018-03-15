@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="codegen">
+
+	<property name="platformhome" location="${basedir}/../.." />
+	<property file="${basedir}/../advanced.properties" />
+	
+
+	<import file="${platformhome}/resources/ant/util.xml" />
+	<import file="${platformhome}/resources/ant/antmacros.xml" />
+	<loadenv/>
+	<condition property="config.present" value="true">
+		<available file="${HYBRIS_CONFIG_DIR}"/>
+	</condition>
+	<fail unless="config.present" message="No config folder found, please call ant before"/>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${platformhome}/lib/ant-contrib-1.0b3.jar" />
+	
+	
+	
+
+	<target name="cleanflag" description="Cleans touch file(s) as marker of performed code generation">
+		<clean_codegen_flag resourcedir="${basedir}/../" />
+	</target>
+
+
+	<macrodef name="gensource">
+		<sequential>
+			<outofdate>
+				<sourcefiles>
+					<fileset dir="${basedir}/../">
+						<include name="*.touch" />
+					</fileset>
+				</sourcefiles>
+				<targetfiles path="${basedir}/../global_code_gen.touch" />
+				<sequential>
+					<ycodegenerator/>
+					<touch file="${basedir}/../global_code_gen.touch" />
+				</sequential>
+			</outofdate>
+		</sequential>
+	</macrodef>
+
+	
+	<target name="gensource">
+			<sequential>
+				<gensource />
+			</sequential>
+		</target>
+
+</project>

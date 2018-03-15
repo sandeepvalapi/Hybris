@@ -1,0 +1,11 @@
+<html>
+	<head>
+	</head>
+
+	<body>
+	Hallo <b>$ctx.assigneeName</b>,<br/><br/>
+
+	Bitte überprüfen Sie folgendes Produkt:
+	<a href="http://localhost:9001/hmc/hybris?open=$ctx.attachmentPK">$ctx.attachmentName</a><br/><br/>
+	</body>
+</html>

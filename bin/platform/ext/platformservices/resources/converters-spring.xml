@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+	<!-- Modifiable configurable populators post processor  -->	
+    <bean id="modifableConfigurablePopulatorPostProcessor" class="de.hybris.platform.converters.impl.ModifableConfigurablePopulatorPostProcessor" autowire="byType"/>
+	
+	<!-- Abstract bean to act as a parent bean for converter beans. -->
+	<bean id="abstractPopulatingConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter" abstract="true"/>
+
+	<!-- No operations populator. This populator should be injected into the list of populators for a converter that requires no populators at the time of
+     definition, i.e. when the list of populators will be empty by design and will be extended with real populators in the upstream overridden converter definition.
+     Once the converter is injected with real populators, the NoOpPopulator should be removed form the list of converter's populators.
+     This is required, in order to avoid runtime warnings of the type “Empty populators list found for converter”, that is issued by the
+     AbstractPopulatingConverter validation. -->
+	<bean id="noOpPopulator" class="de.hybris.platform.converters.impl.NoOpPopulator"/>
+
+	<!-- Load the ModifyPopulatorListBeanPostProcessor that looks for ModifyPopulatorList beans. -->
+	<bean class="de.hybris.platform.converters.impl.ModifyPopulatorListBeanPostProcessor"/>
+		
+	<!-- Abstract bean used as a parent for beans that modify a populator list. -->
+	<bean id="modifyPopulatorList" class="de.hybris.platform.converters.impl.ModifyPopulatorList" abstract="true"/>
+		
+	<bean id="abstractPopulatorList" class="de.hybris.platform.converters.impl.DefaultPopulatorList" abstract="true" />	
+
+	<bean id="abstractConfigurablePopulator" class="de.hybris.platform.converters.impl.DefaultModifableConfigurablePopulator" abstract="true" />
+	
+	<!-- Bean Factory Post Processor for preventing lazy-init=true -->
+	
+	<bean id="lazyInitOverrideBeanFactoryPostProcessor" class="de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessor" >
+		<property name="eagerlyLoadedClasses">
+			<list>
+				<value>de.hybris.platform.converters.config.ConfigurablePopulatorModification</value>
+				<value>de.hybris.platform.converters.impl.ModifyPopulatorList</value>
+				<value>de.hybris.platform.spring.config.ListMergeDirective</value>
+				<value>de.hybris.platform.spring.config.MapMergeDirective</value>
+			</list>
+		</property>
+	</bean>
+</beans>

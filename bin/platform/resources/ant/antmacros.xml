@@ -1,0 +1,1034 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="antmacros">
+	<!--
+	  the next line is added allow eclipse resolving the 'platformhome' property.
+	  It is not needed for the normal build process, since platformhome is always set from the outside.
+	  -->
+	<property name="platformhome" location="${basedir}/../.." />
+	<tstamp />
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${platformhome}/lib/ant-contrib-1.0b3.jar" />
+
+	<import file="${platformhome}/resources/ant/util.xml" />
+	<import file="${platformhome}/resources/ant/dist/distmacros.xml" />
+	<import file="${platformhome}/resources/ant/extgen.xml" />
+	<import file="${platformhome}/resources/ant/modulegen.xml" />
+	<import file="${platformhome}/resources/ant/coreplusmodulegen.xml" />
+	<import file="${platformhome}/resources/ant/mavenTasks.xml" />
+    <import file="${platformhome}/resources/ant/roles.xml" />
+
+	<loadenv />
+
+	<available file="${platformhome}/project.properties" property="project.properties.available" />
+	<fail message="Cannot find file ${platformhome}/project.properties" unless="project.properties.available" />
+
+	<property name="useconfig" value="" />
+
+	<!-- Load project specific buildcallbacks.xml from the config folder -->
+	<import file="${HYBRIS_CONFIG_DIR}/buildcallbacks.xml" optional="true" />
+
+    <if>
+        <available file="${platformhome}/active-role-env.properties"/>
+        <then>
+            <property file="${platformhome}/active-role-env.properties"/>
+            <if>
+                <available file="${HYBRIS_ROLES_DIR}/${ACTIVE_ROLE}/${ACTIVE_ROLE_INSTANCE}/config/instance.properties"/>
+                <then>
+                    <property file="${HYBRIS_ROLES_DIR}/${ACTIVE_ROLE}/${ACTIVE_ROLE_INSTANCE}/config/instance.properties"/>
+                </then>
+            </if>
+        </then>
+    </if>
+
+	<property file="${HYBRIS_CONFIG_DIR}/local${useconfig}.properties" />
+	<property file="${platformhome}/resources/advanced.properties" />
+	<property file="${platformhome}/project.properties" />
+
+	<assureTomcat />
+	<assureBootstrapDependencies />
+
+	<!-- hybris compiler taskdef -->
+	<taskdef name="yjavac" classname="de.hybris.ant.taskdefs.YJavaC">
+		<classpath>
+			<fileset dir="${platformhome}/resources/ant/lib">
+				<include name="ecj*.jar" />
+				<include name="y-ant-utils*.jar" />
+			</fileset>
+			<fileset dir="${bundled.tomcat.home}/lib">
+				<include name="jasper*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<!-- bootstrap generation -->
+	<if>
+		<available file="${platformhome}/bootstrap/build.xml" />
+		<then>
+			<import file="${platformhome}/bootstrap/bootstraputil.xml" />
+			<makebootstrapjar />
+		</then>
+	</if>
+
+	<checkenv />
+	<createenv />
+	<load_build_number />
+
+    <updateDBDrivers/>
+
+	<!-- bootstrap taskdefs -->
+	<if>
+		<isset property="CATALINA_BASE"/>
+		<then>
+			<property name="bundled.tomcat.base" value="${CATALINA_BASE}"/>
+		</then>
+		<else>
+			<property name="bundled.tomcat.base" value="${bundled.tomcat.home}"/>
+		</else>
+	</if>
+
+    <if>
+        <isset property="ACTIVE_ROLE"/>
+        <then>
+            <taskdef name="yDbDriverValidator" classname="de.hybris.ant.taskdefs.DbDriverValidator">
+                <classpath>
+                    <pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+                    <pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+                    <fileset dir="${platformhome}/ext/core/lib">
+                        <include name="*.jar" />
+                    </fileset>
+                    <fileset dir="${platformhome}/lib/dbdriver">
+                        <include name="*.jar" />
+                    </fileset>
+                    <fileset dir="${HYBRIS_ROLES_DIR}/${ACTIVE_ROLE}/base/lib">
+                        <include name="*.jar" />
+                    </fileset>
+                </classpath>
+            </taskdef>
+        </then>
+        <else>
+            <taskdef name="yDbDriverValidator" classname="de.hybris.ant.taskdefs.DbDriverValidator">
+                <classpath>
+                    <pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+                    <pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+                    <fileset dir="${platformhome}/ext/core/lib">
+                        <include name="*.jar" />
+                    </fileset>
+                    <fileset dir="${platformhome}/lib/dbdriver">
+                        <include name="*.jar" />
+                    </fileset>
+                </classpath>
+            </taskdef>
+        </else>
+    </if>
+
+	<!-- bootstrap taskdefs -->
+	<taskdef file="${platformhome}/bootstrap/resources/ybootstrap.properties">
+		<classpath>
+			<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+			<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+			<fileset dir="${platformhome}/ext/core/lib">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${platformhome}/lib/dbdriver">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${platformhome}/lib">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${bundled.tomcat.home}/lib">
+				<include name="*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<!-- setting up platform properties & hybris build.classpath -->
+    <ysetplatformproperties />
+
+	<printenv />
+    <if>
+        <equals arg1="${dbDriverValidationEnabled}" arg2="true"/>
+         <then>
+            <yDbDriverValidator />
+        </then>
+    </if>
+
+
+	<taskdef name="generateExtensionsXML" classname="de.hybris.ant.taskdefs.GenerateExtensionsXMLTask">
+		<classpath>
+			<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+			<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+			<fileset dir="${platformhome}/ext/core/lib">
+				<include name="*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<!-- build classpath is needed for these tasks -->
+	<taskdef file="${platformhome}/bootstrap/resources/ytesting.properties">
+		<classpath>
+			<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+			<pathelement path="${platformhome}/bootstrap/bin/ytomcat.jar" />
+			<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+			<fileset dir="${platformhome}/ext/core/lib">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${platformhome}/lib">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${platformhome}/resources/ant/lib">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${bundled.tomcat.home}/lib">
+				<include name="**/*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<!--new stuff -->
+	<import file="${platformhome}/resources/ant/testing.xml" />
+	<import file="${platformhome}/resources/ant/compiling.xml" />
+	<import file="${platformhome}/resources/ant/mavenTasks.xml" />
+	<import file="${platformhome}/resources/ant/meta.xml" />
+	<import file="${platformhome}/resources/ant/platformadministration.xml" />
+	<import file="${platformhome}/resources/ant/assembling.xml" />
+	<import file="${platformhome}/resources/ant/deploying.xml" />
+	<import file="${platformhome}/resources/ant/documentation.xml" />
+	<import file="${platformhome}/resources/ant/apidoc/apidoc.xml" />
+	<import file="${platformhome}/resources/ant/old31macrodefs.xml" />
+	<import file="${platformhome}/resources/ant/pmd.xml" />
+	<import file="${platformhome}/resources/ant/sonar.xml" />
+	<import file="${platformhome}/resources/ant/cleanupEclipseWarnings.xml" />
+
+	<!-- special handling for web.xml being new in config dir since 4.0.3 -->
+	<if>
+		<not>
+			<available file="${HYBRIS_CONFIG_DIR}/tomcat/conf/web.xml" />
+		</not>
+		<then>
+			<echo message="*** UPGRADE INFO ***" />
+			<echo message="Global tomcat/web.xml not found in config dir (${HYBRIS_CONFIG_DIR}/tomcat/conf/web.xml)" />
+			<echo message="this might be due to a change in hybris 4.0.3 (see PLA-8166). A default web.xml is now" />
+			<echo message="being created in this directory and used." />
+			<copy file="${platformhome}/resources/web_for_config_dir_if_not_present.xml" tofile="${HYBRIS_CONFIG_DIR}/tomcat/conf/web.xml" />
+		</then>
+	</if>
+
+	<if>
+		<available file="${HYBRIS_CONFIG_DIR}/localextensions.xml" />
+		<then>
+			<yvalidatexml id="extensions.xml" source="${HYBRIS_CONFIG_DIR}/localextensions.xml" schema="${platformhome}/resources/schemas/extensions.xsd" />
+		</then>
+	</if>
+
+	<if>
+		<available file="${platformhome}/extensions.xml" />
+		<then>
+			<yvalidatexml id="extensions.xml" source="${platformhome}/extensions.xml" schema="${platformhome}/resources/schemas/extensions.xsd" />
+		</then>
+	</if>
+
+	<foreachext>
+		<do>
+			<import file="${ext.@{extname}.path}/buildcallbacks.xml" optional="true" />
+		</do>
+	</foreachext>
+
+	<target name="unzip_file">
+		<if>
+			<not>
+				<available file="${HYBRIS_CONFIG_DIR}/customize" />
+			</not>
+			<then>
+				<mkdir dir="${HYBRIS_CONFIG_DIR}/customize" />
+			</then>
+		</if>
+		<echo message="unzipping ${file}" />
+		<unzip src="${file}" dest="${HYBRIS_CONFIG_DIR}/customize" overwrite="false" />
+	</target>
+
+	<macrodef name="customize">
+        <sequential>
+			<!-- check for langpacks -->
+			<if>
+				<available file="${HYBRIS_CONFIG_DIR}/languages"/>
+				<then>
+					<foreach target="unzip_file" param="file">
+						<path>
+							<fileset dir="${HYBRIS_CONFIG_DIR}/languages/">
+								<include name="langpack*.zip" />
+							</fileset>
+						</path>
+					</foreach>
+				</then>
+			</if>
+
+			<if>
+				<available file="${HYBRIS_CONFIG_DIR}/customize" />
+				<then>
+					<echo message="copy the content from ${HYBRIS_CONFIG_DIR}/customize to ${HYBRIS_BIN_DIR}" />
+					<copy overwrite="yes" todir="${HYBRIS_BIN_DIR}">
+						<fileset dir="${HYBRIS_CONFIG_DIR}/customize">
+							<exclude name="README.txt" />
+							<include name="**/**" />
+						</fileset>
+					</copy>
+				</then>
+				<else>
+					<echo message="There is no ${HYBRIS_CONFIG_DIR}/customize folder. Create the folder and than the content will be copied into the ${HYBRIS_BIN_DIR} folder." />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare">
+		<sequential>
+			<onlyonce name="prepare">
+				<once>
+					<echo message="preparing..." />
+					<load_build_number />
+					<locale />
+					<!-- @deprecated remove this call in the 5.0 version -->
+					<createenv />
+					<gentcinst />
+					<check_ltw />
+					<foreachext>
+						<do>
+							<callback extname="@{extname}" target="only_once_prepare" />
+						</do>
+					</foreachext>
+				</once>
+			</onlyonce>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="log4j">
+		<sequential>
+			<locale />
+			<!-- @deprecated remove this call in the further version -->
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="gentcinst" description="macro for generating tcServer instance structure">
+		<sequential>
+			<!-- make bin's executable -->
+
+			<chmod perm="+x">
+				<fileset dir="${bundled.tomcat.home}/bin">
+					<include name="*.sh" />
+					<include name="wrapper-*" />
+				</fileset>
+			</chmod>
+
+			<if>
+				<equals arg1="${bundled.server.type}" arg2="tcserver" />
+				<then>
+					<chmod perm="+x">
+						<fileset dir="${bundled.tcserver.home}/${bundled.tcserver.tomcat.home}/bin">
+							<include name="*.sh" />
+							<include name="wrapper-*" />
+						</fileset>
+					</chmod>
+				</then>
+			</if>
+
+			<chmod perm="+x">
+				<fileset dir="${platformhome}">
+					<include name="*.sh" />
+				</fileset>
+			</chmod>
+
+			<!-- make tcServer instance -->
+			<if>
+				<and>
+					<equals arg1="${bundled.server.type}" arg2="tcserver" />
+					<not>
+						<available file="${bundled.server.home}" />
+					</not>
+				</and>
+				<then>
+					<chmod perm="+x">
+						<fileset dir="${bundled.tcserver.home}">
+							<include name="*.sh" />
+							<include name="wrapper-*" />
+						</fileset>
+					</chmod>
+					<if>
+						<os family="windows" />
+						<then>
+							<echo>
+Creating new tcServer instance ${bundled.tcserver.instance} at ${bundled.tcserver.home}
+Calling ${bundled.tcserver.home}/tcruntime-instance.bat create "'${bundled.tcserver.instance}'" "-t '${bundled.tcserver.template}' -v '${bundled.tcserver.tomcat.version}'"
+																								</echo>
+							<exec dir="${bundled.tcserver.home}" executable="cmd.exe" osfamily="windows">
+								<arg line="/c" />
+								<arg line="&quot;tcruntime-instance.bat create ${bundled.tcserver.instance} -t ${bundled.tcserver.template} -v ${bundled.tcserver.tomcat.version}&quot;" />
+							</exec>
+						</then>
+						<else>
+							<echo>
+Creating new tcServer instance ${bundled.tcserver.instance} at ${bundled.tcserver.home}
+Calling ${bundled.tcserver.home}/tcruntime-instance.sh -c &quot;./tcruntime-instance.sh create '${bundled.tcserver.instance}' -t '${bundled.tcserver.template}' -v '${bundled.tcserver.tomcat.version}'&quot;
+																								</echo>
+							<exec dir="${bundled.tcserver.home}" executable="sh" osfamily="unix">
+								<arg line="-c &quot;./tcruntime-instance.sh create '${bundled.tcserver.instance}' -t '${bundled.tcserver.template}' -v '${bundled.tcserver.tomcat.version}'&quot;" />
+							</exec>
+							<chmod perm="+x">
+								<fileset dir="${bundled.server.home}/bin">
+									<include name="*.sh" />
+									<include name="wrapper-*" />
+								</fileset>
+							</chmod>
+						</else>
+					</if>
+					<echo message="Patching catalina.properties" />
+					<replaceregexp file="${bundled.tcserver.home}/${bundled.tcserver.instance}/conf/catalina.properties" match="tcserver.node=tcServer" replace="tcserver.node=${bundled.tcserver.instance}" byline="true" />
+					<echo message="Finished creating server instance" />
+					<echo message="Removing svn-files from ${bundled.tcserver.instance}" />
+					<delete includeemptydirs="true">
+						<fileset dir="${bundled.tcserver.home}/${bundled.tcserver.instance}" defaultexcludes="false">
+							<include name="**/.svn/" />
+						</fileset>
+					</delete>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="extension_generate_deployment">
+		<attribute name="extname" />
+		<sequential>
+			<if>
+				<istrue value="${ext.@{extname}.extension.isoldstyleextension}" />
+				<then>
+					<extension_generate_deployment_oldstyle extname="@{extname}" />
+					<!-- @deprecated: find out, if the old style can be removed in 5.0 -->
+				</then>
+				<else>
+					<extension_generate_deployment_newstyle extname="@{extname}" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_generate_deployment_newstyle">
+		<attribute name="extname" />
+		<sequential>
+			<if>
+				<isset property="ext.@{extname}.coremodule.available" />
+				<then>
+					<if>
+						<istrue value="${ext.@{extname}.extension.coremodule.sourceavailable}" />
+						<then>
+							<property name="extpath@{extname}" location="${ext.@{extname}.path}" />
+
+							<mkdir dir="${ext.@{extname}.path}/classes" />
+							<mkdir dir="${ext.@{extname}.path}/gensrc" />
+
+							<!-- AbstractTypeInitializer -->
+							<if>
+								<available file="${extpath@{extname}}/resources/@{extname}-items.xml" />
+								<then>
+									<xslt in="${extpath@{extname}}/resources/@{extname}-items.xml" out="${ext.@{extname}.path}/gensrc/@{extname}/GeneratedTypeInitializer.java" style="${make-type-initializer.xsl}">
+										<param name="package" expression="@{extname}" />
+										<param name="packageRoot" expression="${ext.@{extname}.extension.coremodule.packageroot}" />
+									</xslt>
+								</then>
+								<elseif>
+									<available file="${extpath@{extname}}/resources/items.xml" />
+									<then>
+										<xslt in="${extpath@{extname}}/resources/items.xml" out="${ext.@{extname}.path}/gensrc/@{extname}/GeneratedTypeInitializer.java" style="${make-type-initializer.xsl}">
+											<param name="package" expression="@{extname}" />
+											<param name="packageRoot" expression="${ext.@{extname}.extension.coremodule.packageroot}" />
+										</xslt>
+									</then>
+								</elseif>
+							</if>
+
+							<!-- and compile all stuff -->
+							<javacompile destdir="${ext.@{extname}.path}/classes">
+								<additionalclasspath>
+									<pathelement path="${ext.@{extname}.classpath}"/>
+								</additionalclasspath>
+								<source>
+									<pathelement path="${ext.@{extname}.path}/gensrc">
+
+									</pathelement>
+								</source>
+							</javacompile>
+						</then>
+					</if>
+
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_generate_deployment_oldstyle">
+		<!-- never used? @deprecated: find out if this can be removed in 5.0 -->
+		<attribute name="extname" />
+		<sequential>
+
+			<if>
+				<isset property="ext.@{extname}.coremodule.available" />
+				<then>
+					<if>
+						<istrue value="${ext.@{extname}.extension.coremodule.sourceavailable}" />
+						<then>
+							<property name="extpath@{extname}" location="${ext.@{extname}.path}" />
+
+							<mkdir dir="${ext.@{extname}.path}/classes" />
+							<mkdir dir="${ext.@{extname}.path}/gensrc" />
+
+							<javacompile destdir="${ext.@{extname}.path}/classes">
+								<source>
+									<pathelement path="${ext.@{extname}.path}/gensrc" />
+								</source>
+							</javacompile>
+
+
+							<!-- hjmp wrapper and DeploymentInfo.class -->
+							<outofdate>
+								<!--we have to do this outofdate check, but the hjmpgenerator ALWAYS writes the files
+								    and so the following javac process will always be started -->
+								<sourcefiles>
+									<fileset dir="${ext.@{extname}.path}/classes">
+										<include name="@{extname}/DeploymentInfo.class" />
+									</fileset>
+								</sourcefiles>
+								<targetfiles path="${HYBRIS_TEMP_DIR}/touch/@{extname}_hjmpgensrctouch" />
+								<sequential>
+									<java classname="de.hybris.platform.persistence.hjmpgen.HJMPGenerator" fork="no" failonerror="true">
+										<classpath>
+											<pathelement path="${build.classpath}" />
+											<pathelement location="${ext.@{extname}.path}/classes" />
+										</classpath>
+										<arg value="${platformhome}" />
+										<arg value="@{extname}" />
+
+										<syspropertyset>
+											<propertyref prefix="modelgeneration" />
+											<propertyref prefix="HYBRIS_" />
+										</syspropertyset>
+									</java>
+									<mkdir dir="${HYBRIS_TEMP_DIR}/touch" />
+									<touch file="${HYBRIS_TEMP_DIR}/touch/@{extname}_hjmpgensrctouch" />
+								</sequential>
+							</outofdate>
+
+							<!-- Type Initializer -->
+							<if>
+								<available file="${extpath@{extname}}/resources/@{extname}-items.xml" />
+								<then>
+									<xslt in="${extpath@{extname}}/resources/@{extname}-items.xml" out="${ext.@{extname}.path}/gensrc/@{extname}/GeneratedTypeInitializer.java" style="${make-type-initializer.xsl}">
+										<param name="package" expression="@{extname}" />
+									</xslt>
+								</then>
+								<else>
+									<xslt in="${extpath@{extname}}/resources/items.xml" out="${ext.@{extname}.path}/gensrc/@{extname}/GeneratedTypeInitializer.java" style="${make-type-initializer.xsl}">
+										<param name="package" expression="@{extname}" />
+									</xslt>
+								</else>
+							</if>
+
+							<javacompile destdir="${ext.@{extname}.path}/classes">
+								<source>
+									<pathelement path="${ext.@{extname}.path}/gensrc" />
+								</source>
+							</javacompile>
+
+						</then>
+					</if>
+
+				</then>
+			</if>
+
+		</sequential>
+
+	</macrodef>
+
+	<macrodef name="clean">
+		<sequential>
+			<models_clean />
+			<extensions_clean />
+			<deploy_clean />
+
+			<echo message="Deleting temp directory ${HYBRIS_TEMP_DIR}" />
+			<delete includeemptydirs="true">
+				<fileset dir="${HYBRIS_TEMP_DIR}">
+					<include name="**/*" />
+				</fileset>
+			</delete>
+
+			<delete verbose="true">
+				<fileset dir="${platformhome}">
+					<include name="junittestcases*" />
+					<include name="velocity.log" />
+					<include name="jdbc.log" />
+				</fileset>
+			</delete>
+
+			<clean_codegen_flag resourcedir="${platformhome}/resources" />
+
+			<mkdir dir="${production.output.path}" />
+
+			<!-- some cleanup if you call more than one target in one vm-call like "ant clean all clean all" -->
+			<onlyonce_reset name="deploy" />
+			<onlyonce_reset name="prepare" />
+			<onlyonce_reset name="hmc_special_handling" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="cleancomplete">
+		<sequential>
+
+			<clean />
+
+			<delete dir="${platformhome}/eclipsebin" />
+			<delete>
+				<fileset dir="${platformhome}/..">
+					<include name="*/eclipsebin" />
+					<include name="*/eclipsebin/**" />
+				</fileset>
+			</delete>
+
+			<delete>
+				<fileset dir="${bundled.tomcat.home}">
+					<include name="logs/**" />
+				</fileset>
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<!-- clean extensions -->
+	<macrodef name="extensions_clean">
+		<sequential>
+			<foreachext>
+				<do>
+					<extension_clean extname="@{extname}" />
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="models_clean">
+		<sequential>
+			<echo message="     cleaning models   " />
+			<delete dir="${platformhome}/bootstrap/gensrc" />
+			<delete dir="${platformhome}/bootstrap/modelclasses" />
+			<delete file="${HYBRIS_BOOTSTRAP_BIN_DIR}/models.jar" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_clean">
+		<attribute name="extname" />
+		<sequential>
+			<callback extname="@{extname}" target="before_clean" />
+			<if>
+				<istrue value="${ext.@{extname}.extension.coremodule.sourceavailable}" />
+				<then>
+					<callback extname="@{extname}" target="before_core_clean" />
+					<!-- clean generated sources -->
+					<delete>
+						<fileset dir="${ext.@{extname}.path}">
+							<exclude name="src/**/*CronJobConstants.java" />
+							<exclude name="src/**/*TaskConstants.java" />
+							<exclude name="src/**/*ProcessengineConstants.java" />
+							<include name="src/**/${ext.@{extname}.extension.abstractclassprefix}*.java" />
+							<include name="resources/jar/@{extname}/generated-application-context.xml" />
+							<!--old-->
+							<include name="resources/@{extname}-generated-application-context.xml" />
+							<include name="resources/@{extname}/@{extname}-generated-application-context.xml" />
+						</fileset>
+					</delete>
+					<!--
+					<mkdir dir="${ext.@{extname}.path}/gensrc" />
+					-->
+					<delete includeEmptyDirs="true" failonerror="false">
+						<fileset dir="${ext.@{extname}.path}">
+							<include name="gensrc/**/**" />
+							<exclude name="gensrc" />
+						</fileset>
+					</delete>
+					<delete dir="${ext.@{extname}.path}/bin" />
+					<callback extname="@{extname}" target="after_core_clean" />
+				</then>
+			</if>
+			<if>
+				<istrue value="${ext.@{extname}.extension.webmodule.sourceavailable}" />
+				<then>
+					<callback extname="@{extname}" target="before_web_clean" />
+					<delete dir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+					<delete dir="${ext.@{extname}.path}/web/testclasses" />
+					<if>
+						<available file="${ext.@{extname}.path}/web/gensrc" type="dir" />
+						<then>
+							<delete dir="${ext.@{extname}.path}/web/gensrc" />
+						</then>
+					</if>
+					<if>
+						<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/core-webservices.jar" />
+						<then>
+							<delete file="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/core-webservices.jar" verbose="false" />
+						</then>
+					</if>
+					<if>
+						<available file="${ext.@{extname}.path}/resources/generated-@{extname}-web-spring.xml" />
+						<then>
+							<delete file="${ext.@{extname}.path}/resources/generated-@{extname}-web-spring.xml" verbose="false" />
+						</then>
+					</if>
+					<callback extname="@{extname}" target="after_web_clean" />
+				</then>
+			</if>
+			<if>
+				<istrue value="${ext.@{extname}.extension.hmcmodule.sourceavailable}" />
+				<then>
+					<callback extname="@{extname}" target="before_hmc_clean" />
+					<delete dir="${ext.@{extname}.path}/hmc/classes" />
+					<delete dir="${ext.@{extname}.path}/hmc/testclasses" />
+					<delete dir="${ext.@{extname}.path}/hmc/bin" />
+					<callback extname="@{extname}" target="after_hmc_clean" />
+				</then>
+			</if>
+
+			<!-- clean backoffice -->
+			<if>
+				<istrue value="${ext.@{extname}.extension.meta.backoffice-module}" />
+				<then>
+					<callback extname="@{extname}" target="before_backoffice_clean" />
+					<echo message="cleaning @{extname} backoffice..." />
+					<if>
+						<available file="${ext.@{extname}.path}/backoffice/src" type="dir" />
+						<then>
+							<delete file="${ext.@{extname}.path}/resources/backoffice/@{extname}_bof.jar" failonerror="false" />
+						</then>
+					</if>
+					<delete dir="${ext.@{extname}.path}/backoffice/classes" failonerror="false" />
+					<callback extname="@{extname}" target="after_backoffice_clean" />
+				</then>
+			</if>
+
+			<!-- clean hac -->
+			<if>
+				<istrue value="${ext.@{extname}.extension.meta.hac-module}" />
+				<then>
+					<callback extname="@{extname}" target="before_hac_clean" />
+					<echo message="cleaning @{extname} hac..." />
+					<if>
+						<available file="${ext.@{extname}.path}/hac/src" type="dir" />
+						<then>
+							<delete file="${ext.@{extname}.path}/resources/hac/@{extname}_hac.jar" failonerror="false" />
+						</then>
+					</if>
+					<delete dir="${ext.@{extname}.path}/hac/classes" failonerror="false" />
+					<delete dir="${ext.@{extname}.path}/hac/testclasses" failonerror="false" />
+					<callback extname="@{extname}" target="after_hac_clean" />
+				</then>
+			</if>
+
+			<!-- clean deployment -->
+			<delete dir="${ext.@{extname}.path}/classes" />
+			<delete dir="${ext.@{extname}.path}/gensrc" />
+			<delete dir="${HYBRIS_TEMP_DIR}/@{extname}" />
+			<delete dir="${ext.@{extname}.path}/doc/junit" failonerror="false" />
+			<delete dir="${ext.@{extname}.path}/doc/api" failonerror="false" />
+			<delete dir="${ext.@{extname}.path}/web/bin" />
+			<delete dir="${ext.@{extname}.path}/temp" />
+			<delete dir="${ext.@{extname}.path}/eclipsebin" failonerror="false" />
+			<delete file="${ext.@{extname}.path}/extensioninfo.xsd" />
+			<delete file="${ext.@{extname}.path}/resources/items.xsd" />
+			<delete file="${ext.@{extname}.path}/resources/beans.xsd" />
+			<delete file="${ext.@{extname}.path}/hmc/resources/hmc.xsd" />
+			<delete file="${ext.@{extname}.path}/hmc/resources/webm?.xsd" />
+			<!-- '?' to exclude from 'webmc' search -->
+			<appserver_jspclean extname="@{extname}" />
+
+			<!--clean only if called global and it is not the CORE extension-->
+			<if>
+				<equals arg1="${ant.project.name}" arg2="platform" />
+				<then>
+					<delete file="${ext.@{extname}.path}/build.xml" />
+					<delete file="${ext.@{extname}.path}/pom.xml" />
+					<delete file="${ext.@{extname}.path}/platformhome.properties" />
+				</then>
+			</if>
+
+			<!-- delete testclasses.xml -->
+			<delete file="${ext.@{extname}.path}/resources/@{extname}/@{extname}-testclasses.xml" />
+
+			<callback extname="@{extname}" target="after_clean" />
+
+			<delete dir="${HYBRIS_TEMP_DIR}/touch">
+				<include name="@{extname}*touch" />
+			</delete>
+
+			<!-- clear the onlyonce targets -->
+			<onlyonce_reset name="gensource" />
+
+		</sequential>
+	</macrodef>
+
+	<!-- appserver cleaning -->
+	<macrodef name="deploy_clean">
+		<sequential>
+			<appserver_customclean />
+			<appserver_cleanvmstartdir />
+			<onlyonce_reset name="deploy" />
+			<!--<clean_web_manifests/>-->
+		</sequential>
+	</macrodef>
+
+	<macrodef name="gensource">
+		<sequential>
+			<onlyonce name="gensource">
+				<once>
+					<copy_meta_xsds />
+					<ycodegenerator />
+				</once>
+			</onlyonce>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="copy_meta_xsds">
+		<sequential>
+			<foreachext>
+				<do>
+					<property name="@{extname}.items.xml" location="${ext.@{extname}.path}/resources/@{extname}-items.xml" />
+					<if>
+						<available file="${@{extname}.items.xml}" />
+						<then>
+							<copy todir="${ext.@{extname}.path}/resources" file="${platformhome}/resources/schemas/items.xsd" failonerror="false" />
+							<yvalidatexml id="@{extname}" source="${@{extname}.items.xml}" schema="${platformhome}/resources/schemas/items.xsd" />
+						</then>
+					</if>
+				</do>
+			</foreachext>
+
+			<foreachext>
+				<do>
+					<property name="@{extname}.beans.xml" location="${ext.@{extname}.path}/resources/@{extname}-beans.xml" />
+					<if>
+						<available file="${@{extname}.beans.xml}" />
+						<then>
+							<copy todir="${ext.@{extname}.path}/resources" file="${platformhome}/resources/schemas/beans.xsd" failonerror="false" />
+							<yvalidatexml id="@{extname}" source="${@{extname}.beans.xml}" schema="${platformhome}/resources/schemas/beans.xsd" />
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="models_build">
+		<sequential>
+			<outofdate>
+				<sourcefiles>
+					<fileset dir="${platformhome}/bootstrap/gensrc">
+						<include name="*.java" />
+					</fileset>
+				</sourcefiles>
+				<targetfiles path="${HYBRIS_BOOTSTRAP_BIN_DIR}/models.jar" />
+				<sequential>
+					<echo message="      building models from ${platformhome}/bootstrap/gensrc to ${HYBRIS_BOOTSTRAP_BIN_DIR}/models.jar" />
+					<mkdir dir="${platformhome}/bootstrap/modelclasses" />
+					<javacompile destdir="${platformhome}/bootstrap/modelclasses">
+                        <additionalclasspath>
+                            <pathelement path="${ext.validation.classpath}"/>
+                        </additionalclasspath>
+						<source>
+							<pathelement path="${platformhome}/bootstrap/gensrc" />
+						</source>
+					</javacompile>
+					<jar destfile="${HYBRIS_BOOTSTRAP_BIN_DIR}/models.jar" basedir="${platformhome}/bootstrap/modelclasses" />
+				</sequential>
+			</outofdate>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="normalize_for_beanshell">
+		<attribute name="input"/>
+		<attribute name="output"/>
+		<sequential>
+			<pathconvert targetos="unix" property="@{output}">
+				<path location="@{input}"/>
+			</pathconvert>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="yrun">
+		<text name="code" trim="true" />
+		<attribute name="additionalclasspath" default="." />
+		<attribute name="deployname" default="client" />
+		<attribute name="jvmargs" default="${standalone.javaoptions}" />
+		<attribute name="loadhybris" default="true" />
+        <attribute name="systeminit" default="false" />
+		<attribute name="failonerror" default="true" />
+
+		<sequential>
+			<mkdir dir="${HYBRIS_TEMP_DIR}/client" />
+			<echo file="${HYBRIS_TEMP_DIR}/client/yrunexec.bsh">@{code}</echo>
+			<java fork="true" classname="de.hybris.bootstrap.loader.Loader" failonerror="@{failonerror}">
+				<jvmarg line="@{jvmargs} &quot;-Djava.util.logging.config.file=${bundled.tomcat.home}/bin/jdk_logging.properties&quot; &quot;-Dfile.encoding=UTF-8&quot;" />
+				<arg line="-deployname @{deployname}" />
+				<arg line="-platformhome &quot;${platformhome}&quot;" />
+				<arg line="-cp @{additionalclasspath}" />
+				<arg line="-loadhybris @{loadhybris}" />
+                <arg line="-systeminit @{systeminit}" />
+				<arg line="-file &quot;${HYBRIS_TEMP_DIR}/client/yrunexec.bsh&quot;" />
+				<classpath>
+					<fileset dir="${platformhome}/bootstrap/bin">
+						<include name="ybootstrap.jar" />
+					</fileset>
+					<fileset dir="${ext.core.path}/lib">
+						<include name="commons*.jar" />
+					</fileset>
+				</classpath>
+				<syspropertyset>
+					<propertyref prefix="HYBRIS_" />
+					<propertyref prefix="platform.extensions" />
+				</syspropertyset>
+			</java>
+		</sequential>
+	</macrodef>
+
+
+	<!---
+	checks of any extension might be loadtime weaved this means
+	/extension/resource/ contains META-INF/aop.xml
+	/extension/web/src META-INF/aop.xml
+	if so there will be aspectj agent added into java runtime arguments
+	-->
+	<macrodef name="check_ltw">
+		<!-- TODO called only once?!?-->
+		<sequential>
+			<property name="ltw.configuration" value="" />
+			<property name="found.web.configurations" value="" />
+			<property name="found.core.configurations" value="" />
+
+
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<available file="${ext.@{extname}.path}/resources/META-INF" />
+							<available file="${ext.@{extname}.path}/resources/META-INF/aop.xml" />
+						</and>
+						<then>
+							<var name="found.core.configurations" value="${found.core.configurations} @{extname}, " />
+							<var name="ltw.configuration" value="-javaagent:${ext.core.path}/lib/${aspect.weaver.library} ${aspect.weaver.config}" />
+						</then>
+					</if>
+					<if>
+						<and>
+							<isset property="ext.@{extname}.webmodule.available" />
+							<available file="${ext.@{extname}.path}/web/resources/META-INF" />
+							<available file="${ext.@{extname}.path}/web/resources/META-INF/aop.xml" />
+						</and>
+						<then>
+							<var name="found.web.configurations" value="${found.web.configurations} @{extname}, " />
+							<var name="ltw.configuration" value="-javaagent:${ext.core.path}/lib/${aspect.weaver.library} ${aspect.weaver.config}" />
+						</then>
+					</if>
+				</do>
+			</foreachext>
+			<if>
+				<not>
+					<equals arg1="${found.core.configurations}" arg2="" />
+				</not>
+				<then>
+					<echo>Found core Load Time Weaving configuration(s) for an extension(s): ${found.core.configurations}</echo>
+				</then>
+			</if>
+			<if>
+				<not>
+					<equals arg1="${found.web.configurations}" arg2="" />
+				</not>
+				<then>
+					<echo>Found web Load Time Weaving configuration(s) for an extension(s): ${found.web.configurations}</echo>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<taskdef name="localproperties" classname="de.hybris.ant.util.AppendToLocalProperties">
+		<classpath>
+			<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+			<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+		</classpath>
+	</taskdef>
+
+	<macrodef name="executesql">
+		<attribute name="sqlfile"/>
+		<sequential>
+			<fail message="Cannot find sql file at @{sqlfile}!">
+			    <condition>
+			        <not>
+			        	<available file="@{sqlfile}"/>
+			        </not>
+			    </condition>
+			</fail>
+	    	<sql
+	    	    driver="${db.driver}"
+	    	    url="${db.url}"
+	    	    userid="${db.username}"
+	    	    password="${db.password}"
+	    	    src="@{sqlfile}">
+	    		<classpath>
+	    			<fileset dir="${platformhome}/lib/dbdriver">
+	    				<include name="*.jar" />
+	    			</fileset>
+	    		</classpath>
+	    	</sql>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="update_spring_xsd">
+		<sequential>
+			<foreachext>
+				<do>
+					<replaceregexp byline="true">
+					  <regexp pattern="(spring-.*)-[0-9]\.[0-9]\.xsd"/>
+					  <substitution expression="\1.xsd"/>
+					  <fileset dir="${ext.@{extname}.path}">
+					    <include name="**/*.xml"/>
+					  </fileset>
+					</replaceregexp>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="inittenant">
+		<sequential>
+			<if>
+				<or>
+					<equals arg1="${dryRun}" arg2="true" />
+					<equals arg1="${typeSystemOnly}" arg2="true" />
+				</or>
+				<then>
+					<initializeTypeSystem dryRun="${dryRun}" typeSystemOnly="${typeSystemOnly}" tenant="${tenant}"/>
+				</then>
+				<else>
+					<callback extname="" target="before_initialize"/>
+					<initialize/>
+					<callback extname="" target="after_initialize"/>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>
+

@@ -1,0 +1,21 @@
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;other;;
+;supercockpitgroup;;
+;cockpitgroup;supercockpitgroup;
+;customergroup;cockpitgroup;
+
+INSERT_UPDATE CockpitUIConfigurationMedia;code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];
+;advanced_search_demo_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;advanced_search_hweaving_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;editor_area_demo_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;list_view_demo_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;list_view_cockpitgroup_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;list_view_customergroup_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+
+INSERT_UPDATE CockpitUIComponentConfiguration;code[unique=true];objectTemplateCode[unique=true];principal(uid)[unique=true];media(code);factoryBean;
+;advancedSearch;TestProduct;demo;advanced_search_demo_ui_config;advancedSearchConfigurationFactory;
+;advancedSearch;TestProduct;demo;advanced_search_hweaving_ui_config;advancedSearchConfigurationFactory;
+;editorArea;TestProduct;demo;editor_area_demo_ui_config;editorAreaConfigurationFactory;
+;listView;TestProduct;demo;list_view_demo_ui_config;listViewConfigurationFactory;
+;listView;TestCategory;cockpitgroup;list_view_cockpitgroup_ui_config;listViewConfigurationFactory;
+;listView;TestCatalog;customergroup;list_view_customergroup_ui_config;listViewConfigurationFactory;

@@ -1,0 +1,36 @@
+.tracking-action {
+	color: black;
+	text-decoration: underline;
+}
+
+.tracking-action:VISITED {
+	color: #ec7205;
+}
+
+div.ship-detail-table {
+	padding: 0 0 0 0;
+}
+
+div.ship-detail-date {
+	border-left: 15px solid #0099C8;
+	padding: 10px 10px 10px 10px;
+}
+
+div.ship-detail-date ul {
+	list-style: none;
+}
+
+div.carrier-info label {
+	font-size: 15px;
+}
+
+div.carrier-info a {
+	float: right;
+	color: #0099CC;
+	font-size: 15px;
+}
+
+div.status-info {
+	background-color: #DBD8D3;
+	padding: 10px 0;
+}

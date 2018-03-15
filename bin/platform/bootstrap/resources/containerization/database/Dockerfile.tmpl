@@ -1,0 +1,10 @@
+FROM ${baseImage}
+
+RUN mkdir -p ${hsqldb_dir}
+COPY ./*.jar ${hsqldb_dir}
+COPY server.properties ${hsqldb_dir}
+COPY start.sh ${hsqldb_dir}
+RUN chmod +x ${hsqldb_dir}/start.sh
+
+EXPOSE $port
+ENTRYPOINT ["${hsqldb_dir}/start.sh"]

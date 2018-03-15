@@ -1,0 +1,4 @@
+INSERT_UPDATE ComposedType;code[unique=true];name;catalogItemType;generate;superType(code);singleton
+;TestComposedTypeParent;TestComposedTypeParent;false;false;ComposedType;false
+;TestComposedTypeChild;TestComposedTypeChild;false;false;TestComposedTypeParent;false
+

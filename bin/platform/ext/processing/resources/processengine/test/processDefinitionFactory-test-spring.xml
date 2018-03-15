@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean name="generationalCounterService" class="de.hybris.platform.regioncache.generation.impl.TypeCodeGenerationalCounterService" lazy-init="true" >
+        <property name="debugMode" value="true"/>
+    </bean>
+
+    <bean name="generationalCacheDelegate" class="de.hybris.platform.regioncache.key.impl.GenerationalCacheDelegate" lazy-init="true" />
+
+    <alias name="CacheController" alias="defaultCacheController" />
+    <bean name="CacheController" class="de.hybris.platform.regioncache.DefaultCacheController" />
+
+    <bean name="defaultScriptsCacheRegion"
+          class="de.hybris.platform.scripting.engine.internal.cache.impl.ScriptsCacheRegion">
+        <constructor-arg name="name" value="defaultScriptsCacheRegion"/>
+        <constructor-arg name="maxEntries" value="1000"/>
+        <constructor-arg name="statsEnabled" value="true"/>
+        <property name="handledTypes">
+            <array>
+                <value>__SCRIPT__</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean name="cacheConfiguration" class="de.hybris.platform.regioncache.DefaultCacheConfiguration">
+        <constructor-arg name="regions">
+            <list>
+                <ref bean="defaultScriptsCacheRegion" />
+            </list>
+        </constructor-arg>
+
+        <constructor-arg name="invalidationFilters">
+            <list />
+        </constructor-arg>
+
+        <constructor-arg name="resolvers">
+            <list>
+                <bean class="de.hybris.platform.regioncache.region.SingleCacheRegionResolver" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean name="cacheRegionProvider" class="de.hybris.platform.regioncache.region.impl.DefaultCacheRegionProvider">
+        <constructor-arg name="cacheRegions">
+            <list>
+                <ref bean="defaultScriptsCacheRegion" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean name="regionRegistryAllocationStrategy" class="de.hybris.platform.regioncache.RegionRegistryAllocationStrategy" />
+
+	<bean id="processDefinitionFactory" class="de.hybris.platform.processengine.definition.DefaultProcessDefinitionFactory">
+		<property name="definitionsCache" ref="processDefinitionsCache" />
+		<property name="xmlDefinitionsReader" ref="xmlProcessDefinitionsReader"/>
+	</bean>
+
+	<bean id="processDefinitionsCache" class="de.hybris.platform.processengine.definition.ProcessDefinitionsCache">
+		<property name="processDefinitionsProvider" ref="processDefinitionsProvider" />
+	</bean>
+
+	<bean id="xmlProcessDefinitionsReader" class="de.hybris.platform.processengine.definition.XMLProcessDefinitionsReader">
+		<constructor-arg ref="scriptingLanguagesService" />
+	</bean>
+	<bean id="processDefinitionsProvider" class="de.hybris.platform.processengine.definition.TestProcessDefinitionsProvider">
+		<constructor-arg ref="xmlProcessDefinitionsReader" />
+	</bean>
+
+	<bean id="noAction" class="de.hybris.platform.processengine.standard.NoAction"/>
+
+	<bean id="testProcess1Definition" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/processengine/test/valid.xml"/>
+	</bean>
+	
+	<context:component-scan base-package="de.hybris.platform.scripting.engine"/>
+
+    <alias name="defaultScriptingEnginesRegistry" alias="scriptEnginesRegistry" />
+    <bean id="defaultScriptingEnginesRegistry" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEnginesRegistry"/>
+
+    <bean id="groovyEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="groovy" c:fileExtension="groovy" c:mime="application/x-groovy" c:cached="true" />
+    <bean id="bshEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="beanshell" c:fileExtension="bsh" c:mime="application/x-bsh" />
+    <bean id="javascriptEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="javascript" c:fileExtension="js" c:mime="application/x-javascript" />
+
+    <alias name="defaultScriptRepositoriesRegistry" alias="scriptRepositoriesRegistry" />
+    <bean id="defaultScriptRepositoriesRegistry" class="de.hybris.platform.scripting.engine.repository.impl.DefaultScriptRepositoriesRegistry" />
+
+    <bean id="classpathScriptsRepository" class="de.hybris.platform.scripting.engine.repository.impl.TestClasspathScriptsRepository">
+       <property name="supportedProtocols">
+       	<list>
+       		<value>classpath</value>
+       	</list>
+       </property>
+   	</bean>
+    
+    <bean id="remoteScriptsRepository" class="de.hybris.platform.scripting.engine.repository.impl.RemoteScriptsRepository">
+       <property name="supportedProtocols">
+       	<list>
+       		<value>http</value>
+       		<value>https</value>
+       		<value>ftp</value>
+       	</list>
+       </property>
+   	</bean>
+
+    <bean id="filesystemScriptsRepository" class="de.hybris.platform.scripting.engine.repository.impl.FileSystemScriptsRepository" >
+       <property name="supportedProtocols">
+       	<list>
+       		<value>file</value>
+       	</list>
+       </property>
+   	</bean>
+
+	<alias name="defaultScriptExecutableCacheService" alias="scriptExecutableCacheService"/>
+	<bean id="defaultScriptExecutableCacheService"
+			class="de.hybris.platform.scripting.engine.internal.cache.impl.DefaultScriptExecutableCacheService">
+		<property name="cacheController" ref="defaultCacheController"/>
+	</bean>
+
+    <alias name="defaultScriptingLanguagesService" alias="scriptingLanguagesService" />
+    <bean id="defaultScriptingLanguagesService" class="de.hybris.platform.scripting.engine.impl.TestScriptingLanguagesService" >
+        <property name="scriptEnginesRegistry" ref="scriptEnginesRegistry"/>
+        <property name="scriptRepositoriesRegistry" ref="scriptRepositoriesRegistry"/>
+        <property name="cacheService" ref="scriptExecutableCacheService"/>
+    </bean>
+
+
+</beans>

@@ -1,0 +1,78 @@
+# testcatalog data for multisync
+
+#  productCatalog
+#      |
+#      +- Category 'SAP'
+#      |      |
+#      |      + Product 'P1'
+#      |      + Product 'P2'
+#      |
+#      +- Category 'NONSAP'
+#             |
+#             + Product 'P3'
+#             + Product 'P4'
+#
+#   categoryCatalog
+#      |
+#      +- Category 'HARDWARE'
+#      |      |
+#      |      + reference to 'productCatalog':'P1'
+#      |      |
+#      |      +- Category 'NEW'
+#      |             |
+#      |             + reference to 'productCatalog':'P3'
+#      |
+#      +- Category 'TOP'
+#             |
+#             + reference to 'productCatalog':'P2'
+#             + reference to 'productCatalog':'P3'
+#
+#  non_sync_catalog (will also be separate synced )
+#      |
+#      +- Category 'SOFTWARE'
+#             |
+#             + Product 'P5'
+#
+#
+#
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;de;true;
+;en;true;
+
+INSERT_UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en]
+;de;Deutsch;German
+;en;Englisch;English
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en]
+;weight;kg;Kilogramm;kilogram
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;categoryCatalog;"contains categories";"contains categories";true
+;productCatalog;"contains products";"contains products";false
+;non_sync_catalog;"will be not synced";"will be not synced";true
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);inclAssurance;inclDuty;inclFreight;inclPacking;active
+;categoryCatalog;cv_cat_online;de,en;true;true;true;false;true
+;categoryCatalog;cv_cat_staged;de,en;false;false;false;false;false
+;productCatalog;cv_prod_online;de,en;true;true;true;false;true
+;productCatalog;cv_prod_staged;de,en;false;false;false;false;false
+;non_sync_catalog;cv_nonsync_online;de,en;true;true;true;false;true
+;non_sync_catalog;cv_nonsync_staged;de,en;false;false;false;false;false
+
+INSERT_UPDATE Category;code[unique=true];name[lang=de];name[lang=en];supercategories( code, catalogVersion(catalog(id),version));catalogVersion(catalog(id),version)[unique=true,allowNull=true]
+;SAP;SAP;SAP;;productCatalog:cv_prod_staged
+;NONSAP;NONSAP;NONSAP;;productCatalog:cv_prod_staged
+;HARDWARE;HARDWARE;HARDWARE;;categoryCatalog:cv_cat_staged;
+;NEW;NEW;NEW;HARDWARE:categoryCatalog:cv_cat_staged;categoryCatalog:cv_cat_staged;
+;TOP;TOP;TOP;;categoryCatalog:cv_cat_staged;
+;SOFTWARE;SOFTWARE;SOFTWARE;;non_sync_catalog:cv_nonsync_staged
+
+INSERT_UPDATE Product;code[unique=true];catalogVersion(catalog(id),version)[unique=true,allowNull=true];name[lang=de];name[lang=en];unit(code);supercategories(code,catalogVersion(catalog(id),version));approvalStatus(code)
+;P1;productCatalog:cv_prod_staged;P1;P1;kg;SAP:productCatalog:cv_prod_staged,HARDWARE:categoryCatalog:cv_cat_staged;approved
+;P2;productCatalog:cv_prod_staged;P2;P2;kg;SAP:productCatalog:cv_prod_staged,TOP:categoryCatalog:cv_cat_staged;approved
+;P3;productCatalog:cv_prod_staged;P3;P3;kg;NONSAP:productCatalog:cv_prod_staged,TOP:categoryCatalog:cv_cat_staged,NEW:categoryCatalog:cv_cat_staged;approved
+;P4;productCatalog:cv_prod_staged;P4;P4;kg;NONSAP:productCatalog:cv_prod_staged;approved
+;P5;non_sync_catalog:cv_nonsync_staged;P5;P5;kg;SOFTWARE:non_sync_catalog:cv_nonsync_staged;approved
+
+

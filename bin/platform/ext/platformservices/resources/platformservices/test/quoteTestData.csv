@@ -1,0 +1,20 @@
+$testQuote0-id=testQuote0
+$testQuote1-id=testQuote1
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID[unique=true];name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;testcustomer;testcustomer;Albert Test;;en;EUR;customergroup;1234
+
+INSERT_UPDATE Quote;code[unique=true];version[unique=true];state(QuoteState.code);name;description;user(User.uid);currency(isocode);date[dateformat=dd.MM.yyyy HH:mm:ss]
+;$testQuote0-id;1;CREATED;Test Quote 0;A Test Quote;testcustomer;EUR;03.10.2016 00:00:00;
+;$testQuote0-id;2;DRAFT;Test Quote 0;A Test Quote;testcustomer;EUR;03.10.2016 00:00:00;
+;$testQuote0-id;3;CANCELLED;Test Quote 0;A Test Quote;testcustomer;EUR;03.10.2016 00:00:00;
+;$testQuote1-id;1;CREATED;Test Quote 1;Another Test Quote;testcustomer;EUR;03.10.2016 00:00:00;
+;$testQuote1-id;2;DRAFT;Test Quote 1;Another Test Quote;testcustomer;EUR;03.10.2016 00:00:00;
+;$testQuote1-id;3;SUBMITTED;Test Quote 1;Another Test Quote;testcustomer;EUR;03.10.2016 00:00:00;
+;$testQuote1-id;4;OFFER;Test Quote 1;Another Test Quote;testcustomer;EUR;03.10.2016 00:00:00;

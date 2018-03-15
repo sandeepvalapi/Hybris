@@ -1,0 +1,480 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="platform" default="all" basedir=".">
+    <tstamp/>
+    <property name="platformhome" location="."/>
+
+    <import file="${platformhome}/resources/ant/antmacros.xml"/>
+
+    <target name="build" depends="updateMavenDependencies" description="Builds all extensions">
+        <callback extname="" target="before_build"/>
+        <build/>
+        <callback extname="" target="after_build"/>
+    </target>
+
+    <target name="deploy"
+            description="Deploys platform to bundled server. Will copy files of config/tomcat or config/tcServer to config folder of configured bundled server.">
+        <callback extname="" target="before_deploy"/>
+        <deploy/>
+        <callback extname="" target="after_deploy"/>
+    </target>
+
+    <target name="ear" description="Builds ear file">
+        <callback extname="" target="before_ear"/>
+        <if>
+            <equals arg1="${ear.target.appserver}" arg2="glassfish"/>
+            <then>
+                <property name="glassfish" value="true"/>
+                <echo message="creating ear using glassfish ear format"/>
+            </then>
+        </if>
+        <buildear/>
+        <callback extname="" target="after_ear"/>
+    </target>
+
+    <target name="all" depends="build,server" description="executes ant build and ant server">
+        <callback extname="" target="before_all"/>
+        <tstamp prefix="finish">
+            <format property="time" pattern="d-MMMM-yyyy HH:mm:ss" locale="en,GB"/>
+        </tstamp>
+        <echo message="Build finished on ${finish.time}.">
+        </echo>
+        <callback extname="" target="after_all"/>
+    </target>
+
+    <target name="clean" description="Cleans platform and all extensions">
+        <callback extname="" target="before_clean"/>
+        <clean/>
+        <callback extname="" target="after_clean"/>
+    </target>
+
+    <target name="cleanear" description="Cleans ear file">
+        <callback extname="" target="before_cleanear"/>
+        <cleanear/>
+        <callback extname="" target="after_cleanear"/>
+    </target>
+
+    <target name="dist" description="Creates a distribution">
+	    <property name="finalzipname" value="${HYBRIS_TEMP_DIR}/dists/hybris-distribution-${build.version}-${DSTAMP}-${TSTAMP}.zip"/>
+	    <property name="finaldevzipname" value="${HYBRIS_TEMP_DIR}/dists/hybris-distribution-${build.version}-${DSTAMP}-${TSTAMP}-dev.zip"/>
+	    <callback extname="" target="before_dist"/>
+        <dist dependencies.dist="true" development.dist="true" include.platform="true" extensions.activated="${extension.names}" extensions.binary="${extension.names}" finalzipname="${finalzipname}" finaldevzipname="${finaldevzipname}"/>
+        <callback extname="" target="after_dist"/>
+    </target>
+
+    <target name="pmd" description="Tests the source code with the pmd rules.">
+        <callback extname="" target="before_pmd"/>
+        <pmd_start extensions="${extension.names}"/>
+        <callback extname="" target="after_pmd"/>
+    </target>
+
+    <target name="sonar" description="Executes sonar to check all projects with the sonar rules.">
+        <callback extname="" target="before_sonar"/>
+        <sonar extensions="${extension.names}"/>
+        <callback extname="" target="sonar_pmd"/>
+    </target>
+
+    <target name="sonarsingle" description="Executes sonar to check a single project with the sonar rules.">
+        <callback extname="" target="before_sonar"/>
+        <sonarsingle extensions="${extension.names}"/>
+        <callback extname="" target="sonar_pmd"/>
+    </target>
+
+    <target name="classpathgen" description="Creates a standard platform .classpath file">
+        <callback extname="" target="before_classpathgen"/>
+        <create_platform_classpath_file destinationplatformhome="${platformhome}"/>
+        <callback extname="" target="after_classpathgen"/>
+    </target>
+
+    <target name="sourcezip" description="Creates a sourcezip">
+        <property name="sourcezip.extensions" value="${extension.names}"/>
+        <property name="sourcezip.zipfile"
+                  value="${HYBRIS_TEMP_DIR}/dists/hybris-sourcezip-${build.version}-${DSTAMP}-${TSTAMP}.zip"/>
+        <property name="include.bootstrap.sources" value="false"/>
+        <callback extname="" target="before_sourcezip"/>
+        <sourcezip extensions="${sourcezip.extensions}" zipfile="${sourcezip.zipfile}"
+                   includebootstrap="${include.bootstrap.sources}"/>
+        <callback extname="" target="after_sourcezip"/>
+    </target>
+
+    <target name="extgen" description="Runs extgen">
+        <callback extname="" target="before_extgen"/>
+        <extgen_generate/>
+        <callback extname="" target="after_extgen"/>
+    </target>
+
+    <target name="modulegen" description="Runs modulegen">
+        <callback extname="" target="before_modulegen"/>
+        <modulegen_generate/>
+        <callback extname="" target="after_modulegen"/>
+    </target>
+
+	<target name="initialize" depends="build,server"
+            description="Runs an initialization of the specified tenant in stand-alone mode, using hybris Administration Console default settings. Syntax: ant initialize [-Dtenant=tenantID -DdryRun=true|false -DtypeSystemOnly=true|false]">
+		 <inittenant/>
+    </target>
+
+	<target name="initializetenantdb" depends="build"
+			description="Runs an initialization of the specified tenant database tables without building or restarting server">
+		<inittenant/>
+	</target>
+
+	<target name="droptypesystem" depends="build,server" description="Drops type system tables.">
+		<input message="Enter valid type system name" addproperty="typeSystemName" />
+		<input message="Enter valid tenant id" addproperty="tenant" />
+		<yTypeSystemClean tenantId="${tenant}" typeSystemName="${typeSystemName}"/>
+	</target>
+
+	<target name="createtypesystem" depends="build,server" description="Creates type system tables.">
+		<input message="Enter valid type system name" addproperty="typeSystemName" />
+		<input message="Enter valid tenant id" addproperty="tenant" />
+		<yTypeSystemCreate tenantId="${tenant}" typeSystemName="${typeSystemName}"/>
+	</target>
+
+	<target name="server" description="Configures hybris Server and restart if running">
+		<callback extname="" target="before_server" />
+		<deploy />
+		<callback extname="" target="after_server" />
+	</target>
+
+    <target name="updatesystem" depends="build,server"
+				description="Runs an update system of the specified tenant in stand-alone mode, using hybris Administration Console default settings or the configuration from a given file. Syntax: ant updatesystem [-Dtenant=tenantID -DdryRun=true|false -DtypeSystemOnly=true|false -DconfigFile=PATH_TO_CONFIG_FILE]">
+		 <if>
+			<or>				
+				<equals arg1="${dryRun}" arg2="true" />
+				<equals arg1="${typeSystemOnly}" arg2="true" />
+			</or>
+			<then>
+				<updateTypeSystem dryRun="${dryRun}" typeSystemOnly="${typeSystemOnly}" tenant="${tenant}"/>
+			</then>
+			<else>
+				<callback extname="" target="before_updatesystem"/>
+				<updatesystem/>
+				<callback extname="" target="after_updatesystem"/>
+			</else>
+		 </if>
+    </target>
+
+    <target name="executeScript" description="Executes script from file. Syntax: ant executeScript -Dresource=scriptURI [-Dparams=&quot;key1=value1,key2=value2&quot;] (example ant executeScript -Dresource=file:///path/to/script.groovy)">
+        <executeScript />
+    </target>
+
+    <target name="importImpex" description="Import ImpEx from file. Syntax: ant importImpex -Dresource=/full/path/to/import.impex">
+        <importImpex />
+    </target>
+
+    <target name="clearOrphanedTypes" description="Clears orphaned types after system update. Syntax: ant clearOrphanedTypes [-DclearInstances=true/false -DclearDeployments=true/false]. Default value for clearInstances is true, default value for clearDeployments is true">
+        <clearOrphanedTypes />
+    </target>
+
+    <target name="sanitycheck" description="Executes sanity check (db health check, license check, etc...) on current platform">
+        <sanitycheck />
+    </target>
+
+	<target name="copyFromTemplate"
+			description="Creates directory based on provided template directory and substitutes
+	all variables defined in .tmpl files with provided parameters. -DtemplateDir - (required) path to template directory
+	-DoutputDir - (required) path to output directory -DfilesToCopy - (optional) coma separated list of files/directories that will be additionally copied
+	-Dproperties - (optional) properties file that overrides default template properties">
+		<copyFromTemplate/>
+	</target>
+
+
+	<target name="createPlatformImageStructure" description="Creates platform docker image structure">
+		<property name="productionPackagesDir" value="${HYBRIS_TEMP_DIR}/hybrisServer"/>
+		<property name="platformImageDir" value="${HYBRIS_TEMP_DIR}/platformimage-${DSTAMP}-${TSTAMP}"/>
+		<property name="serverXmlTemplate" value="${platformhome}/bootstrap/resources/containerization/platformimage/server.xml.tmpl"/>
+		<property name="loggingPropertiesTemplate" value="${platformhome}/bootstrap/resources/containerization/platformimage/logging.properties.tmpl"/>
+		<property name="platformImageAspects" value=""/>
+		<property name="customTomcatFiles" value="" />
+		<property name="externalTomcatDir" value="${vanilla.tomcat.home}" />
+		<property name="templatesProperties" value="" />
+		<createPlatformImageStructure
+			productionPackagesDir="${productionPackagesDir}"
+			platformImageDir="${platformImageDir}"
+			externalTomcatDir="${externalTomcatDir}"
+			serverXmlTemplate="${serverXmlTemplate}"
+			loggingPropertiesTemplate="${loggingPropertiesTemplate}"
+			customTomcatFiles="${customTomcatFiles}"
+			platformImageAspects="${platformImageAspects}"
+			templatesProperties="${templatesProperties}"/>
+	</target>
+
+	<target name="webservice_nature" description="Provides webservice nature to selected extension">
+        <callback extname="" target="before_webservice_nature"/>
+        <set_webservice_nature extensionname="${extname}"/>
+        <callback extname="" target="after_webservice_nature"/>
+    </target>
+
+    <target name="yunitinit" description="Initializes JUnit tenant">
+        <callback extname="" target="before_yunitinit"/>
+        <yunitinit/>
+        <callback extname="" target="after_yunitinit"/>
+    </target>
+
+    <target name="yunitupdate" description="Update JUnit tenant">
+        <callback extname="" target="before_yunitupdate"/>
+        <yunitupdate/>
+        <callback extname="" target="after_yunitupdate"/>
+    </target>
+
+    <target name="apidoc" description="build javadoc for all current extensions">
+        <callback extname="" target="before_api"/>
+        <apidoc extensions="${extension.names}" create.zip="true" title="hybris Commerce Suite"
+                zip.name="hybris-commerce-suite-apidoc"/>
+        <callback extname="" target="after_api"/>
+    </target>
+
+
+    <!-- new style junit targets, see https://wiki.hybris.com/display/release4/Test+Framework+Enhancements -->
+    <target name="unittests" description="executes all unittests">
+        <callback extname="" target="before_unittests"/>
+        <annotationtests annotations="unittests"/>
+        <callback extname="" target="after_unittests"/>
+    </target>
+
+    <target name="demotests" description="executes all demotests">
+        <callback extname="" target="before_demotests"/>
+        <annotationtests annotations="demotests"/>
+        <callback extname="" target="after_demotests"/>
+    </target>
+
+    <target name="integrationtests" description="executes all integrationtests">
+        <callback extname="" target="before_integrationtests"/>
+        <annotationtests annotations="integrationtests"/>
+        <callback extname="" target="after_integrationtests"/>
+    </target>
+
+    <target name="performancetests" description="performancetests">
+        <callback extname="" target="before_performancetests"/>
+        <annotationtests annotations="performancetests"/>
+        <callback extname="" target="after_performancetests"/>
+    </target>
+
+    <target name="manualtests" description="executes all manualtests">
+        <callback extname="" target="before_manualtests"/>
+        <annotationtests annotations="manualtests"/>
+        <callback extname="" target="after_manualtests"/>
+    </target>
+
+    <target name="bugprooftests" description="executes all bugprooftests">
+        <callback extname="" target="before_bugprooftests"/>
+        <annotationtests annotations="bugprooftests"/>
+        <callback extname="" target="after_bugprooftests"/>
+    </target>
+
+    <target name="localizationtest" description="executes the localizationtest to see if all types are properly localized">
+        <callback extname="" target="before_localizationtest"/>
+        <annotationtests packages="*.LocalizationTest"/>
+        <callback extname="" target="after_localizationtest"/>
+    </target>
+
+    <target name="typecodetest" description="executes the typecodetest to see if any reserved typecodes are being used">
+        <callback extname="" target="before_typecodetest"/>
+        <annotationtests packages="*.ReservedTypecodeTest"/>
+        <callback extname="" target="after_typecodetest"/>
+    </target>
+
+    <target name="alltests"
+				description="executes all tests except manualtests and performancetests (allowed parameters: -Dtestclasses.extensions -Dtestclasses.annotations -Dtestclasses.packages -Dtestclasses.packages.excluded)">
+        <callback extname="" target="before_alltests"/>
+        <annotationtests annotations="unittests,demotests,integrationtests"/>
+        <callback extname="" target="after_alltests"/>
+    </target>
+
+    <target name="allwebtests" description="">
+        <callback extname="" target="before_yunitweb"/>
+        <annotationtests annotations="unittests,demotests,integrationtests" web="true"/>
+        <callback extname="" target="after_yunitweb"/>
+    </target>
+
+    <target name="codequality" description="executes all codequality tests">
+        <callback extname="" target="before_codequality"/>
+
+        <!-- override this property to change the set of code quality tested extensions -->
+        <property name="codequality.extensions" value="${extension.names}"/>
+
+        <!-- PMD -->
+        <property name="pmd.extensions" value="${codequality.extensions}"/>
+        <pmd_start extensions="${codequality.extensions}"/>
+
+        <!-- LOCALIZATION -->
+        <property name="localization.extensions" value="${codequality.extensions}"/>
+        <annotationtests packages="*.LocalizationTest" junit.results.directory="${HYBRIS_LOG_DIR}/localizationtest"/>
+
+        <callback extname="" target="after_codequality"/>
+    </target>
+
+    <target name="updateMavenDependencies" description="Updates all maven dependencies in all extensions">
+        <callback extname="" target="before_updateMavenDependencies"/>
+        <updateAllMavenDependencies/>
+        <callback extname="" target="before_reload_updateMavenDependencies"/>
+		<ysetplatformproperties/>
+    	<!-- bootstrap taskdefs -->
+		<taskdef file="${platformhome}/bootstrap/resources/ybootstrap.properties">
+			<classpath>
+				<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+				<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+				<fileset dir="${platformhome}/lib/dbdriver">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="${platformhome}/ext/core/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${platformhome}/lib">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="${bundled.tomcat.home}/lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</taskdef>
+		
+		<!-- build classpath is needed for these tasks -->
+		<taskdef file="${platformhome}/bootstrap/resources/ytesting.properties">
+			<classpath>
+				<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+				<pathelement path="${platformhome}/bootstrap/bin/ytomcat.jar" />
+				<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+				<fileset dir="${platformhome}/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${platformhome}/resources/ant/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${platformhome}/ext/core/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${bundled.tomcat.home}/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</taskdef>
+        <callback extname="" target="after_updateMavenDependencies"/>
+    </target>
+	
+	<target name="cleanMavenDependencies" description="Deletes all maven dependencies in all extensions">
+        <callback extname="" target="before_clearMavenDependencies"/>
+        <clearAllMavenDependencies/>
+		<ysetplatformproperties/>
+        <callback extname="" target="after_clearMavenDependencies"/>
+    </target>
+
+    <target name="testMavenDependencies" description="Test all maven dependencies in platform and all extensions">
+        <callback extname="" target="before_testMavenDependencies"/>
+        <testAllMavenDependencies/>
+        <callback extname="" target="after_testMavenDependencies"/>
+    </target>
+
+    <target name="extensionsxml"
+            description="Generates complete extensions.xml file config/generatedextensions.xml  based on current settings of localextensions.xml">
+        <callback extname="" target="before_extensionsxml"/>
+        <generateExtensionsXML/>
+        <callback extname="" target="after_extensionsxml"/>
+    </target>
+
+    <target name="localproperties" description="Appends properties to local.properties">
+        <callback extname="" target="before_localproperties"/>
+        <localproperties/>
+        <callback extname="" target="after_localproperties"/>
+    </target>
+
+    <target name="generateLicenseOverview" description="Downloads all third party licenses and generates an overview file">
+        <callback extname="" target="before_generateLicenseOverview"/>
+        <generateLicenseOverview/>
+        <generateWebLicenseOverview/>
+        <generateNoTransitiveLicenseOverview/>
+        <callback extname="" target="after_generateLicenseOverview"/>
+    </target>
+
+    <!-- special hybris targets -->
+
+    <target name="customize" description="Copies all files from '/config/customize' folder to '/bin' folder recursively">
+        <callback extname="" target="before_customize"/>
+        <customize/>
+        <callback extname="" target="after_customize"/>
+    </target>
+
+    <target name="production" description="Creates production environment zip's for hybris Server">
+        <callback extname="" target="before_production"/>
+        <production/>
+        <callback extname="" target="after_production"/>
+    </target>
+
+    <target name="runcronjob"
+            description="Performs a  cronjob in stand-alone mode. Syntax: ant runcronjob [-Dcronjob] [-Dtenant]. Use -Dcronjob to pass a CronJob code, such as -Dcronjob=MyCronJob. Use quotation marks for CronJob codes with spaces, such as -Dcronjob=&quot;My Cron Job&quot;.">
+        <callback extname="" target="before_runcronjob"/>
+        <runcronjob/>
+        <callback extname="" target="after_runcronjob"/>
+    </target>
+
+    <target name="clearAdministrationLock"
+            description="Clears any administration lock, which can be left after unfinsihed system update or initialization. This will work only for cluster node which acquired such a lock.">
+        <callback extname="" target="before_clearAdministrationLock"/>
+        <clearLockFlag/>
+        <callback extname="" target="after_clearAdministrationLock"/>
+    </target>
+
+    <target name="startHybrisServer" description="Starts the hybris Server">
+        <callback extname="" target="before_startHybrisServer"/>
+        <startHybrisServer/>
+        <callback extname="" target="after_startHybrisServer"/>
+    </target>
+
+    <target name="startAdminServer" description="Starts the hybris AdminServer">
+        <callback extname="" target="before_startAdminServer"/>
+        <startAdminServer/>
+        <callback extname="" target="after_startAdminServer"/>
+    </target>
+
+    <target name="executesql" description="Executes raw sql using the current platform database settings. You must provide a ${sql.file} property!">
+    	<executesql sqlfile="${sql.file}"/>
+    </target>
+	
+	<target name="updateSpringXsd" description="Converts spring xsd definitions to versionless.">
+		<update_spring_xsd/>
+	</target>
+	
+	<target name="distWithSources" description="Creates distribution and source packages.">
+		<antcall target="dist">
+			<param name="finalzipname" value="${HYBRIS_TEMP_DIR}/dists/distribution.zip"/>
+			<param name="finaldevzipname" value="${HYBRIS_TEMP_DIR}/dists/distribution-dev.zip"/>
+			<param name="development.dist" value="true"/>
+            <param name="dependencies.dist" value="true"/>
+		</antcall>
+		<antcall target="sourcezip">
+			<param name="sourcezip.zipfile" value="${HYBRIS_TEMP_DIR}/dists/distribution-sources.zip"/>
+		</antcall>	
+	</target>
+
+	<target name="deployDist" description="Deploys a distribution package to maven repository.">
+		<deployDistAndSourceZip
+				file="${HYBRIS_TEMP_DIR}/dists/distribution.zip"
+				locfile="${HYBRIS_TEMP_DIR}/dists/langpack.zip"
+				devfile="${HYBRIS_TEMP_DIR}/dists/distribution-dev.zip"
+                depfile="${HYBRIS_TEMP_DIR}/dists/dependencies.zip"/>
+	</target>
+
+	<target name="deployDistWithSources" description="Deploys distribution and source packages to maven repository.">
+		<deployDistAndSourceZip
+			file="${HYBRIS_TEMP_DIR}/dists/distribution.zip"
+			srcfile="${HYBRIS_TEMP_DIR}/dists/distribution-sources.zip"
+			locfile="${HYBRIS_TEMP_DIR}/dists/langpack.zip"
+			devfile="${HYBRIS_TEMP_DIR}/dists/distribution-dev.zip"
+            depfile="${HYBRIS_TEMP_DIR}/dists/dependencies.zip"/>
+	</target>
+
+	<target name="createConfig" description="If not present creates config folder using template provided by -Dinput.template variable.">
+        <echo message="${config.message}"/>
+    </target>
+
+</project>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="testAddressModelValidateInterceptor" class="de.hybris.platform.impex.jalo.imp.TestAddressModelValidateInterceptor"/>
+    <bean id="testAddressModelValidateInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="testAddressModelValidateInterceptor"/>
+        <property name="typeCode" value="Address"/>
+    </bean>
+
+    <bean id="PLA_12491_Test_Interceptor" class="de.hybris.platform.impex.jalo.PLA_12491_Test_Interceptor"/>
+    <bean id="PLA_12491_Test_InterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="PLA_12491_Test_Interceptor"/>
+        <property name="typeCode" value="Title"/>
+    </bean>
+
+</beans>

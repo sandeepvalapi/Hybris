@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<audit-report-config name="PersonalDataReport">
+    <given-root-type>User</given-root-type>
+    <types>
+        <type code="User">
+            <atomic-attributes>
+                <atomic-attribute qualifier="deactivationDate" displayName="deactivationDate"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="customerID" displayName="customerID"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="uid" displayName="uid"/>
+                <atomic-attribute qualifier="mobileNumber" displayName="mobile Number"/>
+                <atomic-attribute qualifier="sapReplicationInfo" displayName="sapReplicationInfo"/>
+                <atomic-attribute qualifier="sapContactID" displayName="sapContactID"/>
+                <atomic-attribute qualifier="sapIsReplicated" displayName="sapIsReplicated" />
+                <atomic-attribute qualifier="sapConsumerID" displayName="sapConsumerID" />
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="defaultPaymentAddress" displayName="defaultPaymentAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="defaultShipmentAddress" displayName="defaultShipmentAddress"
+                                     type="Address"/>
+				<reference-attribute qualifier="defaultB2BUnit" type="B2BUnit" displayName="defaultB2BUnit"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="user" type="AbstractContactInfo" many="true" displayName="contactInfos"/>
+                <virtual-attribute expression="owner" type="Address" many="true" displayName="addresses"/>
+                <virtual-attribute expression="user" type="Cart" many="true" displayName="carts"/>
+                <virtual-attribute expression="user" type="Order" many="true" displayName="orders"/>
+                <virtual-attribute expression="user" type="PaymentInfo" many="true" displayName="paymentInfos"/>
+                <virtual-attribute expression="user" type="Quote" many="true" displayName="quotes"/>
+                <virtual-attribute expression="user" type="CxUserToSegment" many="true" displayName="cxUserToSegment"/>
+                <virtual-attribute expression="customer" type="CsTicket" many="true" displayName="tickets"/>
+                <virtual-attribute expression="user" type="BTGSegmentResult" many="true" displayName="BTGSegmentResults"/>
+                <virtual-attribute expression="customer" type="Consent" many="true" displayName="consent"/>
+				<virtual-attribute expression="user" type="CustomerReview" many="true" displayName="customerReviews"/>
+                <virtual-attribute expression="author" type="Comment" many="true" displayName="comments"/>
+            </virtual-attributes>
+            <relation-attributes>
+                <relation-attribute relation="PrincipalGroupRelation" displayName="PrincipalGroupRelation" many="true"
+                                    type="UserGroup"/>
+            </relation-attributes>
+        </type>
+        <type code="AbstractContactInfo" displayName="AbstractContactInfo">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="phoneNumber" displayName="phoneNumber"/>
+                <atomic-attribute qualifier="type" displayName="type"/>
+            </atomic-attributes>
+        </type>
+        <type code="Address" displayName="Address">
+            <atomic-attributes>
+                <atomic-attribute qualifier="appartment" displayName="appartment"/>
+                <atomic-attribute qualifier="building" displayName="building"/>
+                <atomic-attribute qualifier="cellphone" displayName="cellphone"/>
+                <atomic-attribute qualifier="company" displayName="company"/>
+                <atomic-attribute qualifier="dateOfBirth" displayName="dateOfBirth"/>
+                <atomic-attribute qualifier="department" displayName="department"/>
+                <atomic-attribute qualifier="district" displayName="district"/>
+                <atomic-attribute qualifier="duplicate" displayName="duplicate"/>
+                <atomic-attribute qualifier="email" displayName="email"/>
+                <atomic-attribute qualifier="fax" displayName="fax"/>
+                <atomic-attribute qualifier="firstname" displayName="firstname"/>
+                <atomic-attribute qualifier="gender" displayName="gender"/>
+                <atomic-attribute qualifier="lastname" displayName="lastname"/>
+                <atomic-attribute qualifier="middlename" displayName="middlename"/>
+                <atomic-attribute qualifier="middlename2" displayName="middlename2"/>
+                <atomic-attribute qualifier="phone1" displayName="phone1"/>
+                <atomic-attribute qualifier="phone2" displayName="phone2"/>
+                <atomic-attribute qualifier="pobox" displayName="pobox"/>
+                <atomic-attribute qualifier="postalcode" displayName="postalcode"/>
+                <atomic-attribute qualifier="streetname" displayName="streetname"/>
+                <atomic-attribute qualifier="streetnumber" displayName="streetnumber"/>
+                <atomic-attribute qualifier="town" displayName="town"/>
+                <atomic-attribute qualifier="fullname" displayName="Full Name"/>
+                <atomic-attribute qualifier="sapCustomerID" displayName="sapCustomerID"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="country" displayName="country" type="Country"/>
+                <reference-attribute qualifier="original" displayName="original" type="Address"/>
+                <reference-attribute qualifier="region" displayName="region" type="Region"/>
+                <reference-attribute qualifier="title" displayName="title" type="Title"/>
+                <reference-attribute qualifier="city" displayName="Chinese City" type="City"/>
+                <reference-attribute qualifier="cityDistrict" displayName="Chinese District" type="District"/>
+            </reference-attributes>
+        </type>
+        <type code="Cart" displayName="Cart">
+            <atomic-attributes>
+                <atomic-attribute qualifier="calculated" displayName="calculated"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="globalDiscountValuesInternal"
+                                  displayName="globalDiscountValuesInternal"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="paymentCost" displayName="paymentCost"/>
+                <atomic-attribute qualifier="totalDiscounts" displayName="totalDiscounts"/>
+                <atomic-attribute qualifier="totalTax" displayName="totalTax"/>
+                <atomic-attribute qualifier="totalTaxValuesInternal" displayName="totalTaxValuesInternal"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="currency" displayName="currency" type="Currency"/>
+                <reference-attribute qualifier="deliveryAddress" displayName="deliveryAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="paymentAddress" displayName="paymentAddress" type="Address"/>
+                <reference-attribute qualifier="paymentInfo" displayName="paymentInfo" type="PaymentInfo"/>
+                <reference-attribute qualifier="paymentMode" displayName="paymentMode" type="PaymentMode"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="order" type="CartEntry" many="true" displayName="entries"/>
+            </virtual-attributes>
+        </type>
+        <type code="CartEntry" displayName="CartEntry">
+            <atomic-attributes>
+                <atomic-attribute qualifier="entryGroupNumbers" displayName="entryGroupNumbers"/>
+                <atomic-attribute qualifier="entryNumber" displayName="entryNumber"/>
+                <atomic-attribute qualifier="info" displayName="info"/>
+                <atomic-attribute qualifier="quantity" displayName="quantity"/>
+                <atomic-attribute qualifier="totalPrice" displayName="totalPrice"/>
+                <atomic-attribute qualifier="externalConfiguration"
+                                  displayName="externalConfiguration"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="product" displayName="product" type="Product"/>
+                <reference-attribute qualifier="unit" displayName="unit"
+                                     type="Unit"/>
+            </reference-attributes>
+        </type>
+        <type code="Country" displayName="Country">
+            <atomic-attributes>
+                <atomic-attribute qualifier="isocode" displayName="isocode"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Currency" displayName="Currency">
+            <atomic-attributes>
+                <atomic-attribute qualifier="isocode" displayName="isocode"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Order" displayName="Order">
+            <atomic-attributes>
+                <atomic-attribute qualifier="calculated" displayName="calculated"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="globalDiscountValuesInternal"
+                                  displayName="globalDiscountValuesInternal"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="paymentCost" displayName="paymentCost"/>
+                <atomic-attribute qualifier="totalDiscounts" displayName="totalDiscounts"/>
+                <atomic-attribute qualifier="totalTax" displayName="totalTax"/>
+                <atomic-attribute qualifier="totalTaxValuesInternal" displayName="totalTaxValuesInternal"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="currency" displayName="currency" type="Currency"/>
+                <reference-attribute qualifier="deliveryAddress" displayName="deliveryAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="paymentAddress" displayName="paymentAddress" type="Address"/>
+                <reference-attribute qualifier="paymentInfo" displayName="paymentInfo" type="PaymentInfo"/>
+                <reference-attribute qualifier="paymentMode" displayName="paymentMode" type="PaymentMode"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="order" type="OrderEntry" many="true" displayName="entries"/>
+                <virtual-attribute expression="order" type="SAPOrder" many="true" displayName="sapOrders"/>
+            </virtual-attributes>
+        </type>
+        <type code="OrderEntry" displayName="OrderEntry">
+            <atomic-attributes>
+                <atomic-attribute qualifier="entryGroupNumbers" displayName="entryGroupNumbers"/>
+                <atomic-attribute qualifier="entryNumber" displayName="entryNumber"/>
+                <atomic-attribute qualifier="info" displayName="info"/>
+                <atomic-attribute qualifier="quantity" displayName="quantity"/>
+                <atomic-attribute qualifier="totalPrice" displayName="totalPrice"/>
+                <atomic-attribute qualifier="externalConfiguration"
+                                  displayName="externalConfiguration"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="product" displayName="product" type="Product"/>
+                <reference-attribute qualifier="unit" displayName="unit"
+                                     type="Unit"/>
+            </reference-attributes>
+        </type>
+        <type code="PaymentInfo" displayName="PaymentInfo">
+            <atomic-attributes>
+                <atomic-attribute qualifier="accountNumber" displayName="accountNumber"/>
+                <atomic-attribute qualifier="bank" displayName="bank"/>
+                <atomic-attribute qualifier="bankIDNumber" displayName="bankIDNumber"/>
+                <atomic-attribute qualifier="baOwner" displayName="baOwner"/>
+                <atomic-attribute qualifier="ccOwner" displayName="ccOwner"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="duplicate" displayName="duplicate"/>
+                <atomic-attribute qualifier="number" displayName="number"/>
+                <atomic-attribute qualifier="validFromMonth" displayName="validFromMonth"/>
+                <atomic-attribute qualifier="validFromYear" displayName="validFromYear"/>
+                <atomic-attribute qualifier="validToMonth" displayName="validToMonth"/>
+                <atomic-attribute qualifier="validToYear" displayName="validToYear"/>
+                <atomic-attribute qualifier="type" displayName="type"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="billingAddress" displayName="billingAddress" type="Address"/>
+            </reference-attributes>
+        </type>
+        <type code="PaymentMode" displayName="PaymentMode">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Product" displayName="Product">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Quote" displayName="Quote">
+            <atomic-attributes>
+                <atomic-attribute qualifier="calculated" displayName="calculated"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="globalDiscountValuesInternal"
+                                  displayName="globalDiscountValuesInternal"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="paymentCost" displayName="paymentCost"/>
+                <atomic-attribute qualifier="state" displayName="state"/>
+                <atomic-attribute qualifier="totalDiscounts" displayName="totalDiscounts"/>
+                <atomic-attribute qualifier="totalTax" displayName="totalTax"/>
+                <atomic-attribute qualifier="totalTaxValuesInternal" displayName="totalTaxValuesInternal"/>
+                <atomic-attribute qualifier="version" displayName="version"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="currency" displayName="currency" type="Currency"/>
+                <reference-attribute qualifier="deliveryAddress" displayName="deliveryAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="paymentAddress" displayName="paymentAddress" type="Address"/>
+                <reference-attribute qualifier="paymentInfo" displayName="paymentInfo" type="PaymentInfo"/>
+                <reference-attribute qualifier="paymentMode" displayName="paymentMode" type="PaymentMode"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="order" type="QuoteEntry" many="true" displayName="entries"/>
+            </virtual-attributes>
+        </type>
+        <type code="QuoteEntry" displayName="QuoteEntry">
+            <atomic-attributes>
+                <atomic-attribute qualifier="entryGroupNumbers" displayName="entryGroupNumbers"/>
+                <atomic-attribute qualifier="entryNumber" displayName="entryNumber"/>
+                <atomic-attribute qualifier="info" displayName="info"/>
+                <atomic-attribute qualifier="quantity" displayName="quantity"/>
+                <atomic-attribute qualifier="totalPrice" displayName="totalPrice"/>
+                <atomic-attribute qualifier="externalConfiguration"
+                                  displayName="externalConfiguration"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="product" displayName="product" type="Product"/>
+                <reference-attribute qualifier="unit" displayName="unit"
+                                     type="Unit"/>
+            </reference-attributes>
+        </type>
+        <type code="Region" displayName="Region">
+            <atomic-attributes>
+                <atomic-attribute qualifier="isocode" displayName="isocode"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Title" displayName="Title">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Unit" displayName="Unit">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="unitType" displayName="unitType"/>
+            </atomic-attributes>
+        </type>
+        <type code="UserGroup">
+            <atomic-attributes>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="locName" displayName="locName"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="uid" displayName="uid"/>
+            </atomic-attributes>
+        </type>
+				
+		<type code="B2BUnit" displayName="B2BUnit">	
+			<atomic-attributes>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+			
+			<virtual-attributes>
+                <virtual-attribute expression="unit" type="SapB2BDocument" many="true" displayName="sapb2bDocument"/>
+            </virtual-attributes>			
+        </type>
+		
+		<type code="SapB2BDocument" displayName="sapb2bDocument">
+			<atomic-attributes>
+                <atomic-attribute qualifier="customerNumber" displayName="customerNumber"/> 
+				<atomic-attribute qualifier="payerName" displayName="payerName"/>
+				<atomic-attribute qualifier="payerAddress" displayName="payerAddress"/>
+				<atomic-attribute qualifier="billAddress" displayName="billAddress"/>				
+            </atomic-attributes>	
+
+			<virtual-attributes>
+                <virtual-attribute expression="sapB2BDocument" type="PartnerAddress" many="true" displayName="partnerAddress"/>
+            </virtual-attributes>
+        </type>
+		
+		<type code="PartnerAddress" displayName="PartnerAddress">
+            <atomic-attributes>
+                <atomic-attribute qualifier="partnerCode" displayName="partnerCode"/>
+                <atomic-attribute qualifier="partner" displayName="partner"/>
+                <atomic-attribute qualifier="streetHouseNumber1" displayName="streetHouseNumber1"/>
+                <atomic-attribute qualifier="streetHouseNumber2" displayName="streetHouseNumber2"/>
+				<atomic-attribute qualifier="poBox" displayName="poBox"/>
+				<atomic-attribute qualifier="city" displayName="city"/>
+				<atomic-attribute qualifier="countryCode" displayName="countryCode"/>
+				<atomic-attribute qualifier="postalCode" displayName="postalCode"/>
+				<atomic-attribute qualifier="poBoxPostalCode" displayName="poBoxPostalCode"/>
+				<atomic-attribute qualifier="countryKey" displayName="countryKey"/>
+            </atomic-attributes>
+        </type> 
+ 
+        <type code="CxUserToSegment" displayName="CxUserToSegment">
+          <atomic-attributes>
+            <atomic-attribute qualifier="affinity" displayName="Affinity" />
+          </atomic-attributes>
+          <reference-attributes>
+            <reference-attribute qualifier="segment" displayName="Segment" type="CxSegment" />
+          </reference-attributes>
+        </type>
+        <type code="CxSegment" displayName="CxSegment">
+          <atomic-attributes>
+            <atomic-attribute qualifier="code" displayName="code" />
+          </atomic-attributes>
+        </type>
+
+        <type code="BTGSegmentResult" displayName="BTGSegmentResult">
+          <reference-attributes>
+            <reference-attribute qualifier="segment" displayName="segment" type="BTGSegment" />
+          </reference-attributes>
+        </type>
+        <type code="BTGSegment" displayName="BTGSegment">
+          <atomic-attributes>
+            <atomic-attribute qualifier="name" />
+            <atomic-attribute qualifier="active" />
+          </atomic-attributes>
+        </type>
+
+        <type code="Consent" displayName="Consent">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="consentGivenDate" displayName="consentGivenDate"/>
+                <atomic-attribute qualifier="consentWithdrawnDate" displayName="consentWithdrawnDate"/>
+                <atomic-attribute qualifier="consentGivenDate" displayName="consentGivenDate"/>
+            </atomic-attributes>
+            
+            <reference-attributes>
+                <reference-attribute qualifier="consentTemplate"
+                                     displayName="consentTemplate" type="ConsentTemplate"/>
+            </reference-attributes>
+        </type>
+        
+        <type code="ConsentTemplate" displayName="ConsentTemplate">
+            <atomic-attributes>
+                <atomic-attribute qualifier="id" displayName="id"/>
+                <atomic-attribute qualifier="version" displayName="version"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        
+        <type code="City">
+            <atomic-attributes>
+                <atomic-attribute qualifier="name" displayName="City Name"/>
+            </atomic-attributes>
+        </type>
+        
+        <type code="District">
+            <atomic-attributes>
+                <atomic-attribute qualifier="name" displayName="District Name"/>
+            </atomic-attributes>
+        </type>
+        
+        <type code="CsTicket" displayName="CsTicket">
+            <atomic-attributes>
+                <atomic-attribute qualifier="headline" displayName="headline"/>
+                <atomic-attribute qualifier="category" displayName="category"/>
+                <atomic-attribute qualifier="state" displayName="state"/>
+                <atomic-attribute qualifier="priority" displayName="priority"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="baseSite" type="BaseSite" displayName="baseSite"/>
+                <reference-attribute qualifier="assignedAgent" type="Employee" displayName="assignedAgent"/>
+                <reference-attribute qualifier="assignedGroup" type="CsAgentGroup" displayName="assignedGroup"/>
+            </reference-attributes>
+        </type>
+        
+        <type code="Comment" displayName="Comment">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="text" displayName="text"/>
+                <atomic-attribute qualifier="priority" displayName="priority"/>
+                <atomic-attribute qualifier="subject" displayName="subject"/>
+            </atomic-attributes>
+        </type>
+
+        <type code="Employee" displayName="Employee">
+            <atomic-attributes>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        
+        <type code="CsAgentGroup" displayName="CsAgentGroup">
+            <atomic-attributes>
+                <atomic-attribute qualifier="locName" displayName="locName"/>
+            </atomic-attributes>
+        </type>
+        
+        <type code="BaseSite" displayName="BaseSite">
+            <atomic-attributes>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="SAPOrder" displayName="SAPOrder">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="sapOrderStatus" displayName="sapOrderStatus"/>
+            </atomic-attributes>
+        </type>
+        <type code="CustomerReview" displayName="customerReview" >
+            <atomic-attributes>
+                <atomic-attribute qualifier="headline" displayName="headline" />
+                <atomic-attribute qualifier="comment" displayName="comment" />
+                <atomic-attribute qualifier="rating" displayName="rating" />
+                <atomic-attribute qualifier="blocked" displayName="blocked" />
+                <atomic-attribute qualifier="alias" displayName="alias" />
+                <atomic-attribute qualifier="approvalStatus" displayName="approvalStatus"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="language" displayName="language" type="Language"/>
+            </reference-attributes>
+        </type>
+
+        <type code="Language" displayName="language">
+            <atomic-attributes>
+                <atomic-attribute qualifier="name" displayName="name" />
+            </atomic-attributes>
+        </type>
+    </types>
+</audit-report-config>

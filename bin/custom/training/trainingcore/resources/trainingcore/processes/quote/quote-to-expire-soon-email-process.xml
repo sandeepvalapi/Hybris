@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition"
+         start="generateQuoteToExpireSoonEmail" name="quote-to-expire-soon-email-process"
+         processClass="de.hybris.platform.commerceservices.model.process.QuoteProcessModel">
+
+    <action id="generateQuoteToExpireSoonEmail" bean="generateQuoteToExpireSoonEmail">
+        <transition name="OK" to="sendEmail"/>
+        <transition name="NOK" to="error"/>
+    </action>
+
+    <action id="sendEmail" bean="sendEmail">
+        <transition name="OK" to="removeSentEmail"/>
+        <transition name="NOK" to="failed"/>
+    </action>
+
+    <action id="removeSentEmail" bean="removeSentEmail">
+        <transition name="OK" to="markQuoteToExpireSoonEmailAsSent"/>
+        <transition name="NOK" to="error"/>
+    </action>
+
+    <action id="markQuoteToExpireSoonEmailAsSent" bean="markQuoteToExpireSoonEmailAsSent">
+        <transition name="OK" to="success"/>
+        <transition name="NOK" to="error"/>
+    </action>
+
+    <end id="error" state="ERROR">Something went wrong.</end>
+    <end id="failed" state="FAILED">Could not send quote to expire soon email.</end>
+    <end id="success" state="SUCCEEDED">Sent quote to expire soon email.</end>
+
+</process>

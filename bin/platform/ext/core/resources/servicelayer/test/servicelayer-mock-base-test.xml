@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!--  Mocked Services -->
+			
+		<bean id="abstractService" class="de.hybris.platform.servicelayer.internal.service.AbstractService" abstract="true">
+			<property name="currentTenant" ref="tenantFactory" />
+		</bean>
+		<bean id="tenantFactory" class="de.hybris.platform.servicelayer.tenant.TestTenantFactory"/>
+
+	
+		<bean id="sessionService" class="de.hybris.platform.servicelayer.session.MockSessionService"  parent="abstractService">
+			<property name="modelService" ref="modelService"/>
+		</bean>	
+		
+	
+		<bean id="modelService" class="de.hybris.platform.servicelayer.model.MockModelService"  parent="abstractService"/>
+
+		<bean id="clusterService" class="de.hybris.platform.servicelayer.cluster.MockClusterService" parent="abstractService">
+			<property name="clusterId" value="0"/>
+			<property name="clusterIslandId" value="0"/>
+		</bean>
+		<bean id="clusterService1" class="de.hybris.platform.servicelayer.cluster.MockClusterService" parent="abstractService">
+			<property name="clusterId" value="1"/>
+			<property name="clusterIslandId" value="0"/>
+		</bean>
+
+		<bean id="txManager" class="de.hybris.platform.servicelayer.tx.MockTransactionManager"/>
+    	
+	<!--  no need to mock these services, they work with the mocked services above -->
+
+		
+		
+		<bean id="abstractBusinessService" class="de.hybris.platform.servicelayer.internal.service.AbstractBusinessService" abstract="true" parent="abstractService">
+			<property name="modelService" ref="modelService"/>
+			<property name="sessionService" ref="sessionService"/>
+			<property name="txManager" ref="txManager"/>
+		</bean>
+		    
+		<bean id="eventService" class="de.hybris.platform.servicelayer.event.impl.DefaultEventService" parent="abstractService">
+			<property name="tenantService" ref="tenantService"/>
+			<property name="clusterService" ref="clusterService"/>
+			<property name="applicationEventMulticaster" ref="applicationEventMulticaster"/>
+			<property name="eventSender" ref="springEventSender"/>
+		</bean>	
+		<bean id="eventService1" class="de.hybris.platform.servicelayer.event.impl.DefaultEventService" parent="abstractService">
+			<property name="tenantService" ref="tenantService"/>
+			<property name="clusterService" ref="clusterService1"/>
+			<property name="applicationEventMulticaster" ref="applicationEventMulticaster"/>			
+			<property name="eventSender" ref="springEventSender"/>
+		</bean>	
+
+		<bean id="hybrisEventMultiplexer" class="de.hybris.platform.servicelayer.event.impl.EventMultiplexer">
+			<property name="clusterService" ref="clusterService"/>
+		</bean>
+		<bean id="hybrisEventMultiplexer1" class="de.hybris.platform.servicelayer.event.impl.EventMultiplexer">
+			<property name="clusterService" ref="clusterService1"/>
+		</bean>	
+	
+		<bean id="springEventSender" class="de.hybris.platform.servicelayer.event.impl.SpringEventSender"/>		
+	
+		<bean id="serializationService" class="de.hybris.platform.servicelayer.event.impl.JDKSerializationService"/>
+
+		<bean id="tenantService" class="de.hybris.platform.servicelayer.tenant.impl.TestTenantService" parent="abstractService">
+			<property name="currentTenant" ref="tenantFactory" />
+		</bean>
+		
+	
+	<!--  some listener to check if events are fired -->	
+	
+		<bean id="myConfiguredTestListener" class="de.hybris.platform.servicelayer.event.ConfiguredTestListener" >
+			<property name="tenantService" ref="tenantService"/>
+			<property name="clusterService" ref="clusterService"/>		
+		</bean>
+		<bean id="myConfiguredTestListener1" class="de.hybris.platform.servicelayer.event.ConfiguredTestListener1" >
+			<property name="tenantService" ref="tenantService"/>
+			<property name="clusterService" ref="clusterService1"/>		
+		</bean>
+
+	<!-- Register a new multicaster to replace Spring's default one. The id of the bean *must* be "applicationEventMulticaster".-->
+	<bean id="applicationEventMulticaster" class="de.hybris.platform.servicelayer.event.impl.HybrisApplicationEventMulticaster" >
+	</bean>
+	
+</beans>

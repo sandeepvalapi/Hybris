@@ -1,0 +1,24 @@
+ul {
+    margin: 0 0 !important;
+    padding-left: 1.5em;
+}
+
+#suspendButtonContainer {
+    float: left;
+}
+
+#forShutdownContainer {
+    margin-top: 27px;
+}
+
+#runningOperationsContainer {
+    margin-top: 30px
+}
+
+.cantSuspend {
+    color: #d94c24;
+}
+
+.infoName {
+    font-weight: bold;
+}

@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<atomictypes/>
+
+	<collectiontypes>
+		<collectiontype code="PriceRowCollectionType" elementtype="PriceRow" autocreate="true" generate="false"/>
+		<collectiontype code="TaxRowCollectionType" elementtype="TaxRow" autocreate="true" generate="false"/>
+		<collectiontype code="DiscountRowCollectionType" elementtype="DiscountRow" autocreate="true" generate="false"/>
+		<collectiontype code="GlobalDiscountRowCollectionType" elementtype="GlobalDiscountRow" autocreate="true" generate="false"/>
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="ProductTaxGroup" autocreate="true" generate="true" dynamic="true"/>
+		<enumtype code="UserTaxGroup" autocreate="true" generate="true" dynamic="true"/>
+
+		<enumtype code="ProductPriceGroup" autocreate="true" generate="true" dynamic="true"/>
+		<enumtype code="UserPriceGroup" autocreate="true" generate="true" dynamic="true"/>
+
+		<enumtype code="ProductDiscountGroup" autocreate="true" generate="true" dynamic="true"/>
+		<enumtype code="UserDiscountGroup" autocreate="true" generate="true" dynamic="true"/>
+
+		<enumtype code="PriceRowChannel" autocreate="true" generate="true" dynamic="true">
+			<!-- Default Values to support Mobile channel and desktop channel -->
+			<value code="desktop"/>
+			<value code="mobile"/>
+		</enumtype>
+
+	</enumtypes>
+
+	<maptypes/>
+
+	<relations>
+		<relation code="User2OwnEurope1Discounts" localized="false" autocreate="true">
+			<sourceElement type="User" cardinality="one" qualifier="user">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="GlobalDiscountRow" cardinality="many" qualifier="ownEurope1Discounts">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="Product2OwnEurope1Discounts" localized="false" autocreate="true">
+			<sourceElement type="Product" cardinality="one" qualifier="product">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="DiscountRow" cardinality="many" qualifier="ownEurope1Discounts">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="Product2OwnEurope1Prices" localized="false" autocreate="true">
+			<sourceElement type="Product" cardinality="one" qualifier="product">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="PriceRow" cardinality="many" qualifier="ownEurope1Prices">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="Product2OwnEurope1Taxes" localized="false" autocreate="true">
+			<sourceElement type="Product" cardinality="one" qualifier="product">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="TaxRow" cardinality="many" qualifier="ownEurope1Taxes">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="PDTRow"
+					 extends="GenericItem"
+					 jaloclass="de.hybris.platform.europe1.jalo.PDTRow"
+					 autocreate="true"
+					 generate="true"
+					 abstract="true">
+			<attributes>
+				<attribute qualifier="product" type="Product" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true"/>
+				</attribute>
+				<attribute qualifier="pg" type="EnumerationValue" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<!--  internal attribute holding either product PK, product group PK or 0 (any) for easier matching -->
+				<attribute qualifier="productMatchQualifier" type="java.lang.Long" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="startTime" type="java.util.Date" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="endTime" type="java.util.Date" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="dateRange" type="de.hybris.platform.util.StandardDateRange" autocreate="true">
+					<persistence type="dynamic" attributeHandler="pdtDateRangeHandler"/>
+					<modifiers read="true" write="true" search="false" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="user" type="User" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="ug" type="EnumerationValue" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<!--  internal attribute holding either user PK, user group PK or 0 (any) for easier matching -->
+				<attribute qualifier="userMatchQualifier" type="java.lang.Long" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="productId" type="java.lang.String" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="MatchIndexP">
+					<key attribute="productMatchQualifier"/>
+				</index>
+				<index name="MatchIndexU">
+					<key attribute="userMatchQualifier"/>
+				</index>
+				<index name="PIdx">
+					<key attribute="product"/>
+				</index>
+				<index name="UIdx">
+					<key attribute="user"/>
+				</index>
+				<index name="PGIdx">
+					<key attribute="pg"/>
+				</index>
+				<index name="UGIdx">
+					<key attribute="ug"/>
+				</index>
+				<index name="ProductIdIdx">
+					<key attribute="productId"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AbstractDiscountRow"
+					 extends="PDTRow"
+					 jaloclass="de.hybris.platform.europe1.jalo.AbstractDiscountRow"
+					 autocreate="true"
+					 generate="true"
+					 abstract="true">
+			<attributes>
+				<attribute qualifier="currency" type="Currency" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="discount" type="Discount" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="false" removable="false" initial="true"
+								  private="false" partof="false"/>
+				</attribute>
+				<attribute qualifier="pg" type="ProductDiscountGroup" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="absolute" type="java.lang.Boolean" autocreate="true">
+					<persistence type="dynamic" attributeHandler="abstractDiscountRowAbsoluteHandler"/>
+					<modifiers read="true" write="false" optional="true"/>
+				</attribute>
+				<attribute qualifier="ug" type="UserDiscountGroup" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="value" type="java.lang.Double" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+
+				<attribute qualifier="discountString" type="java.lang.String" autocreate="true">
+					<persistence type="dynamic" attributeHandler="abstractDiscountRowDiscountStringHandler"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="false" initial="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DiscountRow"
+					 extends="AbstractDiscountRow"
+					 jaloclass="de.hybris.platform.europe1.jalo.DiscountRow"
+					 autocreate="true"
+					 generate="true">
+			<deployment table="DiscountRows" typecode="1052"/>
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"product,pg,user,ug,discount"</value>
+				</property>
+				<property name="catalog.sync.default.root.type">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalog.sync.default.root.type.order">
+					<value>Integer.valueOf(7)</value>
+				</property>
+				<property name="catalog.sync.root.type.restriction">
+					<value>"{product} IS NULL"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="asTargetPrice" type="java.lang.Boolean">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="product" type="Product" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true"/>
+				</attribute>
+			</attributes>
+         	<indexes>
+		       	<index name="versionIDX" unique="false">
+	         		<key attribute="catalogVersion"/>
+	        	</index>
+	        </indexes>
+		</itemtype>
+
+		<itemtype code="GlobalDiscountRow"
+					 extends="AbstractDiscountRow"
+					 jaloclass="de.hybris.platform.europe1.jalo.GlobalDiscountRow"
+					 autocreate="true"
+					 generate="true">
+			<deployment table="GlobalDiscountRows" typecode="1053"/>
+			<attributes>
+				<attribute qualifier="pg" type="ProductDiscountGroup" redeclare="true" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="false" initial="false"
+								  private="true"/>
+				</attribute>
+				<attribute qualifier="product" type="Product" redeclare="true" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="false" initial="false"
+								  private="true"/>
+				</attribute>
+				<attribute qualifier="user" type="User" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="PriceRow"
+					 extends="PDTRow"
+					 jaloclass="de.hybris.platform.europe1.jalo.PriceRow"
+					 autocreate="true"
+					 generate="true">
+			<deployment table="PriceRows" typecode="1055"/>
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"product,pg,user,ug,unit,minqtd,currency,net"</value>
+				</property>
+				<property name="catalog.sync.default.root.type">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalog.sync.default.root.type.order">
+					<value>Integer.valueOf(5)</value>
+				</property>
+				<property name="catalog.sync.root.type.restriction">
+					<value>"{product} IS NULL"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion" autocreate="true" generate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="matchValue" type="java.lang.Integer" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="currency" type="Currency" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="minqtd" type="java.lang.Long" autocreate="true">
+					<defaultvalue>Long.valueOf(1L)</defaultvalue>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="net" type="java.lang.Boolean" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false"
+								  partof="false"/>
+					<defaultvalue>Boolean.valueOf(false)</defaultvalue>
+				</attribute>
+				<attribute qualifier="pg" type="ProductPriceGroup" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="price" type="java.lang.Double" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="ug" type="UserPriceGroup" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="unit" type="Unit" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="unitFactor" type="java.lang.Integer" autocreate="true">
+					<defaultvalue>Integer.valueOf(1)</defaultvalue>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="giveAwayPrice" type="java.lang.Boolean" autocreate="true">
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="channel" type="PriceRowChannel" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="product" type="Product" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true"/>
+				</attribute>
+			</attributes>
+         	<indexes>
+		       	<index name="versionIDX" unique="false">
+	         		<key attribute="catalogVersion"/>
+	        	</index>
+	        </indexes>
+		</itemtype>
+
+		<itemtype code="TaxRow"
+					 extends="PDTRow"
+					 jaloclass="de.hybris.platform.europe1.jalo.TaxRow"
+					 autocreate="true"
+					 generate="true">
+			<deployment table="TaxRows" typecode="1054"/>
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<!--  	 PLA-8375 needed additional uniqueness column since data range is a jalo we use enddate/startdate , ranges shouldn't overlap -->
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"product,pg,user,ug,tax,starttime"</value>
+				</property>
+				<property name="catalog.sync.default.root.type">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalog.sync.default.root.type.order">
+					<value>Integer.valueOf(4)</value>
+				</property>
+				<property name="catalog.sync.root.type.restriction">
+					<value>"{product} IS NULL"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion" autocreate="true" generate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="pg" type="ProductTaxGroup" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true" private="false"
+								  partof="false"/>
+				</attribute>
+				<attribute qualifier="currency" type="Currency" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="absolute" type="java.lang.Boolean" autocreate="true">
+					<persistence type="dynamic" attributeHandler="taxRowAbsoluteHandler"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="tax" type="Tax" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="false" removable="false" initial="true"
+								  private="false" partof="false"/>
+				</attribute>
+				<attribute qualifier="ug" type="UserTaxGroup" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="value" type="java.lang.Double" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" removable="false"/>
+				</attribute>
+				<attribute qualifier="product" type="Product" autocreate="true" redeclare="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" search="true" optional="true" removable="false" initial="true"/>
+				</attribute>
+			</attributes>
+         	<indexes>
+		       	<index name="versionIDX" unique="false">
+	         		<key attribute="catalogVersion"/>
+	        	</index>
+	        </indexes>
+		</itemtype>
+
+		<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		     ~~~ changes of Product and Customer type:
+		     ~~~ adding Product.ProductPriceGroup                
+		     ~~~        Product.ProductTaxGroup
+		     ~~~        Product.ProductDiscountGroup
+		     ~~~        User.UserPriceGroup
+		     ~~~        User.UserTaxGroup
+		     ~~~        User.UserDiscountGroup
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+		<!-- nothing should be created here - so we set autocreate=false !!! -->
+		<itemtype code="Product"
+					 extends="LocalizableItem"
+					 jaloclass="de.hybris.platform.jalo.product.Product"
+					 autocreate="false"
+					 generate="false">
+			<attributes>
+				<attribute autocreate="true" qualifier="Europe1PriceFactory_PPG" type="ProductPriceGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute autocreate="true" qualifier="Europe1PriceFactory_PTG" type="ProductTaxGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute autocreate="true" qualifier="Europe1PriceFactory_PDG" type="ProductDiscountGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute autocreate="true" qualifier="europe1Prices" type="PriceRowCollectionType">
+					<persistence type="dynamic"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+				<attribute autocreate="true" qualifier="europe1Taxes" type="TaxRowCollectionType">
+					<persistence type="dynamic"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+				<attribute autocreate="true" qualifier="europe1Discounts" type="DiscountRowCollectionType">
+					<persistence type="dynamic"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- nothing should be created here - so we set autocreate=false !!! -->
+		<itemtype code="User" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="Europe1PriceFactory_UDG" type="UserDiscountGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute qualifier="Europe1PriceFactory_UPG" type="UserPriceGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute qualifier="Europe1PriceFactory_UTG" type="UserTaxGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute qualifier="europe1Discounts" type="GlobalDiscountRowCollectionType">
+					<persistence type="dynamic"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="UserGroup" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="userDiscountGroup" type="UserDiscountGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute qualifier="userPriceGroup" type="UserPriceGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+				<attribute qualifier="userTaxGroup" type="UserTaxGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" initial="false" optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+        <itemtype code="AbstractOrder" autocreate="false" generate="false">
+            <attributes>
+				<attribute qualifier="Europe1PriceFactory_UDG" type="UserDiscountGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="Europe1PriceFactory_UPG" type="UserPriceGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="Europe1PriceFactory_UTG" type="UserTaxGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+        <itemtype code="AbstractOrderEntry" autocreate="false" generate="false">
+            <attributes>
+				<attribute qualifier="Europe1PriceFactory_PPG" type="ProductPriceGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="Europe1PriceFactory_PTG" type="ProductTaxGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="Europe1PriceFactory_PDG" type="ProductDiscountGroup">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>
+           </attributes>
+      	</itemtype>
+
+
+	</itemtypes>
+
+</items>

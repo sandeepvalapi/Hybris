@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias alias="classificationService" name="defaultClassificationService" />
+	<bean id="defaultClassificationService" class="de.hybris.platform.classification.impl.DefaultClassificationService" parent="abstractBusinessService">
+		<property name="classificationDao" ref="classificationDao" />
+		<property name="productService" ref="productService" />
+		<property name="formatFactory" ref="formatFactory" />
+		<property name="loadStoreFeaturesStrategy" ref="loadStoreFeaturesStrategy" />
+		<property name="classResolverStrategy" ref="classificationClassesResolverStrategy" />
+	</bean>
+
+	<alias alias="classificationClassesResolverStrategy" name="defaultClassificationClassesResolverStrategy" />
+	<bean id="defaultClassificationClassesResolverStrategy" class="de.hybris.platform.classification.impl.DefaultClassificationClassesResolverStrategy">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<alias alias="classificationSystemService" name="defaultClassificationSystemService" />
+	<bean id="defaultClassificationSystemService" class="de.hybris.platform.classification.impl.DefaultClassificationSystemService"
+		parent="abstractBusinessService">
+		<property name="categoryService" ref="categoryService" />
+		<property name="classificationSystemDao" ref="classificationSystemDao" />
+		<property name="classificationSystemVersionDao" ref="classificationSystemVersionDao" />
+	</bean>
+
+	<!-- DAOs -->
+	<alias alias="classificationDao" name="defaultClassificationDao" />
+	<bean id="defaultClassificationDao" class="de.hybris.platform.classification.daos.impl.DefaultClassificationDao" parent="abstractItemDao" />
+
+	<alias alias="classificationSystemDao" name="defaultClassificationSystemDao" />
+	<bean id="defaultClassificationSystemDao" class="de.hybris.platform.classification.daos.impl.DefaultClassificationSystemDao" />
+
+	<alias alias="classificationSystemVersionDao" name="defaultClassificationSystemVersionDao" />
+	<bean id="defaultClassificationSystemVersionDao" class="de.hybris.platform.classification.daos.impl.DefaultClassificationSystemVersionDao" />
+
+	<bean id="productFeaturesDao" class="de.hybris.platform.classification.daos.impl.DefaultProductFeaturesDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<!-- Strategies -->
+	<alias name="defaultLoadStoreFeaturesStrategy" alias="loadStoreFeaturesStrategy" />
+	<bean id="defaultLoadStoreFeaturesStrategy" class="de.hybris.platform.classification.strategy.impl.DefaultLoadStoreFeaturesStrategy">
+		<property name="productFeaturesDao" ref="productFeaturesDao" />
+		<property name="modelService" ref="modelService" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="commonI18nService" ref="commonI18NService" />
+		<property name="txTemplate">
+			<bean class="org.springframework.transaction.support.TransactionTemplate">
+				<property name="transactionManager" ref="txManager" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- Dynamic attributes -->
+	<bean id="ClassificationClass_allClassificationAttributeAssignmentsAttributeHandler" class="de.hybris.platform.catalog.model.AllClassificationAttributesAssignments" />
+	
+	<!-- Interceptors -->
+	<bean id="classificationAttributeValueRemoveInterceptor" class="de.hybris.platform.classification.interceptors.ClassificationAttributeValueRemoveInterceptor">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="l10nService" ref="l10nService"/>
+	</bean>		
+	
+	<bean id="classificationAttributeValueRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="classificationAttributeValueRemoveInterceptor"/>
+		<property name="typeCode" value="ClassificationAttributeValue"/>
+		<property name="order" value="1"/>
+	</bean>
+
+</beans>

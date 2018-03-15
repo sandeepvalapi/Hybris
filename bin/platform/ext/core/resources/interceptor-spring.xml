@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+	<alias alias="interceptorRegistry" name="defaultInterceptorRegistry"/>
+	<bean id="defaultInterceptorRegistry" class="de.hybris.platform.servicelayer.interceptor.impl.DefaultInterceptorRegistry" autowire="byType"/>
+	
+	<!-- the default initializing interceptor which loads default values from composed type -->
+	<bean id="jaloInitDefaultsInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.JaloInitDefaultsInterceptor" autowire="byName"/>
+	<bean id="jaloInitDefaultsInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="jaloInitDefaultsInterceptor"/>
+		<property name="typeCode" value="Item"/>
+		<property name="order" value="0"/>
+	</bean>
+
+	<!-- the default creation validator which checks if all mandatory attributes got values -->
+	<bean id="MandatoryAttributesValidator" class="de.hybris.platform.servicelayer.interceptor.impl.MandatoryAttributesValidator" autowire="byName"/>
+	<bean id="mandatoryAttributesValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="MandatoryAttributesValidator"/>
+		<property name="typeCode" value="Item"/>
+		<!-- The order property is only effective with 4.1.1 and later -->
+		<property name="order" value="1"/>		
+	</bean>
+
+	<!-- the default save  validator which checks unique attribute values -->
+	<bean id="UniqueAttributesValidator" class="de.hybris.platform.servicelayer.interceptor.impl.UniqueAttributesInterceptor" autowire="byName"/>
+	<bean id="itemUniqueAttributesValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="UniqueAttributesValidator"/>
+		<property name="typeCode" value="Item"/>
+	</bean>
+	
+	<!-- Address validator which checks if country and region of an address matches -->
+	<bean id="AddressValidator" class="de.hybris.platform.servicelayer.interceptor.impl.AddressValidator" autowire="byName"/>
+	<bean id="AddressValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="AddressValidator"/>
+		<property name="typeCode" value="Address"/>
+	</bean>
+	
+	<!-- Address prepare interceptor -->
+	<bean id="AddressPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.AddressPrepareInterceptor" autowire="byName"/>
+	<bean id="AddressPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="AddressPrepareInterceptor"/>
+		<property name="typeCode" value="Address"/>
+	</bean>
+
+	<!-- the void prepare interceptor -->
+	<bean id="VoidInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.VoidInterceptor" autowire="byName"/>
+	
+	<bean id="PartOfModelRegisterForRemoveInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.PartOfModelRegisterForRemoveInterceptor" autowire="byName"/>
+	<bean id="PartOfModelRegisterForRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="PartOfModelRegisterForRemoveInterceptor"/>
+		<property name="typeCode" value="Item"/>
+	</bean>
+
+	<bean id="OrphanedPartOfCleanupPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.OrphanedPartOfCleanupPrepareInterceptor" autowire="byName"/>
+	<bean id="OrphanedPartOfCleanupPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="OrphanedPartOfCleanupPrepareInterceptor"/>
+		<property name="typeCode" value="Item"/>
+	</bean>
+
+	<!-- special prepare interceptor for LinkModel -->
+	
+	<bean id="LinkPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.LinkPrepareInterceptor"/>
+	<bean id="LinkPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="LinkPrepareInterceptor"/>
+		<property name="typeCode" value="Link"/>
+	</bean>
+	
+	<!-- the enumeration prepare interceptor -->
+	<bean id="EnumerationPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.EnumerationPrepareInterceptor" autowire="byName"/>
+	<bean id="EnumerationPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="EnumerationPrepareInterceptor"/>
+		<property name="typeCode" value="EnumerationValue"/>
+	</bean>
+	
+	<!-- Enumeration validator which checks if the enum is dynamic -->
+	<bean id="EnumerationValidator" class="de.hybris.platform.servicelayer.interceptor.impl.EnumerationValidator" autowire="byName"/>
+	<bean id="EnumerationValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="EnumerationValidator"/>
+		<property name="typeCode" value="EnumerationValue"/>
+	</bean>
+	
+	<!-- MediaFolder validator that checks media folder qualifier for uniqueness -->
+	<bean id="MediaFolderValidator" class="de.hybris.platform.servicelayer.interceptor.impl.MediaFolderValidator" autowire="byName"/>
+	<bean id="MediaFolderValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="MediaFolderValidator"/>
+		<property name="typeCode" value="MediaFolder"/>
+	</bean>	
+
+	<!-- MediaContext validator that checks media media context for duplicated sources of mappings -->
+	<bean id="MediaContextValidator" class="de.hybris.platform.servicelayer.interceptor.impl.MediaContextValidator" autowire="byName"/>
+	<bean id="MediaContextValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="MediaContextValidator"/>
+		<property name="typeCode" value="MediaContext"/>
+	</bean>
+
+	<!-- sets for the viewtype the supertype value to item -->
+	<bean id="viewTypePrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.ViewTypePrepareInterceptor" autowire="byName">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	<bean id="viewTypePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="viewTypePrepareInterceptor"/>
+		<property name="typeCode" value="ViewType"/>
+	</bean>
+	
+	<!-- prepare interceptor for AbstractDynamicContentModel -->
+	<bean id="abstractDynamicContentPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.AbstractDynamicContentPrepareInterceptor" autowire="byName"/>
+	<bean id="abstractDynamicContentPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="abstractDynamicContentPrepareInterceptor"/>
+		<property name="typeCode" value="AbstractDynamicContent"/>
+	</bean>
+	<bean id="abstractDynamicContentValidateInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.AbstractDynamicContentValidateInterceptor" autowire="byName"/>
+	<bean id="abstractDynamicContentValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="abstractDynamicContentValidateInterceptor"/>
+		<property name="typeCode" value="AbstractDynamicContent"/>
+	</bean>	
+
+</beans>

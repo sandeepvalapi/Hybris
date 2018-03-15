@@ -1,0 +1,35 @@
+$catalogversion=catalogversion(catalog(id),version)[unique=true];
+$supercategories=supercategories(code,catalogversion(catalog(id),version));
+$writableCatalogVersions=writableCatalogVersions(catalog(id),version);
+$readableCatalogVersions=readableCatalogVersions(catalog(id),version);
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog;
+;testCatalog1;testCatalog1;testCatalog1;true
+;testCatalog2;testCatalog2;testCatalog2;false
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;
+;testCatalog1;Spring;true;
+;testCatalog1;Winter;true;
+;testCatalog2;Spring;true;
+;testCatalog2;Winter;true;
+
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories
+;shoes;testCatalog1:Winter;winter shoes;winter shoes;
+;shoes;testCatalog1:Spring;spring shoes;spring shoes;
+
+INSERT_UPDATE UserGroup;UID[unique=true];locname[lang=de];locname[lang=en];groups(uid);$writableCatalogVersions;$readableCatalogVersions;
+;testUserGroupParent;Test-Gruppe1;Test-Group1;;testCatalog1:Spring;testCatalog1:Spring;
+;testUserGroupChild;Test-Gruppe2;Test-Group2;testUserGroupParent;testCatalog2:Spring;testCatalog2:Spring;
+
+
+INSERT_UPDATE User;UID[unique=true];$writableCatalogVersions;$readableCatalogVersions;name;groups(uid);
+;testUser1;testCatalog1:Winter;testCatalog1:Winter;user1;testUserGroupChild;
+;testUser2;testCatalog2:Winter;testCatalog2:Winter;user2;testUserGroupParent;
+;testUser3;;;user2;;
+
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;$supercategories
+;shoes;testCatalog1:Winter;winter shoes 1;winter shoes 1;pieces;157,95 EUR;approved;admin;0;shoes:testCatalog1:Winter
+;shoes;testCatalog1:Spring;spring shoes 1;spring shoes 1;pieces;157,95 EUR;approved;admin;0;shoes:testCatalog1:Spring
+

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- Note:  A "Server" is not itself a "Container", so you may not
+     define subcomponents such as "Valves" at this level.
+     Documentation at /docs/config/server.html
+-->
+#set( $DOLAR_SIGN = '$' )
+<Server port="8005" shutdown="SHUTDOWN">
+
+	$serverXmlServerHook
+
+	<Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+
+	<Service name="Catalina">
+
+		$serverXmlServiceHook
+
+		<Executor name="hybrisExecutor"
+			namePrefix="hybrisHTTP"
+			maxThreads="200"
+			minSpareThreads="40"
+			maxIdleTime="10000" />
+
+#if( $httpsConnectorEnabled == "true" )
+		<Connector
+			port="${DOLAR_SIGN}{ENV::HTTPS_PORT}"
+			maxHttpHeaderSize="8192"
+			maxThreads="150"
+			protocol="org.apache.coyote.http11.Http11Protocol"
+			executor="hybrisExecutor"
+			enableLookups="false"
+			acceptCount="100"
+			connectionTimeout="20000"
+			disableUploadTimeout="true"
+			URIEncoding="UTF-8"
+			SSLEnabled="true"
+			scheme="https"
+			secure="true"
+			clientAuth="false"
+			keystoreFile="${DOLAR_SIGN}{ENV::KEYSTORE_LOCATION}"
+			keystorePass="${DOLAR_SIGN}{ENV::KEYSTORE_PASSWORD}" />
+#end
+
+#if( $httpConnectorEnabled == "true" )
+		<Connector
+			port="${DOLAR_SIGN}{ENV::HTTP_PORT}"
+			maxHttpHeaderSize="8192"
+			maxThreads="200"
+			protocol="org.apache.coyote.http11.Http11Protocol"
+			executor="hybrisExecutor"
+			enableLookups="false"
+			acceptCount="100"
+			connectionTimeout="20000"
+			URIEncoding="UTF-8"
+			disableUploadTimeout="true"
+			redirectPort="${DOLAR_SIGN}{ENV::HTTPS_PORT}" />
+#end
+
+		<Connector
+			port="${DOLAR_SIGN}{ENV::AJP_PORT}"
+			protocol="AJP/1.3"
+			executor="hybrisExecutor" />
+
+		<Engine
+			name="Catalina"
+			defaultHost="localhost"
+			jvmRoute="${DOLAR_SIGN}{ENV::JVM_ROUTE}">
+
+			$serverXmlEngineHook
+
+			<Host
+				name="localhost"
+				unpackWARs="true"
+				autoDeploy="true">
+				<Valve
+					className="org.apache.catalina.valves.ErrorReportValve"
+					showReport="${DOLAR_SIGN}{ENV::ERROR_SHOW_REPORT}"
+					showServerInfo="${DOLAR_SIGN}{ENV::ERROR_SHOW_SERVER_INFO}" />
+				<Valve
+					className="de.hybris.tomcat.StoreJvmRouteAsContextParameterValve" />
+				<Valve
+					className="org.apache.catalina.valves.AccessLogValve"
+					directory="${DOLAR_SIGN}{ENV::ACCESS_LOG_DIR}"
+					prefix="${DOLAR_SIGN}{ENV::ACCESS_LOG_PREFIX}"
+					suffix="${DOLAR_SIGN}{ENV::ACCESS_LOG_SUFFIX}"
+					pattern="${DOLAR_SIGN}{ENV::ACCESS_LOG_PATTERN}" />
+
+				$serverXmlHostHook
+
+			</Host>
+		</Engine>
+	</Service>
+</Server>

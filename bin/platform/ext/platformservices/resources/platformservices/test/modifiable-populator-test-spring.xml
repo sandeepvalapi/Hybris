@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:util="http://www.springframework.org/schema/util"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+		
+	<bean id="modifableConfigurablePopulatorPostProcessor" class="de.hybris.platform.converters.impl.ModifableConfigurablePopulatorPostProcessor" autowire="byType" />
+		
+	<!-- Abstract bean used as a parent for beans that modify a ModifiableConfigurablePopulator. -->
+	<bean id="configurablePopulatorModification" class="de.hybris.platform.converters.config.ConfigurablePopulatorModification"
+			abstract="true" init-method="initialize"/>
+
+	<bean id="testProductCodePopulator" class="de.hybris.platform.converters.config.TestProductCodePopulator" />
+	<bean id="testProductNamePopulator" class="de.hybris.platform.converters.config.TestProductNamePopulator" />
+	<bean id="testProductDescriptionPopulator" class="de.hybris.platform.converters.config.TestProductDescriptionPopulator" />
+	
+	<alias name="testDefaultProductConfiguredPopulator" alias="productConfiguredPopulator" />
+	<bean id="testDefaultProductConfiguredPopulator" class="de.hybris.platform.converters.impl.DefaultModifableConfigurablePopulator">
+		<property name="populators">
+			<map key-type="java.lang.String">
+				<entry key="CODE" value-ref="testProductCodePopulator"/>
+			</map>
+		</property>
+	</bean>
+	
+	<alias name="testExtendedProductConfiguredPopulator" alias="extendedProductConfiguredPopulator" />
+	<bean id="testExtendedProductConfiguredPopulator" parent="testDefaultProductConfiguredPopulator" class="de.hybris.platform.converters.impl.DefaultModifableConfigurablePopulator">
+		<property name="populators">
+			<map key-type="java.lang.String" merge="true">
+				<entry key="NAME" value-ref="testProductNamePopulator"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="noCodeProductConfiguredPopulator" parent="testExtendedProductConfiguredPopulator" class="de.hybris.platform.converters.impl.DefaultModifableConfigurablePopulator">
+		<property name="populators">
+			<map key-type="java.lang.String" merge="true">
+				<entry key="DESCRIPTION" value-ref="testProductDescriptionPopulator"/>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- modification for testDefaultProductConfiguredPopulator (alias: productConfiguredPopulator) -->
+	<bean parent="configurablePopulatorModification">
+		<property name="target" ref="productConfiguredPopulator" />
+		<property name="keyType" value="java.lang.String" />
+		<property name="key" value="DESCRIPTION" />
+		<property name="add" ref="testProductDescriptionPopulator" />
+	</bean>
+	
+	<!-- modification for noCodeProductConfiguredPopulator -->
+	<bean parent="configurablePopulatorModification">
+		<property name="target" ref="noCodeProductConfiguredPopulator" />
+		<property name="keyType" value="java.lang.String" />
+		<property name="key" value="CODE" />
+		<property name="remove" ref="testProductCodePopulator" />
+	</bean>
+</beans>

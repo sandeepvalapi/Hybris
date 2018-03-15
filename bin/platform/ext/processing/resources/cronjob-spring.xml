@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="cronJobDao" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultCronJobDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="cronJobHistoryDao" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultCronJobHistoryDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="typeService" ref="typeService"/>
+ 	</bean>
+
+	<bean id="jobDao" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultJobDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="jobLogDao" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultJobLogDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="cronJobLogConverter" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultJobLogConverter">
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<bean id="cronJobMessageBuilder" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultRunCronJobMessageCreatorAndSender">
+		<property name="tenantService" ref="tenantService" />
+		<property name="legacyBroadcastHandler">
+      			<bean factory-method="getInstance" class="de.hybris.platform.cluster.legacy.LegacyBroadcastHandler" />
+		</property>
+		<property name="clusterService" ref="clusterService"/>
+	</bean>
+
+	<alias alias="triggerService" name="defaultTriggerService"/>
+	
+	<bean id="defaultTriggerService" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultTriggerService">
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="triggerDao" ref="triggerDao"/>
+		<property name="i18NService" ref="i18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias alias="triggerDao" name="defaultTriggerDao"/>
+	<bean id="defaultTriggerDao" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultTriggerDao">
+		<property name="genericSearchService" ref="genericSearchService"/>
+	</bean>
+	
+	
+	<bean id="processing.manager" class="de.hybris.platform.cronjob.jalo.CronJobManager" init-method="init" >
+		<property name="keyGenerator" ref="cronJobCodeGenerator"/>
+	</bean>
+
+	<alias alias="cronJobService" name="defaultCronJobService"/>
+	<bean id="defaultCronJobService" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultCronJobService" parent="abstractBusinessService">
+		<property name="cronJobDao" ref="cronJobDao"/>
+		<property name="jobDao" ref="jobDao"/>
+		<property name="jobLogDao" ref="jobLogDao"/>
+		<property name="clusterService" ref="clusterService" />
+		<property name="taskService" ref="taskService" />
+		<property name="jobLogConverter" ref="cronJobLogConverter" />
+		<property name="cronJobCodeGenerator" ref="cronJobCodeGenerator" />
+	</bean>
+
+	<alias alias="cronJobHistoryService" name="defaultCronJobHistoryService"/>
+	<bean id="defaultCronJobHistoryService" class="de.hybris.platform.servicelayer.cronjob.impl.DefaultCronJobHistoryService" parent="abstractBusinessService">
+		<property name="cronJobHistoryDao" ref="cronJobHistoryDao" />
+	</bean>
+
+
+	<bean id="cronJobInitDefaultsInterceptor" class="de.hybris.platform.servicelayer.cronjob.impl.CronJobInitDefaultsInterceptor" autowire="byName">
+		<property name="userService" ref="userService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<bean id="cronJobInitDefaultsInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="cronJobInitDefaultsInterceptor"/>
+		<property name="typeCode" value="CronJob"/>
+	</bean>
+
+	<bean id="triggerExpressionValidator" class="de.hybris.platform.servicelayer.cronjob.impl.TriggerValidateInterceptor" autowire="byName">
+		<property name="triggerService" ref="defaultTriggerService" />
+	</bean>
+	
+	<bean id="triggerExpressionDefaultsMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="triggerExpressionValidator"/>
+		<property name="typeCode" value="Trigger"/>
+	</bean>
+
+	<!-- All your JobPerformables can inherit from AbstractJobPerformable to have direct access to ModelService and SessionService -->
+	<bean id="abstractJobPerformable" class="de.hybris.platform.servicelayer.cronjob.AbstractJobPerformable" abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="PrepareCronJobInterceptor" class="de.hybris.platform.servicelayer.cronjob.impl.PrepareCronJobInterceptor">
+		<property name="keyGenerator" ref="cronJobCodeGenerator"/>
+	</bean>
+
+	<bean id="PrepareCronJobInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="PrepareCronJobInterceptor"/>
+		<property name="typeCode" value="CronJob"/>
+	</bean>
+
+	<!--  jobPerformable generic type check  -->
+	<bean id="jobPerformableGenericTypeValidator" class="de.hybris.platform.servicelayer.cronjob.impl.JobPerformableGenericTypeValidator">
+	 <property name="cronJobService" ref="cronJobService"/>
+	</bean>
+
+	<bean id="jobPerformableGenericTypeValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="jobPerformableGenericTypeValidator"/>
+		<property name="typeCode" value="CronJob"/>
+	</bean>
+
+	<!--  trigger's job check -->
+	<bean id="triggerJobValidator" class="de.hybris.platform.servicelayer.cronjob.impl.TriggerJobValidateInterceptor">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="triggerJobValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="triggerJobValidator"/>
+		<property name="typeCode" value="Trigger"/>
+	</bean>
+
+    <!--
+    Enable this if trigger is ready to be persisted without jalo
+    <bean id="triggerPrepareInterceptor" class="de.hybris.platform.servicelayer.cronjob.impl.TriggerPrepareInterceptor">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="triggerPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="triggerPrepareInterceptor"/>
+        <property name="typeCode" value="Trigger"/>
+    </bean>
+    -->
+
+	<!--  composite entry's job check -->
+	<bean id="compositeEntryJobValidator" class="de.hybris.platform.servicelayer.cronjob.impl.CompositeEntryJobValidateInterceptor"/>
+
+	<bean id="compositeEntryJobValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="compositeEntryJobValidator"/>
+		<property name="typeCode" value="CompositeEntry"/>
+	</bean>
+
+	<alias alias="triggerTimetable" name="defaultTriggerTimetable"/>
+	<bean id="defaultTriggerTimetable" class="de.hybris.platform.servicelayer.cronjob.attributehandler.TriggerTimetable">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias alias="cronjobTimetable" name="defaultCronjobTimetable"/>
+	<bean id="defaultCronjobTimetable" class="de.hybris.platform.servicelayer.cronjob.attributehandler.CronjobTimetable">
+	</bean>
+
+</beans>

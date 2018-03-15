@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="abstractEventListener" class="de.hybris.platform.servicelayer.event.impl.AbstractEventListener"
+          abstract="true">
+        <property name="tenantService" ref="tenantService"/>
+        <property name="clusterService" ref="clusterService"/>
+    </bean>
+
+    <!-- All your Business Services can inherit from AbstractBusinessService to have direct access to ModelService and SessionService -->
+    <bean id="abstractBusinessService" class="de.hybris.platform.servicelayer.internal.service.AbstractBusinessService"
+          abstract="true" parent="abstractService">
+        <property name="modelService" ref="modelService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="txManager" ref="txManager"/>
+    </bean>
+
+    <!-- If you want to write Data Access objects you can use AbstractItemDao to have direct access to ModelService and FlexibleSearchService -->
+    <bean id="abstractItemDao" class="de.hybris.platform.servicelayer.internal.dao.AbstractItemDao" abstract="true">
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <!-- Cluster -->
+
+    <!-- ClusterService provides access to cluster specific information Note: This Service has scope SINGLETON, not scope tenant -->
+    <alias alias="clusterService" name="defaultClusterService"/>
+    <bean id="defaultClusterService" class="de.hybris.platform.servicelayer.cluster.impl.DefaultClusterService"
+          scope="singleton"
+          parent="abstractService">
+    </bean>
+
+    <!-- Tenant -->
+
+    <!-- TenantService provides access to tenant specific information -->
+    <alias alias="tenantService" name="defaultTenantService"/>
+    <bean id="defaultTenantService" class="de.hybris.platform.servicelayer.tenant.impl.DefaultTenantService"
+          scope="singleton"
+          parent="abstractService">
+
+    </bean>
+
+    <!-- Configuration -->
+
+    <!-- Configuration Service -->
+    <alias alias="configurationService" name="defaultConfigurationService"/>
+    <bean id="defaultConfigurationService"
+          class="de.hybris.platform.servicelayer.config.impl.DefaultConfigurationService" parent="abstractService">
+        <property name="tenantService" ref="tenantService"/>
+    </bean>
+
+    <!-- Session Handling -->
+
+    <!-- Session Service -->
+    <!-- you can overwrite this definition in your project. however it is important to understand that you can always only have ONE sessionService.
+        If you want to have different sessions for different web applications, just replace the session factory as described in the bean definition
+        below -->
+    <alias alias="sessionService" name="defaultSessionService"/>
+    <bean id="defaultSessionService" class="de.hybris.platform.servicelayer.session.impl.DefaultSessionService"
+          parent="abstractService">
+        <property name="modelService" ref="modelService"/>
+        <lookup-method name="createSession" bean="sessionFactory"/>
+        <!-- the factory which is responsible for creating new sessions -->
+    </bean>
+
+    <!-- you can either replace the complete factory in your project (even in web contexts) or you just take this definition and change
+        the sessionClass to match your session -->
+    <bean id="sessionFactory" class="de.hybris.platform.servicelayer.session.impl.DefaultSessionFactory">
+        <property name="sessionClass" value="de.hybris.platform.servicelayer.session.impl.DefaultSession"/>
+    </bean>
+
+    <alias alias="sessionTokenService" name="defaultSessionTokenService"/>
+	<bean id="defaultSessionTokenService" class="de.hybris.platform.servicelayer.session.impl.DefaultSessionTokenService" >
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+    <!-- Model -->
+	<bean name="bigDecimalPayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.BigDecimalPayloadConverter"/>
+	<bean name="PKPayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.PayloadPKConverter"/>
+	<bean name="booleanPayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.BooleanPayloadConverter"/>
+	<bean name="stringPayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.StringPayloadConverter"/>
+	<bean name="datePayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.DatePayloadConverter" />
+	<bean name="integerPayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.IntegerPayloadConverter" />
+	<bean name="doublePayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.DoublePayloadConverter" />
+	<bean name="longPayloadConverter" class="de.hybris.platform.persistence.audit.payload.converter.LongPayloadConverter" />
+	<bean name="passthroughConvertet" class="de.hybris.platform.persistence.audit.payload.converter.PassthroughConverter" />
+	<bean name="itemPropertyValueConverter" class="de.hybris.platform.persistence.audit.payload.converter.ItemPropertyValueConverter" />
+	<bean name="hybrisEnumValueConverter" class="de.hybris.platform.persistence.audit.payload.converter.HybrisEnumValueConverter" />
+	<bean name="oldJaloItemValueConverter" class="de.hybris.platform.persistence.audit.payload.converter.OldJaloItemConverter" />
+
+	<bean name="payloadConverterRegistry" class="de.hybris.platform.persistence.audit.payload.converter.PayloadConverterRegistry"/>
+
+	<alias alias="payloadSerializer" name="defaultPayloadSerializer"/>
+	<bean name="defaultPayloadSerializer" class="de.hybris.platform.persistence.audit.payload.PayloadSerializer">
+		<property name="payloadConverterRegistry" ref="payloadConverterRegistry"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+	<alias alias="payloadDeserializer" name="defaultPayloadDeserializer"/>
+	<bean name="defaultPayloadDeserializer" class="de.hybris.platform.persistence.audit.payload.PayloadDeserializer"/>
+
+    <bean id="abstractReadAuditGateway" class="de.hybris.platform.persistence.audit.gateway.impl.AbstractReadAuditGateway" abstract="true">
+        <property name="payloadDeserializer" ref="payloadDeserializer" />
+    </bean>
+
+    <alias name="defaultReadAuditGateway" alias="readAuditGateway" />
+    <bean id="defaultReadAuditGateway" class="de.hybris.platform.persistence.audit.gateway.impl.DefaultReadAuditGateway" parent="abstractReadAuditGateway">
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
+    <bean name="abstractWriteAuditGateway" class="de.hybris.platform.persistence.audit.gateway.impl.AbstractWriteAuditGateway" abstract="true">
+        <property name="payloadSerializer" ref="defaultPayloadSerializer"/>
+    </bean>
+
+    <alias name="defaultWriteAuditRecordsDAO" alias="writeAuditRecordsDAO" />
+    <bean name="defaultWriteAuditRecordsDAO" class="de.hybris.platform.directpersistence.audit.dao.impl.DefaultWriteAuditRecordsDAO">
+        <property name="writeAuditGateway" ref="writeAuditGateway"/>
+    </bean>
+
+    <alias name="defaultWriteAuditGateway" alias="writeAuditGateway" />
+    <bean name="defaultWriteAuditGateway" class="de.hybris.platform.persistence.audit.gateway.impl.DefaultWriteAuditGateway" parent="abstractWriteAuditGateway">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="auditScopeInvalidator" ref="auditScopeInvalidator"/>
+    </bean>
+
+     <bean id="auditableSaver" class="de.hybris.platform.persistence.audit.impl.DefaultAuditableSaver">
+        <property name="userService" ref="userService"/>
+        <property name="writeAuditGateway" ref="writeAuditGateway"/>
+        <property name="sessionService" ref="sessionService"/>
+    </bean>
+
+    <bean id="auditEnablementService" class="de.hybris.platform.directpersistence.audit.internal.AuditEnablementService">
+        <property name="delegate" ref="auditingEnablementService" />
+    </bean>
+
+    <bean id="auditingEnablementService" class="de.hybris.platform.persistence.audit.internal.AuditEnablementService">
+        <property name="modelService" ref="defaultModelService"/>
+        <property name="typeService" ref="defaultTypeService"/>
+    </bean>
+
+    <bean id="auditScopeInvalidator" class="de.hybris.platform.persistence.audit.impl.DefaultAuditScopeInvalidator" />
+
+    <bean id="transactionalAuditableOperationHandler" class="de.hybris.platform.persistence.audit.impl.TransactionalAuditableOperationHandler" scope="prototype">
+    		<constructor-arg ref="sldDataContainerProvider" />
+    		<constructor-arg ref="auditableSaver" />
+    </bean>
+
+	<bean id="nonTransactionalAuditableOperationHandler" class="de.hybris.platform.persistence.audit.impl.NonTransactionalAuditableOperationHandler" scope="prototype">
+    		<constructor-arg ref="sldDataContainerProvider" />
+    		<constructor-arg ref="auditableSaver" />
+    </bean>
+
+	<!-- Model Service -->
+	<alias alias="modelService" name="defaultModelService" />
+	<bean id="defaultModelService" class="de.hybris.platform.servicelayer.internal.model.impl.DefaultModelService" parent="abstractService">
+		<lookup-method name="lookupConverterRegistry" bean="converterRegistry" />
+		<lookup-method name="lookupInterceptorRegistry" bean="interceptorRegistry" />
+		<lookup-method name="lookupModelCloningStrategy" bean="modelCloningStrategy" />
+		<lookup-method name="lookupModelCloningContext" bean="modelCloningContext" />
+		<lookup-method name="lookupModelSearchStrategy" bean="modelSearchStrategy" />
+		<lookup-method name="lookupSessionService" bean="sessionService" />
+		<lookup-method name="lookupWritePersistenceGateway" bean="writePersistenceGateway"/>
+		<property name="modelContext" ref="modelContext" />
+		<property name="modelPersister" ref="resolvingModelPersister" />
+		<property name="modelExtractor" ref="modelExtractor"/>
+		<property name="changeSetBuilder" ref="changeSetBuilder"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="cascader" ref="cascader"/>
+		<property name="sourceTransformer" ref="sourceTransformer"/>
+
+		<!-- This property enables saving within transactions globally! -->
+		<property name="transactional" value="${model.service.transactional.saves}" />
+		<property name="transactionTemplate">
+			<bean class="org.springframework.transaction.support.TransactionTemplate">
+				<property name="transactionManager" ref="txManager" />
+			</bean>
+		</property>
+		<property name="persistenceTypeService" ref="defaultPersistenceTypeService"/>
+		<property name="sldDataContainerProvider" ref="sldDataContainerProvider"/>
+    </bean>
+
+	<!-- Source Transformer -->
+	<bean id="sourceTransformer" class="de.hybris.platform.servicelayer.internal.model.impl.SourceTransformer">
+		<lookup-method name="lookupConverterRegistry" bean="converterRegistry" />
+		<constructor-arg name="sldDataContainerProvider" ref="sldDataContainerProvider" />
+		<constructor-arg name="sldRelationDAO" ref="sldRelationDAO" />
+        <constructor-arg name="jaloAccessorsService" ref="jaloAccessorsService" />
+	</bean>
+
+	<!-- Dummy invalidator - only development time -->
+	<bean id="dummyCacheInvalidator" class="de.hybris.platform.directpersistence.impl.DummyCacheInvalidator"/>
+
+    <alias alias="cacheInvalidator" name="defaultCacheInvalidator"/>
+    <bean id="defaultCacheInvalidator" class="de.hybris.platform.directpersistence.impl.DefaultCacheInvalidator"/>
+
+    <!-- Cloning -->
+    <alias alias="modelCloningStrategy" name="defaultItemModelCloneStrategy"/>
+    <bean id="defaultItemModelCloneStrategy"
+          class="de.hybris.platform.servicelayer.internal.model.impl.DefaultItemModelCloneStrategy">
+        <property name="itemModelCloneCreator" ref="itemModelCloneCreator"/>
+        <property name="typeService" ref="typeService"/>
+    </bean>
+
+    <bean id="itemModelCloneCreator" class="de.hybris.platform.servicelayer.internal.model.impl.ItemModelCloneCreator">
+        <constructor-arg name="typeService" ref="typeService"/>
+        <constructor-arg name="modelService" ref="modelService"/>
+        <constructor-arg name="i18nService" ref="i18nService"/>
+    </bean>
+
+    <alias alias="modelCloningContext" name="defaultModelCloningContext"/>
+    <bean id="defaultModelCloningContext"
+          class="de.hybris.platform.servicelayer.internal.model.impl.DefaultModelCloningContext"/>
+    <!-- End cloning -->
+
+
+    <bean id="modelSearchStrategy"
+          class="de.hybris.platform.servicelayer.internal.model.impl.DefaultItemModelSearchStrategy">
+        <property name="typeService" ref="typeService"/>
+        <property name="i18nService" ref="i18nService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <bean id="defaultModelPersister" class="de.hybris.platform.servicelayer.internal.model.impl.DefaultModelPersister"/>
+    <bean id="resolvingModelPersister"
+          class="de.hybris.platform.servicelayer.internal.model.impl.ResolvingModelPersister"/>
+
+    <alias name="defaultCascader" alias="cascader"/>
+    <bean id="defaultCascader" class="de.hybris.platform.servicelayer.internal.model.extractor.impl.DefaultCascader">
+        <property name="modelService" ref="defaultModelService"/>
+    </bean>
+
+    <alias name="defaultCascadingDependenciesResolver" alias="cascadingDependenciesResolver"/>
+    <bean id="defaultCascadingDependenciesResolver"
+          class="de.hybris.platform.servicelayer.internal.model.extractor.impl.DefaultCascadingDependenciesResolver">
+        <property name="modelService" ref="defaultModelService"/>
+    </bean>
+
+    <alias alias="modelExtractor" name="defaultModelExtractor"/>
+    <bean id="defaultModelExtractor"
+          class="de.hybris.platform.servicelayer.internal.model.extractor.impl.DefaultModelExtractor">
+        <property name="dependenciesResolver" ref="defaultCascadingDependenciesResolver"/>
+    </bean>
+
+	<alias alias="nonNavigableRelationsDAO" name="defaultNonNavigableRelationsDAO"/>
+	<bean name="defaultNonNavigableRelationsDAO" class="de.hybris.platform.persistence.links.DefaultNonNavigableRelationsDAO">
+	</bean>
+
+    <alias alias="changeSetBuilder" name="defaultChangeSetBuilder"/>
+    <bean id="defaultChangeSetBuilder"
+          class="de.hybris.platform.servicelayer.internal.model.extractor.impl.DefaultChangeSetBuilder">
+        <property name="enumerationDelegate" ref="enumerationDelegate"/>
+		<property name="nonNavigableRelationsDAO" ref="nonNavigableRelationsDAO"/>
+        <property name="localizedAttributesProcessor" ref="localizedAttributesProcessor"/>
+    </bean>
+
+    <bean id="localizedAttributesProcessor"
+          class="de.hybris.platform.servicelayer.internal.converter.impl.LocalizedAttributesProcessor">
+        <constructor-arg ref="i18nService"/>
+    </bean>
+
+    <bean id="enumerationDelegate"
+          class="de.hybris.platform.servicelayer.internal.model.extractor.impl.EnumerationDelegate">
+        <property name="enumerationManager" ref="core.enumerationManager"/>
+    </bean>
+
+    <!-- <bean id="modelContext" class="de.hybris.platform.servicelayer.internal.model.impl.DefaultModelContext" scope="yrequest" destroy-method="clear">
+        <aop:scoped-proxy/> </bean> -->
+    <bean id="modelContext" class="de.hybris.platform.servicelayer.internal.model.impl.ModelContextProxy">
+        <property name="modelContextFactory" ref="modelContextFactory"/>
+    </bean>
+
+    <bean id="modelContextFactory"
+          class="de.hybris.platform.servicelayer.internal.model.impl.DefaultModelContextFactory"/>
+
+    <alias alias="converterRegistry" name="defaultConverterRegistry"/>
+    <bean id="defaultConverterRegistry"
+          class="de.hybris.platform.servicelayer.internal.converter.impl.DefaultModelConverterRegistry"
+          autowire="byType" parent="abstractEventListener">
+        <property name="defaulItemModelSerializationStrategy" ref="leanSerializationStrategy"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="sourceTransformer" ref="sourceTransformer"/>
+        <property name="selfHealingService" ref="selfHealingService"/>
+    </bean>
+
+    <!-- how to serialize item models: lean means a) if unmodified write a PK handle to stream and fetch new upon read b) if modified
+        write full model to stream -->
+    <bean id="leanSerializationStrategy"
+          class="de.hybris.platform.servicelayer.model.strategies.SerializationStrategyLeanImpl">
+    </bean>
+
+    <!-- FlexibleSearch -->
+
+    <!-- Model resolver strategies -->
+    <alias name="defaultModelResolver" alias="modelResolver"/>
+    <bean name="defaultModelResolver"
+          class="de.hybris.platform.servicelayer.search.internal.resolver.impl.DefaultModelResolver">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultMultiModelResolver" alias="multiModelResolver"/>
+    <bean name="defaultMultiModelResolver"
+          class="de.hybris.platform.servicelayer.search.internal.resolver.impl.DefaultMultiModelResolver">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <!-- FlexibleSearch Service -->
+    <alias alias="flexibleSearchService" name="defaultFlexibleSearchService"/>
+    <bean id="defaultFlexibleSearchService" parent="abstractBusinessService"
+          class="de.hybris.platform.servicelayer.search.impl.DefaultFlexibleSearchService">
+        <lookup-method name="lookupConverterRegistry" bean="converterRegistry"/>
+        <lookup-method name="lookupModelSearchStrategy" bean="modelSearchStrategy"/>
+        <lookup-method name="lookupQueryPreprocessorRegistry" bean="queryPreprocessorRegistry"/>
+
+        <property name="modelResolver" ref="modelResolver"/>
+        <property name="multiModelResolver" ref="multiModelResolver"/>
+    </bean>
+
+	<alias alias="paginatedFlexibleSearchService" name="defaultPaginatedFlexibleSearchService"/>
+    <bean id="defaultPaginatedFlexibleSearchService" class="de.hybris.platform.servicelayer.search.paginated.impl.DefaultPaginatedFlexibleSearchService">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="sortDataParsingStrategy" ref="sortDataParsingStrategy"/>
+        <property name="abstractQueryHelper" ref="abstractQueryHelper"/>
+    </bean>
+
+    <alias alias="sortDataParsingStrategy" name="defaultSortDataParsingStrategy"/>
+    <bean id="defaultSortDataParsingStrategy" class="de.hybris.platform.servicelayer.search.paginated.strategies.impl.DefaultSortDataParsingStrategy" />
+
+    <alias alias="abstractQueryHelper" name="defaultAbstractQueryHelper"/>
+    <bean id="defaultAbstractQueryHelper" class="de.hybris.platform.servicelayer.search.paginated.impl.DefaultAbstractQueryHelper" />
+
+    <!-- SearchRestriction Service -->
+    <alias alias="searchRestrictionService" name="defaultSearchRestrictionService"/>
+    <bean id="defaultSearchRestrictionService"
+          class="de.hybris.platform.search.restriction.impl.DefaultSearchRestrictionService">
+        <property name="sessionService" ref="sessionService"/>
+        <property name="searchRestrictionDao" ref="searchRestrictionDao"/>
+        <property name="converter" ref="sessionSearchRestrictionConverter"/>
+    </bean>
+
+    <alias alias="searchRestrictionDao" name="defaultSearchRestrictionDao"/>
+    <bean id="defaultSearchRestrictionDao"
+          class="de.hybris.platform.search.restriction.dao.impl.DefaultSearchRestrictionDao"/>
+
+    <alias alias="sessionSearchRestrictionConverter" name="defaultSessionSearchRestrictionConverter"/>
+    <bean id="defaultSessionSearchRestrictionConverter"
+          class="de.hybris.platform.search.restriction.session.converter.impl.DefaultSessionSearchRestrictionConverter">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+    <!-- GenericSearch -->
+
+    <!-- GenericSearch Service -->
+    <alias alias="genericSearchService" name="defaultGenericSearchService"/>
+    <bean id="defaultGenericSearchService" parent="abstractService"
+          class="de.hybris.platform.genericsearch.impl.DefaultGenericSearchService">
+        <property name="typeService" ref="typeService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+    </bean>
+
+    <!-- Query preprocessors -->
+    <bean id="queryPreprocessorRegistry"
+          class="de.hybris.platform.servicelayer.search.internal.preprocessor.impl.DefaultQueryPreprocessorRegistry"
+          autowire="byType"/>
+
+    <bean id="userQueryPreprocessor"
+          class="de.hybris.platform.servicelayer.user.search.preprocessor.UserQueryPreprocessor">
+        <property name="userService" ref="userService"/>
+    </bean>
+
+	<bean id="searchRestrictionPreprocessor" class="de.hybris.platform.search.restriction.preprocessor.SearchRestrictionsQueryPreprocessor">
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+	</bean>
+
+	<bean id="specificDbLimitSupportQueryPreprocessor" class="de.hybris.platform.servicelayer.search.preprocessor.impl.SpecificDbLimitSupportQueryPreprocessor">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+
+	<bean id="disableCachingQueryPreprocessor" class="de.hybris.platform.servicelayer.search.preprocessor.impl.DisableCachingQueryPreprocessor">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<!-- Type / Meta Model -->
+
+    <!-- TypeService -->
+    <alias alias="typeService" name="defaultTypeService"/>
+    <bean id="defaultTypeService" class="de.hybris.platform.servicelayer.type.impl.DefaultTypeService"
+          parent="abstractBusinessService">
+        <property name="converterRegistry" ref="converterRegistry"/>
+        <property name="typeDao" ref="typeDao"/>
+    </bean>
+
+    <bean name="typeModelGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="Type"/>
+    </bean>
+
+    <bean name="composedTModelGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="ComposedType"/>
+    </bean>
+
+    <bean name="atomicTModelGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="AtomicType"/>
+    </bean>
+
+    <bean name="typeDao" class="de.hybris.platform.servicelayer.type.daos.impl.DefaultTypeDao">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <!-- event listener -->
+
+    <bean id="servicelayerEventListener"
+          class="de.hybris.platform.servicelayer.event.impl.InvalidateConverterRegistryListener"
+          parent="abstractEventListener">
+        <lookup-method name="getConverterRegistry" bean="defaultConverterRegistry"/>
+    </bean>
+
+    <!-- SystemSetup -->
+    <bean id="serviceLayerDataSetup" class="de.hybris.platform.servicelayer.datasetup.ServiceLayerDataSetup">
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+
+    <!-- Enumeration Service -->
+    <alias alias="enumerationService" name="defaultEnumerationService"/>
+    <bean id="defaultEnumerationService" class="de.hybris.platform.enumeration.impl.DefaultEnumerationService"
+          parent="abstractService">
+        <property name="typeService" ref="typeService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <!-- Permissions Services -->
+
+    <bean id="permissionDAO" class="de.hybris.platform.servicelayer.security.permissions.PermissionDAO">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="batchCollectorFactory" ref="batchCollectorFactory"/>
+    </bean>
+
+    <bean id="permissionManagementStrategyFactory"
+          class="de.hybris.platform.servicelayer.security.permissions.PermissionManagementStrategyFactory">
+        <property name="jaloStrategy">
+            <bean class="de.hybris.platform.servicelayer.security.permissions.impl.JaloPermissionManagementStrategy"/>
+        </property>
+        <property name="sldStrategy">
+            <bean class="de.hybris.platform.servicelayer.security.permissions.impl.SLDPermissionManagementStrategy">
+                <property name="permissionDAO" ref="permissionDAO"/>
+                <property name="cacheInvalidator" ref="cacheInvalidator"/>
+            </bean>
+        </property>
+    </bean>
+
+    <alias alias="permissionManagementService" name="defaultPermissionManagementService"/>
+    <bean id="defaultPermissionManagementService"
+          class="de.hybris.platform.servicelayer.security.permissions.impl.DefaultPermissionManagementService">
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="permissionManagementStrategyFactory" ref="permissionManagementStrategyFactory"/>
+    </bean>
+
+    <alias alias="permissionCheckingService" name="defaultPermissionCheckingService"/>
+    <bean id="defaultPermissionCheckingService"
+          class="de.hybris.platform.servicelayer.security.permissions.impl.DefaultPermissionCheckingService">
+        <!-- <property name="permissionManagementService" ref="permissionManagementService" /> -->
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="permissionCheckValMappingStrategy" ref="permissionCheckValueMappingStrategy"/>
+        <property name="principalHierarchyCheckingStrategy" ref="principalHierarchyCheckingStrategy"/>
+        <property name="permissionManagementStrategyFactory" ref="permissionManagementStrategyFactory"/>
+    </bean>
+
+    <alias alias="permissionCRUDService" name="defaultPermissionCRUDService"/>
+    <bean id="defaultPermissionCRUDService"
+          class="de.hybris.platform.servicelayer.security.permissions.impl.DefaultPermissionCRUDService">
+        <property name="permissionCheckingService" ref="permissionCheckingService"/>
+    </bean>
+
+    <!-- TimeService allows adjustment of current time either backwards or forwards -->
+    <alias alias="timeService" name="defaultTimeService"/>
+    <bean id="defaultTimeService" class="de.hybris.platform.servicelayer.time.impl.DefaultTimeService"
+          parent="abstractBusinessService">
+          <property name="i18nService" ref="i18nService"/>
+    </bean>
+
+    <alias alias="permissionCheckValueMappingStrategy" name="defaultPermissionCheckValueMappingStrategy"/>
+    <bean id="defaultPermissionCheckValueMappingStrategy"
+          class="de.hybris.platform.servicelayer.security.strategies.impl.DefaultPermissionCheckValueMappingStrategy"/>
+
+    <alias alias="principalHierarchyCheckingStrategy" name="defaultPrincipalHierarchyCheckingStrategy"/>
+    <bean id="defaultPrincipalHierarchyCheckingStrategy"
+          class="de.hybris.platform.servicelayer.security.strategies.impl.DefaultPrincipalHierarchyCheckingStrategy">
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <bean id="defaultTenantInitializationListener"
+          class="de.hybris.platform.servicelayer.internal.tenant.impl.DefaultTenantInitializationListener"
+          autowire="byType" parent="abstractEventListener">
+    </bean>
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorExecutionPolicy" name="interceptorExecutionPolicy">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	 <!-- Locking Service allows to block an item for further processing -->
+	<alias alias="itemLockingService" name="defaultLockingService"/>
+    <bean id="defaultLockingService" class="de.hybris.platform.servicelayer.locking.impl.DefaultItemLockingService">
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="writePersistenceGateway" ref="writePersistenceGateway"/>
+        <property name="cacheInvalidator" ref="cacheInvalidator"/>
+    </bean>
+</beans>

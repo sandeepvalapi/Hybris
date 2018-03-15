@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           ">
+
+	<!-- 
+		Mapping between ContextIDs and Factories.
+	 -->
+	 
+	<alias alias="rendererService" name="defaultRendererService"/>
+	<bean id="defaultRendererService" class="de.hybris.platform.commons.renderer.impl.DefaultRendererService" parent="abstractBusinessService">
+		<property name="rendererTemplateDao" ref="rendererTemplateDao"/>
+		<property name="mapping">
+			<map>
+				<entry key="VELOCITY" value-ref="velocityTemplateRenderer">
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<alias alias="rendererTemplateDao" name="defaultRendererTemplateDao"/>
+	<bean id="defaultRendererTemplateDao" class="de.hybris.platform.commons.renderer.daos.impl.DefaultRendererTemplateDao">
+	</bean>
+
+	<bean id="velocityTemplateRenderer" class="de.hybris.platform.commons.renderer.impl.VelocityTemplateRenderer">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="contextName" value="ctx"/>
+	</bean>
+
+</beans>

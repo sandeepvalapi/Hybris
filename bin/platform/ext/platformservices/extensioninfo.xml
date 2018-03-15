@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+--><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+
+   <extension abstractclassprefix="Generated" classprefix="PlatformServices" managername="PlatformServicesManager" managersuperclass="de.hybris.platform.jalo.extension.Extension" name="platformservices" usemaven="false">
+
+      <requires-extension name="europe1"/>
+      <requires-extension name="impex"/>
+      <requires-extension name="processing"/>
+      <requires-extension name="deliveryzone"/>
+      <requires-extension name="paymentstandard"/>
+      <!-- actually there is dependency to comments but this causes
+      	   cyclic dependencies errors !!!
+      <requires-extension name="comments"/>
+      -->
+
+      <coremodule generated="false" manager="de.hybris.platform.jalo.extension.GenericManager" packageroot="de.hybris.platform.platformservices"/>
+   </extension>
+      
+</extensioninfo>

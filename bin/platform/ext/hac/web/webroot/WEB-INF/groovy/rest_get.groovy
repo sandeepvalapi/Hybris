@@ -1,0 +1,4 @@
+
+result = [
+				"typecode":typecode
+			]

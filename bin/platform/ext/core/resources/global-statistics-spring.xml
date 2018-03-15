@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd"  default-lazy-init="true" >	
+	
+	<bean id="defaultStatisticsData" class="de.hybris.platform.servicelayer.stats.DefaultStatisticsData">
+		<property name="sizeLvl1Ms" value="${hac.statistics.statisticsdata.levelOne}" />
+		<property name="sizeLvl2Ms" value="${hac.statistics.statisticsdata.levelTwo}" />
+		<property name="sizeLvl3Ms" value="${hac.statistics.statisticsdata.levelThree}" />
+	</bean>
+
+	<bean id="defaultStatMonitoringFacade" class="de.hybris.platform.servicelayer.stats.DefaultStatMonitoringFacade" />
+	
+	<bean id="committedMemoryCollector" class="de.hybris.platform.servicelayer.stats.collector_impl.CommittedMemoryCollector" />
+	<bean id="maxMemoryCollector" class="de.hybris.platform.servicelayer.stats.collector_impl.MaxMemoryCollector" />
+	<bean id="usedMemoryCollector" class="de.hybris.platform.servicelayer.stats.collector_impl.UsedMemoryCollector" />
+	
+	<bean id="memoryChart" class="de.hybris.platform.servicelayer.stats.chart_impl.DefaultStatisticsChart">
+		<constructor-arg name="name" value="memoryChart" />
+		<constructor-arg name="unit" value="MB" />
+		<property name="basicLines">
+			<list>
+				<ref bean="committedMemoryCollector" />
+				<ref bean="maxMemoryCollector" />
+				<ref bean="usedMemoryCollector" />
+			</list>			
+		</property>
+	</bean>
+	
+	<bean id="threadsCollector" class="de.hybris.platform.servicelayer.stats.collector_impl.ThreadsCollector" />
+	
+	<bean id="threadsChart" class="de.hybris.platform.servicelayer.stats.chart_impl.DefaultStatisticsChart">
+		<constructor-arg name="name" value="threadsChart" />
+		<constructor-arg name="unit" value="" />
+		<property name="basicLines">
+			<list>
+				<ref bean="threadsCollector" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="cpuWorkloadCollector" class="de.hybris.platform.servicelayer.stats.collector_impl.CpuWorkloadCollector" />
+	
+	<bean id="osChart" class="de.hybris.platform.servicelayer.stats.chart_impl.DefaultStatisticsChart">
+		<constructor-arg name="name" value="osChart" />
+		<constructor-arg name="unit" value="%" />
+		<property name="basicLines">
+			<list>
+				<ref bean="cpuWorkloadCollector" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="sessionsChart" class="de.hybris.platform.servicelayer.stats.chart_impl.SessionsStatisticsChart">
+		<constructor-arg name="name" value="sessionsChart" />
+		<constructor-arg name="unit" value="" />
+		<property name="basicLines">
+			<list>
+			</list>
+		</property>
+		<property name="views">
+			<map>
+				<entry key="poll">
+					<list>
+					</list>
+				</entry>
+				<entry key="zoom">
+					<list>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<alias name="defaultStatisticsService" alias="statisticsService"/>
+	<bean id="defaultStatisticsService" class="de.hybris.platform.servicelayer.stats.DefaultStatisticsService">
+		<property name="interval" value="${hac.statistics.statisticsservice.interval}" />
+		<property name="dataHolder" ref="defaultStatisticsData" />
+		<property name="charts">
+			<list>
+				<ref bean="memoryChart"/>
+				<ref bean="threadsChart"/>
+				<ref bean="osChart"/>
+				<ref bean="sessionsChart"/>
+			</list>
+		</property>
+		<property name="standaloneEnabled" value="${hac.statistics.statisticsservice.standalone}" />
+	</bean>
+</beans>

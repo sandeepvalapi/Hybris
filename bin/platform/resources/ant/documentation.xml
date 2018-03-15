@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="project.documentation">
+
+	
+	<macrodef name="extension_uml">
+		<attribute name="extname" />
+		<attribute name="mode" default="normal" />
+		<sequential>
+
+			<!-- ugly way to check for existence of a file using a wildcard... -->
+			<pathconvert property="jarfound" setonempty="false" pathsep=" ">
+				<path>
+					<fileset dir="${platformhome}/lib" includes="yuml-*.jar" />
+				</path>
+			</pathconvert>
+
+
+			<if>
+				<isset property="jarfound" />
+				<then>
+					<java fork="true" classname="de.hybris.anttasks.main.Main">
+						<arg value="-@{mode}" />
+						<arg value="${ext.@{extname}.path}/resources/@{extname}-items.xml" />
+						<arg value="${ext.@{extname}.path}/resources/uml" />
+						<arg value="@{extname}-@{mode}" />
+						<classpath>
+							<fileset dir="${platformhome}/lib">
+								<include name="yuml-*.jar" />
+							</fileset>
+						</classpath>
+					</java>
+				</then>
+				<else>
+					<echo>
+	****************************************************************
+
+	  The UML plugin can not be used from within a binary release!
+	  Please use the hybris UML Service instead!
+
+	****************************************************************
+							</echo>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_clean_uml">
+		<attribute name="extname" />
+		<sequential>
+			<delete dir="${ext.@{extname}.path}/resources/uml" failonerror="false" />
+		</sequential>
+	</macrodef>
+
+</project>

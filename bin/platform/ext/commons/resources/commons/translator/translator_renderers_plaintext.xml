@@ -1,0 +1,49 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<renderers>
+	<velocityRenderer name="mainNode">
+		<templateName>commons/translator/templates/main.vm</templateName>
+	</velocityRenderer>
+	<velocityRenderer name="defaultRenderer">
+		<templateName>commons/translator/templates/default.vm</templateName>
+	</velocityRenderer>
+	<velocityRenderer name="entity">
+		<templateName>commons/translator/templates/entity.vm</templateName>
+	</velocityRenderer>
+
+	<renderer name="div" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="paragraph" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="span" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+
+	<renderer name="bold" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="strong" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="italic" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="underline" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="strike" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="superscript" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="subscript" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="newLine" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+
+	<renderer name="header1" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="header2" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="header3" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="header4" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="header5" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="header6" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+
+	<renderer name="table" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="orderedList" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="unorderedList" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+
+	<renderer name="itemlink" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+	<renderer name="image" rendererClass="de.hybris.platform.commons.translator.renderers.PlainTextRenderer" />
+
+</renderers>

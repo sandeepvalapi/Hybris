@@ -1,0 +1,24 @@
+#sidebar2,#sidebar3,#sidebar4 {
+	display: none;
+}
+
+button {
+	float: none;
+	clear: both;
+}
+
+#spinnerWrapper {
+	text-align: center;
+}
+
+#orphans {
+	display: none;
+}
+
+.dataTables_wrapper {
+	min-height: 0;
+}
+
+h3 {
+	margin-top: 2em;
+}

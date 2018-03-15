@@ -1,0 +1,3663 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="KeywordCollection" elementtype="Keyword" autocreate="true" generate="true"/>
+		<collectiontype code="TerritoryCollection" elementtype="Country" autocreate="true" generate="true"/>
+		<collectiontype code="AgreementCollection" elementtype="Agreement" autocreate="true" generate="true"/>
+		<collectiontype code="CatalogCollection" elementtype="Catalog" autocreate="true" generate="true"/>
+		<collectiontype code="CatalogVersionCollection" elementtype="CatalogVersion" autocreate="true" generate="true"/>
+		<collectiontype code="ProductReferenceCollection" elementtype="ProductReference" autocreate="true" generate="true"/>
+		<collectiontype code="ProductFeatureCollection" elementtype="ProductFeature" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="ProductCatalogVersionDifferenceCollection" elementtype="ProductCatalogVersionDifference" autocreate="true" generate="true"/>
+		<collectiontype code="SyncItemJobCollection" elementtype="SyncItemJob" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="SyncItemCronJobCollection" elementtype="SyncItemCronJob" autocreate="true" generate="true"/>
+		<collectiontype code="SyncCategoryList" elementtype="Category" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="SyncProductList" elementtype="Product" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="SyncMediaList" elementtype="Media" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="SyncKeywordList" elementtype="Keyword" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="SyncOthersList" elementtype="Item" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="SyncTimestampList" elementtype="ItemSyncTimestamp" autocreate="true" generate="true" type="list"/>
+		<collectiontype code="SyncAttributeConfigCollection" elementtype="SyncAttributeDescriptorConfig" autocreate="true" generate="true"/>
+		<collectiontype code="ClassificationAttributeValueCollection" elementtype="ClassificationAttributeValue" autocreate="true" type="list" generate="true"/>
+		<collectiontype code="CategoryList" elementtype="Category" type="list" autocreate="true" generate="true"/>
+		<collectiontype code="ClassificationAttributeList" elementtype="ClassificationAttribute" type="list" autocreate="true" generate="true"/>
+		<collectiontype code="ClassificationClassList" elementtype="ClassificationClass" type="list" autocreate="true" generate="true"/>
+		<collectiontype code="ClassificationAttributeAssignmentList" elementtype="ClassAttributeAssignment" type="list" autocreate="true" generate="true"/>
+		<collectiontype code="ClassificationAttributeValueList" elementtype="ClassificationAttributeValue" type="list" autocreate="true" generate="true"/>
+		<collectiontype code="ClassificationSystemVersionCollection" elementtype="ClassificationSystemVersion" autocreate="true" generate="true"/>
+		<collectiontype code="ClassificationAttributeUnitSet" elementtype="ClassificationAttributeUnit" autocreate="true" generate="true" type="set"/>
+		<!-- category collections -->
+		<collectiontype code="CategoryCollection" elementtype="Category" autocreate="true" generate="true"/>
+		<!-- variants collections -->
+		<collectiontype code="VPCollection" elementtype="VariantProduct" autocreate="true" generate="true"/>
+		<collectiontype code="VACollection" elementtype="VariantAttributeDescriptor" autocreate="true" generate="true" type="list"/>
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="ClassificationAttributeTypeEnum" autocreate="true" generate="true">
+			<value code="string"/>
+			<value code="number"/>
+			<value code="boolean"/>
+			<value code="enum"/>
+			<value code="date"/>
+		</enumtype>
+		<enumtype code="ClassificationAttributeVisibilityEnum" autocreate="true" generate="true">
+			<value code="visible"/>
+			<value code="not_visible"/>
+			<value code="visible_in_base"/>
+			<value code="visible_in_variant"/>
+		</enumtype>
+		<enumtype code="IDType" autocreate="true" generate="true">
+			<value code="duns"/>
+			<value code="iln"/>
+			<value code="supplier_specific"/>
+			<value code="buyer_specific"/>
+			<value code="unspecified"/>
+		</enumtype>
+		<!--
+			article status from bmecat
+			-->
+		<enumtype code="ArticleStatus" autocreate="true" generate="true">
+			<value code="bargain"/>
+			<value code="new_article"/>
+			<value code="old_article"/>
+			<value code="new"/>
+			<value code="used"/>
+			<value code="refurbished"/>
+			<value code="core_article"/>
+			<value code="others"/>
+		</enumtype>
+
+		<enumtype code="LineOfBusiness" autocreate="true" generate="true">
+			<value code="trade"/>
+			<value code="bank"/>
+			<value code="industry"/>
+			<value code="building"/>
+			<value code="government"/>
+			<value code="service"/>
+		</enumtype>
+
+		<enumtype code="ArticleApprovalStatus" autocreate="true" generate="true">
+			<value code="check"/>
+			<value code="approved"/>
+			<value code="unapproved"/>
+		</enumtype>
+
+		<enumtype code="CategoryDifferenceMode" autocreate="true" generate="true">
+			<value code="category_new"/>
+			<value code="category_removed"/>
+		</enumtype>
+
+		<enumtype code="ProductDifferenceMode" autocreate="true" generate="true">
+			<value code="product_new"/>
+			<value code="product_removed"/>
+			<value code="product_pricedifference"/>
+		</enumtype>
+
+		<enumtype code="EclassVersion" generate="true" autocreate="true">
+			<value code="VERSION_4_10"/>
+			<value code="VERSION_5_00"/>
+			<value code="VERSION_5_10"/>
+		</enumtype>
+
+		<enumtype code="EtimVersion" generate="true" autocreate="true">
+			<value code="VERSION_2_0"/>
+			<value code="VERSION_3_0"/>
+		</enumtype>
+
+		<enumtype code="ProfiClassVersion" generate="true" autocreate="true">
+			<value code="VERSION_3_0"/>
+		</enumtype>
+
+		<enumtype code="ProductReferenceTypeEnum" autocreate="true" generate="true">
+			<value code="ACCESSORIES"/>
+			<value code="BASE_PRODUCT"/>
+			<value code="CONSISTS_OF"/>
+			<value code="DIFF_ORDERUNIT"/>
+			<value code="FOLLOWUP"/>
+			<value code="MANDATORY"/>
+			<value code="SIMILAR"/>
+			<value code="SELECT"/>
+			<value code="SPAREPART"/>
+			<value code="OTHERS"/>
+			<value code="UPSELLING"/>
+			<value code="CROSSELLING"/>
+  		</enumtype>
+
+        <enumtype code="ProductInfoStatus" dynamic="true">
+			<value code="NONE" />
+            <value code="SUCCESS" />
+            <value code="INFO" />
+            <value code="WARNING" />
+            <value code="ERROR" />
+        </enumtype>
+
+        <enumtype code="ConfiguratorType" dynamic="true" />
+
+		<enumtype code="SyncItemStatus" autocreate="true" generate="true">
+			<value code="IN_SYNC"/>
+			<value code="NOT_SYNC"/>
+			<value code="COUNTERPART_MISSING"/>
+			<value code="ITEM_MISSING"/>
+			<value code="NOT_APPLICABLE"/>
+			<value code="IN_PROGRESS"/>
+			<value code="SYNC_RULES_VIOLATED"/>
+		</enumtype>
+	</enumtypes>
+
+	<maptypes>
+		<maptype code="ArticleStatusMapType"
+               argumenttype="ArticleStatus"
+               returntype="java.lang.String"
+               autocreate="true"
+               generate="true"/>
+
+      <maptype code="localized:ArticleStatusMapType"
+               argumenttype="Language"
+               returntype="ArticleStatusMapType"
+               autocreate="true"
+               generate="true"/>
+
+		<maptype code="IDTypeMapType"
+               argumenttype="IDType"
+               returntype="java.lang.String"
+               autocreate="true"
+               generate="true"/>
+
+		<maptype code="String2StringMapType"
+               argumenttype="java.lang.String"
+               returntype="java.lang.String"
+               autocreate="true"
+               generate="true"/>
+
+		<maptype code="SelectedAttributeDescriptorMapType"
+               argumenttype="AttributeDescriptor"
+               returntype="java.lang.Boolean"
+               autocreate="true"
+               generate="true"/>
+
+		<maptype code="AttributeValuesMap"
+               argumenttype="ClassificationAttribute"
+               returntype="ClassificationAttributeValueCollection"
+               autocreate="true"
+               generate="true"/>
+
+	</maptypes>
+
+	<relations>
+
+		<relation code="Catalog2VersionsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="Catalog" qualifier="catalog" cardinality="one">
+				<modifiers read="true" write="false" initial="true" optional="false" search="true" unique="true"/>
+			</sourceElement>
+			<targetElement type="CatalogVersion" qualifier="catalogVersions" cardinality="many" ordered="false" collectiontype="set">
+				<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="CatalogVersion2Synchronizations" localized="false" generate="true" autocreate="true">
+			<sourceElement type="CatalogVersion" qualifier="sourceVersion" cardinality="one">
+				<modifiers read="true" write="false" initial="true" optional="false" search="true" unique="true"/>
+			</sourceElement>
+			<targetElement type="SyncItemJob" qualifier="synchronizations" cardinality="many" ordered="false"
+						   collectiontype="list">
+				<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="CatalogVersion2IncomingSynchronizations" localized="false" generate="true" autocreate="true">
+			<sourceElement type="CatalogVersion" qualifier="targetVersion" cardinality="one">
+				<modifiers read="true" write="false" initial="true" optional="false" search="true" unique="true"/>
+			</sourceElement>
+			<targetElement type="SyncItemJob" qualifier="incomingSynchronizations" cardinality="many" ordered="false"
+						   collectiontype="list">
+				<modifiers read="true" write="false" optional="true" search="true" partof="false"/>
+			</targetElement>
+		</relation>
+
+        <relation code="CatalogVersion2Agreements" localized="false" generate="true" autocreate="true">
+            <sourceElement type="CatalogVersion" qualifier="catalogVersion" cardinality="one">
+                <modifiers read="true" write="true" optional="true" search="true"/>
+            </sourceElement>
+            <targetElement type="Agreement" qualifier="agreements" cardinality="many" ordered="false"
+                           collectiontype="list">
+                <modifiers read="true" write="true" optional="true" search="true" partof="false"/>
+            </targetElement>
+        </relation>
+
+		<relation code="Product2KeywordRelation" autocreate="true" generate="true" localized="true">
+			<deployment table="Prod2KeywordRel" typecode="604"/>
+    		<sourceElement qualifier="keywords" type="Keyword" cardinality="many" ordered="true" collectiontype="list">
+    		   <description>Keywords</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="products" type="Product" cardinality="many" ordered="false">
+    		   <description>Products</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>
+    	</relation>
+        
+        <relation code="ConfigurationCategory2ConfiguratorSettingsRelation" localized="false">
+            <sourceElement type="ConfigurationCategory" qualifier="configurationCategory" cardinality="one">
+                <modifiers optional="false" write="false" initial="true"/>
+            </sourceElement>
+            <targetElement type="AbstractConfiguratorSetting" qualifier="configuratorSettings" cardinality="many" collectiontype="list" ordered="true">
+                <description>Product configuration</description>
+                <modifiers optional="true" partof="true" />
+            </targetElement>
+        </relation>
+
+        <relation code="AbstractOrderEntry2AbstractOrderEntryProductInfoRelation" autocreate="true" generate="true" localized="false">
+            <sourceElement type="AbstractOrderEntry" qualifier="orderEntry" cardinality="one">
+                <modifiers optional="false" initial="true" write="false"/>
+            </sourceElement>
+            <targetElement type="AbstractOrderEntryProductInfo" qualifier="productInfos" cardinality="many" collectiontype="list" ordered="true">
+                <modifiers optional="true" partof="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="Product2FeatureRelation" autocreate="true" generate="true" localized="false">
+    		<sourceElement qualifier="product" type="Product" cardinality="one">
+    			<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+				<!-- changed into relation 
+				<attribute qualifier="product" type="Product">
+					<description>Product</description>
+					<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				 -->
+    		</sourceElement>
+    		<targetElement qualifier="features" type="ProductFeature" cardinality="many" ordered="true" collectiontype="list">
+    			<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+    			<custom-properties>
+    				<property name="ordering.attribute"><value>"featurePosition"</value></property>
+					<property name="readOnlyForUI"><value>Boolean.TRUE</value></property>
+				</custom-properties>
+				<!-- 
+				<attribute qualifier="features" type="ProductFeatureCollection">
+					<custom-properties>
+						<property name="readOnlyForUI">
+							<value>Boolean.TRUE</value>
+						</property>
+					</custom-properties>
+					<modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				 -->
+    		</targetElement>
+    	</relation>
+
+		<relation code="Product2VariantRelation" autocreate="true" generate="true" localized="false">
+    		<sourceElement qualifier="baseProduct" type="Product" cardinality="one">
+    			<modifiers read="true" write="true" search="true" optional="false" initial="true"/>
+				<!-- changed into relation 
+			    <attribute autocreate="true" qualifier="baseProduct" type="Product">
+			      <persistence type="property"/>
+			      <modifiers read="true" write="true" search="true" optional="false" initial="true"/>
+			    </attribute>
+				 -->
+    		</sourceElement>
+    		<targetElement qualifier="variants" type="VariantProduct" cardinality="many" ordered="false">
+    			<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+    			<custom-properties>
+    				<property name="ordering.attribute"><value>"code"</value></property>
+				</custom-properties>
+				<!-- 
+				<attribute autocreate="true" qualifier="variants" type="VPCollection">
+			      <persistence type="jalo"/>
+			      <modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+			    </attribute>
+				 -->
+    		</targetElement>
+    	</relation>
+
+ 		<relation code="Category2KeywordRelation" autocreate="true" generate="true" localized="true">
+			<deployment table="Cat2KeywordRel" typecode="605"/>
+    		<sourceElement qualifier="categories" type="Category" cardinality="many" ordered="false">
+    		   <description>Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="keywords" type="Keyword" cardinality="many" ordered="true" collectiontype="list">
+    		   <description>Keyword</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>
+    	</relation>
+
+ 		<relation code="Category2PrincipalRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Cat2PrincRel" typecode="613"/>
+    		<sourceElement qualifier="accessibleCategories" type="Category" cardinality="many" ordered="false">
+    		   <description>catalog categories which are accessible for this principal</description>
+    			<modifiers read="true" write="false" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="allowedPrincipals" type="Principal" cardinality="many" collectiontype="list" ordered="true">
+    		   <description>Principals which are allowed to access this catalog category</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>
+    	</relation>
+
+ 		<relation code="Principal2WriteableCatalogVersionRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Pcp2WrtbleCVRel" typecode="617"/>
+    		<sourceElement qualifier="writePrincipals" type="Principal" cardinality="many" collectiontype="list" ordered="true"/>
+    		<targetElement qualifier="writableCatalogVersions" type="CatalogVersion" cardinality="many" collectiontype="list" ordered="true"/>
+    	</relation>
+
+ 		<relation code="Principal2ReadableCatalogVersionRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Pcpl2RdbleCVRel" typecode="618"/>
+    		<sourceElement qualifier="readPrincipals" type="Principal" cardinality="many" collectiontype="list" ordered="true"/>
+    		<targetElement qualifier="readableCatalogVersions" type="CatalogVersion" cardinality="many" collectiontype="list" ordered="true"/>
+    	</relation>
+
+		<relation code="SyncJob2TypeRel" generate="true" localized="false" autocreate="true">
+			<deployment table="SyncJob2TypeRel" typecode="621"/>
+			<sourceElement type="SyncItemJob" qualifier="syncJobs" cardinality="many" ordered="false">
+				<modifiers read="true" write="false" optional="true" private="true"/>
+			</sourceElement>
+			<targetElement type="ComposedType" qualifier="rootTypes" ordered="true" collectiontype="list" cardinality="many">
+				<modifiers read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="SyncJob2LangRel" generate="true" localized="false" autocreate="true">
+			<deployment table="SyncJob2LangRel" typecode="622"/>
+			<sourceElement type="SyncItemJob" qualifier="syncJobs" cardinality="many" ordered="false">
+				<modifiers read="true" write="false" optional="true" private="true"/>
+			</sourceElement>
+			<targetElement type="Language" qualifier="syncLanguages" ordered="false" collectiontype="set" cardinality="many">
+				<modifiers read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="SyncItemJob2Principal" autocreate="true" generate="true" localized="false">
+			<deployment table="SyncJob2PcplRel" typecode="623"/>
+    		<sourceElement qualifier="syncJobs" type="SyncItemJob" cardinality="many" ordered="true"/>
+    		<targetElement qualifier="syncPrincipals" type="Principal" cardinality="many" collectiontype="list" ordered="true"/>
+    	</relation>
+
+		<relation code="ProductReferenceRelation" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="source" type="Product" cardinality="one">
+				<modifiers read="true" write="false" initial="true" optional="false" unique="true"/>
+			</sourceElement>
+			<targetElement qualifier="productReferences" type="ProductReference" cardinality="many" ordered="true" collectiontype="collection">
+				<modifiers read="true" write="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="SyncJobScheduleMediaRelation" generate="true" autocreate="true" localized="false">
+			<sourceElement type="CatalogVersionSyncCronJob"  qualifier="cronjob" cardinality="one">
+				<modifiers read="true" write="false" initial="true" private="false" optional="false" />
+			</sourceElement>
+			<targetElement type="CatalogVersionSyncScheduleMedia" qualifier="scheduleMedias" collectiontype="list" cardinality="many" ordered="true">
+				<modifiers read="true" write="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="DependentCatalogVersionSyncJobRelation" autocreate="true" generate="true" localized="false"> 
+			<deployment table="CatalogVersionSyncJob" typecode="624"/>
+    		<sourceElement qualifier="dependentSyncJobs"  type="CatalogVersionSyncJob" cardinality="many" collectiontype="set">
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="dependsOnSyncJobs" type="CatalogVersionSyncJob" cardinality="many" collectiontype="set">
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>
+    	</relation>
+
+    	<!-- category relations -->
+    	<relation code="CategoryProductRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Cat2ProdRel" typecode="143"/>
+    		<sourceElement qualifier="supercategories" type="Category" cardinality="many" ordered="false">
+    		    <description>Super Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="products" type="Product" cardinality="many" collectiontype="list" ordered="true">
+    		    <description>Products</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>		
+    	</relation>
+    	
+    	<relation code="CategoryCategoryRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Cat2CatRel" typecode="144"/>
+    		<sourceElement qualifier="supercategories" type="Category" cardinality="many" collectiontype="list" ordered="true">
+    		    <description>Super Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="categories" type="Category" cardinality="many" collectiontype="list" ordered="true">
+    		    <description>Sub Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>    		
+    	</relation>    	
+
+    	<relation code="CategoryMediaRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Cat2MedRel" typecode="145"/>
+    		<sourceElement qualifier="supercategories" type="Category" cardinality="many" ordered="false">
+    		    <description>Super Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="medias" type="Media" cardinality="many" collectiontype="list" ordered="true">
+    		    <description>Category medias</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>    		
+    	</relation>
+
+		<relation code="Company2ProvidedCatalogs" localized="false" generate="true" autocreate="true">
+			<sourceElement type="Company" qualifier="supplier" cardinality="one">
+				<modifiers read="true" write="true"/>
+			</sourceElement>
+			<targetElement type="Catalog" qualifier="providedCatalogs" cardinality="many">
+				<modifiers read="true" write="false"/>
+			</targetElement>
+		</relation>
+
+
+		<relation code="Company2PurchasedCatalogs" localized="false" generate="true" autocreate="true">
+			<sourceElement type="Company" qualifier="buyer" cardinality="one">
+				<modifiers read="true" write="true"/>
+			</sourceElement>
+			<targetElement type="Catalog" qualifier="purchasedCatalogs" cardinality="many">
+				<modifiers read="true" write="false"/>
+			</targetElement>
+		</relation>
+
+		<!--	<relation code="Company2Addresses" localized="false" generate="true" autocreate="true">
+                <sourceElement type="Company" qualifier="owner" cardinality="one" navigable="false">
+                    <modifiers read="true" write="true" optional="true" search="true"/>
+                </sourceElement>
+                <targetElement type="Address" qualifier="addresses" cardinality="many">
+                    <modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+                </targetElement>
+            </relation>-->
+
+	</relations>
+
+   <itemtypes>
+
+		<!-- Item must be placed above Product, Media and Category redeclarations
+		     since redeclaration of their copy collection will not work -->
+		<itemtype code="Item" generate="false" autocreate="false">
+			<attributes>
+				<attribute qualifier="synchronizedCopies" type="SyncTimestampList">
+					<model generate="false"/>
+					<modifiers read="true" write="false" search="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="synchronizationSources" type="SyncTimestampList">
+					<model generate="false"/>
+					<modifiers read="true" write="false" search="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+   	<itemtype code="ComposedType"
+				  generate="false"
+				  autocreate="false">
+			<attributes>
+				<attribute qualifier="catalogItemType" type="java.lang.Boolean" >
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersionAttribute" type="AttributeDescriptor" isSelectionOf="attributedescriptors">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="catalogVersionAttributeQualifier" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="uniqueKeyAttributes" type="attributeSet" isSelectionOf="attributedescriptors">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="uniqueKeyAttributeQualifier" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+   	<itemtype code="Catalog"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.Catalog"
+				  extends="GenericItem"
+				  autocreate="true">
+			<deployment table="Catalogs" typecode="600"/>
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<description>ID</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property">
+						<columntype database="oracle">
+						<value>varchar2(200)</value>
+						</columntype>
+						<columntype database="sap">
+						<value>nvarchar(200)</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>nvarchar(200)</value>
+						</columntype>
+						<columntype>
+							<value>varchar(200)</value>
+						</columntype>
+					</persistence>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<description>Name</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<!-- replaced by 1-n relation
+				<attribute qualifier="catalogVersions" type="CatalogVersionCollection">
+					<description>CatalogVersion</description>
+					<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				-->
+				<attribute qualifier="activeCatalogVersion" type="CatalogVersion" isSelectionOf="catalogVersions">
+					<description>active CatalogVersion</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="rootCategories" type="CategoryList">
+					<description>The categories of the active CatalogVersion</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogRootCategoriesHandler"/>
+				</attribute>
+            <attribute qualifier="defaultCatalog" type="java.lang.Boolean">
+					<description>Default catalog</description>
+               <defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="version" type="java.lang.String">
+					<description>version</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogVersionHandler"/>
+				</attribute>
+				<attribute qualifier="mimeRootDirectory" type="java.lang.String">
+					<description>Mime Root Directory</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogMimeRootDirectoryHandler"/>
+				</attribute>
+				<attribute qualifier="generationDate" type="java.util.Date">
+					<description>Generation Date</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogGenerationDateHandler"/>
+				</attribute>
+				<attribute qualifier="defaultCurrency" type="Currency">
+					<description>Default Currency</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogDefaultCurrencyHandler"/>
+				</attribute>
+				<attribute qualifier="inclFreight" type="java.lang.Boolean">
+					<description>incl.Freight</description>
+					<modifiers read="true" write="false" search="true" optional="false"/>
+					<persistence type="dynamic" attributeHandler="catalogIncludeFreightHandler"/>
+				</attribute>
+				<attribute qualifier="inclPacking" type="java.lang.Boolean">
+					<description>incl.Packing</description>
+					<modifiers read="true" write="false" search="true" optional="false"/>
+					<persistence type="dynamic" attributeHandler="catalogIncludePackingHandler"/>
+				</attribute>
+				<attribute qualifier="inclAssurance" type="java.lang.Boolean">
+					<description>incl.Assurance</description>
+					<modifiers read="true" write="false" search="true" optional="false"/>
+					<persistence type="dynamic" attributeHandler="catalogIncludeAssuranceHandler"/>
+				</attribute>
+				<attribute qualifier="inclDuty" type="java.lang.Boolean">
+					<description>incl.Duty</description>
+					<modifiers read="true" write="false" search="true" optional="false"/>
+					<persistence type="dynamic" attributeHandler="catalogIncludeDutyHandler"/>
+				</attribute>
+				<attribute qualifier="territories" type="TerritoryCollection">
+					<description>Territory</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogTerritoriesHandler"/>
+				</attribute>
+				<attribute qualifier="languages" type="LanguageCollection">
+					<description>Language</description>
+					<modifiers read="true" write="false" search="true" optional="false"/>
+					<persistence type="dynamic" attributeHandler="catalogLanguagesHandler"/>
+				</attribute>
+				<attribute qualifier="generatorInfo" type="java.lang.String">
+					<description>Generator Info</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogGeneratorInfoHandler"/>
+				</attribute>
+				<attribute qualifier="agreements" type="AgreementCollection">
+					<description>Agreement Collection</description>
+					<modifiers read="true" write="false" search="true" optional="true"/>
+					<persistence type="dynamic" attributeHandler="catalogAgreementsHandler"/>
+				</attribute>
+				<attribute qualifier="previewURLTemplate" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>"/storefoundation/index.jsf"</defaultvalue>
+				</attribute>
+				<attribute qualifier="urlPatterns" type="StringCollection">
+					<description>Collection of URL patterns</description>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="idIdx">
+					<key attribute="id"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+       <itemtype code="AbstractConfiguratorSetting"
+                 jaloclass="de.hybris.platform.product.jalo.AbstractConfiguratorSetting"
+                 extends="GenericItem" autocreate="true" generate="true" abstract="true">
+           <deployment table="ConfiguratorSettings" typecode="130" />
+           <custom-properties>
+               <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+               <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+               <property name="uniqueKeyAttributeQualifier"><value>"id"</value></property>
+           </custom-properties>
+           <attributes>
+               <attribute qualifier="id" type="java.lang.String">
+                   <description>Identifier</description>
+                   <persistence type="property"/>
+                   <modifiers optional="false" write="false" initial="true" />
+               </attribute>
+               <attribute qualifier="catalogVersion" type="CatalogVersion">
+                   <description>Catalog Version</description>
+                   <modifiers optional="false" write="false" initial="true"/>
+                   <persistence type="property"/>
+               </attribute>
+               <attribute qualifier="configuratorType" type="ConfiguratorType">
+                   <description>Type of the product configurator</description>
+                   <modifiers optional="false" write="false" initial="true" />
+                   <persistence type="property" />
+               </attribute>
+               <attribute qualifier="qualifier" type="java.lang.String">
+                   <description>To override a setting you should create one with the same qualifier in a descending category</description>
+                   <persistence type="property"/>
+                   <modifiers optional="false" write="false" initial="true" />
+               </attribute>
+           </attributes>
+           <indexes>
+               <index name="versionIdx" unique="false">
+                   <key attribute="catalogVersion"/>
+               </index>
+               <index name="idVersionIdx" unique="true">
+                   <key attribute="id"/>
+                   <key attribute="catalogVersion"/>
+               </index>
+           </indexes>
+       </itemtype>
+
+
+       <itemtype code="AbstractOrderEntryProductInfo"
+                  jaloclass="de.hybris.platform.order.jalo.AbstractOrderEntryProductInfo" abstract="true">
+            <deployment table="AbstrCfgProductInfo" typecode="131" />
+            <attributes>
+                <attribute qualifier="productInfoStatus" type="ProductInfoStatus">
+                    <description>Status of AbstractOrderEntryProductInfo, NONE by default</description>
+                    <modifiers optional="false" />
+                    <persistence type="property" />
+                    <defaultvalue>em().getEnumerationValue("ProductInfoStatus", "NONE")</defaultvalue>
+                </attribute>
+                <attribute qualifier="configuratorType" type="ConfiguratorType">
+                    <description>Configurator type for configurable product</description>
+                    <modifiers optional="false" write="false" initial="true"/>
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<itemtype code="Keyword"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.Keyword"
+				  extends="GenericItem"
+				  autocreate="true">
+			<deployment table="Keywords" typecode="602"/>
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+				<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+				<property name="uniqueKeyAttributeQualifier"><value>"keyword,language"</value></property>
+   	 			<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>
+   	 			<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(4)</value></property>
+			</custom-properties>
+			<attributes>
+				<!-- -->
+				<attribute qualifier="keyword" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="language" type="Language">
+					<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalog" type="Catalog">
+					<modifiers read="true" write="true" search="true" optional="false" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+         <indexes>
+         	<index name="keywordIDX" unique="false">
+         		<key attribute="keyword"/>
+         	</index>
+	       	<index name="versionIDX" unique="false">
+         		<key attribute="catalogVersion"/>
+         	</index>
+	       	<index name="codeVersionIDX" unique="true">
+         		<key attribute="keyword"/>
+         		<key attribute="catalogVersion"/>
+         	</index>
+         </indexes>
+		</itemtype>
+
+		<itemtype code="Address" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="remarks" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="publicKey" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" dontOptimize="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="url" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="typeQualifier" type="java.lang.String">
+					<description>typeQualifier</description>
+					<modifiers read="true" write="false" search="false" optional="true"/>
+					<persistence type="dynamic"/>
+				</attribute>
+				<attribute qualifier="shippingAddress" type="java.lang.Boolean">
+					<description>shippingAddress</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="unloadingAddress" type="java.lang.Boolean">
+					<description>unloadingAddress</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="billingAddress" type="java.lang.Boolean">
+					<description>billingAddress</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="contactAddress" type="java.lang.Boolean">
+					<description>contactAddress</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Company"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.Company"
+				  extends="UserGroup"
+				  autocreate="true"
+				  abstract="false">
+			<attributes>
+				<attribute qualifier="dunsID" type="java.lang.String">
+					<description>DUNS</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="ilnID" type="java.lang.String">
+					<description>ILN</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="buyerSpecificID" type="java.lang.String">
+					<description>Buyer Specific ID</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="Id" type="java.lang.String">
+					<description>id</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="supplierSpecificID" type="java.lang.String">
+					<description>Supplier Specific ID</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="addresses" type="AddressCollection">
+					<modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="medias" type="MediaCollection">
+					<description>medias</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+            <attribute autocreate="true" qualifier="shippingAddresses" type="AddressCollection">
+               <modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+               <persistence type="dynamic"/>
+            </attribute>
+				<attribute qualifier="shippingAddress" type="Address" isSelectionOf="shippingAddresses">
+					<description>Shipping address of this company</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+            <attribute autocreate="true" qualifier="unloadingAddresses" type="AddressCollection">
+               <modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+               <persistence type="dynamic"/>
+            </attribute>
+				<attribute qualifier="unloadingAddress" type="Address" isSelectionOf="unloadingAddresses">
+					<description>Unloading address of this company</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+            <attribute autocreate="true" qualifier="billingAddresses" type="AddressCollection">
+               <modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+               <persistence type="dynamic"/>
+            </attribute>
+				<attribute qualifier="billingAddress" type="Address" isSelectionOf="billingAddresses">
+					<description>Billing address of this company</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+            <attribute autocreate="true" qualifier="contactAddresses" type="AddressCollection">
+               <modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+               <persistence type="dynamic"/>
+            </attribute>
+				<attribute qualifier="contactAddress" type="Address" isSelectionOf="contactAddresses">
+					<description>Contact address of this company</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="contact" type="User">
+					<description>Contact for this company</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="vatID" type="java.lang.String">
+					<description>vat id</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="responsibleCompany" type="Company">
+					<description>responsible company</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="country" type="Country">
+					<description>country</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="lineOfBuisness" type="LineOfBusiness">
+					<description>line of business</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="buyer" type="java.lang.Boolean">
+					<description>buyer</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="supplier" type="java.lang.Boolean">
+					<description>supplier</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="manufacturer" type="java.lang.Boolean">
+					<description>manufacturer</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="carrier" type="java.lang.Boolean">
+					<description>carrier</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+            <!--
+            	These are now relations
+            <attribute autocreate="true" qualifier="providedCatalogs" type="CatalogCollection">
+               <modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+               <persistence type="jalo"/>
+            </attribute>
+            <attribute autocreate="true" qualifier="purchasedCatalogs" type="CatalogCollection">
+               <modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+               <persistence type="jalo"/>
+            </attribute>-->
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Agreement"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.Agreement"
+				  extends="GenericItem"
+				  autocreate="true">
+			<deployment table="Agreements" typecode="603"/>
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<description>Agreement ID</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="startdate" type="java.util.Date">
+					<description>Start Date</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="enddate" type="java.util.Date">
+					<description>Agreement ID</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="Catalog" type="Catalog">
+					<description>Catalog</description>
+					<modifiers read="true" write="true" search="true" optional="false" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="buyer" type="Company">
+					<description>buyer</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="supplier" type="Company">
+					<description>supplier</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="buyerContact" type="User">
+					<description>buyerContact</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="supplierContact" type="User">
+					<description>supplierContact</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<description>currency</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CatalogVersion"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.CatalogVersion"
+				  extends="GenericItem"
+				  autocreate="true">
+			<deployment table="CatalogVersions" typecode="601"/>
+			<attributes>
+				<!-- replaced by 1-n relation
+				<attribute qualifier="catalog" type="Catalog">
+					<description>Catalog</description>
+					<modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+					<persistence type="property"/>
+				</attribute>
+				-->
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<description>active flag</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="version" type="java.lang.String">
+					<description>version</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="mimeRootDirectory" type="java.lang.String">
+					<description>Mime Root Directory</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="generationDate" type="java.util.Date">
+					<description>Generation Date</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="defaultCurrency" type="Currency">
+					<description>Default Currency</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="inclFreight" type="java.lang.Boolean">
+					<description>incl.Freight</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="inclPacking" type="java.lang.Boolean">
+					<description>incl.Packing</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="inclAssurance" type="java.lang.Boolean">
+					<description>incl.Assurance</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="inclDuty" type="java.lang.Boolean">
+					<description>incl.Duty</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="territories" type="TerritoryCollection">
+					<description>Territory</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="languages" type="LanguageCollection">
+					<description>languages</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Collections.EMPTY_LIST</defaultvalue>
+				</attribute>
+				<attribute qualifier="generatorInfo" type="java.lang.String">
+					<description>Generator Info</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="categorySystemID" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="categorySystemName" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="categorySystemDescription" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="rootCategories" type="CategoryList">
+					<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+					<persistence type="dynamic" attributeHandler="catalogVersionRootCategoriesHandler"/>
+				</attribute>
+				<attribute qualifier="previousUpdateVersion" type="java.lang.Integer">
+                   <modifiers read="true" write="true" search="true" optional="true"/>
+				   <persistence type="property"/>
+				</attribute>
+			</attributes>
+         <indexes>
+         	<index name="versionIDX" unique="false">
+         		<key attribute="version"/>
+         	</index>
+         	<index name="catalogIDX" unique="false">
+         		<key attribute="catalog"/>
+         	</index>
+         	<index name="visibleIDX" unique="false">
+         		<key attribute="active"/>
+         	</index>
+         </indexes>
+		</itemtype>
+
+		<itemtype code="Category" 
+					generate="true" 
+					jaloclass="de.hybris.platform.category.jalo.Category"
+					extends="GenericItem" 
+					autocreate="true">
+			<deployment table="Categories" typecode="142"/>
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+				<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+				<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+				<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>		
+				<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(1)</value></property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<description>Catalog Category Description</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="order" type="java.lang.Integer">
+					<description>Order</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalog" type="Catalog">
+					<description>Catalog</description>
+					<modifiers read="true" write="true" initial="true" search="true" optional="false" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<description>CatalogVersion</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="normal" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="thumbnails" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="detail" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="logo" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="data_sheet" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="others" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<!-- from category-items.xml -->
+				<attribute qualifier="thumbnail" type="Media">
+					<description>Small Image</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>				
+				</attribute>
+				<attribute qualifier="picture" type="Media">
+					<description>Image</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>				
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<description>Name</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>				
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Code</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>				
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="allSubcategories" type="CategoryCollection">
+					<modifiers read="true" write="false" search="false" optional="true"/>
+					<persistence type="dynamic" attributeHandler="categoryAllSubcategories"/>
+				</attribute>
+				<attribute qualifier="allSupercategories" type="CategoryCollection">
+					<modifiers read="true" write="false" search="false" optional="true"/>
+					<persistence type="dynamic" attributeHandler="categoryAllSupercategories" />
+				</attribute>
+			</attributes>
+         <indexes>
+         	<index name="codeIDX" unique="false">
+         		<key attribute="code"/>
+         	</index>
+	       	<index name="versionIDX" unique="false">
+         		<key attribute="catalogVersion"/>
+         	</index>
+	       	<index name="codeVersionIDX" unique="true">
+         		<key attribute="code"/>
+         		<key attribute="catalogVersion"/>
+         	</index>
+
+         </indexes>
+		</itemtype>
+
+        <itemtype code="ConfigurationCategory" jaloclass="de.hybris.platform.category.jalo.ConfigurationCategory" extends="Category">
+            <description>Category type for configurable products</description>
+        </itemtype>
+
+		<itemtype code="Product" autocreate="false" generate="false">
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+				<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+				<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+				<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>
+				<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(2)</value></property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalog" type="Catalog">
+					<modifiers read="true" write="true" search="true" optional="false" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="onlineDate" type="java.util.Date">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="offlineDate" type="java.util.Date">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<!--
+				<attribute qualifier="productReferences" type="ProductReferenceCollection">
+					<description>ProductReference Collection</description>
+					<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				-->
+				<attribute qualifier="ean" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="supplierAlternativeAID" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="buyerIDS" type="IDTypeMapType">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="manufacturerAID" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="manufacturerName" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="manufacturerTypeDescription" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="erpGroupBuyer" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="erpGroupSupplier" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="deliveryTime" type="java.lang.Double">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="specialTreatmentClasses" type="String2StringMapType">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="remarks" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" dontOptimize="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="segment" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="order" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="articleStatus" type="localized:ArticleStatusMapType">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="approvalStatus" type="ArticleApprovalStatus">
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<!-- quick hack for setting enum values as default value - this syntax may no be supported in future versions ! -->
+					<defaultvalue>em().getEnumerationValue("ArticleApprovalStatus","check")</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="contentUnit" type="Unit">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="numberContentUnits" type="java.lang.Double">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="minOrderQuantity" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="maxOrderQuantity" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="orderQuantityInterval" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<!--<attribute qualifier="status" type="StatusEnum">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>-->
+				<attribute qualifier="priceQuantity" type="java.lang.Double">
+					<defaultvalue>new Double( 1 )</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="normal" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="thumbnails" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="detail" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="logo" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="data_sheet" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="others" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<!-- 
+				<attribute qualifier="features" type="ProductFeatureCollection">
+					<custom-properties>
+						<property name="readOnlyForUI">
+							<value>Boolean.TRUE</value>
+						</property>
+					</custom-properties>
+					<modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				 -->
+				<attribute qualifier="untypedFeatures" type="ProductFeatureCollection">
+					<custom-properties>
+						<property name="readOnlyForUI">
+							<value>Boolean.TRUE</value>
+						</property>
+					</custom-properties>
+					<modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+					<persistence type="dynamic"/>
+				</attribute>
+				<!-- for beeing indexed by lucene search -->
+				<attribute qualifier="classificationIndexString" type="localized:java.lang.String">
+					<custom-properties>
+						<property name="forceLuceneIndexable"><value>Boolean.TRUE</value></property>
+					</custom-properties>
+					<model generate="false"/><!-- switch off access to this attribute in model class; see PLA-7618 -->
+					<modifiers read="true" write="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="classificationClasses" type="ClassificationClassList">
+					<modifiers read="true" write="false" optional="true"/>
+					<persistence type="dynamic"/>
+				</attribute>
+				<attribute qualifier="startLineNumber" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="endLineNumber" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="xmlcontent" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" dontOptimize="true" />
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+         <indexes>
+         	<index name="catalogIDX" unique="false">
+         		<key attribute="catalog"/>
+         	</index>
+         	<index name="visibilityIDX" unique="false">
+         		<key attribute="approvalStatus"/>
+         		<key attribute="onlineDate"/>
+         		<key attribute="offlineDate"/>
+         	</index>
+         	<index name="codeVersionIDX" unique="true">
+         		<key attribute="code"/>
+         		<key attribute="catalogVersion"/>
+         	</index>
+	       	<index name="versionIDX" unique="false">
+         		<key attribute="catalogVersion"/>
+         	</index>
+         </indexes>
+		</itemtype>
+
+		<itemtype code="Media" autocreate="false"  generate="false">
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+				<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+				<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+  	 			<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>	 
+  	 			<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(3)</value></property>          	 
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalog" type="Catalog">
+					<modifiers read="true" write="true" search="true" optional="false" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+         <indexes>
+	       	<index name="versionIDX" unique="false">
+         		<key attribute="catalogVersion"/>
+         	</index>
+	       	<index name="codeVersionIDX" unique="true">
+         		<key attribute="code"/>
+         		<key attribute="catalogVersion"/>
+         	</index>
+         	<index name="mediaCatalogVersionIdx" unique="false">
+         		<key attribute="catalogVersion"/>
+         	</index>
+         </indexes>
+		</itemtype>
+		
+		<itemtype code="CatalogUnawareMedia" autocreate="true" generate="true" extends="Media"
+						jaloclass="de.hybris.platform.catalog.jalo.CatalogUnawareMedia">
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.FALSE</value></property>
+			</custom-properties>
+			<attributes>
+  				<attribute qualifier="catalogVersion" type="CatalogVersion" redeclare="true">
+  					<persistence type="property"/>
+  					<modifiers optional="true" initial="false" />
+  				</attribute>
+  			</attributes>
+		</itemtype>
+
+		<itemtype code="Formatter" autocreate="false"  generate="false">
+			<attributes>
+				<attribute redeclare="true" qualifier="catalogVersion" type="CatalogVersion" >
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Document" autocreate="false"  generate="false">
+			<attributes>
+				<attribute redeclare="true" qualifier="catalogVersion" type="CatalogVersion" >
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MediaContainer" autocreate="false" generate="false">
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+				<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+				<property name="uniqueKeyAttributeQualifier"><value>"qualifier"</value></property>
+   	 			<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>	    
+   	 			<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(8)</value></property>       	 
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+	         <indexes>
+		       	<index name="versionIDX" unique="false">
+	         		<key attribute="catalogVersion"/>
+	         	</index>
+		       	<index name="codeVersionIDX" unique="true">
+	         		<key attribute="qualifier"/>
+	         		<key attribute="catalogVersion"/>
+	         	</index>
+	        </indexes>
+		</itemtype>
+
+		<itemtype code="LogFile" autocreate="false" generate="false">
+			<attributes>
+				<!-- allow empty catalog version -->
+				<attribute redeclare="true" qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers read="true" write="false" search="true" optional="true" initial="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+<!--
+		<itemtype code="ReportStylesheet"
+					 extends="Media"
+					 jaloclass="de.hybris.platform.catalog.jalo.ReportStylesheet"
+					 autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="xsl" type="java.lang.String">
+					<modifiers read="true" write="true" search="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Report"
+					 extends="Media"
+					 jaloclass="de.hybris.platform.catalog.jalo.Report"
+					 autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="cronjob" type="CompareCatalogVersionsCronJob">
+					<modifiers read="true" write="false" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="style" type="ReportStylesheet">
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="pageNumber" type="java.lang.Integer">
+					<modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="xml" type="java.lang.String">
+					<modifiers read="true" write="true" search="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+-->
+
+		<itemtype code="Customer" autocreate="false"  generate="false">
+			<attributes>
+				<attribute qualifier="previewCatalogVersions" type="CatalogVersionCollection">
+					<modifiers read="true" write="true" search="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	  	<itemtype code="ProductReference"
+	   			  generate="true"
+	   			  jaloclass="de.hybris.platform.catalog.jalo.ProductReference"
+	   			  extends="GenericItem"
+	   			  autocreate="true">
+			<deployment table="ProductReferences" typecode="606"/>
+		   	<attributes>
+				<attribute qualifier="qualifier" type="java.lang.String">
+					<description>Qualifier</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="target" type="Product">
+					<description>Target</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="quantity" type="java.lang.Integer">
+					<description>Quantity</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="referenceType" type="ProductReferenceTypeEnum">
+					<modifiers read="true" write="true" search="true" optional="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="icon" type="Media">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="preselected" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="targetIDX">
+					<key attribute="target"/>
+				</index>
+				<index name="qualifierIDX">
+					<key attribute="qualifier"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+	<itemtype code="CatalogOverview" extends="Item" metatype="ViewType"
+		jaloonly="true" jaloclass="de.hybris.platform.util.ViewResultItem"
+		autocreate="true" generate="false">
+		<custom-properties>
+			<property name="query">
+				<value>"# The query for this view will be generated with the essential data # "</value>
+			</property>
+			<property name="legacyPersistence">
+				<value>java.lang.Boolean.TRUE</value>
+			</property>
+		</custom-properties>
+		<attributes>
+			<attribute autocreate="true" qualifier="cat" type="Catalog" metatype="ViewAttributeDescriptor">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.TRUE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(0)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+			<!--  <attribute autocreate="true" qualifier="cv" type="CatalogVersion" metatype="ViewAttributeDescriptor">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="true" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.TRUE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(1)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+			-->
+			<attribute qualifier="typeCode" type="ComposedType" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.FALSE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(0)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+			<attribute qualifier="amount" type="java.lang.Integer" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false"
+					initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.FALSE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(1)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+			<attribute qualifier="catalogversion" type="CatalogVersion" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.FALSE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(2)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+		</attributes>
+	</itemtype>
+
+		<itemtype code="DuplicateCatalogItemCodesView"
+				extends="Item"
+				metatype="ViewType"
+				jaloonly="true"
+				jaloclass="de.hybris.platform.util.ViewResultItem"
+				autocreate="true"
+				generate="false">
+		<custom-properties>
+			<property name="query">
+				<value>"# The query for this view will be generated with the essential data # "</value>
+			</property>
+			<property name="legacyPersistence">
+				<value>java.lang.Boolean.TRUE</value>
+			</property>
+		</custom-properties>
+		<attributes>
+			<attribute qualifier="typeCode" type="ComposedType" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.FALSE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(0)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+			<attribute qualifier="code" type="java.lang.String" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.FALSE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(1)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+
+			<attribute qualifier="count" type="java.lang.Integer" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.FALSE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(3)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+
+			<attribute qualifier="catalogVersion" type="CatalogVersion" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.FALSE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(4)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+
+			<attribute qualifier="cv" type="CatalogVersion" metatype="ViewAttributeDescriptor" autocreate="true">
+				<persistence type="jalo" />
+				<modifiers read="true" write="false" search="false" initial="false" optional="false" />
+				<custom-properties>
+					<property name="param">
+						<value>Boolean.TRUE</value>
+					</property>
+					<property name="position">
+						<value>Integer.valueOf(0)</value>
+					</property>
+				</custom-properties>
+			</attribute>
+
+		</attributes>
+	</itemtype>
+
+
+      <itemtype code="CompareCatalogVersionsCronJob"
+					 jaloclass="de.hybris.platform.catalog.jalo.CompareCatalogVersionsCronJob"
+					 extends="CronJob"
+					 autocreate="true"
+					 generate="true" >
+			<attributes>
+				<attribute type="int" qualifier="processedItemsCount">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="sourceVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+            			<attribute qualifier="targetVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+			    <!--
+			    <attribute qualifier="reportPages" type="ReportCollection">
+					<modifiers read="true" write="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				-->
+				<attribute qualifier="missingProducts" type="int">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="newProducts" type="int">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="maxPriceTolerance" type="java.lang.Double">
+					<modifiers read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+					<defaultvalue>new Double( 0.0 )</defaultvalue>
+				</attribute>
+				<attribute qualifier="searchMissingProducts" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="searchMissingCategories" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="searchNewProducts" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="searchNewCategories" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="searchPriceDifferences" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="overwriteProductApprovalStatus" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="priceCompareCustomer" type="User">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+      </itemtype>
+
+      <itemtype code="CompareCatalogVersionsJob"
+					 generate="true"
+					 jaloclass="de.hybris.platform.catalog.jalo.CompareCatalogVersionsJob"
+					 extends="Job"
+					 autocreate="true"/>
+
+      <itemtype code="RemoveCatalogVersionCronJob"
+					 jaloclass="de.hybris.platform.catalog.jalo.RemoveCatalogVersionCronJob"
+					 extends="CronJob"
+					 autocreate="true"
+					 generate="true">
+ 			<attributes>
+				<attribute qualifier="catalog" type="Catalog">
+					<modifiers read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+            <attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="dontRemoveObjects" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="notRemovedItems" type="ImpexMedia">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="totalDeleteItemCount" type="java.lang.Integer">
+					<description>Predicted count of items to remove</description>
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="currentProcessingItemCount" type="java.lang.Integer">
+					<description>Current processed(removed) item instance</description>
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+      </itemtype>
+
+      <itemtype code="RemoveCatalogVersionJob"
+			generate="true"
+			jaloclass="de.hybris.platform.catalog.jalo.RemoveCatalogVersionJob"
+			extends="Job"
+			autocreate="true">
+		</itemtype>
+
+      <itemtype code="AttributeDescriptor" autocreate="false" generate="false">
+         <attributes>
+            <attribute autocreate="true" qualifier="dontCopy" type="java.lang.Boolean">
+               <defaultvalue>Boolean.FALSE</defaultvalue>
+               <persistence type="property"/>
+               <modifiers read="true" write="true" search="true" optional="false"/>
+            </attribute>
+         </attributes>
+      </itemtype>
+
+   	<itemtype code="CatalogVersionDifference"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.CatalogVersionDifference"
+				  extends="GenericItem"
+				  autocreate="true"
+				  abstract="true" >
+		<deployment table="CatVerDiffs" typecode="615"/>
+         <attributes>
+            <attribute qualifier="sourceVersion" type="CatalogVersion">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="targetVersion" type="CatalogVersion">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="cronJob" type="CompareCatalogVersionsCronJob">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="differenceText" type="java.lang.String">
+               <modifiers read="true" write="true" search="true" optional="true"/>
+               <persistence type="property">
+					<columntype database="oracle">
+						<value>CLOB</value>
+					</columntype>
+					<columntype database="sap">
+						<value>NCLOB</value>
+					</columntype>
+					<columntype>
+						<value>HYBRIS.LONG_STRING</value>
+					</columntype>
+				</persistence>
+				</attribute>
+				<attribute qualifier="differenceValue" type="java.lang.Double">
+           <modifiers read="true" write="true" search="true" optional="true"/>
+           <persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+   	<itemtype code="ProductCatalogVersionDifference"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.ProductCatalogVersionDifference"
+				  extends="CatalogVersionDifference"
+				  autocreate="true">
+         <attributes>
+            <attribute qualifier="sourceProduct" type="Product">
+               <modifiers read="true" write="false" search="true" optional="true" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="targetProduct" type="Product">
+               <modifiers read="true" write="false" search="true" optional="true" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="mode" type="ProductDifferenceMode">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="sourceProductApprovalStatus" type="ArticleApprovalStatus">
+               <modifiers read="true" write="false" search="true" optional="true"/>
+               <persistence type="jalo"/>
+				</attribute>
+            <attribute qualifier="targetProductApprovalStatus" type="ArticleApprovalStatus">
+               <modifiers read="true" write="false" search="true" optional="true"/>
+               <persistence type="jalo"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+   	<itemtype code="CategoryCatalogVersionDifference"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.CategoryCatalogVersionDifference"
+				  extends="CatalogVersionDifference"
+				  autocreate="true">
+         <attributes>
+            <attribute qualifier="sourceCategory" type="Category">
+               <modifiers read="true" write="false" search="true" optional="true" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="targetCategory" type="Category">
+               <modifiers read="true" write="false" search="true" optional="true" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="mode" type="CategoryDifferenceMode">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+               <persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="PreviewTicket"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.PreviewTicket"
+				  extends="GenericItem"
+				  autocreate="true">
+				  <deployment table="PreviewTickets" typecode="667"/>
+         <attributes>
+            <attribute qualifier="previewCatalogVersion" type="CatalogVersion">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="validTo" type="java.util.Date">
+               <modifiers read="true" write="true" search="true" optional="false"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="createdBy" type="User">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+               <persistence type="property"/>
+				</attribute>
+            <attribute qualifier="ticketCode" type="java.lang.String">
+               <modifiers read="true" write="false" search="false" optional="false" initial="false" unique="false"/>
+				<persistence type="dynamic" attributeHandler="previewTicketTicketCodeHandler"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	
+
+		<itemtype code="User" autocreate="false"  generate="false">
+			<attributes>
+				<attribute qualifier="allWriteableCatalogVersions" type="CatalogVersionCollection">
+					<modifiers write="false"/>
+					<persistence type="dynamic"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- category items -->
+		<!-- workaround for missing attribute accesses and constants -->
+		<!-- necessary any more?? 
+		<itemtype code="Product" autocreate="false"  generate="false"/>
+		 -->
+
+		<!-- variants items -->
+		<itemtype code="VariantType"
+		          extends="ComposedType"
+		          jaloclass="de.hybris.platform.variants.jalo.VariantType"
+		          autocreate="true"
+		          generate="true">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+         <attributes>
+            <attribute autocreate="true" redeclare="true" qualifier="superType" type="ComposedType">
+               <persistence type="cmp" qualifier="superTypePK"/>
+               <modifiers read="true" write="false" search="true" initial="true" optional="true"/>
+            </attribute>
+		    <attribute autocreate="true" qualifier="variantAttributes" type="VACollection">
+		      <model>
+				<getter name="variantAttributes" deprecated="true" deprecatedSince="ages" default="true" />
+				<setter name="variantAttributes" deprecated="true" deprecatedSince="ages" default="true" />					
+			  </model>	
+		      <persistence type="jalo"/>
+		      <modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+		    </attribute>
+			<!-- for usability in hmc -->
+		    <attribute autocreate="true" qualifier="validProductBaseTypes" type="ComposedTypeCollection">
+		      <model generate="false"> 
+				<getter name="validProductBaseTypes" deprecated="true" deprecatedSince="ages" default="true" />
+			  </model>
+		      <persistence type="jalo"/>
+		      <modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+		    </attribute>
+         </attributes>
+		</itemtype>
+
+		<itemtype code="VariantAttributeDescriptor"
+		          extends="AttributeDescriptor"
+		          jaloclass="de.hybris.platform.variants.jalo.VariantAttributeDescriptor"
+		          autocreate="true"
+		          generate="true">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+         <attributes>
+            <attribute redeclare="true" autocreate="true" qualifier="enclosingType" type="VariantType">
+               <persistence type="cmp" qualifier="enclosingTypePK"/>
+               <modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+            </attribute>
+            <attribute autocreate="true" qualifier="position" type="java.lang.Integer">
+            	<defaultvalue>Integer.valueOf(-1)</defaultvalue>
+               <persistence type="property"/>
+               <modifiers read="true" write="true" search="true" optional="true" initial="false"/>
+            </attribute>
+         </attributes>
+		</itemtype>
+		
+		<itemtype code="Product" autocreate="false"  generate="false">
+			<attributes>
+				<!-- changed into relation 		
+				<attribute autocreate="true" qualifier="variants" type="VPCollection">
+			      <persistence type="jalo"/>
+			      <modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+			    </attribute>
+			    -->
+			    <attribute autocreate="true" qualifier="variantType" type="VariantType">
+			      <persistence type="property"/>
+			      <modifiers read="true" write="true" search="true" optional="true" initial="false"/>
+			    </attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="VariantProduct"
+		          extends="Product"
+		          jaloclass="de.hybris.platform.variants.jalo.VariantProduct"
+		          metatype="VariantType"
+		          autocreate="true"
+		          generate="true">
+		  <attributes>
+		  	<!-- changed into relation
+		    <attribute autocreate="true" qualifier="baseProduct" type="Product">
+		      <persistence type="property"/>
+		      <modifiers read="true" write="true" search="true" optional="false" initial="true"/>
+		    </attribute>
+		    -->
+		  </attributes>
+	     <!-- created by relation now 
+         <indexes>
+         	<index name="baseIDX" unique="false">
+         		<key attribute="baseProduct"/>
+         	</index>
+         </indexes>
+         -->
+		</itemtype>
+
+		<!-- typegroup from catalog itself -->
+		<typegroup name="sync">
+
+		<itemtype code="ExecutedPublicationsView" extends="Item" generate="false" metatype="ViewType" jaloonly="true" jaloclass="de.hybris.platform.util.ViewResultItem" autocreate="true">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="query">
+					<value>
+						"SELECT {sij:targetVersion}, \n"+
+		    			"   {sij:code}, \n"+
+					   "   {sicj:PK}, \n"+
+					   "   {sicj:result}, \n"+
+		       		"   {sicj:startTime}, \n"+
+		       		"   {sicj:endTime} \n"+
+						"FROM { \n"+
+						"   SyncItemCronJob AS sicj LEFT JOIN \n"+
+						"   SyncItemJob AS sij ON \n"+
+						"   {sicj:job} = {sij:pk} \n"+
+						"} \n"+
+						"WHERE {sij:sourceVersion} = ?sourceVersion \n"+
+						"AND {sij:targetVersion} IS NOT NULL \n"
+					</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute generate="false" autocreate="true" qualifier="sourceVersion" type="CatalogVersion" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="true" initial="false" optional="false"/>
+					<custom-properties>
+						<property name="position"><value>Integer.valueOf(0)</value></property>
+						<property name="param"><value>Boolean.TRUE</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="targetVersion" type="CatalogVersion" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+					<custom-properties>
+		           	<property name="position"><value>Integer.valueOf(0)</value></property>
+						<property name="param"><value>Boolean.FALSE</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="code" type="java.lang.String" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+					<custom-properties>
+		           	<property name="position"><value>Integer.valueOf(1)</value></property>
+						<property name="param"><value>Boolean.FALSE</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="sicjpk" type="SyncItemCronJob" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+					<custom-properties>
+		           	<property name="position"><value>Integer.valueOf(2)</value></property>
+						<property name="param"><value>Boolean.FALSE</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="result" type="CronJobResult" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+					<custom-properties>
+		           	<property name="position"><value>Integer.valueOf(3)</value></property>
+						<property name="param"><value>Boolean.FALSE</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="startTime" type="java.util.Date" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+					<custom-properties>
+		           	<property name="position"><value>Integer.valueOf(4)</value></property>
+						<property name="param"><value>Boolean.FALSE</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="endTime" type="java.util.Date" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+					<custom-properties>
+		           	<property name="position"><value>Integer.valueOf(5)</value></property>
+						<property name="param"><value>Boolean.FALSE</value></property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+
+		<itemtype code="ModifiedCatalogItemsView" extends="Item" metatype="ViewType" jaloonly="true" jaloclass="de.hybris.platform.util.ViewResultItem" autocreate="true" generate="false">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="query">
+					<value>
+						"SELECT tbl.sourceItem, tbl.targetItem, tbl.modifiedTime , tbl.lastSyncTime, tbl.type, tbl.ord FROM ( \n"+
+						<!--  synchronized products -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			{ts:lastSyncSourceModifiedTime} as lastSyncTime, \n"+
+						"			'Product' as type, \n"+
+						"			{p1:code} as ord \n"+
+						"     FROM {Product* as p1 JOIN ItemSyncTimestamp* as ts \n"+
+						"        ON {p1:catalogVersion}=?job.sourceVersion AND {p1:PK}={ts:sourceItem} AND \n"+
+						"				{ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion \n"+
+						"		JOIN Product* as p2 \n"+
+						"        ON {p2:catalogVersion}=?job.targetVersion AND {p2:PK}={ts:targetItem} } \n"+
+						"		WHERE {p1:modifiedtime}&gt;{ts:lastSyncSourceModifiedTime} \n"+
+						"	}} \n"+
+						"UNION ALL \n"+
+						<!--  un-synchronized products -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			null as lastSyncTime, \n"+
+						"			'Product' as type, \n"+
+						"			{p1:code} as ord \n"+
+						"     FROM {Product* as p1 \n"+
+						"        LEFT JOIN Product* as p2 \n"+
+						"           ON {p1:catalogVersion}=?job.sourceVersion AND {p2:catalogVersion}=?job.targetVersion AND \n"+
+						"				{p1:code}={p2:code} \n"+
+						"        LEFT JOIN ItemSyncTimestamp* AS ts \n"+
+						"           ON {ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion AND \n"+
+						"              ({ts:sourceItem}={p1:pk} OR {ts:targetItem}={p2:PK} ) } \n"+
+						"		WHERE {p1:catalogVersion}=?job.sourceVersion AND {ts:pk} IS NULL\n"+
+						"	}} \n"+
+						"UNION ALL \n"+
+						<!--  synchronized categories -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			{ts:lastSyncSourceModifiedTime} as lastSyncTime, \n"+
+						"			'Category' as type, \n"+
+						"			{p1:code} as ord \n"+
+						"     FROM {Category* as p1 JOIN ItemSyncTimestamp* as ts \n"+
+						"        ON {p1:catalogVersion}=?job.sourceVersion AND {p1:PK}={ts:sourceItem} AND \n"+
+						"				{ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion \n"+
+						"		JOIN Category* as p2 \n"+
+						"        ON {p2:catalogVersion}=?job.targetVersion AND {p2:PK}={ts:targetItem} } \n"+
+						"		WHERE {p1:modifiedtime}&gt;{ts:lastSyncSourceModifiedTime} \n"+
+						"	}} \n"+
+						"UNION ALL \n"+
+						<!--  un-synchronized categories -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			null as lastSyncTime, \n"+
+						"			'Category' as type, \n"+
+						"			{p1:code} as ord \n"+
+						"     FROM {Category* as p1 LEFT JOIN Category* as p2 \n"+
+						"        ON {p1:catalogVersion}=?job.sourceVersion AND {p2:catalogVersion}=?job.targetVersion AND \n"+
+						"				{p1:code}={p2:code} \n"+
+						"        LEFT JOIN ItemSyncTimestamp* AS ts \n"+
+						"           ON {ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion AND \n"+
+						"              ({ts:sourceItem}={p1:pk} OR {ts:targetItem}={p2:PK} ) } \n"+
+						"		WHERE {p1:catalogVersion}=?job.sourceVersion AND {ts:pk} IS NULL\n"+
+						"	}} \n"+
+						"UNION ALL \n"+
+						<!--  synchronized keywords -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			{ts:lastSyncSourceModifiedTime} as lastSyncTime, \n"+
+						"			'Keyword' as type, \n"+
+						"			{p1:keyword} as ord \n"+
+						"     FROM {Keyword* as p1 JOIN ItemSyncTimestamp* as ts \n"+
+						"        ON {p1:catalogVersion}=?job.sourceVersion AND {p1:PK}={ts:sourceItem} AND \n"+
+						"				{ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion \n"+
+						"		JOIN Keyword* as p2 \n"+
+						"        ON {p2:catalogVersion}=?job.targetVersion AND {p2:PK}={ts:targetItem} } \n"+
+						"		WHERE {p1:modifiedtime}&gt;{ts:lastSyncSourceModifiedTime} \n"+
+						"	}} \n"+
+						"UNION ALL \n"+
+						<!--  un-synchronized keywords -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			null as lastSyncTime, \n"+
+						"			'Keyword' as type, \n"+
+						"			{p1:keyword} as ord \n"+
+						"     FROM {Keyword* as p1 LEFT JOIN Keyword* as p2 \n"+
+						"        ON {p1:catalogVersion}=?job.sourceVersion AND {p2:catalogVersion}=?job.targetVersion AND \n"+
+						"				{p1:keyword}={p2:keyword} \n"+
+						"        LEFT JOIN ItemSyncTimestamp* AS ts \n"+
+						"           ON {ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion AND \n"+
+						"              ({ts:sourceItem}={p1:pk} OR {ts:targetItem}={p2:PK} ) } \n"+
+						"		WHERE {p1:catalogVersion}=?job.sourceVersion AND {ts:pk} IS NULL\n"+
+						"	}} \n"+
+						"UNION ALL \n"+
+						<!--  synchronized medias -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			{ts:lastSyncSourceModifiedTime} as lastSyncTime, \n"+
+						"			'Media' as type, \n"+
+						"			{p1:code} as ord \n"+
+						"     FROM {Media* as p1 JOIN ItemSyncTimestamp* as ts \n"+
+						"        ON {p1:catalogVersion}=?job.sourceVersion AND {p1:PK}={ts:sourceItem} AND \n"+
+						"				{ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion \n"+
+						"		JOIN Media* as p2 \n"+
+						"        ON {p2:catalogVersion}=?job.targetVersion AND {p2:PK}={ts:targetItem} } \n"+
+						"		WHERE {p1:modifiedtime}&gt;{ts:lastSyncSourceModifiedTime} \n"+
+						"	}} \n"+
+						"UNION ALL \n"+
+						<!--  un-synchronized categories -->
+						"	{{SELECT \n"+
+						"			{p1:PK} as sourceItem, \n"+
+						"			{p2:PK} as targetItem, \n"+
+						"			{p1:modifiedtime} as modifiedTime, \n"+
+						"			null as lastSyncTime, \n"+
+						"			'Media' as type, \n"+
+						"			{p1:code} as ord \n"+
+						"     FROM {Media* as p1 LEFT JOIN Media* as p2 \n"+
+						"        ON {p1:catalogVersion}=?job.sourceVersion AND {p2:catalogVersion}=?job.targetVersion AND \n"+
+						"				{p1:code}={p2:code} \n"+
+						"        LEFT JOIN ItemSyncTimestamp* AS ts \n"+
+						"           ON {ts:sourceVersion}=?job.sourceVersion AND {ts:targetVersion}=?job.targetVersion AND \n"+
+						"              ({ts:sourceItem}={p1:pk} OR {ts:targetItem}={p2:PK} ) } \n"+
+						"		WHERE {p1:catalogVersion}=?job.sourceVersion AND {ts:pk} IS NULL\n"+
+						"	}} \n"+
+						") tbl \n"+
+						"ORDER BY \n"+
+						"	CASE \n"+
+						"		WHEN tbl.type = 'Product' THEN 1 \n"+
+						"		WHEN tbl.type = 'Category' THEN 2 \n"+
+						"		WHEN tbl.type = 'Media' THEN 3 \n"+
+						"		WHEN tbl.type = 'Keyword' THEN 4 \n"+
+						"		ELSE 10 \n"+
+						"	END ASC, \n"+
+						"	tbl.ord ASC, \n"+
+						"	tbl.modifiedTime DESC, \n"+
+						"	tbl.sourceItem ASC "
+					</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute autocreate="true" qualifier="job" type="SyncItemJob" metatype="ViewAttributeDescriptor">
+               <persistence type="jalo"/>
+               <modifiers read="true" write="false" search="true" initial="false" optional="false"/>
+               <custom-properties>
+               	<property name="param"><value>Boolean.TRUE</value></property>
+               </custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="sourceItem" type="Item" metatype="ViewAttributeDescriptor">
+               <persistence type="jalo"/>
+               <modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+               <custom-properties>
+               	<property name="param"><value>Boolean.FALSE</value></property>
+               	<property name="position"><value>Integer.valueOf(0)</value></property>
+               </custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="targetItem" type="Item" metatype="ViewAttributeDescriptor">
+               <persistence type="jalo"/>
+               <modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+               <custom-properties>
+               	<property name="param"><value>Boolean.FALSE</value></property>
+               	<property name="position"><value>Integer.valueOf(1)</value></property>
+               </custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="sourceModifiedTime" type="java.util.Date" metatype="ViewAttributeDescriptor">
+               <persistence type="jalo"/>
+               <modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+               <custom-properties>
+               	<property name="param"><value>Boolean.FALSE</value></property>
+               	<property name="position"><value>Integer.valueOf(2)</value></property>
+               </custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="lastSyncTime" type="java.util.Date" metatype="ViewAttributeDescriptor">
+               <persistence type="jalo"/>
+               <modifiers read="true" write="false" search="false" initial="false" optional="true"/>
+               <custom-properties>
+               	<property name="param"><value>Boolean.FALSE</value></property>
+               	<property name="position"><value>Integer.valueOf(3)</value></property>
+               </custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="typeCode" type="java.lang.String" metatype="ViewAttributeDescriptor">
+               <persistence type="jalo"/>
+               <modifiers read="true" write="false" search="false" initial="false" optional="false"/>
+               <custom-properties>
+               	<property name="param"><value>Boolean.FALSE</value></property>
+               	<property name="position"><value>Integer.valueOf(4)</value></property>
+               </custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="ItemSyncDescriptor"
+					 generate="true"
+					 autocreate="true"
+					 jaloclass="de.hybris.platform.catalog.jalo.ItemSyncDescriptor"
+					 extends="ChangeDescriptor">
+			<attributes>
+				<attribute redeclare="true" qualifier="cronJob" type="SyncItemCronJob">
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="targetItem" type="Item">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="done" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+               <defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="copiedImplicitely" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+               <defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+         <indexes>
+         	<index name="doneIDX" unique="false">
+         		<key attribute="done"/>
+         	</index>
+         </indexes>
+		</itemtype>
+
+
+		<itemtype code="SyncItemCronJob"
+					 jaloclass="de.hybris.platform.catalog.jalo.SyncItemCronJob"
+					 extends="CronJob"
+					 autocreate="true"
+					 generate="true" >
+			<attributes>
+				<attribute qualifier="job" redeclare="true" type="SyncItemJob">
+					<modifiers read="true" write="false" initial="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="changeRecordingEnabled" redeclare="true" type="java.lang.Boolean">
+					<modifiers read="true" write="false" initial="false" optional="true" private="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="forceUpdate" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="pendingItems" type="ItemCollection">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="finishedItems" type="ItemCollection">
+					<modifiers read="true" write="false" initial="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="createSavedValues" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="fullSync" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="abortOnCollidingSync" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+      </itemtype>
+
+		<itemtype code="SyncItemJob"
+			generate="true"
+			jaloclass="de.hybris.platform.catalog.jalo.SyncItemJob"
+			extends="Job"
+			autocreate="true">
+ 			<attributes>
+				<!-- make CODE optional -->
+				<attribute qualifier="code" redeclare="true" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+            <attribute qualifier="exclusiveMode" type="java.lang.Boolean">
+               <modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+               <persistence type="property"/>
+               <defaultvalue>Boolean.FALSE</defaultvalue>
+			</attribute>
+			<attribute qualifier="syncPrincipalsOnly" type="java.lang.Boolean">
+               <modifiers read="true" write="true" search="true" optional="false" initial="true"/>
+               <persistence type="property"/>
+               <defaultvalue>Boolean.FALSE</defaultvalue>
+			</attribute>
+			<attribute qualifier="createNewItems" type="java.lang.Boolean">
+				<modifiers read="true" write="true" optional="false"/>
+				<persistence type="property"/>
+				<defaultvalue>Boolean.TRUE</defaultvalue>
+			</attribute>
+			<attribute qualifier="removeMissingItems" type="java.lang.Boolean">
+				<modifiers read="true" write="true" optional="false"/>
+				<persistence type="property"/>
+				<defaultvalue>Boolean.FALSE</defaultvalue>
+			</attribute>
+			<attribute qualifier="executions" type="SyncItemCronJobCollection">
+				<modifiers read="true" write="false" initial="false" optional="true"/>
+				<persistence type="jalo"/>
+			</attribute>
+			<!-- hidden field to store order of synchronizations -->
+            <attribute qualifier="syncOrder" type="java.lang.Integer">
+				<modifiers read="true" write="true" search="true" optional="true" initial="false" private="false"/>
+               <persistence type="property"/>
+				</attribute>
+				<attribute qualifier="exportAttributeDescriptors" type="SelectedAttributeDescriptorMapType">
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="syncAttributeConfigurations" type="SyncAttributeConfigCollection">
+					<modifiers read="true" write="true" partof="true" initial="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+			<attribute qualifier="effectiveSyncLanguages" type="LanguageCollection">
+				<modifiers read="true" write="false" initial="false" optional="true"/>
+				<persistence type="jalo"/>
+			</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CatalogVersionSyncCronJob"
+					 jaloclass="de.hybris.platform.catalog.jalo.synchronization.CatalogVersionSyncCronJob"
+					 extends="SyncItemCronJob"
+					 autocreate="true"
+					 generate="true" >
+			<attributes>
+				<attribute qualifier="activeCronJobHistory" redeclare="true" type="CatalogVersionSyncCronJobHistory">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+				</attribute>
+				<attribute qualifier="statusMessage" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CatalogVersionSyncCronJobHistory" jaloclass="de.hybris.platform.catalog.jalo.synchronization.CatalogVersionSyncCronJobHistory" extends="CronJobHistory">
+        	<deployment table="CVSyncCronJobHistories" typecode="523"/>
+        	<attributes>
+				<attribute qualifier="processedItemsCount" type="java.lang.Integer">
+					<persistence type="property"/>
+	                <modifiers read="true" write="true"/>
+				</attribute>
+				<attribute qualifier="scheduledItemsCount" type="java.lang.Integer">
+					<persistence type="property"/>
+	                <modifiers read="true" write="true"/>
+				</attribute>
+				<attribute qualifier="dumpedItemsCount" type="java.lang.Integer">
+					<persistence type="property"/>
+	                <modifiers read="true" write="true"/>
+				</attribute>
+				<attribute qualifier="fullSync" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CatalogVersionSyncJob" autocreate="true" generate="true"
+				  extends="SyncItemJob"
+				  jaloclass="de.hybris.platform.catalog.jalo.synchronization.CatalogVersionSyncJob">
+			<attributes>
+				<attribute qualifier="copyCacheSize" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="true"/>
+				</attribute>
+				<attribute qualifier="enableTransactions" type="java.lang.Boolean">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" search="true"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="maxThreads" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="true"/>
+				</attribute>
+				<attribute qualifier="maxSchedulerThreads" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CatalogVersionSyncScheduleMedia" autocreate="true" generate="true"
+					extends="Media"
+					jaloclass="de.hybris.platform.catalog.jalo.synchronization.CatalogVersionSyncScheduleMedia">
+			<attributes>
+				<attribute qualifier="scheduledCount" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="SyncAttributeDescriptorConfig"
+					 jaloclass="de.hybris.platform.catalog.jalo.SyncAttributeDescriptorConfig"
+					 extends="GenericItem"
+					 autocreate="true"
+					 generate="true">
+			<deployment table="SynAttCfg" typecode="620"/>
+			<custom-properties>
+         		<property name="systemType"><value>java.lang.Boolean.TRUE</value></property>
+         	</custom-properties>
+			<attributes>
+				<attribute qualifier="syncJob" type="SyncItemJob">
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="attributeDescriptor" type="AttributeDescriptor">
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="includedInSync" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="copyByValue" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="untranslatable" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="translateValue" type="java.lang.Boolean">
+					<description>deprecated: please use attribute untranslatable</description>
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="presetValue" type="java.lang.Object">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="partiallyTranslatable" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="jobIdx">
+					<key attribute="syncJob"/>
+				</index>
+				<index name="attrIdx">
+					<key attribute="attributeDescriptor"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="ItemSyncTimestamp"
+				  generate="true"
+				  jaloclass="de.hybris.platform.catalog.jalo.ItemSyncTimestamp"
+				  extends="GenericItem"
+				  autocreate="true">
+			<deployment table="ItemSyncTimestamps" typecode="619"/>
+	         <attributes>
+	            <attribute qualifier="syncJob" type="SyncItemJob">
+					<modifiers read="true" write="false" search="true" optional="true" initial="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="sourceItem" type="Item">
+	               <modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="targetItem" type="Item">
+	               <modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="sourceVersion" type="CatalogVersion">
+	               <modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="targetVersion" type="CatalogVersion">
+	               <modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+	               <persistence type="property"/>
+				</attribute>
+				<!-- -->
+	            <attribute qualifier="lastSyncSourceModifiedTime" type="java.util.Date">
+	               <modifiers read="true" write="true" search="true" optional="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="lastSyncTime" type="java.util.Date">
+	               <modifiers read="true" write="true" search="true" optional="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="pendingAttributesOwnerJob" type="SyncItemCronJob">
+	               <modifiers read="true" write="true" search="true" optional="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="pendingAttributesScheduledTurn" type="java.lang.Integer">
+	               <modifiers read="true" write="true" search="true" optional="true"/>
+	               <persistence type="property"/>
+				</attribute>
+	            <attribute qualifier="pendingAttributeQualifiers" type="java.lang.String">
+	               <modifiers read="true" write="true" search="true" optional="true"/>
+  					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<!-- view attributes -->
+	            <attribute qualifier="outdated" type="java.lang.Boolean">
+	               <modifiers read="true" write="false" search="false" optional="false" initial="false"/>
+	               <persistence type="jalo"/>
+				</attribute>
+	            <attribute qualifier="pendingAttributes" type="attributeSet">
+	               <modifiers read="true" write="false" search="false" optional="false" initial="false"/>
+	               <persistence type="jalo"/>
+				</attribute>
+			</attributes>
+         <indexes>
+         	<index name="syncIDX" unique="true">
+         		<key attribute="sourceItem"/>
+         		<key attribute="targetVersion"/>
+         		<key attribute="syncJob"/>
+         	</index>
+         	<index name="srcIDX" unique="false">
+         		<key attribute="sourceItem"/>
+         	</index>
+         	<index name="tgtIDX" unique="false">
+         		<key attribute="targetItem"/>
+         	</index>
+         	<index name="jobIDX" unique="false">
+         		<key attribute="syncJob"/>
+         	</index>
+         	<index name="srcVerIDX" unique="false">
+         		<key attribute="sourceVersion"/>
+         	</index>
+         	<index name="tgtVerIDX" unique="false">
+         		<key attribute="targetVersion"/>
+         	</index>
+         </indexes>
+		</itemtype>
+
+		<itemtype code="ItemTargetVersionView"
+				  extends="Item"
+				  jaloclass="de.hybris.platform.util.ViewResultItem"
+				  generate="false"
+				  singleton="false"
+				  jaloonly="true"
+				  metatype="ViewType"
+				  autocreate="true">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="query">
+					<value>
+						"SELECT {ist:targetItem}, \n"+
+						"   {ist:targetVersion}\n"+
+						"FROM {ItemSyncTimestamp AS ist}\n"+
+						"WHERE {ist:sourceItem} = ?sourceItem \n"+
+						"AND {ist:targetVersion} IS NOT NULL "
+					</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute generate="false" autocreate="true" qualifier="sourceItem" type="Item" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="true" initial="false" unique="false" private="false" partof="false"/>
+					<custom-properties>
+						<property name="position">
+							<value>Integer.valueOf(0)</value>
+						</property>
+						<property name="param">
+							<value>Boolean.TRUE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute generate="false" autocreate="true" qualifier="targetItem" type="Item" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="true" initial="false" unique="false" private="false" partof="false"/>
+					<custom-properties>
+						<property name="position">
+							<value>Integer.valueOf(0)</value>
+						</property>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute generate="false" autocreate="true" qualifier="targetVersion" type="CatalogVersion" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="true" initial="false" unique="false" private="false" partof="false"/>
+					<custom-properties>
+						<property name="position">
+							<value>Integer.valueOf(1)</value>
+						</property>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ItemSourceVersionView"
+					extends="Item"
+					jaloclass="de.hybris.platform.util.ViewResultItem"
+					generate="false"
+					singleton="false"
+					jaloonly="true"
+					metatype="ViewType"
+					autocreate="true">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="query">
+					<value>
+						"SELECT {ist:sourceItem}, \n"+
+						"   {ist:sourceVersion}\n"+
+						"FROM {ItemSyncTimestamp AS ist}\n"+
+						"WHERE {ist:targetItem} = ?targetItem \n"+
+						"AND {ist:sourceVersion} IS NOT NULL "
+					</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute generate="false" autocreate="true" qualifier="targetItem" type="Item" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="true" initial="false" unique="false" private="false" partof="false"/>
+					<custom-properties>
+						<property name="position">
+							<value>Integer.valueOf(0)</value>
+						</property>
+						<property name="param">
+							<value>Boolean.TRUE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute generate="false" autocreate="true" qualifier="sourceItem" type="Item" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="true" initial="false" unique="false" private="false" partof="false"/>
+					<custom-properties>
+						<property name="position">
+							<value>Integer.valueOf(0)</value>
+						</property>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute generate="false" autocreate="true" qualifier="sourceVersion" type="CatalogVersion" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="false" search="false" optional="true" removable="true" initial="false" unique="false" private="false" partof="false"/>
+					<custom-properties>
+						<property name="position">
+							<value>Integer.valueOf(1)</value>
+						</property>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		</typegroup>
+
+		<!-- #######################################################################
+		     ### classification                                                  ###
+			 ####################################################################### -->
+
+		<typegroup name="classification">
+
+			<itemtype code="ClassificationSystem"
+							generate="true"
+							jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationSystem"
+							extends="Catalog"
+							autocreate="true">
+				<attributes>
+					<attribute qualifier="catalogVersions" redeclare="true" type="ClassificationSystemVersionCollection">
+						<description>classification system versions of this catalog</description>
+						<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ClassificationSystemVersion"
+							generate="true"
+							jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationSystemVersion"
+							extends="CatalogVersion"
+							autocreate="true">
+				<attributes>
+					<attribute qualifier="catalog" type="ClassificationSystem" redeclare="true">
+						<description>the classification system</description>
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ClassificationClass"
+					 generate="true"
+					 autocreate="true"
+					 jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationClass"
+				    extends="Category">
+				<attributes>
+					<attribute qualifier="catalogVersion" redeclare="true" type="ClassificationSystemVersion">
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="externalID" type="java.lang.String">
+						<description>external identificator refering to the actual classification system definition</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+					</attribute>
+					<attribute qualifier="revision" type="java.lang.String">
+						<description>revision field of this class</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+					</attribute>
+					<!-- for storefront -->
+					<attribute qualifier="showEmptyAttributes" type="java.lang.Boolean">
+						<description>defines whether or not attributes without value are to be shown for a classified product</description>
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>Boolean.FALSE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<!-- for hmc -->
+					<attribute qualifier="declaredClassificationAttributes" type="ClassificationAttributeList">
+						<description>list of assigned attributes</description>
+						<modifiers read="true" write="false" search="false" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+					<attribute qualifier="inheritedClassificationAttributes" type="ClassificationAttributeList">
+						<description>list of assigned attributes</description>
+						<modifiers read="true" write="false" search="false" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+					<attribute qualifier="classificationAttributes" type="ClassificationAttributeList">
+						<description>list of all attributes available within this class</description>
+						<modifiers read="true" write="false" search="false" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+					<!-- for hmc -->
+					<attribute qualifier="declaredClassificationAttributeAssignments" type="ClassificationAttributeAssignmentList">
+						<description>list of attribute assignments</description>
+						<modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+					<attribute qualifier="hmcXML" type="java.lang.String">
+						<description>custom hmc.xml for this class</description>
+						<modifiers read="true" write="true" search="false" optional="true" dontOptimize="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<!-- dynamic attributes -->
+					<attribute qualifier="allClassificationAttributeAssignments" type="ClassificationAttributeAssignmentList">
+						<description>list all attribute assignments (recursively to the top)</description>
+						<modifiers read="true" write="false" search="false" optional="true" partof="true"/>
+						<persistence type="dynamic"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					 <index name="extID" unique="false">
+						 <key attribute="externalID"/>
+					 </index>
+				 </indexes>
+			</itemtype>
+
+			<itemtype code="ClassificationKeyword"
+					  generate="true"
+					  jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationKeyword"
+					  extends="Keyword"
+					  autocreate="true">
+				<!-- all keywords are catalog items, so we dont have to do anything here
+				<custom-properties>
+					<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+					<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+					<property name="uniqueKeyAttributeQualifier"><value>"keyword"</value></property>
+				</custom-properties>
+				-->
+				<attributes>
+					<!-- -->
+					<attribute qualifier="externalID" type="java.lang.String">
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="catalog" type="ClassificationSystem" redeclare="true">
+						<modifiers read="true" write="true" search="true" optional="false" private="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="catalogVersion" type="ClassificationSystemVersion" redeclare="true">
+						<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="extIDX" unique="false">
+						<key attribute="externalID"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="ClassificationAttributeUnit"
+						 generate="true"
+						 autocreate="true"
+						 jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationAttributeUnit"
+						 extends="GenericItem" >
+				<deployment table="ClAttrUnt" typecode="612"/>
+				<custom-properties>
+					<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+					<property name="catalogVersionAttributeQualifier"><value>"systemVersion"</value></property>
+					<property name="uniqueKeyAttributeQualifier"><value>"code,unitType"</value></property>
+				</custom-properties>
+				<attributes>
+					<attribute qualifier="systemVersion" type="ClassificationSystemVersion">
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="code" type="java.lang.String">
+						<description>external identifier refering to the actual classification system definition</description>
+						<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="name" type="localized:java.lang.String">
+						<description>optional localized name of this class</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="externalID" type="java.lang.String">
+						<description>external identifier refering to the actual classification system definition</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="symbol" type="java.lang.String">
+						<description>Symbol</description>
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="unitType" type="java.lang.String">
+						<description>Unit type</description>
+						<modifiers read="true" write="true" search="true" optional="true" unique="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="conversionFactor" type="java.lang.Double">
+						<description>Conversion factor</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<defaultvalue>new Double(1.0)</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="convertibleUnits" type="ClassificationAttributeUnitSet">
+						<description>Convertible units</description>
+						<modifiers read="true" write="false" search="true" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="sysVer" unique="false">
+						<key attribute="systemVersion"/>
+					</index>
+					<index name="codeIdx" unique="false">
+						<key attribute="code"/>
+					</index>
+					<index name="extID" unique="false">
+						<key attribute="externalID"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="ClassAttributeAssignment"
+					  jaloclass="de.hybris.platform.catalog.jalo.classification.ClassAttributeAssignment"
+				      extends="GenericItem"
+					  generate="true"
+					  autocreate="true">
+				<deployment table="Cat2AttrRel" typecode="610"/>
+				<custom-properties>
+					<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+					<property name="catalogVersionAttributeQualifier"><value>"systemVersion"</value></property>
+					<property name="uniqueKeyAttributeQualifier"><value>"classificationClass,classificationAttribute"</value></property>
+				</custom-properties>
+				<attributes>
+					<attribute qualifier="classificationClass" type="ClassificationClass">
+						<modifiers read="true" write="true" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="classificationAttribute" type="ClassificationAttribute">
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="description" type="localized:java.lang.String">
+						<description>description of attribute usage</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="systemVersion" type="ClassificationSystemVersion">
+						<modifiers read="true" write="false" search="true" optional="true" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="position" type="java.lang.Integer">
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="externalID" type="java.lang.String">
+						<description>external identifier refering to the actual classification system definition</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="unit" type="ClassificationAttributeUnit">
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="mandatory" type="java.lang.Boolean">
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="localized" type="java.lang.Boolean">
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="range" type="java.lang.Boolean">
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="multiValued" type="java.lang.Boolean">
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<!-- for enabling lucene search -->
+					<attribute qualifier="searchable" type="java.lang.Boolean">
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="attributeType" type="ClassificationAttributeTypeEnum">
+						<description>Type of attribute: string, number, boolean or range</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<defaultvalue>em().getEnumerationValue("ClassificationAttributeTypeEnum", "string")</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="formatDefinition" type="java.lang.String">
+						<description>Format definition string: optionally used e.g. as number format</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<!-- viewing options -->
+					<attribute qualifier="listable" type="java.lang.Boolean">
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="comparable" type="java.lang.Boolean">
+						<modifiers read="true" write="true" search="true" optional="false"/>
+						<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="visibility" type="ClassificationAttributeVisibilityEnum">
+						<description>Visibility of attribute: visible, not_visible, visible_in_base or visible_in_variant</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<defaultvalue>em().getEnumerationValue("ClassificationAttributeVisibilityEnum", "visible")</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="attributeValues" type="ClassificationAttributeValueList">
+						<modifiers read="true" write="true" search="false" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+					<!-- for hmc -->
+					<attribute qualifier="attributeValueDisplayString" type="localized:java.lang.String">
+						<modifiers read="true" write="false" search="false" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="sysVer" unique="false">
+						<key attribute="systemVersion"/>
+					</index>
+					<index name="relSrcIDX" unique="false">
+						<key attribute="classificationClass"/>
+					</index>
+					<index name="idIDX" unique="false">
+						<key attribute="externalID"/>
+					</index>
+					<index name="relTgtIDX" unique="false">
+						<key attribute="classificationAttribute"/>
+					</index>
+					<index name="posIdx">
+						<key attribute="position"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="ClassificationAttribute"
+					  generate="true"
+					  autocreate="true"
+					  jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationAttribute"
+					  extends="GenericItem">
+				<deployment table="ClassificationAttrs" typecode="607"/>
+				<custom-properties>
+					<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+					<property name="catalogVersionAttributeQualifier"><value>"systemVersion"</value></property>
+					<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+				</custom-properties>
+				<attributes>
+					<attribute qualifier="systemVersion" type="ClassificationSystemVersion">
+						<modifiers optional="false" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="code" type="java.lang.String">
+						<description>Code</description>
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="externalID" type="java.lang.String">
+						<description>external identifier refering to the actual classification system definition</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="name" type="localized:java.lang.String">
+						<description>Name</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="classes" type="ClassificationClassList">
+						<description>list of classes this attribute was assigned to</description>
+						<modifiers read="true" write="false" search="false" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+					<attribute qualifier="defaultAttributeValues" type="ClassificationAttributeValueList">
+						<modifiers read="true" write="true" search="false" optional="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="sysVer" unique="false">
+						<key attribute="systemVersion"/>
+					</index>
+					<index name="code" unique="false">
+						<key attribute="code"/>
+					</index>
+					<index name="idIDX" unique="false">
+						<key attribute="externalID"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="ClassificationAttributeValue"
+						 generate="true"
+						 autocreate="true"
+						 jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationAttributeValue"
+						 extends="GenericItem" >
+				<deployment table="ClassAttrValues" typecode="608"/>
+				<custom-properties>
+					<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+					<property name="catalogVersionAttributeQualifier"><value>"systemVersion"</value></property>
+					<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+				</custom-properties>
+				<attributes>
+					<attribute qualifier="code" type="java.lang.String">
+						<description>Code</description>
+						<modifiers write="false" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="externalID" type="java.lang.String">
+						<description>external identifier refering to the actual classification system definition</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="name" type="localized:java.lang.String">
+						<description>Name</description>
+						<modifiers write="true" optional="true" initial="true"/>
+						<persistence type="property"/>
+						<custom-properties>
+							<property name="hmcIndexField"><value>"thefield"</value></property>
+						</custom-properties>
+					</attribute>
+					<attribute qualifier="systemVersion" type="ClassificationSystemVersion">
+						<modifiers write="false" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="sysVer" unique="false">
+						<key attribute="systemVersion"/>
+					</index>
+					<index name="code" unique="false">
+						<key attribute="code"/>
+					</index>
+					<index name="idIDX" unique="false">
+						<key attribute="externalID"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="AttributeValueAssignment"
+					    jaloclass="de.hybris.platform.catalog.jalo.classification.AttributeValueAssignment"
+						 extends="GenericItem"
+						 generate="true"
+						 autocreate="true">
+				<deployment table="Attr2ValueRel" typecode="609"/>
+				<custom-properties>
+					<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+					<property name="catalogVersionAttributeQualifier"><value>"systemVersion"</value></property>
+					<property name="uniqueKeyAttributeQualifier"><value>"attributeAssignment,attribute,value"</value></property>
+				</custom-properties>
+				<attributes>
+					<attribute qualifier="value" type="ClassificationAttributeValue">
+						<modifiers write="false" search="true" initial="true" optional="false" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="attributeAssignment" type="ClassAttributeAssignment">
+						<modifiers write="false" search="true" optional="true" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="attribute" type="ClassificationAttribute">
+						<modifiers write="false" search="true" optional="true" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="systemVersion" type="ClassificationSystemVersion">
+						<modifiers read="true" write="false" search="true" optional="true" initial="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="position" type="java.lang.Integer">
+						<modifiers write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="externalID" type="java.lang.String">
+						<description>external identifier refering to the actual classification system definition</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="sysVer" unique="false">
+						<key attribute="systemVersion"/>
+					</index>
+					<index name="catRelIDX" unique="false">
+						<key attribute="attributeAssignment"/>
+					</index>
+					<index name="idIDX" unique="false">
+						<key attribute="externalID"/>
+					</index>
+					<index name="valIDX" unique="false">
+						<key attribute="value"/>
+					</index>
+					<index name="attrIDX" unique="false">
+						<key attribute="attribute"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="ProductFeature"
+						 generate="true"
+						 jaloclass="de.hybris.platform.catalog.jalo.ProductFeature"
+						 extends="GenericItem"
+						 autocreate="true">
+				<deployment table="ProductFeatures" typecode="611"/>
+				<attributes>
+					<!-- changed into relation 
+					<attribute qualifier="product" type="Product">
+						<description>Product</description>
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					 -->
+					<attribute qualifier="qualifier" type="java.lang.String">
+						<description>Qualifier</description>
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="classificationAttributeAssignment" type="ClassAttributeAssignment">
+						<description>Classification attribute assignment which this value belongs to</description>
+						<modifiers read="true" write="false" search="true" optional="true" initial="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="language" type="Language">
+						<modifiers read="true" write="false" search="true" optional="true" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="valuePosition" type="java.lang.Integer">
+						<description>position mark for multi value features</description>
+						<modifiers read="true" write="true" search="true" optional="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="featurePosition" type="java.lang.Integer">
+						<description>position of the feature which this value belongs to</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<!-- value containing attributes: one per type -->
+					<attribute qualifier="valueType" type="java.lang.Integer">
+						<description>actual value type </description>
+						<custom-properties><property name="dontCopy"><value>java.lang.Boolean.TRUE</value></property></custom-properties>
+						<modifiers read="true" write="true" search="true" optional="true" private="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="stringValue" type="java.lang.String">
+						<description>String representation of value </description>
+						<custom-properties><property name="dontCopy"><value>java.lang.Boolean.TRUE</value></property></custom-properties>
+						<modifiers read="true" write="true" search="true" optional="true" private="true"/>
+						<persistence type="property">
+							<columntype database="oracle">
+								<value>CLOB</value>
+							</columntype>	
+							<columntype database="sap">
+								<value>NCLOB</value>
+							</columntype>
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+					<attribute qualifier="booleanValue" type="java.lang.Boolean">
+						<description>Boolean representation of value </description>
+						<custom-properties><property name="dontCopy"><value>java.lang.Boolean.TRUE</value></property></custom-properties>
+						<modifiers read="true" write="true" search="true" optional="true" private="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="numberValue" type="java.math.BigDecimal">
+						<description>Number representation of value </description>
+						<custom-properties><property name="dontCopy"><value>java.lang.Boolean.TRUE</value></property></custom-properties>
+						<modifiers read="true" write="true" search="true" optional="true" private="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="rawValue" type="java.lang.Object">
+						<description>serialized raw value</description>
+						<custom-properties><property name="dontCopy"><value>java.lang.Boolean.TRUE</value></property></custom-properties>
+						<modifiers read="true" write="true" search="false" optional="true" private="true"/>
+						<persistence type="property">
+							<columntype database="oracle">
+								<value>BLOB</value>
+							</columntype>	
+							<columntype>
+								<value>java.io.Serializable</value>
+							</columntype>
+						</persistence>
+					</attribute>
+					<!-- one jalo accessor for the value -->
+					<attribute qualifier="value" type="java.lang.Object">
+						<description>the actual value of this feature</description>
+						<modifiers read="true" write="true" search="false" optional="false"/>
+						<persistence type="dynamic"/>
+					</attribute>
+					<attribute qualifier="unit" type="ClassificationAttributeUnit">
+						<description>Classification attribute unit</description>
+						<modifiers read="true" write="true" search="true" optional="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="valueDetails" type="java.lang.String">
+						<description>value details text</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="description" type="java.lang.String">
+						<description>description text</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="featureIDX" unique="false">
+						<key attribute="product"/>
+					</index>
+					<index name="featureIDX2" unique="false">
+						<key attribute="qualifier"/>
+					</index>
+					<index name="featureIDX3" unique="false">
+						<key attribute="classificationAttributeAssignment"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="ImpExMedia" autocreate="false"  generate="false">
+				<attributes>
+					<attribute qualifier="catalogVersion" type="CatalogVersion" redeclare="true">
+						<modifiers read="true" write="true" initial="false" search="true" optional="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+	</itemtypes>
+</items>

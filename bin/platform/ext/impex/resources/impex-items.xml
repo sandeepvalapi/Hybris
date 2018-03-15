@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="ImpExMediaCollection" elementtype="ImpExMedia" autocreate="true" generate="true"/>
+	</collectiontypes>
+	
+	<enumtypes>
+		<enumtype code="ImpExProcessModeEnum" autocreate="true" generate="true">
+			<value code="insert"/>
+			<value code="update"/>
+			<value code="remove"/>
+			<value code="ignore"/>
+			<value code="insert_update"/>
+		</enumtype>
+		<enumtype code="ImpExValidationModeEnum" autocreate="true" generate="true">
+			<value code="import_strict"/>
+			<value code="import_relaxed"/>
+			<value code="export_only"/>
+			<value code="export_reimport_strict"/>
+			<value code="export_reimport_relaxed"/>
+		</enumtype>
+		<enumtype code="ExportConverterEnum" autocreate="true" generate="true" dynamic="true">
+			<!-- 
+			<value code="de_hybris_platform_impex_jalo_exp_converter_ExcelConverter"/>
+			-->
+		</enumtype>
+		<enumtype code="ScriptModifierEnum" autocreate="true" generate="true" dynamic="true">
+			<value code="de_hybris_platform_impex_jalo_exp_generator_MigrationScriptModifier"/>
+		</enumtype>
+		<enumtype code="ScriptTypeEnum" autocreate="true" generate="true" dynamic="true">
+			<value code="headerlibrary"/>
+			<value code="exportscript"/>
+		</enumtype>
+	</enumtypes>
+
+	<itemtypes>	
+
+		<itemtype code="Export"
+					 jaloclass="de.hybris.platform.impex.jalo.exp.Export"
+					 extends="GenericItem"
+					 autocreate="true"
+					 generate="true" >
+					 <deployment table="Exports" typecode="151"/>
+			<custom-properties>
+         		<property name="systemType"><value>java.lang.Boolean.TRUE</value></property>
+         	</custom-properties>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="exportedMedias" type="ImpExExportMedia">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>contains the exported medias</description>
+				</attribute>
+				<attribute qualifier="exportedData" type="ImpExExportMedia">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>contains the exported data</description>
+				</attribute>
+				<attribute qualifier="exportScript" type="ImpExMedia">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>contains the export script</description>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>description</description>
+				</attribute>
+				
+			</attributes> 
+		</itemtype>
+			
+		<itemtype code="Report"
+					 jaloclass="de.hybris.platform.impex.jalo.exp.Report"
+					 extends="Export"
+					 autocreate="true"
+					 generate="true" >
+			<custom-properties>
+         		<property name="systemType"><value>java.lang.Boolean.TRUE</value></property>
+         	</custom-properties> 
+		</itemtype>
+		
+		<itemtype code="ImpExMedia"
+					 jaloclass="de.hybris.platform.impex.jalo.ImpExMedia"
+					 extends="Media"
+					 autocreate="true"
+					 generate="true" >
+			<custom-properties>
+         		<property name="systemType"><value>java.lang.Boolean.TRUE</value></property>
+         	</custom-properties>
+			<attributes>
+				<attribute qualifier="fieldSeparator" type="java.lang.Character">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>Character used for separating columns in CSV-lines</description>
+				</attribute>
+				<attribute qualifier="quoteCharacter" type="java.lang.Character">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>Character used for escaping columns in CSV-lines</description>
+				</attribute>
+				<attribute qualifier="commentCharacter" type="java.lang.Character">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>Character used for indicating a comment</description>
+				</attribute>
+				<attribute qualifier="encoding" type="EncodingEnum">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+					<description>Used encoding for data stored within media</description>
+				</attribute>
+				<attribute qualifier="linesToSkip" type="int">
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+					<persistence type="property"/>
+					<description>Amount of lines ImpEx has to skip while processing data</description>
+				</attribute>
+				<attribute qualifier="removeOnSuccess" type="boolean">
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+					<persistence type="property"/>
+					<description>Should the media be removed after processing?</description>
+				</attribute>
+				<attribute qualifier="zipentry" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="preview" type="java.lang.String">
+					<modifiers read="true" write="false" initial="false" optional="true"/>
+					<persistence type="jalo"/>
+					<description>Preview of content</description>
+				</attribute>				
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="HeaderLibrary"
+					 jaloclass="de.hybris.platform.impex.jalo.exp.HeaderLibrary"
+					 extends="ImpExMedia"
+					 autocreate="true"
+					 generate="true" />
+			
+		<itemtype code="ImpExExportMedia"
+					 jaloclass="de.hybris.platform.impex.jalo.exp.ImpExExportMedia"
+					 extends="ImpExMedia"
+					 autocreate="true"
+					 generate="true"/> 
+					 		 
+		
+			
+		<itemtype code="ImpExImportJob"
+			 jaloclass="de.hybris.platform.impex.jalo.cronjob.ImpExImportJob"
+			 extends="Job" 
+			 autocreate="true"
+			 generate="true">
+			<attributes>
+				<attribute qualifier="maxThreads" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ImpExExportJob"
+			 jaloclass="de.hybris.platform.impex.jalo.cronjob.ImpExExportJob"
+			 extends="Job"
+			 autocreate="true"
+			 generate="true">
+		</itemtype>
+
+		<itemtype code="ImpExExportCronJob"
+			 jaloclass="de.hybris.platform.impex.jalo.cronjob.ImpExExportCronJob"
+			 extends="CronJob"
+			 autocreate="true"
+			 generate="true" >
+			<attributes>
+				<attribute qualifier="encoding" type="EncodingEnum">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="mode" type="ImpExValidationModeEnum">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="dataExportTarget" type="ImpExExportMedia">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="mediasExportTarget" type="ImpExExportMedia">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="exportTemplate" type="HeaderLibrary">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="export" type="Export">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="itemsExported" redeclare="false" type="java.lang.Integer">
+					<modifiers read="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="itemsMaxCount" redeclare="false" type="java.lang.Integer">
+					<modifiers read="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="itemsSkipped" redeclare="false" type="java.lang.Integer">
+					<modifiers read="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="jobMedia" type="ImpExMedia">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<!-- destination media settings -->
+				<attribute qualifier="fieldSeparator" type="java.lang.Character">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+					<description>Character used for separating columns in CSV-lines</description>
+					<model>
+						<getter default="true" name="fieldSeparator">
+							<nullDecorator>Character.valueOf(';')</nullDecorator>
+						</getter>
+					</model>
+				</attribute>
+				<attribute qualifier="quoteCharacter" type="java.lang.Character">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+					<description>Character used for escaping columns in CSV-lines</description>
+					<model>
+						<getter default="true" name="quoteCharacter">
+							<nullDecorator>Character.valueOf('"')</nullDecorator>
+						</getter>
+					</model>
+				</attribute>
+				<attribute qualifier="commentCharacter" type="java.lang.Character">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+					<description>Character used for indicating a comment</description>
+					<model>
+						<getter default="true" name="commentCharacter">
+							<nullDecorator>Character.valueOf('#')</nullDecorator>
+						</getter>
+					</model>
+				</attribute>
+				<attribute qualifier="dataExportMediaCode" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+					<description>Code of the generated export media, containing the exported data</description>
+					<model>
+						<getter default="true" name="dataExportMediaCode">
+							<nullDecorator>("dataexport_" + this.getCode())</nullDecorator>
+						</getter>
+					</model>
+				</attribute>
+				<attribute qualifier="mediasExportMediaCode" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+					<description>Code of the generated export media, containing the exported medias</description>
+					<model>
+						<getter default="true" name="mediasExportMediaCode">
+							<nullDecorator>("mediasexport_" + this.getCode())</nullDecorator>
+						</getter>
+					</model>
+				</attribute>
+				<attribute qualifier="report" type="Report">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="converterClass" type="ExportConverterEnum">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+					<description>class, which will be used for report generation</description>
+				</attribute>
+				
+				<attribute qualifier="singleFile" type="java.lang.Boolean" >
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+					<description>Export result as a single file instead of Zip archive</description>
+				</attribute>
+			</attributes> 
+		</itemtype>
+
+		<itemtype code="ImpExImportCronJob"
+			 jaloclass="de.hybris.platform.impex.jalo.cronjob.ImpExImportCronJob"
+			 extends="CronJob" 
+			 autocreate="true"
+			 generate="true" >
+			<attributes>
+				<attribute qualifier="jobMedia" type="ImpExMedia">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="workMedia" type="ImpExMedia">
+					<modifiers read="true" write="true" initial="false" optional="true" partof="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="lastSuccessfulLine" type="java.lang.Integer">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="mediasMedia" type="Media">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="externalDataCollection" type="ImpExMediaCollection">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="job" redeclare="true" type="ImpExImportJob">
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="locale" type="java.lang.String" >
+               		<modifiers read="true" write="true" initial="false" optional="true" />
+               		<defaultvalue>Locale.GERMAN.toString()</defaultvalue>
+					<persistence type="property"/>
+            	</attribute>
+				<attribute qualifier="dumpFileEncoding" type="EncodingEnum">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="enableCodeExecution" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="enableExternalCodeExecution" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="enableExternalSyntaxParsing" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="enableHmcSavedValues" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="mediasTarget" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="valueCount" type="java.lang.Integer">
+					<modifiers read="true" write="true" initial="false" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="unresolvedDataStore" type="ImpExMedia">
+					<modifiers read="true" write="true" initial="false" optional="true" partof="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="zipentry" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="mode" type="ImpExValidationModeEnum">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("ImpExValidationModeEnum", "import_strict")</defaultvalue>
+				</attribute>
+				<attribute qualifier="dumpingAllowed" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="unzipMediasMedia" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="logToDatabase" type="java.lang.Boolean" redeclare="true">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="logLevelDatabase" type="JobLogLevel" redeclare="true">
+					<modifiers read="true" write="true" initial="false" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("JobLogLevel", "ERROR")</defaultvalue>
+				</attribute>
+				<attribute qualifier="maxThreads" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="true"/>
+				</attribute>
+				<attribute qualifier="legacyMode" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="true" search="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>	
+		<itemtype code="ComposedType" 
+			autocreate="false" 
+			generate="false">
+			<attributes>
+				<attribute qualifier="systemType" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false" initial="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+        <itemtype code="ExternalImportKey" extends="GenericItem" jaloclass="de.hybris.platform.impex.jalo.ExternalImportKey" autocreate="true" generate="true">
+            <deployment table="externalimportkey" typecode="110"/>
+            <attributes>
+                <attribute qualifier="sourceSystemID" type="java.lang.String">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sourceKey" type="java.lang.String">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="targetPK" type="de.hybris.platform.core.PK">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="sourceSystemIDSourceKeyIDX" unique="true">
+                    <key attribute="sourceSystemID"/>
+                    <key attribute="sourceKey"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+		<itemtype code="ImpexDocumentId">
+			<deployment table="impexdocumentids" typecode="114"/>
+			<attributes>
+				<attribute qualifier="processCode" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="docId" type="java.lang.String">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="itemQualifier" type="java.lang.String">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="itemPK" type="de.hybris.platform.core.PK">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="resolved" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="ImpexDocumentIdsIdx" unique="true">
+					<key attribute="processCode"/>
+					<key attribute="docId"/>
+					<key attribute="itemQualifier"/>
+					<key attribute="itemPK"/>
+					<key attribute="resolved"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<typegroup name="Distributed Import Realted Types">
+        
+        	<itemtype code="ImportBatch" extends="Batch">
+        		<attributes>
+        			<attribute qualifier="group" type="int">
+                    	<modifiers read="true" write="false" optional="false" initial="true"/>
+                    	<persistence type="property"/>
+                    	<defaultvalue>0</defaultvalue>
+                	</attribute>
+                	<attribute qualifier="metadata" type="java.lang.String">
+                    	<modifiers read="true" write="false" optional="true" initial="true" />
+                    	<persistence type="property"/>
+                	</attribute>
+                	<attribute qualifier="importContentCode" type="java.lang.String">
+                    	<modifiers read="true" write="false" optional="true" initial="true" />
+                    	<persistence type="property"/>
+                	</attribute>
+                    <attribute qualifier="importBatchContent" type="ImportBatchContent">
+                        <persistence type="dynamic" attributeHandler="importBatchContentModelAttributeHandler" />
+                        <modifiers read="true" write="false" />
+                    </attribute>
+        		</attributes>
+        	</itemtype>
+        
+        	<itemtype code="ImportBatchContent">
+        		<deployment table="impbatchcontent" typecode="113"/>
+        		<attributes>
+        			<attribute qualifier="code" type="java.lang.String">
+                    	<modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+                    	<persistence type="property"/>
+                	</attribute>
+        			<attribute qualifier="content" type="java.lang.String">
+                    	<modifiers read="true" write="false" optional="false" initial="true"/>
+                    	<persistence type="property">
+	                    	<columntype database="oracle">
+	                            <value>CLOB</value>
+	                        </columntype>
+	                        <columntype database="sap">
+	                            <value>NCLOB</value>
+	                        </columntype>
+	                        <columntype database="mysql">
+	                            <value>MEDIUMTEXT</value>
+	                        </columntype>
+	                        <columntype database="sqlserver">
+	                            <value>TEXT</value>
+	                        </columntype>
+	                        <columntype>
+	                            <value>HYBRIS.LONG_STRING</value>
+	                        </columntype>
+                    	</persistence>
+                	</attribute>
+        		</attributes>
+        		<indexes>
+	                <index name="codeIDX" unique="true">
+	                    <key attribute="code"/>
+	                </index>
+	            </indexes>
+        	</itemtype>
+
+            <itemtype code="DistributedImportProcess" extends="DistributedProcess">
+                <attributes>
+                    <attribute qualifier="impExImportCronJob" type="ImpExImportCronJob">
+                        <persistence type="property" />
+                        <modifiers read="true" write="true" optional="false" initial="true" unique="false" />
+                    </attribute>
+                    <attribute qualifier="metadata" type="java.lang.String">
+                        <modifiers read="true" write="false" optional="true" initial="true" />
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+
+            <itemtype code="DistributedImportSplitErrorDump" extends="ImportBatchContent">
+                <attributes>
+                    <attribute qualifier="processCode" type="java.lang.String">
+                        <modifiers read="true" write="false" optional="false" initial="true" />
+                        <persistence type="property" />
+                    </attribute>
+                </attributes>
+            </itemtype>
+        </typegroup>
+
+	</itemtypes>
+</items>

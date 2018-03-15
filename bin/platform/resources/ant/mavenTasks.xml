@@ -1,0 +1,1118 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="mavenTasks" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+	
+	<loadenv />
+	<!-- Set properties to blank if not set externally to avoid errors in Maven calls -->
+	<property name="env.MAVEN_OPTS" value="" />
+	<property name="env.JAVA_OPTS" value="" />
+
+	<property name="platformhome" value="${basedir}/../.." />
+	<if>
+		<not>
+			<isset property="mvn-init.called"/>
+		</not>
+		<then>
+			<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+				uri="antlib:org.apache.maven.artifact.ant">
+				<classpath>
+					<pathelement
+								location="${platformhome}/resources/ant/lib/maven-ant-tasks-2.1.3.jar" />
+				</classpath>
+			</typedef>
+			<property name="mvn-init.called" value="true" />
+		</then>
+	</if>
+
+	<macrodef name="assureTomcat">
+		<sequential>
+			<property name="vanilla.tomcat.home" value="${platformhome}/resources/tomcat-${bundled.tomcat.version}" />
+			<!-- download tomcat if we cannot find it -->
+			<if>
+				<not>
+					<available file="${vanilla.tomcat.home}/bin/catalina.sh" />
+				</not>
+				<then>
+					<artifact:pom id="tomcatPom" groupId="in.memory.pom.for" artifactId="downloading.tomcat" version="1.0">
+						<dependency groupId="org.apache.tomcat" artifactId="tomcat" version="${bundled.tomcat.version}" type="zip" />
+					</artifact:pom>
+					<mkdir dir="${vanilla.tomcat.home}" />
+					<artifact:writepom pomRefId="tomcatPom" file="${vanilla.tomcat.home}/tomcat.pom" />
+					<artifact:mvn pom="${vanilla.tomcat.home}/tomcat.pom" fork="true" failonerror="true" mavenVersion="3.2.5">
+						<arg line="dependency:copy-dependencies -DoutputDirectory=${vanilla.tomcat.home} ${maven.download.options} ${maven.additional.options}" />
+						<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+					</artifact:mvn>
+					<unzip dest="${vanilla.tomcat.home}" src="${vanilla.tomcat.home}/tomcat-${bundled.tomcat.version}.zip" failOnEmptyArchive="true" overwrite="true">
+						<cutdirsmapper dirs="1" />
+					</unzip>
+					<delete failonerror="false" file="${vanilla.tomcat.home}/tomcat-${bundled.tomcat.version}.zip" />
+					<delete failonerror="false" file="${vanilla.tomcat.home}/tomcat.pom" />
+					<delete failonerror="false" dir="${bundled.tomcat.home}" /> 
+				</then>
+			</if>
+			<if>
+				<not>
+					<available file="${bundled.tomcat.home}/bin" />
+				</not>
+				<then>
+					<mkdir dir="${bundled.tomcat.home}" />
+					<mkdir dir="${bundled.tomcat.home}/tmp" />
+					<copy todir="${bundled.tomcat.home}" overwrite="true">
+				    	<fileset dir="${vanilla.tomcat.home}" includes="**/*" />
+				  	</copy>
+					<artifact:pom id="catalinaJmxRemotePom" groupId="in.memory.pom.for" artifactId="downloading.catalina.jmx.remote" version="1.0">
+						<dependency groupId="org.apache.tomcat" artifactId="tomcat-catalina-jmx-remote" version="${bundled.tomcat.version}" type="jar" />
+					</artifact:pom>
+					<artifact:writepom pomRefId="catalinaJmxRemotePom" file="${bundled.tomcat.home}/tmp/catalinaJmxRemote.pom" />
+					<artifact:mvn pom="${bundled.tomcat.home}/tmp/catalinaJmxRemote.pom" fork="true" failonerror="true" mavenVersion="3.2.5">
+						<arg line="dependency:copy-dependencies -DoutputDirectory=${bundled.tomcat.home}/tmp/ ${maven.download.options} ${maven.additional.options}" />
+						<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+					</artifact:mvn>
+					<artifact:pom id="tomcatExtrasPom" groupId="in.memory.pom.for" artifactId="downloading.tomcat.extras" version="1.0">
+						<dependency groupId="org.apache.tomcat.extras" artifactId="tomcat-extras-juli-adapters" version="${bundled.tomcat.version}" type="jar" />
+					</artifact:pom>
+					<artifact:writepom pomRefId="tomcatExtrasPom" file="${bundled.tomcat.home}/tmp/tomcatExtras.pom" />
+					<artifact:mvn pom="${bundled.tomcat.home}/tmp/tomcatExtras.pom" fork="true" failonerror="true" mavenVersion="3.2.5">
+						<arg line="dependency:copy-dependencies -DoutputDirectory=${bundled.tomcat.home}/tmp/ ${maven.download.options} ${maven.additional.options}" />
+						<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+					</artifact:mvn>
+					<copy todir="${bundled.tomcat.home}/lib">
+						<fileset dir="${bundled.tomcat.home}/tmp" includes="tomcat-catalina-jmx-remote*"/>
+						<globmapper from="tomcat-catalina-jmx-remote*" to="catalina-jmx-remote.jar"/>
+					</copy>
+					<copy todir="${bundled.tomcat.home}/lib">
+						<fileset dir="${bundled.tomcat.home}/tmp" includes="tomcat-extras-juli-adapters*"/>
+						<globmapper from="tomcat-extras-juli-adapters*" to="tomcat-juli-adapters.jar"/>
+					</copy>
+					
+					
+				</then>
+			</if>
+			<!-- patch tomcat if we think it's necessary -->
+			<if>				
+				<not>
+					<available file="${bundled.tomcat.home}/conf/hybris-wrapper-license.conf"/>
+				</not>
+				<then>
+					<if>
+						<not>
+							<available file="${platformhome}/resources/tanukiwrapper"/>
+						</not>
+						<then>
+							<mkdir dir="${bundled.tomcat.home}/tmp" />
+							<artifact:pom id="wrapperPom" groupId="in.memory.pom.for" artifactId="downloading.wrapper" version="1.0">
+								<dependency groupId="de.hybris.platform" artifactId="tanuki-wrapper-hybris" version="1.0.10" type="zip" />
+							</artifact:pom>
+							<artifact:writepom pomRefId="wrapperPom" file="${bundled.tomcat.home}/tmp/wrapper.pom" />
+							<artifact:mvn pom="${bundled.tomcat.home}/tmp/wrapper.pom" fork="true" failonerror="true" mavenVersion="3.2.5">
+								<arg line="dependency:copy-dependencies -DoutputDirectory=${bundled.tomcat.home}/tmp/ ${maven.download.options} ${maven.additional.options}" />
+								<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+							</artifact:mvn>
+							<unzip dest="${platformhome}/resources/tanukiwrapper" src="${bundled.tomcat.home}/tmp/tanuki-wrapper-hybris-1.0.10.zip" failOnEmptyArchive="true" overwrite="true">
+								<cutdirsmapper dirs="1" />
+							</unzip>
+						</then>
+					</if>
+					<copy todir="${bundled.tomcat.home}/" overwrite="true">
+						<fileset dir="${platformhome}/resources/tanukiwrapper" includes="**/*"/>
+					</copy>
+					<copy overwrite="true" file="${platformhome}/resources/devcerts/platform.jks" tofile="${bundled.tomcat.home}/lib/keystore"/>
+					<delete includeemptydirs="true" failonerror="false">
+						<fileset dir="${bundled.tomcat.home}/webapps" includes="**/*" />
+						<fileset dir="${bundled.tomcat.home}/temp" />
+						<fileset dir="${bundled.tomcat.home}/tmp" />
+						<fileset dir="${bundled.tomcat.home}/work" />
+						<fileset dir="${bundled.tomcat.home}/bin" includes="configtest.bat,configtest.sh,cpappend.bat,daemon.sh,digest.bat,digest.sh,setclasspath.bat,setclasspath.sh,shutdown.bat,shutdown.sh,startup.bat,startup.sh,tool-wrapper.bat,tool-wrapper.sh,version.bat,version.sh" />
+						<fileset dir="${bundled.tomcat.home}/conf" includes="logging.properties,server.xml,tomcat-users.xml,web.xml" />
+					</delete>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="assureBootstrapDependencies">
+		<sequential>
+			<condition property="ext.core.path" value="${platformhome}/ext/core">
+			   <not>  
+			      <isset property="ext.core.path"/>
+			   </not>
+			</condition>
+			<if>
+			   <not>
+               		<isset property="ext.core.extension.usemaven"/>
+               </not>
+			   <then>
+			     <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${platformhome}/resources/ant/lib/xmltask-1.16.jar" />
+			     <xmltask source="${ext.core.path}/extensioninfo.xml">
+                 	<copy path="//extension/@usemaven" property="usemaven.from.xml"/>
+                 </xmltask>
+			     <if>
+			       <and>
+				 <isset property="usemaven.from.xml"/>
+				 <equals arg1="${usemaven.from.xml}" arg2="true"/>
+			       </and>
+			       <then>
+				 <property name="ext.core.extension.usemaven" value="true"/>
+			       </then>
+			       <else>
+				 <property name="ext.core.extension.usemaven" value="false"/>
+			       </else>
+			     </if>
+			   </then>
+			</if>
+			<updateMavenDependencies extname="core" />
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="deleteJars" description="deletes all jar files in the lib folder">
+		<attribute name="libfolder" />
+		<attribute name="excludeFile" default="NOT SET" />
+		<sequential>
+			<echo message="cleaning library folder @{libfolder}"/>
+			<if>
+				<available file="@{excludeFile}" />
+				<then>
+					<delete failonerror="false">
+						<fileset dir="@{libfolder}" includes="*.jar" excludesfile="@{excludeFile}"/>
+						<fileset dir="@{libfolder}/../doc/sources/" includes="*.jar" excludesfile="@{excludeFile}"/>
+						<fileset dir="@{libfolder}/../doc/javadoc/" includes="*.jar" excludesfile="@{excludeFile}"/>
+					</delete>
+				</then>
+				<else>
+					<delete failonerror="false">
+						<fileset dir="@{libfolder}" includes="*.jar"/>
+						<fileset dir="@{libfolder}/../doc/sources/" includes="*.jar"/>
+						<fileset dir="@{libfolder}/../doc/javadoc/" includes="*.jar"/>
+					</delete>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="testAllMavenDependencies">
+		<sequential>
+			<!-- testing platform/lib and platform/lib/dbdriver -->
+			<echo
+				message="testing maven dependencies for platform/lib and platform/lib/dbdriver" />
+			<if>
+				<not>
+					<available file="${platformhome}/lib/mavenJars"/>
+				</not>
+				<then>
+					<mkdir dir="${platformhome}/lib/mavenJars"/>
+				</then>
+			</if>
+			<updateLibFolder libfolder="${platformhome}/lib/mavenJars"
+				dependencyfile="${platformhome}/lib/external-dependencies.xml" excludefile="${platformhome}/lib/unmanaged-dependencies.txt" force="true"/>
+			<compareLibraryFolder foldera="${platformhome}/lib"
+				folderb="${platformhome}/lib/mavenJars" excludefile="${platformhome}/lib/unmanaged-dependencies.txt"/>
+			<if>
+				<not>
+					<available file="${platformhome}/lib/dbdriver/mavenJars"/>
+				</not>
+				<then>
+					<mkdir dir="${platformhome}/lib/dbdriver/mavenJars"/>
+				</then>
+			</if>
+			<updateLibFolder libfolder="${platformhome}/lib/dbdriver/mavenJars"
+				dependencyfile="${platformhome}/lib/dbdriver/external-dependencies.xml"  excludefile="${platformhome}/lib/dbdriver/unmanaged-dependencies.txt" force="true"/>
+			<compareLibraryFolder foldera="${platformhome}/lib/dbdriver"
+				folderb="${platformhome}/lib/dbdriver/mavenJars" excludefile="${platformhome}/lib/dbdriver/unmanaged-dependencies.txt"/>
+
+			<!-- the following cannot be called from platform root, OutOfMemoryException 
+				while processing! -->
+			<foreachext>
+				<do>
+					<testMavenDependencies extname="@{extname}" />
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="testMavenDependencies">
+		<attribute name="extname" />
+		<sequential>
+			<!-- testing extension/lib -->
+			<if>
+                <available file="${ext.@{extname}.path}/external-dependencies.xml" />
+				<then>
+					<echo message="testing maven dependencies : ${ext.@{extname}.path}/lib " />
+					<if>
+						<not>
+							<available file="${ext.@{extname}.path}/lib/mavenJars"/>
+						</not>
+						<then>
+							<mkdir dir="${ext.@{extname}.path}/lib/mavenJars"/>
+						</then>
+					</if>
+					<updateLibFolder libfolder="${ext.@{extname}.path}/lib/mavenJars"
+						dependencyfile="${ext.@{extname}.path}/external-dependencies.xml" excludefile="${ext.@{extname}.path}/unamanged-dependencies.txt" force="true"/>
+					<compareLibraryFolder foldera="${ext.@{extname}.path}/lib"
+						folderb="${ext.@{extname}.path}/lib/mavenJars" excludefile="${ext.@{extname}.path}/unamanged-dependencies.txt"/>
+				</then>
+				<elseif>
+                    <available file="${ext.@{extname}.path}/lib" />
+					<then>
+						<echo level="error"
+							message="${ext.@{extname}.path}/lib exists but no ${ext.@{extname}.path}/external-dependencies.xml was not found!" />
+					</then>
+				</elseif>
+			</if>
+
+			<if> <!-- testing extension/web/webroot/WEB-INF/lib -->
+				<available
+					file="${ext.@{extname}.path}/web/webroot/WEB-INF/external-dependencies.xml" />
+				<then>
+					<echo
+						message="testing maven dependencies : ${ext.@{extname}.path}/web/webroot/WEB-INF/lib " />
+					<if>
+						<not>
+							<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/mavenJars"/>
+						</not>
+						<then>
+							<mkdir dir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/mavenJars"/>
+						</then>
+					</if>
+					<updateLibFolder
+						libfolder="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/mavenJars"
+						dependencyfile="${ext.@{extname}.path}/web/webroot/WEB-INF/external-dependencies.xml"
+						excludefile="${ext.@{extname}.path}/web/webroot/WEB-INF/unamanged-dependencies.txt" force="true"/>
+					<compareLibraryFolder
+						foldera="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" folderb="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/mavenJars"
+						excludefile="${ext.@{extname}.path}/web/webroot/WEB-INF/unamanged-dependencies.txt"/>
+				</then>
+				<elseif>
+					<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" />
+					<then>
+						<echo level="warn"
+							message="${ext.@{extname}.path}/web/webroot/WEB-INF/lib exists but no ${ext.@{extname}.path}/web/webroot/WEB-INF/external-dependencies.xml was not found!" />
+					</then>
+				</elseif>
+			</if>
+			
+			<if> <!-- testing AddOn extension/web/webroot/WEB-INF/lib -->
+				<available
+					file="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/external-dependencies.xml" />
+				<then>
+					<echo
+						message="testing maven dependencies : ${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib " />
+					<if>
+						<not>
+							<available file="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib/mavenJars"/>
+						</not>
+						<then>
+							<mkdir dir="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib/mavenJars"/>
+						</then>
+					</if>
+					<updateLibFolder
+						libfolder="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib/mavenJars"
+						dependencyfile="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/external-dependencies.xml"
+						excludefile="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/unamanged-dependencies.txt" force="true"/>
+					<compareLibraryFolder
+						foldera="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib" folderb="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib/mavenJars"
+						excludefile="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/unamanged-dependencies.txt"/>
+				</then>
+				<elseif>
+					<available file="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib" />
+					<then>
+						<echo level="warn"
+							message="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/lib exists but no ${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/external-dependencies.xml was not found!" />
+					</then>
+				</elseif>
+			</if>
+			
+			<if> <!-- testing extension/commonweb/webroot/WEB-INF/lib -->
+				<available
+					file="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/external-dependencies.xml" />
+				<then>
+					<echo
+						message="testing maven dependencies : ${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib " />
+					<if>
+						<not>
+							<available file="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib/mavenJars"/>
+						</not>
+						<then>
+							<mkdir dir="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib/mavenJars"/>
+						</then>
+					</if>
+					<updateLibFolder
+						libfolder="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib/mavenJars"
+						dependencyfile="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/external-dependencies.xml"
+						excludefile="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/unamanged-dependencies.txt" force="true"/>
+					<compareLibraryFolder
+						foldera="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib" folderb="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib/mavenJars"
+						excludefile="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/unamanged-dependencies.txt"/>
+				</then>
+				<elseif>
+					<available file="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib" />
+					<then>
+						<echo level="warn"
+							message="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/lib exists but no ${ext.@{extname}.path}/commonweb/webroot/WEB-INF/external-dependencies.xml was not found!" />
+					</then>
+				</elseif>
+			</if>
+
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="updateDBDrivers">
+		<sequential>
+			<if>
+				<and>
+					<or>
+						<not>
+							<isset property="maven.update.dbdrivers"/>
+						</not>
+						<and>
+							<isset property="maven.update.dbdrivers"/>
+							<equals arg1="${maven.update.dbdrivers}" arg2="true"/>
+						</and>
+					</or>
+					<and>
+						<or>
+							<not>
+								<available file="${platformhome}/lib/dbdriver/.lastupdate"/>
+							</not>
+							<not>
+								<uptodate srcfile="${platformhome}/lib/dbdriver/external-dependencies.xml" targetfile="${platformhome}/lib/dbdriver/.lastupdate"/>
+							</not>
+						</or>
+					</and>
+				</and>
+				<then>
+					<mkdir dir="${platformhome}/lib/dbdriver/" />
+					<deleteJars libfolder="${platformhome}/lib/dbdriver/" excludefile="${platformhome}/lib/dbdriver/unmanaged-dependencies.txt"/>
+					<artifact:mvn pom="${platformhome}/lib/dbdriver/external-dependencies.xml" fork="true" failonerror="true" mavenVersion="3.2.5">
+						<arg line="dependency:copy-dependencies -DoutputDirectory=${platformhome}/lib/dbdriver/ ${maven.download.options} ${maven.additional.options}" />
+						<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+					</artifact:mvn>
+					<if>
+						<available file="${HYBRIS_CONFIG_DIR}/internal-dependencies.xml" />
+						<then>
+							<artifact:mvn pom="${HYBRIS_CONFIG_DIR}/internal-dependencies.xml" fork="true" failonerror="true" mavenVersion="3.2.5">
+								<arg line="dependency:copy-dependencies -DoutputDirectory=${platformhome}/lib/dbdriver/ ${maven.download.options} ${maven.additional.options}" />
+								<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+							</artifact:mvn>
+						</then>
+					</if>
+					<touch file="${platformhome}/lib/dbdriver/.lastupdate"/>
+				</then>
+			</if>
+		</sequential>	
+	</macrodef>
+	
+	<macrodef name="clearNonExtensionDir">
+		<attribute name="excludeFile"/>
+		<attribute name="libfolder"/>
+		<sequential>
+			<if>
+				<available file="@{excludeFile}" />
+				<then>
+					<delete failonerror="false">
+						<fileset dir="@{libfolder}" includes="*.jar" excludesfile="@{excludeFile}"/>
+					</delete>
+				</then>
+				<else>
+					<delete failonerror="false">
+						<fileset dir="@{libfolder}" includes="*.jar"/>
+					</delete>
+				</else>
+			</if>
+			<delete file="@{libfolder}/.lastupdate"/>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="updateAllMavenDependencies">
+		<sequential>
+			<foreachext>
+				<do>
+					<updateMavenDependencies extname="@{extname}" />
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="clearAllMavenDependencies">
+		<sequential>
+			<foreachext>
+				<do>
+					<clearMavenDependencies extname="@{extname}" />
+				</do>
+			</foreachext>
+			<clearNonExtensionDir excludeFile="${platformhome}/ext/core/lib/dbdriver/external-dependencies.xml" libfolder="${platformhome}/ext/core/lib/"/>
+			<clearNonExtensionDir excludeFile="${platformhome}/lib/dbdriver/external-dependencies.xml" libfolder="${platformhome}/lib/dbdriver/"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="updateLibFolder">
+		<attribute name="libfolder" />
+		<attribute name="dependencyFile" />
+		<attribute name="excludeFile" />
+		<attribute name="extname" default="" />
+		<attribute name="force" default="false"/>
+		<sequential>
+			<if>
+				<or>
+					<equals arg1="@{force}" arg2="true"/>
+					<and>
+						<and> 
+							<isset property="ext.@{extname}.extension.usemaven"/>
+							<equals arg1="${ext.@{extname}.extension.usemaven}" arg2="true"/>
+						</and>
+						<or>
+							<not>
+								<available file="@{libfolder}/.lastupdate"/>
+							</not>
+							<not>
+								<uptodate srcfile="@{dependencyFile}" targetfile="@{libfolder}/.lastupdate"/>
+							</not>
+							<and>
+								<available file="@{excludeFile}"/>
+							    <not>
+								    <uptodate srcfile="@{excludeFile}" targetfile="@{libfolder}/.lastupdate"/>
+							    </not>
+							</and>
+						</or>
+					</and>
+				</or>
+				<then>
+					<deleteJars libfolder="@{libfolder}" excludeFile="@{excludeFile}"/>
+					<mkdir dir="@{libfolder}" />
+					<artifact:mvn pom="@{dependencyFile}" fork="true" failonerror="true" mavenVersion="3.2.5">
+						<arg line="dependency:copy-dependencies -DoutputDirectory=@{libfolder} ${maven.download.options} ${maven.additional.options}" />
+						<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+					</artifact:mvn>
+                    <if>
+			<and>
+                        	<isset property="maven.download.sources"/>
+	                        <istrue value="${maven.download.sources}" />
+			</and>
+                        <then>
+                            <updateLibSourcesFolder libfolder="@{libfolder}" dependencyFile="@{dependencyFile}" excludeFile="@{excludeFile}" extname="@{extname}" force="@{force}"/>
+                        </then>
+                    </if>
+                    <if>
+			<and>
+				<isset property="maven.download.javadoc"/>
+	                        <istrue value="${maven.download.javadoc}" />
+			</and>
+                        <then>
+                            <updateLibJavadocFolder libfolder="@{libfolder}" dependencyFile="@{dependencyFile}" excludeFile="@{excludeFile}" extname="@{extname}" force="@{force}"/>
+                        </then>
+                    </if>
+					<touch file="@{libfolder}/.lastupdate"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="updateLibSourcesFolder">
+        <attribute name="libfolder" />
+        <attribute name="dependencyFile" />
+        <attribute name="excludeFile" />
+        <attribute name="extname" default="" />
+        <attribute name="force" default="false"/>
+        <sequential>
+            <if>
+                <or>
+                    <equals arg1="@{force}" arg2="true"/>
+                    <and>
+                        <and>
+                            <isset property="ext.@{extname}.extension.usemaven"/>
+                            <equals arg1="${ext.@{extname}.extension.usemaven}" arg2="true"/>
+                        </and>
+                        <or>
+                            <not>
+                                <available file="@{libfolder}/.lastupdate"/>
+                            </not>
+                            <uptodate targetfile="@{dependencyFile}" srcfile="@{libfolder}/.lastupdate"/>
+                            <uptodate targetfile="@{excludeFile}" srcfile="@{libfolder}/.lastupdate"/>
+                        </or>
+                    </and>
+                </or>
+                <then>
+                    <mkdir dir="@{libfolder}/../doc/sources"/>
+                    <artifact:dependencies sourcesfilesetid="sources.fileset" usescope="compile">
+                        <pom file="@{dependencyFile}"/>
+                    </artifact:dependencies>
+                    <copy todir="@{libfolder}/../doc/sources" flatten="true">
+                        <fileset refid="sources.fileset"/>
+                    </copy>
+                    <!--touch file="@{libfolder}/.lastupdate"/-->
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="updateLibJavadocFolder">
+        <attribute name="libfolder" />
+        <attribute name="dependencyFile" />
+        <attribute name="excludeFile" />
+        <attribute name="extname" default="" />
+        <attribute name="force" default="false"/>
+        <sequential>
+            <if>
+                <or>
+                    <equals arg1="@{force}" arg2="true"/>
+                    <and>
+                        <and>
+                            <isset property="ext.@{extname}.extension.usemaven"/>
+                            <equals arg1="${ext.@{extname}.extension.usemaven}" arg2="true"/>
+                        </and>
+                        <or>
+                            <not>
+                                <available file="@{libfolder}/.lastupdate"/>
+                            </not>
+                            <uptodate targetfile="@{dependencyFile}" srcfile="@{libfolder}/.lastupdate"/>
+                            <uptodate targetfile="@{excludeFile}" srcfile="@{libfolder}/.lastupdate"/>
+                        </or>
+                    </and>
+                </or>
+                <then>
+                    <mkdir dir="@{libfolder}/../doc/javadoc"/>
+                    <artifact:dependencies javadocFilesetId="javadoc.fileset" usescope="compile" >
+                        <pom file="@{dependencyFile}"/>
+                    </artifact:dependencies>
+                    <copy todir="@{libfolder}/../doc/javadoc" flatten="true">
+                        <fileset refid="javadoc.fileset"/>
+                    </copy>
+                    <!--touch file="@{libfolder}/.lastupdate"/-->
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+	<macrodef name="clearLibFolder">
+		<attribute name="libfolder" />
+		<attribute name="dependencyFile" />
+		<attribute name="excludeFile"/>
+		<attribute name="extname" default="" />
+		<sequential>
+			<if>
+				<and> 
+					<isset property="ext.@{extname}.extension.usemaven"/>
+					<equals arg1="${ext.@{extname}.extension.usemaven}" arg2="true"/>
+				</and>
+				<then>
+					<deleteJars libfolder="@{libfolder}" excludeFile="@{excludeFile}"/>
+					<delete file="@{libfolder}/.lastupdate"/>
+					<mkdir dir="@{libfolder}" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="clearMavenDependencies"
+		description="deletes maven dependencies from lib and **/WEB-INF/lib folders">
+		<attribute name="extname" default="" />
+		<sequential>
+			<!-- clean lib folder -->
+			<clearLibraryFolder path="${ext.@{extname}.path}" extname="@{extname}"/>
+
+			<!-- clean **/WEB-INF/lib folders -->
+			<if>
+				<isfalse value="${ext.@{extname}.warextension}"/>
+				<then>
+					<for param="path">
+						<dirset dir="${ext.@{extname}.path}">
+							<include name="**/WEB-INF"/>
+						</dirset>
+						<sequential>
+							<clearLibraryFolder path="@{path}" extname="@{extname}"/>
+						</sequential>
+					</for>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="clearLibraryFolder" description="deletes libraries if external-dependencies.xml file exists in given path">
+		<attribute name="path"/>
+		<attribute name="extname" default="" />
+		<sequential>
+			<if>
+				<available
+						file="@{path}/external-dependencies.xml" />
+				<then>
+					<clearLibFolder libfolder="@{path}/lib"
+									dependencyfile="@{path}/external-dependencies.xml"
+									excludeFile="@{path}/unmanaged-dependencies.txt" extname="@{extname}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="updateMavenDependencies"
+		description="copies all maven dependencies to the lib folder">
+		<attribute name="extname" default="" />
+		<sequential>
+			<!-- update lib folder -->
+			<updateLibraryFolder path="${ext.@{extname}.path}" extname="@{extname}"/>
+
+			<!-- update **/WEB-INF/lib folders -->
+			<if>
+				<isfalse value="${ext.@{extname}.warextension}"/>
+				<then>
+					<for param="path">
+						<dirset dir="${ext.@{extname}.path}">
+							<include name="**/WEB-INF"/>
+						</dirset>
+						<sequential>
+							<echo>updating folder: @{path}</echo>
+							<updateLibraryFolder path="@{path}" extname="@{extname}"/>
+						</sequential>
+					</for>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="updateLibraryFolder" description="Updates libraries if external-dependencies.xml file exists in given path.">
+		<attribute name="path"/>
+		<attribute name="extname" default="" />
+		<sequential>
+			<if>
+				<available
+						file="@{path}/external-dependencies.xml" />
+				<then>
+					<updateLibFolder libfolder="@{path}/lib"
+									 dependencyfile="@{path}/external-dependencies.xml"
+									 excludeFile="@{path}/unmanaged-dependencies.txt" extname="@{extname}"/>
+				</then>
+				<elseif>
+					<not>
+						<isset property="ext.@{extname}.warextension" />
+					</not>
+					<then>
+						<echo level="warn"
+							  message="@{path}/external-dependencies.xml was not found!" />
+					</then>
+				</elseif>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="compareLibraryFolder">
+		<attribute name="folderA" />
+		<attribute name="folderB" />
+		<attribute name="excludefile" />
+		<sequential>
+			<if>
+				<available file="@{excludefile}"/>
+				<then>
+					<fileset dir="@{folderA}" includes="*.jar" excludesfile="@{excludefile}" id="differences" >
+						<different targetdir="@{folderB}" ignoreFileTimes="true" />
+						<present present="both" targetdir="@{folderB}" />
+					</fileset>
+
+					<fileset dir="@{folderA}" includes="*.jar"  excludesfile="@{excludefile}" id="presentAtoB">
+						<present present="srconly" targetdir="@{folderB}" />
+					</fileset>
+
+					<fileset dir="@{folderB}" includes="*.jar"  excludesfile="@{excludefile}" id="presentBtoA">
+						<present present="srconly" targetdir="@{folderA}" />
+					</fileset>
+				</then>
+				<else>
+					<fileset dir="@{folderA}" includes="*.jar" id="differences" >
+						<different targetdir="@{folderB}" ignoreFileTimes="true" />
+						<present present="both" targetdir="@{folderB}" />
+					</fileset>
+
+					<fileset dir="@{folderA}" includes="*.jar" id="presentAtoB">
+						<present present="srconly" targetdir="@{folderB}" />
+					</fileset>
+
+					<fileset dir="@{folderB}" includes="*.jar" id="presentBtoA">
+						<present present="srconly" targetdir="@{folderA}" />
+					</fileset>
+				</else>
+			</if>
+			
+			
+			<if>
+				<not>
+					<equals arg1="" arg2="${toString:differences}" />
+				</not>
+				<then>
+					<echo taskname="LibraryComparer" message=" " />
+					<echo taskname="LibraryComparer"
+						message="########################################################" />
+					<echo taskname="LibraryComparer"
+						message="| File content is different in the following jars :" />
+					<for param="library" list="${toString:differences}" delimiter=";">
+						<sequential>
+							<echo taskname="LibraryComparer" message="|-- @{library}" />
+						</sequential>
+					</for>
+					<echo taskname="LibraryComparer"
+						message="########################################################" />
+				</then>
+			</if>
+
+			<if>
+				<not>
+					<equals arg1="" arg2="${toString:presentAtoB}" />
+				</not>
+				<then>
+					<echo taskname="LibraryComparer"
+						message="#########################################################" />
+					<echo taskname="LibraryComparer" message="# Only available in @{folderA} : " />
+					<for param="library" list="${toString:presentAtoB}" delimiter=";">
+						<sequential>
+							<echo taskname="LibraryComparer" message="# |-- @{library}" />
+						</sequential>
+					</for>
+					<echo taskname="LibraryComparer"
+						message="#########################################################" />
+				</then>
+			</if>
+
+
+			<if>
+				<not>
+					<equals arg1="" arg2="${toString:presentBtoA}" />
+				</not>
+				<then>
+					<echo taskname="LibraryComparer"
+						message="#########################################################" />
+					<echo taskname="LibraryComparer" message="# Only available in @{folderB} : " />
+					<for param="library" list="${toString:presentBtoA}" delimiter=";">
+						<sequential>
+							<echo taskname="LibraryComparer" message="# |-- @{library}" />
+						</sequential>
+					</for>
+					<echo taskname="LibraryComparer"
+						message="#########################################################" />
+				</then>
+			</if>
+
+			<if>
+				<and>
+					<equals arg1="" arg2="${toString:differences}" />
+					<equals arg1="" arg2="${toString:presentAtoB}" />
+					<equals arg1="" arg2="${toString:presentBtoA}" />
+				</and>
+				<then>
+					<echo taskname="LibraryComparer"
+						message="#########################################################" />
+					<echo taskname="LibraryComparer" message="# Checked Libs in @{folderA} - ok" />
+					<echo taskname="LibraryComparer"
+						message="#########################################################" />
+					<deleteJars libfolder="@{folderB}" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="generateLicenseOverview">
+		<sequential>
+			<delete dir="${HYBRIS_LOG_FOLDER}/licences" />		
+			<foreachext>
+				<do>
+					<if>
+						<available file="${ext.@{extname}.path}/external-dependencies.xml"/>
+						<then>
+					<artifact:mvn pom="${ext.@{extname}.path}/external-dependencies.xml"  
+						mavenHome="${platformhome}/apache-maven-3.0.3"
+						fork="true"  
+						failonerror="true"
+                        mavenVersion="3.2.5">
+						<arg value="license:add-third-party" />
+						<arg value="-Dlicense.outputDirectory=${HYBRIS_LOG_DIR}/licences" />
+						<arg value="-Dlicense.thirdPartyFilename=@{extname}-licenses.txt" />
+						<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+					</artifact:mvn>
+					
+					<!-- append to complete file -->
+					<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+#########################################################################
+## @{extname}
+#########################################################################
+
+</concat>
+					<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+						<fileset file="${HYBRIS_LOG_DIR}/licences/@{extname}-licenses.txt" />
+					</concat>
+				</then>
+				<else>
+					<echo message=" ==> SKIPPING @{extname} WEB #########################################################" />
+				</else>	
+			</if>
+				</do>
+			</foreachext>
+			
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="generateWebLicenseOverview">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/external-dependencies.xml"/>
+					<then>
+						<artifact:mvn pom="${ext.@{extname}.path}/web/webroot/WEB-INF/external-dependencies.xml"  
+							mavenHome="${platformhome}/apache-maven-3.0.3"
+							fork="true"
+							failonerror="true"
+	                        mavenVersion="3.2.5">
+							<arg value="license:add-third-party" />
+							<arg value="-Dlicense.outputDirectory=${HYBRIS_LOG_DIR}/licences" />
+							<arg value="-Dlicense.thirdPartyFilename=@{extname}-weblicenses.txt" />
+							<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+						</artifact:mvn>
+
+						<!-- append to complete file -->
+						<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+						#########################################################################
+						## @{extname}/web-inf
+						#########################################################################
+						
+						</concat>
+						<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+							<fileset file="${HYBRIS_LOG_DIR}/licences/@{extname}-weblicenses.txt" />
+						</concat>
+					</then>
+					<else>
+						<echo message=" ==> SKIPPING @{extname} WEB #########################################################" />
+					</else>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="generateAddOnWebLicenseOverview">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<available file="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/external-dependencies.xml"/>
+					<then>
+						<artifact:mvn pom="${ext.@{extname}.path}/acceleratoraddon/web/webroot/WEB-INF/external-dependencies.xml"  
+							mavenHome="${platformhome}/apache-maven-3.0.3"
+							fork="true"
+							failonerror="true"
+	                        mavenVersion="3.2.5">
+							<arg value="license:add-third-party" />
+							<arg value="-Dlicense.outputDirectory=${HYBRIS_LOG_DIR}/licences" />
+							<arg value="-Dlicense.thirdPartyFilename=@{extname}-weblicenses.txt" />
+							<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+						</artifact:mvn>
+
+						<!-- append to complete file -->
+						<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+						#########################################################################
+						## @{extname}/web-inf
+						#########################################################################
+						
+						</concat>
+						<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+							<fileset file="${HYBRIS_LOG_DIR}/licences/@{extname}-weblicenses.txt" />
+						</concat>
+					</then>
+					<else>
+						<echo message=" ==> SKIPPING @{extname} WEB #########################################################" />
+					</else>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="generateCommonWebLicenseOverview">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<available file="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/external-dependencies.xml"/>
+					<then>
+						<artifact:mvn pom="${ext.@{extname}.path}/commonweb/webroot/WEB-INF/external-dependencies.xml"  
+							mavenHome="${platformhome}/apache-maven-3.0.3"
+							fork="true"
+							failonerror="true"
+	                        mavenVersion="3.2.5">
+							<arg value="license:add-third-party" />
+							<arg value="-Dlicense.outputDirectory=${HYBRIS_LOG_DIR}/licences" />
+							<arg value="-Dlicense.thirdPartyFilename=@{extname}-weblicenses.txt" />
+							<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+						</artifact:mvn>
+
+						<!-- append to complete file -->
+						<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+						#########################################################################
+						## @{extname}/web-inf
+						#########################################################################
+						
+						</concat>
+						<concat destfile="${HYBRIS_LOG_DIR}/licences/_all-licenses.txt" append="true">
+							<fileset file="${HYBRIS_LOG_DIR}/licences/@{extname}-weblicenses.txt" />
+						</concat>
+					</then>
+					<else>
+						<echo message=" ==> SKIPPING @{extname} WEB #########################################################" />
+					</else>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+
+
+	<macrodef name="generateNoTransitiveLicenseOverview">
+		<sequential>
+			<if>
+				<available file="${HYBRIS_LOG_DIR}\licences\_all-licenses.txt"/>
+				<then>
+					<java jar="${platformhome}/resources/ant/lib/notranisitives-1.0.jar" fork="true">
+						<classpath>
+				           <pathelement location="${platformhome}/resources/ant/lib/notranisitives-1.0.jar"/>
+					   	</classpath>
+						<arg line="${platformhome}/../ ${HYBRIS_LOG_DIR}/licences/_all-licenses.txt /Users/andreas/hybris/svn/trunk/bin/platform/OVERVIEW.txt"/>
+					</java>
+<!--						<arg line="-jar ${platformhome}/resources/ant/lib/notranisitives-1.0.jar ${platformhome}/../ ${HYBRIS_LOG_DIR}\licences\_all-licenses.txt"/> -->
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+    <macrodef name="ymvn" description="A wrapper for low level use of maven as ant task">
+        <attribute name="pom" default="NONE"/>
+        <attribute name="dir" default="NONE"/>
+        <element name="arguments" optional="no"/>
+        <sequential>
+            <if>
+                <or>
+                    <and>
+                        <equals arg1="@{pom}" arg2="NONE"/>
+                        <equals arg1="@{dir}" arg2="NONE"/>
+                    </and>
+                    <and>
+                        <not><equals arg1="@{pom}" arg2="NONE"/></not>
+                        <not><equals arg1="@{dir}" arg2="NONE"/></not>
+                    </and>
+                </or>
+                <then>
+                  <fail>
+Please do provide either the pom file or the root dir to execute the maven task, not the both at once.
+                  </fail>
+                </then>
+                <else>
+                    <sequential>
+                        <!--echo>Running as pom @{pom} dir @{dir} </echo-->
+                    <if>
+                        <equals arg1="@{pom}" arg2="NONE"/>
+                        <then>
+                            <artifact:mvn dir="@{dir}" mavenHome="${build.mvn.home}" fork="true"  failonerror="true" mavenVersion="3.2.5">
+								<arguments/>
+                            	<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+                            </artifact:mvn>
+
+                        </then>
+                        <else>
+                            <artifact:mvn pom="@{pom}" mavenHome="${build.mvn.home}" fork="true"  failonerror="true" mavenVersion="3.2.5">
+								<arguments/>
+                            	<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+                            </artifact:mvn>
+                        </else>
+                    </if>
+                    </sequential>
+                </else>
+            </if>
+
+        </sequential>
+    </macrodef>
+	
+	<macrodef name="deployDistAndSourceZip">
+		<attribute name="file"/>
+		<attribute name="srcfile" default=""/>
+		<attribute name="locfile" default=""/>
+		<attribute name="devfile" default=""/>
+		<attribute name="depfile" default=""/>
+
+		<sequential>
+			<if>
+				<isset property="dist.properties.file" />
+				<then>
+					<property file="${dist.properties.file}" prefix="dist." />
+				</then>
+			</if>
+			<validateDistProperties/>
+			<if>
+				<available file="@{srcfile}"/>
+				<then>
+					<if>
+						<available file="@{depfile}"/>
+						<then>
+							<property name="deploy.parameters" value="-DrepositoryId=${dist.deploy.repositoryId} -Dfile=@{file} -Dfiles=@{srcfile},@{locfile},@{devfile},@{depfile} -Dclassifiers=src,loc,dev,dep -Dtypes=zip,zip,zip,zip -DartifactId=${dist.deploy.artifactId} -DgroupId=${dist.deploy.groupId} -Dversion=${dist.deploy.version}  -Durl=${dist.deploy.url}"/>
+						</then>
+						<else>
+							<property name="deploy.parameters" value="-DrepositoryId=${dist.deploy.repositoryId} -Dfile=@{file} -Dfiles=@{srcfile},@{locfile},@{devfile} -Dclassifiers=src,loc,dev -Dtypes=zip,zip,zip -DartifactId=${dist.deploy.artifactId} -DgroupId=${dist.deploy.groupId} -Dversion=${dist.deploy.version}  -Durl=${dist.deploy.url}"/>
+						</else>
+					</if>
+				</then>
+				<else>
+					<if>
+					<available file="@{depfile}"/>
+					<then>
+						<property name="deploy.parameters" value="-DrepositoryId=${dist.deploy.repositoryId} -Dfile=@{file} -Dfiles=@{locfile},@{devfile},@{depfile} -Dtypes=zip,zip,zip -Dclassifiers=loc,dev,dep -DartifactId=${dist.deploy.artifactId} -DgroupId=${dist.deploy.groupId} -Dversion=${dist.deploy.version} -Durl=${dist.deploy.url}"/>
+					</then>
+					<else>
+						<property name="deploy.parameters" value="-DrepositoryId=${dist.deploy.repositoryId} -Dfile=@{file} -Dfiles=@{locfile},@{devfile} -Dtypes=zip,zip -Dclassifiers=loc,dev -DartifactId=${dist.deploy.artifactId} -DgroupId=${dist.deploy.groupId} -Dversion=${dist.deploy.version} -Durl=${dist.deploy.url}"/>
+					</else>
+					</if>
+				</else>
+			</if>
+			<echo>Running maven deploy plugin with following parameters: ${deploy.parameters}</echo>
+
+			<artifact:mvn fork="true" failonerror="true" mavenVersion="3.2.5">
+				<arg line="org.apache.maven.plugins:maven-deploy-plugin:2.8.1:deploy-file ${deploy.parameters}" />
+				<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+			</artifact:mvn>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="validateDistProperties">
+		<sequential>
+			<if>
+				<or>
+					<not>
+						<isset property="dist.deploy.repositoryId"/>
+					</not>
+					<not>
+						<isset property="dist.deploy.file"/>
+					</not>
+					<not>
+						<isset property="dist.deploy.artifactId"/>
+					</not>
+					<not>
+						<isset property="dist.deploy.version"/>
+					</not>
+					<not>
+						<isset property="dist.deploy.url"/>
+					</not>
+					<not>
+						<isset property="dist.deploy.groupId"/>
+					</not>
+				</or>
+				<then>
+					<fail message="Required parameters not set! Please check deploy.[url|repositoryId|groupId|artifactId|version|file]"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="processing_buildcallbacks" >
+	
+	 <macrodef name="processing_before_build">
+      <sequential>
+
+			<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+				<classpath>
+			    	<fileset dir="${platformhome}/resources/ant/lib">
+			      		<include name="*.jar"/>
+			    	</fileset>
+				</classpath>
+			</taskdef>
+
+			<outofdate>
+				<sourcefiles>
+					<fileset file="${ext.processing.path}/resources/processengine/processdefinition.xsd"/>
+				</sourcefiles>
+				<targetfiles path="${ext.processing.path}/gensrc/de/hybris/platform/processengine/definition/xml" />
+				<sequential>
+					<echo>generating JAXB classes</echo>
+					<mkdir dir="${ext.processing.path}/gensrc"/>
+					<xjc
+						schema="${ext.processing.path}/resources/processengine/processdefinition.xsd"
+						package="de.hybris.platform.processengine.definition.xml"
+						destdir="${ext.processing.path}/gensrc">
+						<produces dir="${ext.processing.path}/gensrc/de/hybris/platform/processengine/definition/xml">
+							<include name="*.java"/>
+						</produces>
+						<depends file="${ext.processing.path}/resources/processengine/processdefinition.xsd"/>
+					</xjc>
+
+					<replace dir="${ext.processing.path}/gensrc">
+						<include name="**/ObjectFactory.java" />
+						<replacetoken><![CDATA[public ObjectFactory() {]]></replacetoken>
+						<replacevalue><![CDATA[public ObjectFactory() {//empty constructor]]></replacevalue>
+					</replace>
+
+					<replace dir="${ext.processing.path}/gensrc">
+						<include name="**/Wait.java" />
+						<replacetoken><![CDATA[return prependProcessCode;]]></replacetoken>
+						<replacevalue><![CDATA[return prependProcessCode.booleanValue();]]></replacevalue>
+					</replace>
+				</sequential>
+			</outofdate>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="processing_before_ear">
+		<sequential>
+			<!-- you can do anything before the EAR file is being packed -->
+		</sequential>
+	</macrodef>
+
+	<macrodef name="bpm_before_ear">
+		<sequential>
+			<!-- you can do anything before the EAR file is being packed -->
+		</sequential>
+	</macrodef>
+
+</project>

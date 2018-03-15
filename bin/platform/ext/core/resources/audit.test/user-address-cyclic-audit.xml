@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2017 SAP SE
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ Hybris ("Confidential Information"). You shall not disclose such
+  ~ Confidential Information and shall use it only in accordance with the
+  ~ terms of the license agreement you entered into with SAP Hybris.
+  ~
+  -->
+
+<audit-report-config name="ItemsConfig">
+    <given-root-type>User</given-root-type>
+    <types>
+        <type code="User">
+            <atomic-attributes>
+                <atomic-attribute qualifier="passwordEncoding"
+                                  displayKey="user.passwordEncoding.name"/>
+                <atomic-attribute qualifier="encodedPassword"
+                                  displayKey="user.encodedPassword.name"/>
+                <atomic-attribute qualifier="passwordAnswer"
+                                  displayKey="user.passwordAnswer.name"/>
+                <atomic-attribute qualifier="passwordQuestion"
+                                  displayKey="user.passwordQuestion.name"/>
+                <atomic-attribute qualifier="name" displayKey="user.name.name"/>
+                <atomic-attribute qualifier="uid" displayKey="user.uid.name"/>
+            </atomic-attributes>
+
+            <reference-attributes>
+                <reference-attribute qualifier="defaultPaymentAddress"
+                                     displayKey="user.defaultPaymentAddress.name" type="Address"/>
+                <reference-attribute qualifier="defaultShipmentAddress"
+                                     displayKey="user.defaultShipmentAddress.name" type="Address"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="owner" type="Address" displayKey="type.user.addresses.name" />
+            </virtual-attributes>
+
+        </type>
+
+        <type code="Address" displayKey="type.address.name">
+            <atomic-attributes>
+                <atomic-attribute qualifier="duplicate"
+                                  displayKey="address.duplicate.name"/>
+                <atomic-attribute qualifier="shippingAddress"
+                                  displayKey="address.shippingAddress.name"/>
+                <atomic-attribute qualifier="appartment"
+                                  displayKey="address.appartment.name"/>
+                <atomic-attribute qualifier="department"
+                                  displayKey="address.department.name"/>
+                <atomic-attribute qualifier="building" displayKey="address.building.name"/>
+                <atomic-attribute qualifier="cellphone"
+                                  displayKey="address.cellphone.name"/>
+                <atomic-attribute qualifier="cellphone"
+                                  displayKey="address.cellphone.name"/>
+                <atomic-attribute qualifier="company" displayKey="address.company.name"/>
+                <atomic-attribute qualifier="department"
+                                  displayKey="address.department.name"/>
+                <atomic-attribute qualifier="district" displayKey="address.district.name"/>
+                <atomic-attribute qualifier="email" displayKey="address.email.name"/>
+                <atomic-attribute qualifier="fax" displayKey="address.fax.name"/>
+                <atomic-attribute qualifier="firstname"
+                                  displayKey="address.firstname.name"/>
+                <atomic-attribute qualifier="lastname" displayKey="address.lastname.name"/>
+                <atomic-attribute qualifier="middlename"
+                                  displayKey="address.middlename.name"/>
+                <atomic-attribute qualifier="middlename2"
+                                  displayKey="address.middlename2.name"/>
+                <atomic-attribute qualifier="phone1" displayKey="address.phone1.name"/>
+                <atomic-attribute qualifier="phone2" displayKey="address.phone2.name"/>
+                <atomic-attribute qualifier="pobox" displayKey="address.pobox.name"/>
+                <atomic-attribute qualifier="postalcode"
+                                  displayKey="address.postalcode.name"/>
+                <atomic-attribute qualifier="streetname"
+                                  displayKey="address.streetname.name"/>
+                <atomic-attribute qualifier="streetnumber"
+                                  displayKey="address.streetnumber.name"/>
+                <atomic-attribute qualifier="town" displayKey="address.town.name"/>
+                <atomic-attribute qualifier="dateOfBirth"
+                                  displayKey="address.dateOfBirth.name"/>
+                <atomic-attribute qualifier="billingAddress"
+                                  displayKey="address.billingAddress.name"/>
+            </atomic-attributes>
+
+            <reference-attributes>
+                <reference-attribute qualifier="original"
+                                     displayKey="address.original.name" type="Address"/>
+                <reference-attribute qualifier="country"
+                                     displayKey="address.country.name" type="Country"/>
+                <reference-attribute qualifier="region"
+                                     displayKey="address.region.name" type="Region"/>
+                <reference-attribute qualifier="title"
+                                     displayKey="address.title.name" type="Title"/>
+                <reference-attribute qualifier="owner"
+                                     displayKey="type.address.owner.name" type="User"/>
+            </reference-attributes>
+        </type>
+
+
+        <type code="Country" displayKey="type.country.name">
+            <atomic-attributes>
+                <atomic-attribute qualifier="isocode" displayKey="country.isocode.name"/>
+                <atomic-attribute qualifier="name" displayKey="country.name.name"/>
+            </atomic-attributes>
+        </type>
+
+        <type code="Region" displayKey="type.region.name">
+            <atomic-attributes>
+                <atomic-attribute qualifier="name" displayKey="region.name.name"/>
+                <atomic-attribute qualifier="isocodeShort"
+                                  displayKey="region.isocodeShort.name"/>
+                <atomic-attribute qualifier="isocode" displayKey="region.isocode.name"/>
+            </atomic-attributes>
+
+        </type>
+
+        <type code="Title" displayKey="type.title.name">
+            <atomic-attributes>
+                <atomic-attribute qualifier="name" displayKey="title.name.name"/>
+                <atomic-attribute qualifier="code" displayKey="title.code.name"/>
+            </atomic-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="title" type="Address" displayName="addresses"/>
+            </virtual-attributes>
+
+        </type>
+
+    </types>
+
+</audit-report-config>

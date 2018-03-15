@@ -1,0 +1,1020 @@
+<?xml version="1.0" ?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<!--
+  The generic deployment descriptor for the hybris Platform
+
+  @version , $Date: 2007-05-16 16:15:55 +0200 (Mi, 16 Mai 2007) $
+  -->
+
+<model name="hybris" description="...">
+
+    <database-schema database="sap" primary-key="primary key" null="" not-null="not null" >
+        <type-mapping type="java.lang.String" persistence-type="nvarchar(255)" />
+        <type-mapping type="String" persistence-type="nvarchar(255)" />
+
+        <type-mapping type="java.lang.Float" persistence-type="decimal(20,5)" />
+        <type-mapping type="java.lang.Double" persistence-type="decimal(30,8)" />
+        <type-mapping type="java.lang.Byte" persistence-type="smallint" />
+        <type-mapping type="java.lang.Character" persistence-type="smallint" />
+        <type-mapping type="java.lang.Short" persistence-type="integer" />
+        <type-mapping type="java.lang.Boolean" persistence-type="decimal(1,0)" />
+        <type-mapping type="java.lang.Long" persistence-type="bigint" />
+        <type-mapping type="java.lang.Integer" persistence-type="bigint" />
+
+        <type-mapping type="float" persistence-type="decimal(20,5) DEFAULT 0" />
+        <type-mapping type="double" persistence-type="decimal(30,8) DEFAULT 0" />
+        <type-mapping type="byte" persistence-type="integer DEFAULT 0" />
+        <type-mapping type="char" persistence-type="integer DEFAULT ''" />
+        <type-mapping type="short" persistence-type="integer DEFAULT 0" />
+        <type-mapping type="boolean" persistence-type="decimal(1,0) DEFAULT 0" />
+        <type-mapping type="long" persistence-type="bigint DEFAULT 0" />
+        <type-mapping type="int" persistence-type="bigint DEFAULT 0" />
+
+        <type-mapping type="java.util.Date" persistence-type="timestamp" />
+
+        <type-mapping type="java.math.BigDecimal" persistence-type="decimal(30,8)" />
+        <type-mapping type="java.io.Serializable" persistence-type="BLOB" />
+
+        <type-mapping type="HYBRIS.LONG_STRING" persistence-type="nvarchar(5000)" />
+        <type-mapping type="HYBRIS.JSON" persistence-type="CLOB" />
+        <type-mapping type="HYBRIS.COMMA_SEPARATED_PKS" persistence-type="nvarchar(5000)" />
+        <type-mapping type="HYBRIS.PK" persistence-type="bigint" />
+
+    </database-schema>
+
+    <database-schema database="oracle" primary-key="primary key" null="" not-null="not null" >
+        <type-mapping type="java.lang.String" persistence-type="varchar2(255 CHAR)" />
+        <type-mapping type="String" persistence-type="varchar2(255 CHAR)" />
+
+        <type-mapping type="java.lang.Float" persistence-type="number(20,5)" />
+        <type-mapping type="java.lang.Double" persistence-type="number(30,8)" />
+        <type-mapping type="java.lang.Byte" persistence-type="number(10,0)" />
+        <type-mapping type="java.lang.Character" persistence-type="number(10,0)" />
+        <type-mapping type="java.lang.Short" persistence-type="number(10,0)" />
+        <type-mapping type="java.lang.Boolean" persistence-type="number(1,0)" />
+        <type-mapping type="java.lang.Long" persistence-type="number(20,0)" />
+        <type-mapping type="java.lang.Integer" persistence-type="number(20,0)" />
+
+        <type-mapping type="float" persistence-type="number(20,5) DEFAULT 0" />
+        <type-mapping type="double" persistence-type="number(30,8) DEFAULT 0" />
+        <type-mapping type="byte" persistence-type="number(10,0) DEFAULT 0" />
+        <type-mapping type="char" persistence-type="number(10,0) DEFAULT ''" />
+        <type-mapping type="short" persistence-type="number(10,0) DEFAULT 0" />
+        <type-mapping type="boolean" persistence-type="number(1,0) DEFAULT 0" />
+        <type-mapping type="long" persistence-type="number(20,0) DEFAULT 0" />
+        <type-mapping type="int" persistence-type="number(20,0) DEFAULT 0" />
+
+        <type-mapping type="java.util.Date" persistence-type="timestamp(3)" />
+
+        <type-mapping type="java.math.BigDecimal" persistence-type="number(30,8)" />
+        <type-mapping type="java.io.Serializable" persistence-type="BLOB" />
+
+        <type-mapping type="HYBRIS.LONG_STRING" persistence-type="varchar2(4000)" />
+        <type-mapping type="HYBRIS.JSON" persistence-type="CLOB" />
+        <type-mapping type="HYBRIS.COMMA_SEPARATED_PKS" persistence-type="varchar2(4000)" />
+        <type-mapping type="HYBRIS.PK" persistence-type="NUMBER(20,0)" />
+
+    </database-schema>
+
+
+
+
+    <database-schema database="hsqldb" primary-key="primary key" null="" not-null="not null" >
+        <type-mapping type="java.lang.String" persistence-type="VARCHAR(255)" />
+        <type-mapping type="String" persistence-type="VARCHAR(255)" />
+
+        <type-mapping type="java.lang.Float" persistence-type="float"  />
+        <type-mapping type="java.lang.Double" persistence-type="double"  />
+        <type-mapping type="java.lang.Byte" persistence-type="smallint"  />
+        <type-mapping type="java.lang.Character" persistence-type="smallint"  />
+        <type-mapping type="java.lang.Short" persistence-type="smallint"  />
+        <type-mapping type="java.lang.Boolean" persistence-type="tinyint"  />
+        <type-mapping type="java.lang.Long" persistence-type="bigint"  />
+        <type-mapping type="java.lang.Integer" persistence-type="int"  />
+
+        <type-mapping type="float" persistence-type="float default 0"  />
+        <type-mapping type="double" persistence-type="double default 0"  />
+        <type-mapping type="byte" persistence-type="smallint default 0"  />
+        <type-mapping type="char" persistence-type="smallint default 0"  />
+        <type-mapping type="short" persistence-type="smallint default 0"  />
+        <type-mapping type="boolean" persistence-type="tinyint default 0"  />
+        <type-mapping type="long" persistence-type="bigint default 0"  />
+        <type-mapping type="int" persistence-type="int default 0"  />
+
+        <type-mapping type="java.util.Date" persistence-type="timestamp" />
+        <type-mapping type="java.math.BigDecimal" persistence-type="DECIMAL(30,8)" />
+        <type-mapping type="java.io.Serializable" persistence-type="longvarbinary" />
+
+        <type-mapping type="HYBRIS.LONG_STRING" persistence-type="LONGVARCHAR" />
+        <type-mapping type="HYBRIS.JSON" persistence-type="LONGVARCHAR" />
+        <type-mapping type="HYBRIS.COMMA_SEPARATED_PKS" persistence-type="LONGVARCHAR" />
+        <type-mapping type="HYBRIS.PK" persistence-type="BIGINT" />
+
+    </database-schema>
+
+
+    <database-schema database="mysql" primary-key="primary key" null="" not-null="not null" >
+        <type-mapping type="java.lang.String" persistence-type="varchar(255)" />
+        <type-mapping type="String" persistence-type="varchar(255)" />
+
+        <type-mapping type="java.lang.Float" persistence-type="float(20,5)" />
+        <type-mapping type="java.lang.Double" persistence-type="double" />
+        <type-mapping type="java.lang.Byte" persistence-type="smallint" />
+        <type-mapping type="java.lang.Character" persistence-type="smallint" />
+        <type-mapping type="java.lang.Short" persistence-type="integer" />
+        <type-mapping type="java.lang.Boolean" persistence-type="tinyint(1)" />
+        <type-mapping type="java.lang.Long" persistence-type="bigint" />
+        <type-mapping type="java.lang.Integer" persistence-type="integer" />
+
+        <type-mapping type="float" persistence-type="float(20,5) DEFAULT 0" />
+        <type-mapping type="double" persistence-type="double DEFAULT 0" />
+        <type-mapping type="byte" persistence-type="smallint DEFAULT 0" />
+        <type-mapping type="char" persistence-type="smallint DEFAULT 0" />
+        <type-mapping type="short" persistence-type="integer DEFAULT 0" />
+        <type-mapping type="boolean" persistence-type="tinyint(1) DEFAULT 0" />
+        <type-mapping type="long" persistence-type="bigint DEFAULT 0" />
+        <type-mapping type="int" persistence-type="integer DEFAULT 0" />
+
+        <type-mapping type="java.util.Date" persistence-type="datetime" />
+        <type-mapping type="java.math.BigDecimal" persistence-type="DECIMAL(30,8)" />
+        <type-mapping type="java.io.Serializable" persistence-type="LONGBLOB" />
+
+        <type-mapping type="HYBRIS.LONG_STRING" persistence-type="TEXT" />
+        <type-mapping type="HYBRIS.JSON" persistence-type="LONGTEXT" />
+        <type-mapping type="HYBRIS.COMMA_SEPARATED_PKS" persistence-type="TEXT" />
+        <type-mapping type="HYBRIS.PK" persistence-type="BIGINT" />
+    </database-schema>
+
+
+
+
+    <database-schema database="sqlserver" primary-key="primary key" null="" not-null="not null" >
+        <type-mapping type="java.lang.String" persistence-type="nvarchar(255)" />
+        <type-mapping type="String" persistence-type="nvarchar(255)" />
+
+        <type-mapping type="java.lang.Float" persistence-type="float" />
+        <type-mapping type="java.lang.Double" persistence-type="float" />
+        <type-mapping type="java.lang.Byte" persistence-type="integer" />
+        <type-mapping type="java.lang.Character" persistence-type="char(4)" />
+        <type-mapping type="java.lang.Short" persistence-type="integer" />
+        <type-mapping type="java.lang.Boolean" persistence-type="tinyint" />
+        <type-mapping type="java.lang.Long" persistence-type="bigint" />
+        <type-mapping type="java.lang.Integer" persistence-type="integer" />
+
+        <type-mapping type="float" persistence-type="float default 0" />
+        <type-mapping type="double" persistence-type="float default 0" />
+        <type-mapping type="byte" persistence-type="integer default 0" />
+        <type-mapping type="char" persistence-type="char(4) default ''" />
+        <type-mapping type="short" persistence-type="integer default 0" />
+        <type-mapping type="boolean" persistence-type="tinyint default 0" />
+        <type-mapping type="long" persistence-type="integer default 0" />
+        <type-mapping type="int" persistence-type="integer default 0" />
+
+        <type-mapping type="java.util.Date" persistence-type="DATETIME2"/>
+        <type-mapping type="java.math.BigDecimal" persistence-type="DECIMAL(30,8)" />
+        <type-mapping type="java.io.Serializable" persistence-type="IMAGE" />
+
+        <type-mapping type="HYBRIS.LONG_STRING" persistence-type="NVARCHAR(MAX)" />
+        <type-mapping type="HYBRIS.JSON" persistence-type="NVARCHAR(MAX)" />
+        <type-mapping type="HYBRIS.COMMA_SEPARATED_PKS" persistence-type="NVARCHAR(MAX)" />
+        <type-mapping type="HYBRIS.PK" persistence-type="BIGINT" />
+    </database-schema>
+    
+    <database-schema database="postgresql" primary-key="primary key" null="" not-null="not null" >
+        <type-mapping type="java.lang.String" persistence-type="varchar(255)" />
+        <type-mapping type="String" persistence-type="varchar(255)" />
+
+        <type-mapping type="java.lang.Float" persistence-type="double precision"  />
+        <type-mapping type="java.lang.Double" persistence-type="double precision"  />
+        <type-mapping type="java.lang.Byte" persistence-type="smallint"  />
+        <type-mapping type="java.lang.Character" persistence-type="smallint"  />
+        <type-mapping type="java.lang.Short" persistence-type="int"  />
+        <type-mapping type="java.lang.Boolean" persistence-type="smallint"  />
+        <type-mapping type="java.lang.Long" persistence-type="bigint"  />
+        <type-mapping type="java.lang.Integer" persistence-type="int"  />
+
+        <type-mapping type="float" persistence-type="double precision default 0"  />
+        <type-mapping type="double" persistence-type="double precision default 0"  />
+        <type-mapping type="byte" persistence-type="smallint default 0"  />
+        <type-mapping type="char" persistence-type="smallint default ''"  />
+        <type-mapping type="short" persistence-type="int default 0"  />
+        <type-mapping type="boolean" persistence-type="smallint default 0"  />
+        <type-mapping type="long" persistence-type="bigint default 0"  />
+        <type-mapping type="int" persistence-type="int default 0"  />
+
+        <type-mapping type="java.util.Date" persistence-type="timestamp" />
+        <type-mapping type="java.math.BigDecimal" persistence-type="numeric(30,8)" />
+        <type-mapping type="java.io.Serializable" persistence-type="bytea" />
+
+        <type-mapping type="HYBRIS.LONG_STRING" persistence-type="text" />
+        <type-mapping type="HYBRIS.JSON" persistence-type="text" />
+        <type-mapping type="HYBRIS.COMMA_SEPARATED_PKS" persistence-type="text" />
+        <type-mapping type="HYBRIS.PK" persistence-type="bigint" />
+
+    </database-schema>
+
+
+
+
+
+
+
+    <package name="de.hybris.jakarta" description="the base package for all hybris beans">
+
+        <!--
+          ***********************************************************************
+          *                           Session beans                             *
+          ***********************************************************************
+        -->
+
+        <package name="de.hybris.jakarta.session" description="all session beans">
+
+            <bean name="System" abstract="false" type="Session" cmp-type="Container" state-type="Stateless"
+                  description="our multi-purpose session bean">
+
+
+            </bean>
+
+
+
+
+            <package name="de.hybris.jakarta.session.property">
+
+
+                <object name="Property">
+                    <object-mapping>
+                        <table name="Props"/>
+                        <table name="TypeSystemProps"/>
+                        <table name="ProductProps"/>
+                        <table name="UserProps"/>
+                        <table name="UserGroupProps"/>
+                        <table name="AddressProps"/>
+                        <table name="OrderProps"/>
+                        <table name="OrderEntryProps"/>
+                        <table name="QuoteProps"/>
+                        <table name="QuoteEntryProps"/>
+                        <table name="MediaProps"/>
+                        <index name="ITEMPK">
+                            <index-key attribute="itemPK"/>
+                        </index>
+                        <index name="NAMEIDX">
+                            <index-key attribute="name"/>
+                        </index>
+                        <index name="REALNAMEIDX">
+                            <index-key attribute="realName"/>
+                        </index>
+                    </object-mapping>
+                    <attribute name="itemPK" type="HYBRIS.PK" primkey-field="true">
+                        <attribute-mapping persistence-name="ITEMPK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="itemTypePK" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="ITEMTYPEPK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="name" type="java.lang.String" primkey-field="true">
+                        <attribute-mapping persistence-name="NAME" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="langPK" type="HYBRIS.PK" primkey-field="true">
+                        <attribute-mapping  persistence-name="LANGPK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="realName" type="java.lang.String">
+                        <attribute-mapping persistence-name="REALNAME"/>
+                    </attribute>
+                    <attribute name="type1" type="int">
+                        <attribute-mapping persistence-name="TYPE1"/>
+                    </attribute>
+                    <attribute name="valueString1" type="HYBRIS.LONG_STRING">
+                        <attribute-mapping persistence-name="VALUESTRING1"/>
+                    </attribute>
+                    <attribute name="value1" type="java.io.Serializable">
+                        <attribute-mapping persistence-name="VALUE1"/>
+                        <attribute-mapping database="oracle" persistence-name="VALUE1" persistence-type="BLOB"/>
+                    </attribute>
+                </object>
+
+            </package>
+
+
+        </package>
+
+
+        <!--
+          ***********************************************************************
+          *                           Entity beans                              *
+          ***********************************************************************
+        -->
+
+        <package name="de.hybris.platform.persistence" description="all entity beans">
+
+            <bean name="Item" abstract="true" type="Entity" cmp-version="2.x" cmp-type="Container" >
+                <bean-mapping>
+                    <!-- <index name="TypePKIndex">
+                        <index-key attribute="typePkString"/>
+                    </index>
+                    <index name="OwnerIdx">
+                        <index-key attribute="ownerPkString"/>
+                    </index>-->
+                </bean-mapping>
+                <attribute name="pkString" type="HYBRIS.PK" primkey-field="true">
+                    <attribute-mapping persistence-name="PK"  null-allowed="false"/>
+                </attribute>
+                <attribute name="creationTimestampInternal" type="java.util.Date">
+                    <attribute-mapping persistence-name="createdTS" null-allowed="false"/>
+                </attribute>
+                <attribute name="modifiedTimestampInternal" type="java.util.Date">
+                    <attribute-mapping persistence-name="modifiedTS" />
+                </attribute>
+                <attribute name="aCLTimestampInternal" type="long">
+                    <attribute-mapping persistence-name="aCLTS" null-allowed="true"/>
+                </attribute>
+                <attribute name="typePkString" type="HYBRIS.PK" >
+                    <attribute-mapping persistence-name="TypePkString" null-allowed="false"/>
+                </attribute>
+                <attribute name="ownerPkString" type="HYBRIS.PK" >
+                    <attribute-mapping persistence-name="OwnerPkString" />
+                </attribute>
+                <method name="findAll" signature="">
+                </method>
+                <method name="findChangedAfter" signature="java.util.Date">
+                    <method-mapping>
+                        $modifiedTimestampInternal &gt;= $1 OR $creationTimestampInternal &gt; $1
+                    </method-mapping>
+                </method>
+                <method name="findByType" signature="de.hybris.platform.core.PK">
+                    <method-mapping> $typePkString = $1 </method-mapping>
+                </method>
+            </bean>
+
+            <bean name="ExtensibleItem" abstract="true" type="Entity" cmp-type="Container">
+                <extends target="Item"/>
+                <attribute name="propertyTimestampInternal" type="long">
+                    <attribute-mapping persistence-name="propTS" />
+                </attribute>
+            </bean>
+
+            <package name="de.hybris.platform.persistence.security">
+
+                <object name="ACLEntry">
+                    <object-mapping>
+                        <table name="ACLEntries"/>
+                        <index name="ACLCheckIndex">
+                            <index-key attribute="itemPK"/>
+                            <index-key attribute="principalPK"/>
+                        </index>
+                        <index name="ACLUpdateIndex" sqlserverclustered="true">
+                            <index-key attribute="itemPK"/>
+                        </index>
+                    </object-mapping>
+                    <attribute name="permissionPK" type="HYBRIS.PK" primkey-field="true">
+                        <attribute-mapping persistence-name="PermissionPK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="negative" type="boolean" >
+                        <attribute-mapping persistence-name="Negative" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="principalPK" type="HYBRIS.PK" primkey-field="true">
+                        <attribute-mapping persistence-name="PrincipalPK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="itemPK" type="HYBRIS.PK" primkey-field="true">
+                        <attribute-mapping persistence-name="ItemPK" null-allowed="false"/>
+                    </attribute>
+                </object>
+
+                <object name="YDeployment">
+                    <object-mapping>
+                        <table name="YDeployments"/>
+                        <index name="DeplSelect">
+                            <index-key attribute="extensionName"/>
+                        </index>
+                        <index name="DeplSelect2">
+                            <index-key attribute="typecode"/>
+                        </index>
+                        <index name="TSNameIdx">
+                            <index-key attribute="typeSystemName"/>
+                        </index>
+                    </object-mapping>
+                    <attribute name="typecode" type="int">
+                        <attribute-mapping persistence-name="Typecode" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="tableName" type="java.lang.String" >
+                        <attribute-mapping persistence-name="TableName" null-allowed="true"/>
+                    </attribute>
+                    <attribute name="propsTableName" type="java.lang.String" >
+                        <attribute-mapping persistence-name="PropsTableName" null-allowed="true"/>
+                    </attribute>
+                    <attribute name="name" type="java.lang.String" primkey-field="true" >
+                        <attribute-mapping persistence-name="Name" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="packageName" type="java.lang.String">
+                        <attribute-mapping persistence-name="PackageName" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="superName" type="java.lang.String" >
+                        <attribute-mapping persistence-name="SuperName" null-allowed="true"/>
+                    </attribute>
+                    <attribute name="extensionName" type="java.lang.String" >
+                        <attribute-mapping persistence-name="ExtensionName" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="modifiers" type="int">
+                        <attribute-mapping persistence-name="Modifiers" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="typeSystemName" type="java.lang.String" primkey-field="true">
+                        <attribute-mapping persistence-name="TypeSystemName" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="auditTableName" type="java.lang.String">
+                        <attribute-mapping persistence-name="AuditTableName" null-allowed="true"/>
+                    </attribute>
+                </object>
+
+            </package>
+
+            <package name="de.hybris.platform.persistence.link">
+
+                <bean name="Link" abstract="false" type="Entity" typecode="7" cmp-type="Container" reentrant="true" cacheFinders="true" final="false">
+                    <extends target="ExtensibleItem"/>
+                    <bean-mapping persistence-name="Links">
+                        <index name="LinkSource">
+                            <index-key attribute="sourcePKInternal" />
+                        </index>
+                        <index name="LinkTarget">
+                            <index-key attribute="targetPKInternal" />
+                        </index>
+                        <index name="Qualifier">
+                            <index-key attribute="qualifierInternal" />
+                        </index>
+                        <index name="SeqNr">
+                            <index-key attribute="sequenceNumberInternal" />
+                        </index>
+                        <index name="RSeqNr">
+                            <index-key attribute="reverseSequenceNumberInternal" />
+                        </index>
+                    </bean-mapping>
+
+                    <attribute name="sourcePKInternal" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="SourcePK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="targetPKInternal" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="TargetPK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="qualifierInternal" type="java.lang.String" >
+                        <attribute-mapping persistence-name="Qualifier" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="sequenceNumberInternal" type="int" >
+                        <attribute-mapping persistence-name="SequenceNumber" />
+                    </attribute>
+                    <attribute name="reverseSequenceNumberInternal" type="int" >
+                        <attribute-mapping persistence-name="RSequenceNumber" />
+                    </attribute>
+                </bean>
+
+                <!-- link deployments MUST be placed in package "de.hybris.platform.persistence.link" due to a webshere bug -->
+                <bean name="PrincipalGroupRelation" generic="true" abstract="false" type="Entity" typecode="201" reentrant="True" cmp-type="Container" cacheFinders="true">
+                    <extends target="Link"/>
+                    <bean-mapping persistence-name="PGRels"/>
+                </bean>
+
+                <!-- link deployments MUST be placed in package "de.hybris.platform.persistence.link" due to a webshere bug -->
+                <bean name="OrderDiscountRelation" generic="true" abstract="false" type="Entity" typecode="202" reentrant="True" cmp-type="Container" cacheFinders="true">
+                    <extends target="Link"/>
+                    <bean-mapping persistence-name="OrderDiscRels"/>
+                </bean>
+
+            </package>
+
+            <bean name="GenericItem" abstract="false" type="Entity" typecode="99" reentrant="True" cmp-type="Container" final="false" cacheFinders="true">
+                <extends target="LocalizableItem"/>
+                <bean-mapping persistence-name="GenericItems"/>
+            </bean>
+
+            <bean name="GenericTestItem" generic="true" abstract="false" type="Entity" typecode="98" reentrant="True" cmp-type="Container" cacheFinders="true">
+                <extends target="GenericItem"/>
+                <bean-mapping persistence-name="GenTestItems"/>
+            </bean>
+
+            <package name="de.hybris.platform.persistence.test">
+
+                <bean name="TestItem" abstract="false" type="Entity" typecode="25" reentrant="True" cmp-type="Container" cacheFinders="true">
+                    <extends target="LocalizableItem"/>
+                    <bean-mapping persistence-name="TestItem"/>
+                    <attribute name="fieldA" type="java.lang.String">
+                        <attribute-mapping persistence-name="fieldA" />
+                    </attribute>
+                    <attribute name="fieldB" type="java.lang.String">
+                        <attribute-mapping persistence-name="fieldB" />
+                    </attribute>
+
+                    <attribute name="fieldInteger" type="java.lang.Integer">
+                        <attribute-mapping persistence-name="fieldInteger" />
+                    </attribute>
+
+                    <attribute name="fieldCharacter" type="java.lang.Character">
+                        <attribute-mapping persistence-name="fieldCharacter" />
+                    </attribute>
+
+                    <attribute name="fieldLong" type="java.lang.Long">
+                        <attribute-mapping persistence-name="fieldLong" />
+                    </attribute>
+
+                    <attribute name="fieldDouble" type="java.lang.Double">
+                        <attribute-mapping persistence-name="fieldDouble" />
+                    </attribute>
+
+                    <attribute name="fieldBoolean" type="java.lang.Boolean">
+                        <attribute-mapping persistence-name="fieldBoolean" />
+                    </attribute>
+
+                    <attribute name="fieldFloat" type="java.lang.Float">
+                        <attribute-mapping persistence-name="fieldFloat" />
+                    </attribute>
+
+                    <attribute name="fieldByte" type="java.lang.Byte">
+                        <attribute-mapping persistence-name="fieldByte" />
+                    </attribute>
+
+                    <attribute name="fieldString" type="java.lang.String">
+                        <attribute-mapping persistence-name="fieldString" />
+                    </attribute>
+
+                    <attribute name="fieldLongString" type="HYBRIS.LONG_STRING">
+                        <attribute-mapping database="oracle"
+                                           persistence-name="fieldLongString"
+                                           persistence-type="CLOB"/>
+                        <attribute-mapping database="sap"
+                                           persistence-name="fieldLongString"
+                                           persistence-type="NCLOB"/>
+                        <attribute-mapping persistence-name="fieldLongString" />
+
+                    </attribute>
+
+                    <attribute name="fieldJson" type="HYBRIS.JSON">
+                        <attribute-mapping persistence-name="fieldJson" />
+                    </attribute>
+
+                    <attribute name="fieldDate" type="java.util.Date">
+                        <attribute-mapping persistence-name="fieldDate" />
+                    </attribute>
+
+                    <attribute name="fieldBigDecimal" type="java.math.BigDecimal">
+                        <attribute-mapping persistence-name="fieldBigDecimal" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveInteger" type="int">
+                        <attribute-mapping persistence-name="fieldPrimitiveInteger" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveDouble" type="double">
+                        <attribute-mapping persistence-name="fieldPrimitiveDouble" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveFloat" type="float">
+                        <attribute-mapping persistence-name="fieldPrimitiveFloat" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveLong" type="long">
+                        <attribute-mapping persistence-name="fieldPrimitiveLong" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveByte" type="byte">
+                        <attribute-mapping persistence-name="fieldPrimitiveByte" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveShort" type="short">
+                        <attribute-mapping persistence-name="fieldPrimitiveShort" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveChar" type="char">
+                        <attribute-mapping persistence-name="fieldPrimitiveChar" />
+                    </attribute>
+
+                    <attribute name="fieldPrimitiveBoolean" type="boolean">
+                        <attribute-mapping persistence-name="fieldPrimitiveBoolean" />
+                    </attribute>
+
+                    <attribute name="fieldSerializable" type="java.io.Serializable" >
+                        <attribute-mapping database="oracle"
+                                           persistence-name="fieldSerializable"
+                                           persistence-type="RAW(2000)"/>
+                        <attribute-mapping persistence-name="fieldSerializable" />
+                    </attribute>
+
+                    <method name="findByFieldA" signature="java.lang.String">
+                        <method-mapping> $fieldA=$1 </method-mapping>
+                    </method>
+                    <method name="finderTest" signature="java.lang.String, int">
+                        <method-mapping> $fieldString=$1 AND $fieldPrimitiveInteger=$2</method-mapping>
+                    </method>
+                </bean>
+
+            </package>
+
+
+            <package name="de.hybris.platform.persistence.c2l">
+
+                <bean name="LocalizableItem" abstract="true" type="Entity" cmp-type="Container">
+                    <extends target="ExtensibleItem"/>
+                </bean>
+
+            </package>
+
+            <package name="de.hybris.platform.persistence.type">
+
+                <bean name="Type" abstract="true" type="Entity" cmp-type="Container" reentrant="true">
+                    <extends target="TypeManagerManaged"/>
+                    <bean-mapping>
+                        <index name="TypeCodeLowerCase">
+                            <index-key attribute="internalCodeLowerCase" />
+                        </index>
+                        <index name="TypeCode">
+                            <index-key attribute="internalCode" />
+                        </index>
+                    </bean-mapping>
+                    <attribute name="internalCode" type="java.lang.String" >
+                        <attribute-mapping persistence-name="InternalCode" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="internalCodeLowerCase" type="java.lang.String" >
+                        <attribute-mapping persistence-name="InternalCodeLowerCase" null-allowed="true"/>
+                    </attribute>
+
+                    <method name="findByCodeExact" signature="java.lang.String">
+                        <method-mapping> $internalCodeLowerCase=$1 </method-mapping>
+                    </method>
+                </bean>
+
+                <bean name="HierarchieType" abstract="true" type="Entity" cmp-type="Container" reentrant="true">
+                    <extends target="Type"/>
+                    <bean-mapping>
+                        <index name="inheritpsi">
+                            <index-key attribute="inheritancePathStringInternal"/>
+                        </index>
+                    </bean-mapping>
+                    <attribute name="superTypePK" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="SuperTypePK" />
+                    </attribute>
+                    <attribute name="inheritancePathStringInternal" type="HYBRIS.COMMA_SEPARATED_PKS" >
+                        <attribute-mapping persistence-name="InheritancePathString" />
+                        <attribute-mapping database="sqlserver" persistence-name="InheritancePathString" persistence-type="varchar(1800)" />
+                    </attribute>
+                    <method name="findByInheritancePath" signature="java.lang.String">
+                        <method-mapping> $inheritancePathStringInternal LIKE $1 </method-mapping>
+                    </method>
+                    <method name="findBySuperType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $superTypePK=$1 </method-mapping>
+                    </method>
+                </bean>
+
+                <bean name="AtomicType" abstract="false" type="Entity" typecode="81" cmp-type="Container" reentrant="true" cacheFinders="true">
+                    <extends target="HierarchieType"/>
+                    <bean-mapping persistence-name="AtomicTypes" max-instances="0" propertytable="TypeSystemProps"/>
+                    <attribute name="javaClassName" type="java.lang.String" >
+                        <attribute-mapping persistence-name="JavaClassName" />
+                    </attribute>
+                    <method name="findByJavaClass" signature="java.lang.String">
+                        <method-mapping> $javaClassName=$1 </method-mapping>
+                    </method>
+                </bean>
+
+                <bean name="ComposedType" abstract="false" type="Entity" typecode="82" cmp-type="Container" reentrant="true" cacheFinders="true">
+                    <extends target="HierarchieType"/>
+                    <bean-mapping persistence-name="ComposedTypes" max-instances="0" propertytable="TypeSystemProps"/>
+                    <attribute name="removableFlag" type="boolean">
+                        <attribute-mapping persistence-name="removable"/>
+                    </attribute>
+                    <attribute name="propertyTableStatus" type="boolean" >
+                        <attribute-mapping persistence-name="propertyTableStatus" />
+                    </attribute>
+                    <attribute name="itemTypeCodeInt" type="int" >
+                        <attribute-mapping persistence-name="ItemTypeCode" />
+                    </attribute>
+                    <attribute name="jaloClassName" type="java.lang.String" >
+                        <attribute-mapping persistence-name="jaloClassName" />
+                    </attribute>
+                    <attribute name="itemJNDIName" type="java.lang.String" >
+                        <attribute-mapping persistence-name="ItemJNDIName" />
+                    </attribute>
+                    <attribute name="singletonFlag" type="boolean">
+                        <attribute-mapping persistence-name="Singleton" />
+                    </attribute>
+                    <method name="findByJaloClassName" signature="java.lang.String">
+                        <method-mapping> $jaloClassName = $1 </method-mapping>
+                    </method>
+                    <method name="findByTypeCode" signature="int">
+                        <method-mapping> $itemTypeCodeInt = $1 OR $itemTypeCodeInt = -1 * $1 </method-mapping>
+                    </method>
+
+                </bean>
+
+                <bean name="CollectionType" abstract="false" type="Entity" typecode="83" cmp-type="Container" reentrant="true" cacheFinders="true">
+                    <extends target="Type"/>
+                    <bean-mapping persistence-name="CollectionTypes" propertytable="TypeSystemProps"/>
+                    <attribute name="elementTypePK" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="ElementTypePK" />
+                    </attribute>
+                    <attribute name="typeOfCollection" type="int" >
+                        <attribute-mapping persistence-name="typeOfCollection" />
+                    </attribute>
+                    <method name="findByElementType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $elementTypePK=$1 </method-mapping>
+                    </method>
+                </bean>
+
+                <bean name="MapType" abstract="false" type="Entity" typecode="84" cmp-type="Container" reentrant="true" cacheFinders="true">
+                    <extends target="Type"/>
+                    <bean-mapping persistence-name="MapTypes" max-instances="0" propertytable="TypeSystemProps"/>
+                    <attribute name="argumentTypePK" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="ArgumentTypePK" />
+                    </attribute>
+                    <attribute name="returnTypePK" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="ReturnTypePK" />
+                    </attribute>
+
+                    <method name="findByArgumentType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $argumentTypePK=$1 </method-mapping>
+                    </method>
+                    <method name="findByReturnType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $returnTypePK=$1 </method-mapping>
+                    </method>
+                    <method name="findByTypes" signature="de.hybris.platform.core.PK,de.hybris.platform.core.PK">
+                        <method-mapping> $argumentTypePK=$1 AND $returnTypePK=$2 </method-mapping>
+                    </method>
+                </bean>
+
+                <bean name="SearchRestriction" abstract="false" type="Entity" typecode="90" cmp-type="Container" reentrant="true"  cacheFinders="true">
+                    <extends target="TypeManagerManaged"/>
+                    <bean-mapping persistence-name="SearchRestrictions">
+                        <index name="principal">
+                            <index-key attribute="principalPK"/>
+                        </index>
+                        <index name="restrType">
+                            <index-key attribute="restrictedTypePK"/>
+                        </index>
+                    </bean-mapping>
+                    <attribute name="principalPK" type="HYBRIS.PK">
+                        <attribute-mapping persistence-name="principal" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="restrictedTypePK" type="HYBRIS.PK">
+                        <attribute-mapping persistence-name="RestrictedType" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="query" type="HYBRIS.LONG_STRING">
+                        <attribute-mapping persistence-name="query" null-allowed="false"/>
+                    </attribute>
+                    <method name="findRestrictions" signature="de.hybris.platform.core.PK,de.hybris.platform.core.PK">
+                        <method-mapping> $principalPK=$1 AND $restrictedTypePK=$2 </method-mapping>
+                    </method>
+                    <method name="findByPrincipal" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $principalPK=$1</method-mapping>
+                    </method>
+                    <method name="findByRestrictedType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $restrictedTypePK=$1</method-mapping>
+                    </method>
+                </bean>
+
+
+                <package name="de.hybris.platform.persistence.meta">
+                    <bean name="MetaInformation" abstract="false" type="Entity" typecode="55" cmp-type="Container" reentrant="true" cacheFinders="true">
+                        <extends target="ExtensibleItem"/>
+                        <bean-mapping persistence-name="MetaInformations" />
+                        <attribute name="systemPKInternal" type="java.lang.String" >
+                            <attribute-mapping persistence-name="SystemPK" />
+                        </attribute>
+                        <attribute name="systemNameInternal" type="java.lang.String" >
+                            <attribute-mapping persistence-name="SystemName" />
+                        </attribute>
+                        <attribute name="initializedFlagInternal" type="boolean" >
+                            <attribute-mapping persistence-name="isInitialized" />
+                        </attribute>
+                        <attribute name="licenceIDInternal" type="java.lang.String" >
+                            <attribute-mapping persistence-name="LicenceID" />
+                        </attribute>
+                        <attribute name="licenceNameInternal" type="java.lang.String" >
+                            <attribute-mapping persistence-name="LicenceName" />
+                        </attribute>
+                        <attribute name="licenceEditionInternal" type="java.lang.String" >
+                            <attribute-mapping persistence-name="LicenceEdition" />
+                        </attribute>
+                        <attribute name="licenceAdminFactorInternal" type="int" >
+                            <attribute-mapping persistence-name="AdminFactor" />
+                        </attribute>
+                        <attribute name="licenceExpirationDateInternal" type="java.util.Date" >
+                            <attribute-mapping persistence-name="LicenceExpirationDate" />
+                        </attribute>
+                        <attribute name="licenceSignatureInternal" type="java.lang.String" >
+                            <attribute-mapping persistence-name="LicenceSignature" />
+                        </attribute>
+                        <method name="findBySystemID" signature="java.lang.String">
+                            <method-mapping> $systemNameInternal=$1 </method-mapping>
+                        </method>
+                    </bean>
+                </package>
+
+                <package name="de.hybris.platform.persistence">
+                    <bean name="ConfigItem" generic="true" abstract="false" type="Entity" typecode="156" reentrant="True" cmp-type="Container" cacheFinders="true">
+                        <extends target="GenericItem"/>
+                        <bean-mapping persistence-name="ConfigItems"/>
+                    </bean>
+                </package>
+
+                <bean name="TypeManagerManaged" abstract="true" type="Entity" cmp-version="2.x" cmp-type="Container" cacheFinders="true">
+                    <extends target="LocalizableItem"/>
+                </bean>
+
+                <bean name="Descriptor" abstract="true" type="Entity" cmp-version="2.x" cmp-type="Container" cacheFinders="true">
+                    <extends target="TypeManagerManaged"/>
+                    <attribute name="qualifierInternal" type="java.lang.String" >
+                        <attribute-mapping persistence-name="QualifierInternal" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="qualifierLowerCaseInternal" type="java.lang.String" >
+                        <attribute-mapping persistence-name="QualifierLowerCaseInternal" null-allowed="true"/>
+                    </attribute>
+
+
+                    <attribute name="attributeTypePK" type="HYBRIS.PK" >
+                        <attribute-mapping persistence-name="AttributeTypePK" />
+                    </attribute>
+                </bean>
+
+                <bean name="AttributeDescriptor" abstract="false" type="Entity" typecode="87" cmp-type="Container" reentrant="true" cacheFinders="true">
+                    <extends target="Descriptor"/>
+                    <bean-mapping persistence-name="AttributeDescriptors" max-instances="0" propertytable="TypeSystemProps">
+                        <index name="Enclosing">
+                            <index-key attribute="enclosingTypePK"/>
+                        </index>
+                        <index name="LCQualifier">
+                            <index-key attribute="qualifierLowerCaseInternal"/>
+                        </index>
+                        <index name="Qualifier" unique="true">
+                            <index-key attribute="qualifierInternal"/>
+                            <index-key attribute="enclosingTypePK"/>
+                        </index>
+                        <index name="inheritps">
+                            <index-key attribute="inheritancePathString"/>
+                        </index>
+                    </bean-mapping>
+                    <attribute name="columnNameInternal" type="java.lang.String">
+                        <attribute-mapping persistence-name="columnName"/>
+                    </attribute>
+                    <attribute name="enclosingTypePK" type="HYBRIS.PK">
+                        <attribute-mapping persistence-name="EnclosingTypePK" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="persistenceQualifierInternal" type="java.lang.String">
+                        <attribute-mapping persistence-name="PersistenceQualifierInternal"/>
+                    </attribute>
+                    <attribute name="persistenceTypePK" type="HYBRIS.PK">
+                        <attribute-mapping persistence-name="PersistenceTypePK"/>
+                    </attribute>
+                    <attribute name="selectionDescriptorPK" type="HYBRIS.PK">
+                        <attribute-mapping persistence-name="SelectionDescriptorPK"/>
+                    </attribute>
+
+                    <!-- ~~~ modifiers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                    <attribute name="attributeModifiers" type="int">
+                        <attribute-mapping persistence-name="modifiers"/>
+                    </attribute>
+                    <attribute name="hiddenFlag" type="boolean">
+                        <attribute-mapping persistence-name="isHidden"/>
+                    </attribute>
+                    <attribute name="propertyFlag" type="boolean">
+                        <attribute-mapping persistence-name="isProperty"/>
+                    </attribute>
+
+                    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                    <attribute name="superAttributeDescriptorPK" type="HYBRIS.PK">
+                        <attribute-mapping persistence-name="SuperAttributeDescriptorPK"/>
+                    </attribute>
+                    <attribute name="inheritancePathString" type="HYBRIS.COMMA_SEPARATED_PKS">
+                        <attribute-mapping persistence-name="InheritancePathString"/>
+                        <attribute-mapping database="sqlserver" persistence-name="InheritancePathString" persistence-type="varchar(1800)" />
+                    </attribute>
+
+                    <method name="findByEnclosingTypeAndQualifier" signature="de.hybris.platform.core.PK,java.lang.String">
+                        <method-mapping> $enclosingTypePK=$1 AND $qualifierLowerCaseInternal=$2</method-mapping>
+                    </method>
+                    <method name="findByEnclosingTypeAndSelectionDescriptor" signature="de.hybris.platform.core.PK,de.hybris.platform.core.PK">
+                        <method-mapping> $enclosingTypePK=$1 AND $selectionDescriptorPK=$2</method-mapping>
+                    </method>
+                    <method name="findPublicByEnclosingTypeAndQualifier" signature="de.hybris.platform.core.PK,java.lang.String">
+                        <method-mapping> $enclosingTypePK=$1 AND $qualifierLowerCaseInternal=$2 AND $hiddenFlag=0</method-mapping>
+                    </method>
+                    <method name="findDeclaredByEnclosingTypeAndQualifier" signature="de.hybris.platform.core.PK,java.lang.String">
+                        <method-mapping> $enclosingTypePK=$1 AND $qualifierLowerCaseInternal=$2 AND $superAttributeDescriptorPK IS NULL</method-mapping>
+                    </method>
+                    <method name="findByEnclosingType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $enclosingTypePK=$1 </method-mapping>
+                    </method>
+                    <method name="findPropertyByEnclosingType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $enclosingTypePK=$1 AND $propertyFlag=1</method-mapping>
+                    </method>
+                    <method name="findPublicByEnclosingType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $enclosingTypePK=$1 AND $hiddenFlag=0</method-mapping>
+                    </method>
+                    <method name="findDeclaredByEnclosingType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $enclosingTypePK=$1 AND $superAttributeDescriptorPK IS NULL</method-mapping>
+                    </method>
+                    <method name="findInhertitedByEnclosingType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $enclosingTypePK=$1 AND $superAttributeDescriptorPK IS NOT NULL </method-mapping>
+                    </method>
+                    <method name="findBySuperAttributeDescriptor"
+                            signature="de.hybris.platform.core.PK">
+                        <method-mapping> $superAttributeDescriptorPK=$1 </method-mapping>
+                    </method>
+                    <method name="findByType" signature="de.hybris.platform.core.PK">
+                        <method-mapping> $attributeTypePK=$1 AND $enclosingTypePK &lt;&gt; $1 </method-mapping>
+                    </method>
+                    <method name="findInheritedByQualifierAndInheritancePath" signature="java.lang.String,java.lang.String">
+                        <method-mapping> $superAttributeDescriptorPK IS NOT NULL AND $qualifierLowerCaseInternal=$1 AND $inheritancePathString LIKE $2 </method-mapping>
+                    </method>
+                </bean>
+
+            </package>
+
+            <package name="de.hybris.platform.persistence.enumeration">
+
+                <bean name="EnumerationValue" abstract="false" type="Entity" typecode="91" cmp-type="Container" reentrant="true" cacheFinders="true">
+                    <extends target="LocalizableItem"/>
+                    <bean-mapping persistence-name="EnumerationValues" max-instances="0" propertytable="TypeSystemProps">
+                        <index name="codeIdx">
+                            <index-key attribute="codeInternal"/>
+                        </index>
+                        <index name="code2Idx">
+                            <index-key attribute="codeLowerCase"/>
+                        </index>
+                        <index name="seqNrIdx">
+                            <index-key attribute="sequenceNumber"/>
+                        </index>
+                    </bean-mapping>
+                    <attribute name="codeInternal" type="java.lang.String" >
+                        <attribute-mapping persistence-name="Code" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="codeLowerCase" type="java.lang.String" >
+                        <attribute-mapping persistence-name="codeLowerCase" null-allowed="false"/>
+                    </attribute>
+                    <attribute name="sequenceNumber" type="int" >
+                        <attribute-mapping persistence-name="SequenceNumber" />
+                    </attribute>
+                    <attribute name="editableFlag" type="boolean" >
+                        <attribute-mapping persistence-name="Editable" />
+                    </attribute>
+                    <method name="findByTypeAndCode" signature="de.hybris.platform.core.PK,java.lang.String">
+                        <method-mapping>
+                            $typePkString = $1 AND $codeInternal = $2
+                        </method-mapping>
+                    </method>
+                    <method name="findByTypeAndCodeIgnoreCase" signature="de.hybris.platform.core.PK,java.lang.String">
+                        <method-mapping>
+                            $typePkString = $1 AND $codeLowerCase = $2
+                        </method-mapping>
+                    </method>
+
+                    <method name="findSortedValues" signature="de.hybris.platform.core.PK">
+                        <method-mapping>
+                            $typePkString = $1 ORDER BY $sequenceNumber ASC
+                        </method-mapping>
+                    </method>
+                </bean>
+            </package>
+
+        </package>
+
+    </package>
+
+    <package name="de.hybris.jakarta.ext.numberseries.session">
+
+        <object name="NumberSeries">
+
+            <object-mapping>
+                <table name="NumberSeries"/>
+            </object-mapping>
+
+            <attribute name="serieskey" type="java.lang.String" primkey-field="true">
+                <attribute-mapping persistence-name="serieskey"/>
+                <attribute-mapping database="sqlserver" persistence-name="serieskey" persistence-type="varchar(255)"/>
+            </attribute>
+
+            <attribute name="seriestype" type="int">
+                <attribute-mapping persistence-name="seriestype"/>
+            </attribute>
+
+            <attribute name="currentValue" type="java.lang.Long">
+                <attribute-mapping persistence-name="currentValue"/>
+                <attribute-mapping database="oracle" persistence-name="currentValue" persistence-type="number(30,0)"/>
+            </attribute>
+
+            <attribute name="template" type="java.lang.String">
+                <attribute-mapping persistence-name="template"/>
+                <attribute-mapping database="sqlserver" persistence-name="template" persistence-type="varchar(255)"/>
+            </attribute>
+        </object>
+
+    </package>
+
+
+</model>
+
+

@@ -1,0 +1,15 @@
+INSERT_UPDATE Title;code[unique=true]
+;foo_default
+;bar_default
+
+INSERT_UPDATE Title[sld.enabled=true];code[unique=true]
+;foo_sld_forced_by_header
+;bar_sld_forced_by_header
+
+
+
+
+
+
+
+

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd                    
+		   http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd		   
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd" default-lazy-init="default" >
+
+
+
+	
+	<!-- Property support -->
+	
+	<alias  name="appTestHybrisProperties" alias="testHybrisProperties" />
+	<bean id="appTestHybrisProperties" class="de.hybris.platform.spring.properties.beans.TestHybrisPropertiesFactory" >
+		<property name="allProps">
+			<util:map>
+				<entry key="foo" value="app-bar"/>								
+			</util:map>
+		</property>
+	</bean>
+	
+	<bean id="lastResortPropertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="order" value="99999"/>
+		<property name="ignoreUnresolvablePlaceholders" value="false"/>
+	</bean>
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" scope="singleton">
+		<property name="order" value="9999"/>
+  		<property name="properties"  ref="testHybrisProperties" />
+  				  	
+	</bean>
+	
+	  <!--  list>
+                
+            </list-->
+	
+	
+	<bean id="appBean" class="de.hybris.platform.spring.properties.beans.PlaceholderBean">
+		<property name="value" value="${baz}" />
+	</bean>
+	
+
+	
+</beans>           

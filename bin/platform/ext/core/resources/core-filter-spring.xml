@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Default bean definitions for the new "InitFilter" framework. -->
+
+	<!-- deprecated -->
+	<bean id="dynamicTenantActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicTenantSwitchingFilter"/>
+
+	<!-- deprecated -->
+	<bean id="tenantActivationFilter" class="de.hybris.platform.servicelayer.web.TenantActivationFilter">
+		<constructor-arg value="${tenantId}"/>
+	</bean>
+
+	<bean id="sessionFilter" class="de.hybris.platform.servicelayer.web.SessionFilter">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias alias="sessionRepositoryFactory" name="defaultSessionRepositoryFactory"/>
+	<bean id="defaultSessionRepositoryFactory" class="de.hybris.platform.servicelayer.web.session.DefaultHybrisSpringSessionRepositoryFactory">
+		<property name="synchronousSessionPersister" ref="synchronousSessionPersister"/>
+		<property name="asynchronousSessionPersister" ref="asynchronousSessionPersister"/>
+	</bean>
+	
+	<alias name="defaultSynchronousSessionPersister" alias="synchronousSessionPersister"/>
+	<bean id="defaultSynchronousSessionPersister" class="de.hybris.platform.servicelayer.web.session.persister.SyncSessionPersister">
+		<property name="modelService" ref="modelService"/>
+		<property name="storedHttpSessionDao" ref="storedHttpSessionDao"/>
+	</bean>
+
+	<bean id="asyncSessionPersisterRunnable" class="de.hybris.platform.servicelayer.web.session.persister.AsyncSessionPersisterRunnable">
+		<property name="modelService" ref="modelService"/>
+		<property name="storedHttpSessionDao" ref="storedHttpSessionDao"/>
+		<property name="tenant" ref="tenantFactory"/>
+ 	</bean>
+
+	<alias name="defaultAsynchronousSessionPersister" alias="asynchronousSessionPersister"/>
+	<bean id="defaultAsynchronousSessionPersister" class="de.hybris.platform.servicelayer.web.session.persister.AsyncSessionPersister">
+		<property name="asyncSessionPersisterRunnable" ref="asyncSessionPersisterRunnable"/>
+		<property name="storedHttpSessionDao" ref="storedHttpSessionDao"/>
+	</bean>
+
+	<alias name="defaultHybrisSpringSessionFilter" alias="hybrisSpringSessionFilter"/>
+	<bean name="defaultHybrisSpringSessionFilter" class="de.hybris.platform.servicelayer.web.session.HybrisSpringSessionFilter">
+		<property name="sessionRepositoryFactory" ref="sessionRepositoryFactory"/>
+	</bean>
+
+
+	<alias alias="sessionCloseStrategy" name="defaultSessionCloseStrategy"/>
+	<bean id="defaultSessionCloseStrategy" class="de.hybris.platform.servicelayer.web.DefaultSessionCloseStrategy"/>
+
+	<bean id="log4jFilter" class="de.hybris.platform.servicelayer.web.Log4JFilter"/>
+	
+	<bean id="corsFilter" class="org.springframework.web.filter.CorsFilter">
+		<constructor-arg name="configSource" ref="defaultCorsConfigurationSource"/>
+	</bean>
+
+	<!-- We can't provide a default instance of this bean, as there is no real valid default config. This bean should be defined properly in any webApp which requires it -->
+	<!-- 	<bean id="staticCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.StaticCatalogVersionActivationFilter">
+			<constructor-arg ref="catalogVersionService" />
+			<constructor-arg value="hwcatalog:Online,SampleClassification:1.0" />
+			<constructor-arg value="true" />
+		</bean>
+	 -->
+
+	<bean id="abstractPlatformFilterChain" class="de.hybris.platform.servicelayer.web.AbstractPlatformFilterChain"
+		  abstract="true">
+		<constructor-arg>
+			<list>
+				<ref bean="corsFilter"/>
+				<ref bean="log4jFilter"/>
+				<ref bean="sessionFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="defaultPlatformFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain"
+		  parent="abstractPlatformFilterChain"/>
+
+	<bean id="backOfficePlatformFilterChain" class="de.hybris.platform.servicelayer.web.BackOfficeFilterChain"
+		  parent="abstractPlatformFilterChain"/>
+
+</beans>

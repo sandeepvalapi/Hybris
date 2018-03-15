@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Localise hsqldb jasper reports
+#
+
+# Language
+$lang=ja
+
+$defaultCatalog=Default
+$defaultCatalogVersion=Staged
+$catalogVersion=catalogVersion(catalog(id[default='$defaultCatalog']),version[default='$defaultCatalogVersion'])[unique=true,default='$defaultCatalog:$defaultCatalogVersion']
+
+
+# Create Countries
+UPDATE JasperMedia;code[unique=true];$catalogVersion;title[lang=$lang];reportDescription[lang=$lang]
+ ;averageOrderValueBySite;;"サイト別の平均注文額";"このウィジェットでは、一定期間の平均注文額が表示されます。"
+ ;orderVolumeBySite;;"サイト別の注文量";"一定期間に発注された注文の数が表示されます。"
+ ;salesByCountryAndSite;;"国別およびサイト別の販売";"このウィジェットでは、国別の販売額が表示されます。"
+ ;salesByHourAndSite;;"時間別およびサイト別の販売";"24 時間にわたって時間別の販売額が表示されます。"
+ ;salesPerCategoryBySite;;"サイト別の各カテゴリの販売";"このウィジェットでは、一定期間について各カテゴリの販売額が表示されます。"
+ ;salesPerRegionBySite;;"サイト別の各地域の販売";"このウィジェットでは、国の各地域の販売額が表示されます。"
+ ;topSellingProductsBySite;;"サイト別の売上げ上位製品";"システム全体で売上げ上位 5 位の製品の一覧が表示されます。"
+ ;totalSalesBySite;;"サイト別の販売合計";"一定期間の販売合計がサイト別に表示されます。"

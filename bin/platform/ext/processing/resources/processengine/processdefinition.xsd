@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" xmlns:tns="http://www.hybris.de/xsd/processdefinition"
+	targetNamespace="http://www.hybris.de/xsd/processdefinition">
+	<element name="process">
+		<annotation>
+			<documentation>Root element of an XML export. Containing all
+				exported items.</documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+				<element name="contextParameter" type="tns:contextParameter"
+					minOccurs="0" maxOccurs="unbounded" />
+				<group ref="tns:nodes" maxOccurs="unbounded" />
+			</sequence>
+			<attribute name="name" type="tns:name" use="required" />
+			<attribute name="start" type="tns:name" use="required" />
+			<attribute name="onError" type="tns:name" use="optional" />
+			<attribute name="processClass" type="tns:name" use="optional" default="de.hybris.platform.processengine.model.BusinessProcessModel"/>
+			<attribute name="defaultNodeGroup" type="tns:name" use="optional"/>
+		</complexType>
+
+		<unique name="contextParameter-uniqueness">
+			<selector xpath="tns:contextParameter" />
+			<field xpath="@name" />
+		</unique>
+
+		<unique name="nodeId-uniqueness">
+			<selector xpath="tns:action|tns:scriptAction|tns:split|tns:wait|tns:end|tns:join" />
+			<field xpath="@id" />
+		</unique>
+
+		<key name="nodeId-key">
+			<selector xpath="tns:action|tns:scriptAction|tns:split|tns:wait|tns:end|tns:join|tns:notify" />
+			<field xpath="@id" />
+		</key>
+
+		<keyref name="startAction-keyref" refer="tns:nodeId-key">
+			<selector xpath="."/>
+			<field xpath="@start"/>
+		</keyref>
+		<keyref name="onErrorAction-keyref" refer="tns:nodeId-key">
+			<selector xpath="."/>
+			<field xpath="@onError"/>
+		</keyref>
+		<keyref name="waitThen-keyref" refer="tns:nodeId-key">
+			<selector xpath="tns:wait"/>
+			<field xpath="@then"/>
+		</keyref>
+		<keyref name="notifyThen-keyref" refer="tns:nodeId-key">
+			<selector xpath="tns:notify"/>
+			<field xpath="@then"/>
+		</keyref>
+		<keyref name="splitAction-keyref" refer="tns:nodeId-key">
+			<selector xpath="tns:split/tns:action"/>
+			<field xpath="@text"/>
+		</keyref>
+		<keyref name="joinThen-keyref" refer="tns:nodeId-key">
+			<selector xpath="tns:join"/>
+			<field xpath="@then"/>
+		</keyref>
+		<keyref name="actionTransition-keyref" refer="tns:nodeId-key">
+			<selector xpath="tns:action/tns:transition"/>
+			<field xpath="@to"/>
+		</keyref>
+	</element>
+
+	<group name="nodes">
+		<choice>
+			<element name="action" type="tns:action" />
+			<element name="scriptAction" type="tns:scriptAction" />
+			<element name="split" type="tns:split" />
+			<element name="wait" type="tns:wait" />
+			<element name="end" type="tns:end" />
+			<element name="join" type="tns:join" />
+			<element name="notify" type="tns:notify"/>
+		</choice>
+	</group>
+
+	<complexType name="end">
+		<simpleContent>
+			<extension base="string">
+				<attributeGroup ref="tns:nodeAttributes" />
+				<!-- restrict to status enum?? -->
+				<attribute name="state" type="tns:endState" />
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<simpleType name="endState">
+		<restriction base="string">
+			<enumeration value="SUCCEEDED" />
+			<enumeration value="FAILED" />
+			<enumeration value="ERROR" />
+		</restriction>
+	</simpleType>
+
+	<complexType name="join">
+		<attributeGroup ref="tns:nodeAttributes" />
+		<attribute name="then" type="tns:name" />
+	</complexType>
+
+	<complexType name="wait">
+		<sequence>
+			<choice>
+				<element name="event" type="tns:name" />
+				<element name="case" type="tns:case" />
+			</choice>
+			<element name="timeout" type="tns:timeout" minOccurs="0" maxOccurs="1"/>
+		</sequence>
+		<attributeGroup ref="tns:nodeAttributes" />
+		<attribute name="then" type="tns:name" />
+		<attribute name="prependProcessCode" default="true" type="boolean"/>
+	</complexType>
+
+	<complexType name="split">
+		<sequence>
+			<element name="targetNode" type="tns:targetNode" minOccurs="2" maxOccurs="unbounded" />
+		</sequence>
+		<attributeGroup ref="tns:nodeAttributes" />
+	</complexType>
+
+	<complexType name="notify">
+		<sequence>
+			<element name="userGroup" type="tns:userGroupType" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+
+		<attributeGroup ref="tns:nodeAttributes" />
+		<attribute name="then" type="tns:name" />
+
+	</complexType>
+
+	<attributeGroup name="nodeAttributes">
+		<attribute name="id" type="tns:name" use="required" />
+	</attributeGroup>
+
+	<complexType name="action">
+		<sequence>
+			<element name="transition" type="tns:transition" maxOccurs="unbounded" />
+		</sequence>
+		<attributeGroup ref="tns:nodeAttributes" />
+		<attribute name="bean" type="tns:name" use="required" />
+		<!-- some optional stuff -->
+		<attribute name="node" type="int" use="optional" />
+		<attribute name="nodeGroup" type="tns:name" use="optional" />
+	</complexType>
+	
+	<complexType name="scriptAction">
+		<sequence>
+			<element name="script" type="tns:script" minOccurs="1" maxOccurs="1" />
+			<element name="transition" type="tns:transition" maxOccurs="unbounded" />
+		</sequence>
+		<attributeGroup ref="tns:nodeAttributes" />
+		<!-- some optional stuff -->
+		<attribute name="node" type="int" use="optional" />
+		<attribute name="nodeGroup" type="tns:name" use="optional" />
+	</complexType>
+
+	<complexType name="case">
+		<sequence>
+			<element name="choice" type="tns:choice" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+		<attribute name="event" type="tns:name" use="required"></attribute>
+	</complexType>
+
+	<complexType name="script">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="type" type="tns:name" use="required" />
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<complexType name="transition">
+		<attribute name="name" type="tns:name" use="required" />
+		<attribute name="to" type="tns:name" use="required" />
+	</complexType>
+	
+	<complexType name="choice">
+		<attribute name="id" type="tns:name" use="required" />
+		<attribute name="then" type="tns:name" use="required" />
+	</complexType>
+
+	<complexType name="contextParameter">
+		<annotation>
+			<documentation>Aggregation of an items data.
+			</documentation>
+		</annotation>
+		<attribute name="name" type="tns:name" use="required" />
+		<attribute name="use" type="tns:parameterUse" use="optional" />
+		<attribute name="type" type="tns:javaType" use="required" />
+	</complexType>
+
+	<complexType name="targetNode">
+		<annotation>
+			<documentation>Define target node for split.
+			</documentation>
+		</annotation>
+		<attribute name="name" type="tns:name" use="required" />
+	</complexType>
+
+	<complexType name="userGroupType">
+		<annotation>
+			<documentation>Define userGroup for notification.
+			</documentation>
+		</annotation>
+
+		<sequence>
+			<element name="locmessage" type="tns:localizedmessage" maxOccurs="unbounded" />
+		</sequence>
+
+		<attribute name="name" type="tns:name" use="required" />
+		<attribute name="message" type="tns:name" use="optional"/>
+
+	</complexType>
+
+	<complexType name="timeout">
+		<annotation>
+			<documentation>Allow to configure timeout for the wait node</documentation>
+		</annotation>
+		<attribute name="delay" type="duration" use="required">
+			<annotation>
+				<documentation>Delay after which wait will be timed out</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="then" type="tns:name" use="required">
+			<annotation>
+				<documentation>Transition on timeout</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="localizedmessage">
+		<attribute name="name" type="tns:name" use="required" />
+		<attribute name="language" type="tns:name" use="required"/>
+	</complexType>
+
+	<simpleType name="javaType">
+		<annotation>
+			<documentation>Full qualified Java class name.</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="(\p{Ll}+\.)+\p{Lu}([\p{L}|\p{N}])*" />
+			<minLength value="3" />
+			<whiteSpace value="collapse"/>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="parameterUse">
+		<restriction base="string">
+			<enumeration value="required" />
+			<enumeration value="optional" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="name">
+		<annotation>
+			<documentation>A non-empty string.</documentation>
+		</annotation>
+		<restriction base="string">
+			<minLength value="1"/>
+		</restriction>
+	</simpleType>
+</schema>

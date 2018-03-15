@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+
+
+	<!-- Extension Properties -->
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.hybris.platform</groupId>
+	<artifactId>@extname@</artifactId>
+	<version>@hybris.build.version@</version>
+	<name>hybris @extname@</name>
+
+	<properties>
+		<targetJdk>1.6</targetJdk>
+	</properties>
+
+
+
+	<!-- Extension Dependencies -->
+
+	<dependencies>
+		<dependency>
+			<groupId>maven</groupId>
+			<artifactId>maven-ant-plugin</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<dependency>
+			<groupId>de.hybris</groupId>
+			<artifactId>workspaceCreator</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+
+
+	<!-- PMD Reporting -->
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<rulesets>
+						<ruleset>.ruleset</ruleset>
+					</rulesets>
+					<format>html</format>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+
+	<!-- Custom Build Plugins -->
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>testsrc</testSourceDirectory>
+		<testOutputDirectory>classes</testOutputDirectory>
+		<outputDirectory>classes</outputDirectory>
+
+		<plugins>
+
+			<!-- hybris workspace creator definition -->
+
+			<plugin>
+				<groupId>de.hybris</groupId>
+				<artifactId>workspaceCreator</artifactId>
+				<version>1.0</version>
+			</plugin>
+
+
+			<!-- Setting maven compiler to null -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<fork>true</fork>
+					<executable>ant</executable>
+					<compilerArgument />
+				</configuration>
+			</plugin>
+
+
+			<!-- Maven clean, currently enabled to empty the target directory too -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+
+
+			<!-- Maven test, currently skipped -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.7.1</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+
+					<!-- connect "mvn clean" phase to "ant clean" -->
+					<execution>
+						<id>ant clean</id>
+						<phase>clean</phase>
+						<configuration>
+							<target>
+								<ant antfile="build.xml" target="clean" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+
+					<!-- connect "mvn compile" phase to "ant all" -->
+					<execution>
+						<id>ant all</id>
+						<phase>compile</phase>
+						<configuration>
+							<target>
+								<ant antfile="build.xml" target="all" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+
+					<!-- connect "mvn package" phase to "ant dist" -->
+					<execution>
+						<id>ant dist</id>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<property name="${project.artifactId}.finalname" value="target/${project.artifactId}-${project.version}.jar" />
+								<ant antfile="build.xml" target="dist" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+
+	<!-- CUSTOM REPOSITORIES -->
+
+	<repositories>
+		<repository>
+			<id>hybris-binaries</id>
+			<url>https://repository.hybris.com/hybris-binaries</url>
+			<releases>
+				<updatePolicy>always</updatePolicy>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<updatePolicy>always</updatePolicy>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>atlassian-public</id>
+			<url>https://maven.atlassian.com/repository/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<!-- DISTRIBUTION MANAGEMENT -->
+
+	<distributionManagement>
+		<repository>
+			<id>hybris-binaries</id>
+			<name>repository.hybris.com-releases</name>
+			<url>https://repository.hybris.com/hybris-binaries</url>
+		</repository>
+		<snapshotRepository>
+			<id>hybris-binaries</id>
+			<name>repository.hybris.com-snapshots</name>
+			<url>https://repository.hybris.com/hybris-binaries</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

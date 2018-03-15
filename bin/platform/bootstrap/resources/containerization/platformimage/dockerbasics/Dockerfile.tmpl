@@ -1,0 +1,28 @@
+FROM ${baseImage}
+
+ADD binaries/ /opt/
+ADD aspects /opt/aspects
+ADD startup.sh /opt/startup/
+RUN chmod +x /opt/startup/startup.sh && \
+    chmod +x /opt/tomcat/bin/catalina.sh && \
+    chmod +x /opt/ytools/*.sh
+ENV CATALINA_SECURITY_OPTS=-Djava.security.egd=file:/dev/./urandom \
+    CATALINA_MEMORY_OPTS=-Xms2G\ -Xmx2G \
+    HTTPS_PORT=${httpsPort} \
+    HTTP_PORT=${httpPort} \
+    AJP_PORT=${ajpPort} \
+    KEYSTORE_LOCATION=/etc/ssl/certs/hybris/keystore \
+    KEYSTORE_PASSWORD=123456 \
+    PLATFORM_HOME=/opt/hybris/bin/platform/ \
+    WAIT_FOR="" \
+    JVM_ROUTE="" \
+    PATH="/opt/ytools:${PATH}" \
+    HYBRIS_LOG_DIR=/var/log/hybris \
+    CATALINA_LOG_DIR=${HYBRIS_LOG_DIR}/catalina \
+    ACCESS_LOG_DIR=${HYBRIS_LOG_DIR}/tomcat \
+    ACCESS_LOG_SUFFIX=.log \
+    ACCESS_LOG_PATTERN=combined \
+    ACCESS_LOG_PREFIX=access. \
+    ERROR_SHOW_REPORT=${errorShowReport} \
+    ERROR_SHOW_SERVER_INFO=${errorShowServerInfo}
+ENTRYPOINT ["/opt/startup/startup.sh"]

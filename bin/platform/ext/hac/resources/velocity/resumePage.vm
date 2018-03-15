@@ -1,0 +1,150 @@
+<html>
+<head>
+    <script type="application/javascript">
+        function refresh() {
+            setTimeout(function () {
+                document.forms['suspendStatus'].submit();
+            }, 3000);
+        };
+
+        refresh();
+    </script>
+    <style type="text/css" media="screen, projection">
+        html {
+            height: 100%;
+            font-size: 100.01%;
+        }
+
+        body {
+            background: #4B5367;
+            height: 100%;
+            font-size: 75%;
+            color: #222;
+            font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+        }
+
+        .container {
+            width: 950px;
+            margin: 0 auto;
+        }
+
+        .container {
+            background: white;
+            background-color: #ededed;
+            -moz-border-radius: 2px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            -moz-box-shadow: 0 2px 4px #172744;
+            -webkit-box-shadow: 0 2px 4px #172744;
+            box-shadow: 0 2px 4px #172744;
+        }
+
+        .container > div {
+            margin: 20px 20px 20px 20px;
+        }
+
+        fieldset {
+            border: none;
+            margin: 0.5em;
+            padding: 0;
+        }
+
+        label {
+            font-weight: normal;
+        }
+
+        button, input[type="submit"], input.submit, .button {
+            padding: 2px 14px;
+            cursor: pointer;
+            background: #2055CC;
+            background-attachment: fixed;
+            border: 0;
+            color: #fff;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin: 0 0 !important;
+            padding-left: 1.5em;
+        }
+
+        .cantSuspend {
+            color: #d94c24;
+        }
+
+        .infoName {
+            font-weight: bold;
+        }
+
+        .runningOperations {
+            padding-bottom: 20px;
+        }
+
+        footer {
+            text-align: center;
+            width: 950px;
+            margin: 10px auto 0 auto;
+        }
+
+        footer span {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.25);
+            margin: 5px;
+            padding: 5px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0);
+            -webkit-transition-property: background, color;
+            -webkit-transition-duration: 0.3s, 0.3s;
+            -webkit-transition-timing-function: ease, ease;
+        }
+
+        #tokensWarning {
+            padding: 10px;
+            background-color: lightyellow;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div>
+        <h1>System status: ${systemStatus}</h1>
+        <form method="post" action="/monitoring/suspendresume/resume">
+            <button id="resume">Resume</button>
+            <input type="hidden" name="resumeToken" value="${resumeToken}">
+            <input type="hidden" name="suspendToken" value="${suspendToken}">
+        </form>
+    </div>
+
+    <div id="tokensWarning">
+        <strong>Suspend token:</strong> ${suspendToken}<br/>
+        <strong>Resume token:</strong> ${resumeToken}<br/>
+
+        <h3>Warning</h3>
+        Note down your suspend/resume tokens. They're required for obtaining current system status information as well as in order to resume system.
+        If you close this page the only way to get system status information or to resume system is to use REST inferface with valid tokens.
+        Current tokens are also written into <strong>${tokensFilePath}</strong> file.
+    </div>
+
+    <div class="runningOperations">
+        ${runningOperations}
+    </div>
+
+    <div>
+        <form id="suspendStatus" action="/monitoring/suspendresume/status" method="post">
+            <input type="hidden" name="suspendToken" value="${suspendToken}"/>
+            <input type="hidden" name="resumeToken" value="${resumeToken}"/>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <span id="about">&copy; SAP SE, 2017</span>
+</footer>
+</body>
+</html>

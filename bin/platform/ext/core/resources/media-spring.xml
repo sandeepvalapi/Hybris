@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias alias="mediaContainerDao" name="defaultMediaContainerDao" />
+	<bean id="defaultMediaContainerDao" class="de.hybris.platform.servicelayer.media.dao.impl.DefaultMediaContainerDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias alias="mediaContainerService" name="defaultMediaContainerService" />
+	<bean id="defaultMediaContainerService"
+		class="de.hybris.platform.servicelayer.media.impl.DefaultMediaContainerService"
+		parent="abstractBusinessService">
+		<property name="mediaContainerDao" ref="mediaContainerDao" />
+		<property name="mediaService" ref="mediaService" />
+	</bean>
+
+	<alias alias="mediaService" name="defaultMediaService" />
+	<bean id="defaultMediaService"
+		class="de.hybris.platform.servicelayer.media.impl.DefaultMediaService"
+		parent="abstractBusinessService">
+		<property name="mediaDao" ref="mediaDao" />
+		<property name="mimeService" ref="mimeService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="legacyMediaMigrator" class="de.hybris.platform.servicelayer.media.LegacyMediaMigrator">
+		<property name="mimeService" ref="mimeService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="batchSize" value="200"/>
+	</bean>
+
+	<alias alias="mediaDao" name="defaultMediaDao" />
+	<bean id="defaultMediaDao" class="de.hybris.platform.servicelayer.media.impl.DefaultMediaDao">
+		 <property name="flexibleSearchService" ref="flexibleSearchService"/>
+		</bean>
+
+   <alias alias="mediaPermissionService" name="defaultMediaPermissionService" />
+   <bean id="defaultMediaPermissionService" class="de.hybris.platform.servicelayer.media.impl.DefaultMediaPermissionService">
+     <property name="permissionCheckingService" ref="permissionCheckingService"/>
+     <property name="permissionManagementService" ref="permissionManagementService"/>
+   </bean>
+
+   <bean id="dynamicAttributesMediaPermittedPrincipals" class="de.hybris.platform.servicelayer.media.DynamicAttributesMediaPermittedPrincipals">
+      <property name="mediaPermissionService" ref="mediaPermissionService"/>
+   </bean>
+
+    <bean id="dynamicAttributesMediaDeniedPrincipals" class="de.hybris.platform.servicelayer.media.DynamicAttributesMediaDeniedPrincipals">
+      <property name="mediaPermissionService" ref="mediaPermissionService"/>
+   </bean>
+
+	<bean id="Media_URLAttributeHandler" class="de.hybris.platform.servicelayer.media.DynamicAttributesMediaUrl" >
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+
+	<bean id="removeDataOnSetURLPrepareInterceptor" class="de.hybris.platform.media.interceptors.RemoveDataOnSetURLPrepareInterceptor" />
+
+	<bean id="removeDataOnSetURLMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDataOnSetURLPrepareInterceptor"/>
+		<property name="typeCode" value="Media"/>
+	</bean>
+
+	<bean id="mediaModelDefaultsPrepareInterceptor"
+		  class="de.hybris.platform.media.interceptors.MediaModelPrepareInterceptor">
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+	<bean id="mediaModelDefaultsPrepareInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="mediaModelDefaultsPrepareInterceptor"/>
+		<property name="typeCode" value="Media"/>
+	</bean>
+	<bean id="mediaModelPrepareInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDataOnSetURLPrepareInterceptor"/>
+		<property name="typeCode" value="Media"/>
+	</bean>
+
+	<bean id="removeDataOnMediaModelRemoveInterceptor"
+			class="de.hybris.platform.media.interceptors.RemoveDataOnMediaModelRemoveInterceptor" />
+
+	<bean id="removeDataOnMediaModelRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDataOnMediaModelRemoveInterceptor"/>
+		<property name="typeCode" value="Media"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.media.impl.MediaDownloadUrlHandler" name="mediaDownloadUrlHandler">
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+	<bean class="de.hybris.platform.servicelayer.media.impl.MediaPermittedPrincipalsHandler"
+		  name="mediaPermittedPrincipalsHandler">
+		<property name="permissionManagementService" ref="permissionManagementService"/>
+	</bean>
+	<bean class="de.hybris.platform.servicelayer.media.impl.MediaDeniedPrincipalsHandler"
+		  name="mediaDeniedPrincipalsHandler">
+		<property name="permissionManagementService" ref="permissionManagementService"/>
+	</bean>
+	<bean class="de.hybris.platform.media.impl.ForeignDataOwnerHandler" id="mediaForeignDataOwnerHandler">
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+
+	<bean id="checkIfRemovableMediaInterceptor"
+		  class="de.hybris.platform.media.interceptors.CheckIfRemovableMediaInterceptor"/>
+	<bean id="checkIfRemovableMediaInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="checkIfRemovableMediaInterceptor"/>
+		<property name="typeCode" value="Media"/>
+	</bean>
+
+</beans>

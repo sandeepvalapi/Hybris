@@ -1,0 +1,30 @@
+<html>
+	<head>
+	</head>
+
+	<body>
+		Job: $ctx.cronJobName<br/>
+		<br/>
+		Gestartet: $ctx.startDate<br/>
+		Beendet:   $ctx.endDate<br/>
+		Dauer:     $ctx.duration<br/>
+		<br/>
+		<h3>
+#if($ctx.result == "ERROR")
+			<font color="red">Fehler beim Ausführen des Jobs, aktueller Status: $ctx.status</font>
+#end
+ 
+#if($ctx.result == "FAILURE")
+			<font color="red">Job wurde erfolglos abgeschlossen, aktueller Status: $ctx.status</font>
+#end
+ 
+#if($ctx.result == "SUCCESS")
+			<font color="green">Job wurde erfolgreich abgeschlossen, aktueller Status: $ctx.status</font>
+#end
+
+#if($ctx.result == "UNKNOWN")
+			<font color="grey">Ergebnis des Jobs ist unbekannt, aktueller Status: $ctx.status</font>
+#end
+ 		</h3>
+	</body>
+</html>

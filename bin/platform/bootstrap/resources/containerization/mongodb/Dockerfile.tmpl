@@ -1,0 +1,21 @@
+FROM mongo:latest
+
+RUN mkdir -p /opt/mongodb
+ENV DB_NAME=${dbName}
+ENV REPL_SET_ENABLED=${replSetEnabled}  
+ENV REPL_SET=${replSet}
+ENV MONGO_PORT=${port}
+
+RUN apt-get update \
+    && apt-get install openssl -y \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN openssl rand -base64 741 > /opt/mongodb/mongodb-keyfile \
+    && chmod 600 /opt/mongodb/mongodb-keyfile
+
+EXPOSE ${port}
+
+COPY start.sh /opt/mongodb
+RUN chmod +x /opt/mongodb/start.sh
+
+ENTRYPOINT ["/opt/mongodb/start.sh"]

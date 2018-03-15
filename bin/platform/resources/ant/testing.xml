@@ -1,0 +1,380 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- This project contains all macros/targets needed for the junit tests -->
+<project name="project.yunit">
+
+    <!-- the next line is added allow eclipse resolving the 'platformhome' property.
+        It is not needed for the normal build process, since platformhome is always
+        set from the outside. -->
+    <property name="platformhome" location="../.."/>
+
+
+    <macrodef name="annotationtests" description="run annotated tests">
+        <attribute name="extensions" default=""/>
+        <attribute name="annotations" default=""/>
+        <attribute name="replaced" default="true"/>
+        <attribute name="split" default=""/>
+        <attribute name="packages" default=""/>
+        <attribute name="packages.excluded" default=""/>
+        <attribute name="web" default="false"/>
+        <attribute name="suppress.junit.tenant" default="false"/>
+        <attribute name="junit.results.directory" default="${HYBRIS_LOG_DIR}/junit"/>
+        <element name="additionalTests" optional="true"/>
+        <sequential>
+            <!-- check content of embedded elements -->
+            <delete file="${HYBRIS_TEMP_DIR}/testing_additional_tests.txt"/>
+            <trycatch property="foo" reference="bar">
+                <try>
+                    <echoxml file="${HYBRIS_TEMP_DIR}/testing_additional_tests.txt" append="true">
+                        <additionalTests/>
+                    </echoxml>
+                </try>
+                <catch/>
+            </trycatch>
+
+            <loadfile property="additional.tests" srcFile="${HYBRIS_TEMP_DIR}/testing_additional_tests.txt"/>
+
+            <prepare/>
+            <!-- these properties can be overwritten by -Dtestclasses.extensions and
+                -Dtestclasses.annotations and -Dtestclasses.packages and -Dtestclasses.split -->
+            <property name="testclasses.extensions" value="@{extensions}"/>
+            <property name="testclasses.annotations" value="@{annotations}"/>
+            <property name="testclasses.packages" value="@{packages}"/>
+            <property name="testclasses.packages.excluded" value="@{packages.excluded}"/>
+            <property name="testclasses.replaced" value="@{replaced}"/>
+            <property name="testclasses.split" value="@{split}"/>
+            <property name="testclasses.web" value="@{web}"/>
+            <property name="testclasses.suppress.junit.tenant" value="@{suppress.junit.tenant}"/>
+            <property name="testclasses.reportdir" value="@{junit.results.directory}"/>
+
+            <echo message="Annotations : ${testclasses.annotations}"/>
+            <echo message="Extensions  : ${testclasses.extensions}"/>
+            <echo message="Packages(+) : ${testclasses.packages}"/>
+            <echo message="Packages(-) : ${testclasses.packages.excluded}"/>
+            <echo message="Replaced    : ${testclasses.replaced}"/>
+            <echo message="JUnit Split : ${testclasses.split}"/>
+            <echo message="Web : ${testclasses.web}"/>
+            <echo message="Suppress junit tenant  : ${testclasses.suppress.junit.tenant}"/>
+            <echo message="Report dir : ${testclasses.reportdir}"/>
+            <if>
+                <length file="${HYBRIS_TEMP_DIR}/testing_additional_tests.txt" length="0" when="greater"/>
+                <then>
+                    <echo message="Additional Tests"/>
+                    <echo message="${additional.tests}"/>
+                </then>
+            </if>
+
+            <delete dir="${HYBRIS_TEMP_DIR}/junit"/>
+            <mkdir dir="${HYBRIS_TEMP_DIR}/junit"/>
+            <mkdir dir="${testclasses.reportdir}"/>
+
+            <taskdef classname="de.hybris.ant.taskdefs.TestClassesUtilTask" name="testClassesUtil">
+                <classpath>
+                    <pathelement path="${platformhome}/bootstrap/bin/yant.jar"/>
+                    <pathelement path="${platformhome}/bootstrap/bin/ytomcat.jar"/>
+                    <fileset dir="${platformhome}/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <fileset dir="${platformhome}/resources/ant/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <fileset dir="${platformhome}/ext/core/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <fileset dir="${bundled.tomcat.home}/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <pathelement path="${build.classpath}"/>
+                </classpath>
+            </taskdef>
+
+
+            <!-- Check if there are any tests to test (otherwise don't even boot the
+                platform) -->
+            <testClassesUtil property="testlistCheck1" logging="false" annotations="${testclasses.annotations}"
+                             extensions="${testclasses.extensions}" replaced="${testclasses.replaced}"
+                             split="${testclasses.split}" packages="${testclasses.packages}" packages_negative="${testclasses.packages.excluded}" webTests="${testclasses.web}"/>
+
+            <if>
+                <or>
+                    <not>
+                        <equals arg1="" arg2="${testlistCheck1}"/>
+                    </not>
+                    <length file="${HYBRIS_TEMP_DIR}/testing_additional_tests.txt" length="0" when="greater"/>
+                </or>
+                <then>
+                    <if>
+                        <not>
+                            <isset property="localization.extensions" />
+                        </not>
+                        <then>
+                            <property name="localization.extensions" value=""/>
+                        </then>
+                    </if>
+                    <yunit reportdir="${testclasses.reportdir}" test="${test}"
+                           suppressjunittenant="${testclasses.suppress.junit.tenant}"
+                           additionalclasspath="${bundled.tomcat.home}/lib/servlet-api.jar:${platformhome}/ext/core/lib/log4j-1.2.17.jar:${bundled.tomcat.home}/bin/bootstrap.jar:${bundled.tomcat.home}/bin/commons-daemon.jar:${bundled.tomcat.home}/bin/tomcat-juli.jar">
+                        <tests>
+                            <sysproperty key="localizationExtensions" value="${localization.extensions}"/>
+                            <sysproperty key="typecodeExtensions" value="${testclasses.extensions}"/>
+                        	<sysproperty key="running.on.hybris.ci" value="${running.on.hybris.ci}"/>
+                            <sysproperty key="reqIncludedExtensions" value="${testclasses.extensions}"/>
+                            <batchtest fork="yes" webTests="${testclasses.web}" annotations="${testclasses.annotations}"
+                                       extensions="${testclasses.extensions}" replaced="${testclasses.replaced}" split="${testclasses.split}"
+                                       packages="${testclasses.packages}" excludedPackages="${testclasses.packages.excluded}" suppressjunittenant="${testclasses.suppress.junit.tenant}"/>
+                            <additionalTests/>
+                        </tests>
+                    </yunit>
+                </then>
+                <else>
+                    <echo level="warn" message="No tests found!"/>
+                </else>
+            </if>
+
+            <!-- for secondary calls -->
+            <var name="testclasses.extensions" unset="true"/>
+            <var name="testclasses.annotations" unset="true"/>
+            <var name="testclasses.packages" unset="true"/>
+            <var name="testclasses.packages.excluded" unset="true"/>
+            <var name="testclasses.split" unset="true"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="yunit">
+        <attribute name="additionalclasspath" default=""/>
+        <attribute name="jvmargs" default="${standalone.javaoptions} -Ddeployed.server.type=&quot;${bundled.server.type}&quot;"/>
+        <attribute name="reportdir" default="${HYBRIS_LOG_DIR}/junit"/>
+        <attribute name="failbuildonerror" default="no"/>
+        <attribute name="test" default=""/>
+        <attribute name="showoutput" default="true"/>
+        <attribute name="forkmode" default="once"/>
+        <attribute name="suppressjunittenant" default="false"/>
+        <element name="tests"/>
+        <sequential>
+
+            <echo>jvmargs: @{jvmargs}</echo>
+            <foreachext>
+                <do>
+                    <callback extname="@{extname}" target="before_yunit"/>
+                </do>
+            </foreachext>
+
+            <var name="randomnumber" unset="true"/>
+            <math result="randomnumber">
+                <op op="rint" datatype="int">
+                    <op op="*">
+                        <num value="10000000"/>
+                        <op op="random"/>
+                    </op>
+                </op>
+            </math>
+            <var name="yrnd" value="yunit${randomnumber}"/>
+
+            <delete dir="${HYBRIS_TEMP_DIR}/junit" failonerror="false"/>
+            <mkdir dir="${HYBRIS_TEMP_DIR}/junit"/>
+            <mkdir dir="@{reportdir}"/>
+
+            <taskdef classname="de.hybris.ant.taskdefs.yunit.JUnitTask" name="yunitint">
+                <classpath>
+                    <pathelement path="${platformhome}/bootstrap/bin/yant.jar"/>
+                    <pathelement path="${platformhome}/bootstrap/bin/ytomcat.jar"/>
+                    <fileset dir="${platformhome}/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <fileset dir="${platformhome}/resources/ant/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <fileset dir="${platformhome}/ext/core/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <fileset dir="${bundled.tomcat.home}/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <pathelement path="${build.classpath}"/>
+                </classpath>
+            </taskdef>
+
+            <if>
+                <contains string="@{test}" substring="."/>
+                <!--is it a class? -->
+                <then>
+                    <yunitint failureproperty="yuniterr${yrnd}" printsummary="yes" haltonfailure="no" fork="yes" reloading="false"
+                              forkmode="@{forkmode}" showoutput="@{showoutput}" todir="${HYBRIS_TEMP_DIR}/junit"
+                              platformhome="${platformhome}" additionalclasspath="@{additionalclasspath}" suppressjunittenant="@{suppressjunittenant}">
+                        <formatter type="xml"/>
+
+                        <test name="@{test}"/>
+                        <jvmarg line="@{jvmargs}"/>
+                        <syspropertyset>
+                            <propertyref prefix="HYBRIS_"/>
+                        </syspropertyset>
+                    </yunitint>
+                </then>
+                <else>
+                    <yunitint failureproperty="yuniterr${yrnd}" printsummary="yes" haltonfailure="no" fork="yes" reloading="false"
+                              forkmode="@{forkmode}" showoutput="@{showoutput}" todir="${HYBRIS_TEMP_DIR}/junit"
+                              platformhome="${platformhome}" additionalclasspath="@{additionalclasspath}" suppressjunittenant="@{suppressjunittenant}">
+                        <formatter type="xml"/>
+
+                        <tests/>
+                        <jvmarg line="@{jvmargs}"/>
+                        <syspropertyset>
+                            <propertyref prefix="HYBRIS_"/>
+                        </syspropertyset>
+
+                    </yunitint>
+                </else>
+            </if>
+
+            <yunitrep todir="@{reportdir}">
+                <fileset dir="${HYBRIS_TEMP_DIR}/junit">
+                    <include name="TEST-*.xml"/>
+                </fileset>
+                <report format="frames" todir="@{reportdir}"/>
+            </yunitrep>
+            <echo message="Report generated to @{reportdir}/index.html"/>
+
+            <if>
+                <isset property="yuniterr${yrnd}"/>
+                <then>
+                    <propertycopy name="yuniterr" from="yuniterr${yrnd}"/>
+                    <echo message="JUNITTESTS FAILED. See @{reportdir}/index.html!"/>
+                    <if>
+                        <isset property="failbuildonerror"/>
+                        <then>
+                            <property name="failbuildonerror.real" value="${failbuildonerror}"/>
+                        </then>
+                        <else>
+                            <property name="failbuildonerror.real" value="@{failbuildonerror}"/>
+                        </else>
+                    </if>
+                    <if>
+                        <istrue value="${failbuildonerror.real}"/>
+                        <then>
+                        	<fail message="JUNITTESTS FAILED. See @{reportdir}/index.html!"/>
+                        </then>
+                    </if>
+                </then>
+            </if>
+            <foreachext>
+                <do>
+                    <callback extname="@{extname}" target="after_yunit"/>
+                </do>
+            </foreachext>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="yunitinit">
+        <!-- @deprecated remove this call in the 5.0 version ??????? -->
+        <sequential>
+            <yunitAdmTask>
+                <command>
+                    de.hybris.platform.core.Initialization.initializeTestSystem();
+                    de.hybris.platform.util.RedeployUtilities.shutdown();
+                </command>
+            </yunitAdmTask>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="yunitupdate">
+        <!-- @deprecated remove this call in the 5.0 version ??????? -->
+        <sequential>
+            <yunitAdmTask>
+                <command>
+                    de.hybris.platform.core.Initialization.updateTestSystem();
+                    de.hybris.platform.util.RedeployUtilities.shutdown();
+                </command>
+            </yunitAdmTask>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="yunitAdmTask">
+        <!-- @deprecated remove this call in the 5.0 version ??????? -->
+        <element name="command" optional="false"/>
+        <sequential>
+
+            <if>
+                <istrue value="${enable.init.log}"/>
+                <then>
+                    <record action="start" name="${HYBRIS_LOG_DIR}/ant_yunitinit.log"/>
+                </then>
+            </if>
+
+            <available file="${ext.core.path}/classes/core/GeneratedTypeInitializer.class" property="coreclasses.present"/>
+            <available file="${ext.core.path}/bin/coreserver.jar" property="coreclasses.present"/>
+            <if>
+                <equals arg1="${coreclasses.present}" arg2="true"/>
+                <then>
+                    <foreachext>
+                        <do>
+                            <callback extname="@{extname}" target="before_yunitinit"/>
+                        </do>
+                    </foreachext>
+
+                    <yrun deployname="junit">
+                        <command/>
+                    </yrun>
+
+                    <foreachext>
+                        <do>
+                            <callback extname="@{extname}" target="after_yunitinit"/>
+                        </do>
+                    </foreachext>
+                </then>
+                <else>
+                    <echo message="Cannot initialize the test system - you have to run ant all first"/>
+                </else>
+            </if>
+
+            <if>
+                <istrue value="${enable.init.log}"/>
+                <then>
+                    <record action="stop" name="${HYBRIS_LOG_DIR}/ant_yunitinit.log"/>
+                </then>
+            </if>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_yunit">
+        <attribute name="extname"/>
+        <sequential>
+            <prepare/>
+            <extension_compile_core extname="@{extname}"/>
+            <if>
+                <isset property="ext.@{extname}.coremodule.available"/>
+                <then>
+                    <yunit reportdir="${ext.@{extname}.path}/doc/junit" test="${test}">
+                        <tests>
+                            <batchtest fork="yes">
+                                <fileset dir="${ext.@{extname}.path}/testsrc">
+                                    <include name="**/*.java"/>
+                                </fileset>
+                            </batchtest>
+                        </tests>
+                    </yunit>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_yunitweb">
+        <attribute name="extname"/>
+        <sequential>
+            <prepare/>
+            <delete dir="${HYBRIS_TEMP_DIR}/testcase" failonerror="false"/>
+            <extension_compile_core extname="@{extname}"/>
+            <yunit_web_internal extname="@{extname}" partner="false"/>
+        </sequential>
+    </macrodef>
+
+</project>

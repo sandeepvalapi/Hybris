@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="ProductPriceRegisterForRemoveInterceptor"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.ProductPriceRegisterForRemoveInterceptor"
+		  autowire="byName"/>
+	<bean id="ProductPriceRegisterForRemoveInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ProductPriceRegisterForRemoveInterceptor"/>
+		<property name="typeCode" value="Product"/>
+		<property name="replacedInterceptors" ref="PartOfModelRegisterForRemoveInterceptor"/>
+	</bean>
+
+	<bean id="ignoreUserEurope1DiscountsPartOfRemoveInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor">
+			<bean parent="PartOfModelRegisterForRemoveInterceptor">
+				<property name="ignoreAttributes">
+					<set>
+						<value>europe1Discounts</value>
+					</set>
+				</property>
+				<property name="typeService" ref="typeService"/>
+			</bean>
+		</property>
+		<property name="typeCode" value="User"/>
+		<property name="replacedInterceptors" ref="PartOfModelRegisterForRemoveInterceptor"/>
+	</bean>
+
+	<alias alias="retrieveChannelStrategy" name="defaultRetrieveChannelStrategy"/>
+	<bean id="defaultRetrieveChannelStrategy"
+		  class="de.hybris.platform.europe1.channel.strategies.impl.DefaultRetrieveChannelStrategy" scope="tenant">
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+
+	<!-- dynamic -->
+
+	<bean id="User_europe1DiscountsAttributeHandler"
+		  class="de.hybris.platform.europe1.dynamic.UserEurope1DiscountsAttributeHandler">
+		<property name="typeService" ref="typeService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="pdtDateRangeHandler" class="de.hybris.platform.servicelayer.model.attribute.PDTRowDateRangeHandler"/>
+	<bean id="abstractDiscountRowAbsoluteHandler"
+		  class="de.hybris.platform.servicelayer.model.attribute.AbstractDiscountRowAbsoluteHandler"/>
+	<bean id="abstractDiscountRowDiscountStringHandler"
+		  class="de.hybris.platform.servicelayer.model.attribute.DiscountStringHandler">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="formatFactory" ref="formatFactory"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	<bean id="taxRowAbsoluteHandler" class="de.hybris.platform.servicelayer.model.attribute.TaxRowAbsoluteHandler"/>
+
+	<bean id="pdtRowEurope1AttributeHandler" class="de.hybris.platform.europe1.dynamic.PdtRowEurope1AttributeHandler" abstract="true">
+		<property name="typeService" ref="typeService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<bean id="Product_europe1DiscountsAttributeHandler"
+		  class="de.hybris.platform.europe1.dynamic.ProductEurope1DiscountsAttributeHandler" parent="pdtRowEurope1AttributeHandler">
+	</bean>
+	<bean id="Product_europe1TaxesAttributeHandler"
+		  class="de.hybris.platform.europe1.dynamic.ProductEurope1TaxesAttributeHandler" parent="pdtRowEurope1AttributeHandler">
+	</bean>
+	<bean id="Product_europe1PricesAttributeHandler"
+		  class="de.hybris.platform.europe1.dynamic.ProductEurope1PricesAttributeHandler" parent="pdtRowEurope1AttributeHandler">
+	</bean>
+
+
+</beans>

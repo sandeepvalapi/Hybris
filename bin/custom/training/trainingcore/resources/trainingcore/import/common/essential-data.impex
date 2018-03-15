@@ -1,0 +1,114 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Import essential data for the Accelerator
+#
+# Includes:
+# * Languages
+# * Currencies
+# * Titles
+# * Vendors
+# * Warehouses
+# * Supported Credit/Debit cards
+# * User Groups
+# * DistanceUnits for Storelocator
+# * MediaFolders
+# * MediaFormats                               s
+# * Tax & Tax Groups
+# * Jobs
+#% impex.setLocale(Locale.GERMAN);
+
+# Languages
+INSERT_UPDATE Language;isocode[unique=true];fallbackLanguages(isocode);active[default=true]
+;en;;;
+;de;en;;
+;ja;en;;
+;zh;en;;
+
+# Currencies
+INSERT_UPDATE Currency;isocode[unique=true];conversion;digits;symbol
+;GBP;1;2;£
+;EUR;1;2;€
+;USD;1,4;2;$
+;JPY;120;0;¥
+
+# Vendor
+INSERT_UPDATE Vendor;code[unique=true];name
+;default;Default Vendor
+
+# Disable preview for email pages
+UPDATE CMSPageType;code[unique=true];previewDisabled
+;EmailPage;true
+
+# Titles
+INSERT_UPDATE Title;code[unique=true]
+;mr
+;mrs
+;miss
+;ms
+;dr
+;rev
+
+# Media Folders
+INSERT_UPDATE MediaFolder;qualifier[unique=true];path[unique=true]
+;images;images
+;email-body;email-body
+;email-attachments;email-attachments
+
+# Media formats
+INSERT_UPDATE MediaFormat;qualifier[unique=true]
+;1200Wx1200H
+;515Wx515H
+;365Wx246H
+;300Wx300H
+;96Wx96H
+;65Wx65H
+;30Wx30H
+;mobile
+;tablet
+;desktop
+;widescreen
+
+# Tax & Tax Groups
+INSERT_UPDATE UserTaxGroup;code[unique=true]
+;de-taxes
+;jp-taxes
+;uk-taxes
+;us-taxes
+;ca-taxes
+
+INSERT_UPDATE ProductTaxGroup;code[unique=true]
+;jp-vat-full
+;eu-vat-full
+;eu-vat-half
+;us-sales-tax-full
+;ca-sales-tax-full
+
+INSERT_UPDATE Tax;code[unique=true];value;currency(isocode)
+;de-vat-full;19
+;de-vat-half;7
+;jp-vat-full;5
+;uk-vat-full;20
+;uk-vat-half;5
+;us-sales-tax-full;0
+;ca-sales-tax-full;0
+
+INSERT_UPDATE ServicelayerJob;code[unique=true];springId[unique=true]
+;cartRemovalJob;cartRemovalJob
+;siteMapMediaJob;siteMapMediaJob
+;quoteToExpireSoonJobPerformable;quoteToExpireSoonJobPerformable
+;quoteExpiredJobPerformable;quoteExpiredJobPerformable
+
+# Deactivate Frontend Restriction on category by default for perfomance purposes
+UPDATE SearchRestriction;code[unique=true];active[default=false]
+;Frontend_RestrictedCategory
+
+INSERT_UPDATE Script  ; scriptType(code)  ; active  ; code[unique=true]     ; version   ; content;
+                      ; GROOVY            ; true    ; confirmPickup         ; 0         ; "import de.hybris.platform.basecommerce.enums.ConsignmentStatus; import com.hybris.cockpitng.actions.ActionContext; import com.hybris.cockpitng.actions.ActionResult; import de.hybris.platform.ordersplitting.model.ConsignmentModel; import de.hybris.platform.ordersplitting.model.ConsignmentProcessModel; import de.hybris.platform.processengine.BusinessProcessService; import com.hybris.cockpitng.util.BackofficeSpringUtil; import com.hybris.cockpitng.actions.CockpitAction; import com.hybris.cockpitng.dataaccess.facades.object.ObjectFacade; import com.hybris.cockpitng.dataaccess.facades.object.exceptions.ObjectSavingException;  public class PickupConfirmationAction implements CockpitAction {        public ActionResult perform(final ActionContext ctx)      {         final Object data = ctx.getData();         if(data instanceof ConsignmentModel){             try{                 ((ConsignmentModel)data).setStatus(ConsignmentStatus.PICKUP_COMPLETE);                 getObjectFacade().save(data);                 for (final ConsignmentProcessModel process : ((ConsignmentModel)data).getConsignmentProcesses())                 {                     getBusinessProcessService().triggerEvent(process.getCode() + ""_ConsignmentPickup"");                 }             }             catch(final ObjectSavingException e){                 throw new RuntimeException(e);             };             return new ActionResult(ActionResult.SUCCESS);         };         return new ActionResult(ActionResult.ERROR);     };      public boolean canPerform(final ActionContext ctx)     {         return (ctx.getData() instanceof ConsignmentModel) && ((ConsignmentModel)ctx.getData()).getStatus().equals(ConsignmentStatus.READY_FOR_PICKUP)     };      public boolean needsConfirmation(final ActionContext ctx)     {         return false;     };      public String getConfirmationMessage(final ActionContext ctx)     {         return ""Are you sure?"";     };       public ObjectFacade getObjectFacade(){         return (ObjectFacade) BackofficeSpringUtil.getBean(""objectFacade"");     };       protected BusinessProcessService getBusinessProcessService()     {         return BackofficeSpringUtil.getBean(""businessProcessService"", BusinessProcessService.class);     } }";

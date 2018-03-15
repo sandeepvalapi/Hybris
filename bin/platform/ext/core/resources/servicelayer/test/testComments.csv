@@ -1,0 +1,13 @@
+
+INSERT_UPDATE Domain;code[unique=true];name;
+;testDomain;Test Domain;
+;testDomain2;Test Domain;
+
+INSERT_UPDATE Component;code[unique=true];name;domain(code);readPermitted(uid);writePermitted(uid);createPermitted(uid);removePermitted(uid);
+;testComponent;Test;testDomain;employeegroup;employeegroup;employeegroup;employeegroup;
+;testComponent2;Test;testDomain2;employeegroup;employeegroup;employeegroup;employeegroup;
+
+INSERT_UPDATE CommentType;code[unique=true];name;domain(code)[unique=true];
+;testCommentType;Test comment type;testDomain;
+;testCommentType2;Test comment type 2;testDomain;
+

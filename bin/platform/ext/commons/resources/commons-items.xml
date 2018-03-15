@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="DocumentCollection" elementtype="Document" autocreate="true" generate="true" />
+	</collectiontypes>
+	
+	<enumtypes>
+		<enumtype code="documentTypeEnum" autocreate="true" generate="true">
+			<value code="pdf"/>
+			<value code="xml"/>
+			<value code="text"/>
+		</enumtype>
+
+		<enumtype code="RendererTypeEnum" autocreate="true" generate="true">
+			<value code="velocity"/>
+		</enumtype>
+	</enumtypes>
+
+	<maptypes>
+		<maptype code="localized:TemplateMedia"
+				argumenttype="Language"
+				returntype="Media"
+				autocreate="true"
+				generate="false"/>
+	</maptypes>
+
+	<relations>
+		<relation code="Format2MedForRel" autocreate="true" generate="true" localized="false">
+			<deployment table="Format2MedForRel" typecode="13101"/>
+			<sourceElement qualifier="formats" type="Format" cardinality="many"/>
+			<targetElement qualifier="chained" type="MediaFormatter" cardinality="many"/>
+		</relation>
+	
+		<relation code="Format2ComTypRel" autocreate="true" generate="true" localized="false">
+			<deployment table="Format2ComTypRel" typecode="13102"/>
+			<sourceElement qualifier="formats" type="Format" cardinality="many"/>
+			<targetElement qualifier="validFor" type="ComposedType" cardinality="many"/>
+		</relation>
+
+		<relation code="TranslatorConfig2Renderers" localized="false" generate="true" autocreate="true">
+			<sourceElement type="JaloTranslatorConfiguration" qualifier="translatorConfiguration" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="JaloVelocityRenderer" qualifier="renderers" cardinality="many" ordered="true" collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="TranslatorConfig2RenderProperties" localized="false" generate="true" autocreate="true">
+			<sourceElement type="JaloTranslatorConfiguration" qualifier="translatorConfiguration" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="RenderersProperty" qualifier="renderersProperties" cardinality="many" ordered="true" collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="TranslatorConfig2ParserProperties" localized="false" generate="true" autocreate="true">
+			<sourceElement type="JaloTranslatorConfiguration" qualifier="translatorConfiguration" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="ParserProperty" qualifier="parserProperties" cardinality="many" ordered="true" collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="ItemDocrRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="Item" qualifier="sourceItem" cardinality="one">
+				<modifiers read="true" write="false" optional="true" search="true" initial="true"/>
+			</sourceElement>
+			<targetElement type="Document" qualifier="allDocuments" cardinality="many" ordered="false" collectiontype="collection">
+				<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+				<model generate="false"/>
+			</targetElement>
+		</relation>
+	</relations>
+	
+	<itemtypes>
+		<itemtype   code="Formatter" 
+					extends="Media" 
+					jaloclass="de.hybris.platform.commons.jalo.Formatter"
+					generate="true"
+					autocreate="true"
+					abstract="true">
+			<attributes>
+				<attribute qualifier="outputMimeType" type="java.lang.String">
+					<description>The mime type of the output.</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="script" type="java.lang.String" >
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype   code="ItemFormatter"
+					extends="Formatter"
+					jaloclass="de.hybris.platform.commons.jalo.ItemFormatter"
+					generate="true"
+					autocreate="true"
+					abstract="true">
+		</itemtype>
+
+		<itemtype   code="MediaFormatter"
+					extends="Formatter"
+					jaloclass="de.hybris.platform.commons.jalo.MediaFormatter"
+					generate="true"
+					autocreate="true"
+					abstract="true">
+			<attributes>
+				<attribute qualifier="inputMimeType" type="java.lang.String">
+					<description>The mime type of the input.</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+				
+		<itemtype   code="Format"
+					extends="GenericItem"
+					generate="true"
+					jaloclass="de.hybris.platform.commons.jalo.Format"
+					autocreate="true">
+			<deployment table="Format" typecode="13113"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="initial" type="ItemFormatter">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="documentType" type="documentTypeEnum">
+					<modifiers read="true" write="true" optional="false" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+					
+		</itemtype>
+		
+		<itemtype   code="Document" 
+					extends="Media"
+					jaloclass="de.hybris.platform.commons.jalo.Document"
+					generate="true" 
+					autocreate="true" >
+			<attributes>
+				<attribute qualifier="itemTimestamp" type="java.util.Date">
+					<description>The modified time of the attached item. If the time of the item is
+					younger than the value of this document it could be outdated.</description>
+					<modifiers read="true" write="true" optional="true" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="format" type="Format">
+					<description>The format of the document</description>
+					<modifiers read="true" write="false" optional="false" initial="true" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		
+		<itemtype   code="CustomOrder2XML"
+					extends="ItemFormatter"
+					jaloclass="de.hybris.platform.commons.jalo.CustomOrder2XML"
+					generate="true"
+					autocreate="true"
+					abstract="false">
+		</itemtype>
+		
+		<itemtype   code="FOPFormatter"
+					extends="MediaFormatter"
+					jaloclass="de.hybris.platform.commons.jalo.FOPFormatter"
+					generate="true"
+					autocreate="true"
+					abstract="false">
+		</itemtype>
+		
+		<itemtype   code="VelocityFormatter"
+					extends="ItemFormatter"
+					jaloclass="de.hybris.platform.commons.jalo.VelocityFormatter"
+					generate="true"
+					autocreate="true"
+					abstract="false">
+		</itemtype>
+		
+		<itemtype   code="XMLTransformFormatter"
+					extends="MediaFormatter"
+					jaloclass="de.hybris.platform.commons.jalo.XMLTransformFormatter"
+					generate="true"
+					autocreate="true"
+					abstract="false">
+		</itemtype>
+
+<!--
+##############################################################################################
+## Translator types
+############################################################################################## -->
+		
+		<itemtype code="JaloVelocityRenderer"
+		   jaloclass="de.hybris.platform.commons.jalo.translator.JaloVelocityRenderer"
+		   extends="GenericItem"
+		   generate="true" 
+		   autocreate="true" >
+			<deployment table="JaloVelocityRenderer" typecode="13211"/>
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>renderer name</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="template" type="java.lang.String">
+					<description>velocity template</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype
+		   code="RenderersProperty"
+		   jaloclass="de.hybris.platform.commons.jalo.translator.RenderersProperty"
+		   extends="GenericItem"
+		   generate="true"
+		   autocreate="true" >
+			<deployment table="RenderersProperty" typecode="13212"/>
+			<attributes>
+				<attribute qualifier="key" type="java.lang.String">
+					<description>key</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="value" type="java.lang.String">
+					<description>value</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>	
+		
+		<itemtype
+		   code="ParserProperty"
+		   jaloclass="de.hybris.platform.commons.jalo.translator.ParserProperty"
+		   extends="GenericItem"
+		   generate="true"
+		   autocreate="true" >
+			<deployment table="ParserProperty" typecode="13213"/>
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>Name of the tag/element</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="startExp" type="java.lang.String">
+					<description>Start expression of the tag/element</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="endExp" type="java.lang.String">
+					<description>End expression of the tag/element</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="parserClass" type="java.lang.String">
+					<description>Special java class that parses the related tag/element</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>	
+
+		<itemtype code="JaloTranslatorConfiguration"
+		   jaloclass="de.hybris.platform.commons.jalo.translator.JaloTranslatorConfiguration"
+		   extends="GenericItem"
+		   generate="true"
+		   autocreate="true" >
+			<deployment table="JaloTranslatorConfig" typecode="13214"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>unique item identifier</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<!--  See additional relations too  -->
+			</attributes>
+		</itemtype>
+
+		<itemtype code="RendererTemplate" 
+				jaloclass="de.hybris.platform.commons.jalo.renderer.RendererTemplate"
+				extends="GenericItem"	
+				autocreate="true" 
+				generate="true">
+			<deployment table="RendererTemplate" typecode="13215"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>unique item identifier</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="content" type="localized:TemplateMedia">
+					<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="contextClass" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="outputMimeType" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="rendererType" type="RendererTypeEnum">
+					<modifiers read="true" write="true" optional="false" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="templateScript" type="localized:java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="contextClassDescription" type="java.lang.String">
+					<modifiers read="true" write="false" optional="true" search="false"/>
+					<persistence type="jalo"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

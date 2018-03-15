@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition" 
+	name="battleshipsProcess" 
+	start="checkStart">
+
+	<contextParameter name="board" use="required" type="java.lang.String" />
+	
+	<contextParameter name="rows" use="optional" type="java.lang.Integer" />
+	<contextParameter name="cols" use="optional" type="java.lang.Integer" />
+
+	<!-- the enemy process as PK -->
+	<contextParameter name="enemy" use="optional" type="de.hybris.platform.core.PK" />
+	<!-- Shot as  (x,y) -->
+	<contextParameter name="previousShot" use="optional" type="java.awt.Point" />
+	<contextParameter name="currentShot" use="optional" type="java.awt.Point" />
+	<contextParameter name="currentResult" use="optional" type="java.lang.String" />
+	<contextParameter name="enemyBoard" use="optional" type="java.lang.String" />
+
+	
+	<scriptAction id="checkStart">
+		<script type="groovy">
+			<![CDATA[
+import de.hybris.platform.core.PK
+import de.hybris.platform.processengine.BusinessProcessService
+import de.hybris.platform.processengine.helpers.ProcessParameterHelper
+import de.hybris.platform.processengine.model.BusinessProcessModel
+import de.hybris.platform.servicelayer.model.ModelService
+
+println """
+-----------------------------------------------------------------
+--- CheckStart process: ${process.code}
+-----------------------------------------------------------------
+"""
+
+// services
+ProcessParameterHelper pp = processParameterHelper
+ModelService ms = modelService
+BusinessProcessService bps = businessProcessService
+
+// get from context
+BusinessProcessModel me = process
+
+// sanity check
+String board = pp.getProcessParameterByName(me, 'board')?.value
+List<String> lines = board.readLines()
+int rows = lines.size()
+int cols = lines[0].length()
+pp.setProcessParameter(me, 'rows', rows)
+pp.setProcessParameter(me, 'cols', cols)
+
+if( board && cols && rows ){
+
+	println """Checking board setup with ${rows} rows and ${cols} columns:
+---
+${board}
+---"""
+	def lengthWithoutNewlines = board.replace("\n", "").length()
+
+	if( cols * rows == lengthWithoutNewlines ){
+		// enemy known ?
+		PK enemyPK = pp.getProcessParameterByName(me, 'enemy')?.value
+		if( enemyPK ){
+			// make ourself know
+			BusinessProcessModel enemy = ms.get(enemyPK)
+			pp.setProcessParameter(enemy, 'enemy', me.pk)
+			// notify that we joined
+			bps.triggerEvent("${enemy.code}_enemyJoined")
+			// continue as second
+			return 'SECOND'
+		}
+		else{
+			// no one there yet - wait
+			return 'FIRST'
+		}
+	}
+	println "Invalid board cell size: expected ${rows*cols} but got ${lengthWithoutNewlines}!"
+	return 'INVALID_SETUP'
+}
+println "Invalid game setup - check params: cols=${cols} rows=${rows} board=${board}!"
+return 'INVALID_SETUP'
+			]]>
+		</script>
+		<transition name="FIRST" to="waitForEnemyJoining"/>
+		<transition name="SECOND" to="fireShot"/>
+		<transition name="INVALID_SETUP" to="error"/>
+	</scriptAction>
+	
+	<wait id="waitForEnemyJoining" then="fireShot">
+		<event>enemyJoined</event>
+	</wait>
+	
+
+	<scriptAction id="fireShot">
+		<script type="groovy">
+			<![CDATA[
+import de.hybris.platform.processengine.BusinessProcessService
+import de.hybris.platform.processengine.helpers.ProcessParameterHelper
+import de.hybris.platform.processengine.model.BusinessProcessModel
+import de.hybris.platform.servicelayer.model.ModelService
+
+import java.awt.Point
+
+println """
+-----------------------------------------------------------------
+--- FireShot process: ${process.code}
+-----------------------------------------------------------------
+"""
+
+// services
+ProcessParameterHelper pp = processParameterHelper
+ModelService ms = modelService
+BusinessProcessService bps = businessProcessService
+
+// get from context
+BusinessProcessModel me = process
+
+// get params
+BusinessProcessModel enemy = ms.get(pp.getProcessParameterByName(me, 'enemy')?.value)
+Integer rows = pp.getProcessParameterByName(enemy, 'rows')?.value
+Integer cols = pp.getProcessParameterByName(enemy, 'cols')?.value
+String strategy = pp.getProcessParameterByName(me, 'strategy')?.value ?: 'nextShotLeftToRight'
+
+// get or create enemy board ( filled with ? )
+String enemyBoard = pp.getProcessParameterByName(me, 'enemyBoard')?.value
+if(!enemyBoard){
+	enemyBoard = createEnemyBoard(rows, cols)
+	pp.setProcessParameter(me, 'enemyBoard', enemyBoard)
+}
+Point previousShot = pp.getProcessParameterByName(me, 'previousShot')?.value
+Point nextShot = "${strategy}"(previousShot, enemyBoard, rows, cols)
+
+pp.setProcessParameter(enemy, 'currentShot', nextShot)
+pp.setProcessParameter(enemy, 'currentResult', '')
+
+println """Player ${me.code} is firing shot ${nextShot} at player ${enemy.code}
+based on previous shot ${previousShot} and enemy board
+${enemyBoard}
+"""
+
+// notify that we fired
+bps.triggerEvent("${enemy.code}_enemyFired")
+
+return 'FIRED'
+
+def String createEnemyBoard(int rows, int cols){
+	String enemyBoard = ''
+	for(i in 1..rows ){
+		for( j in 1..cols ){
+			enemyBoard += '?'
+		}
+		enemyBoard += '\n'
+	}
+	return enemyBoard
+}
+
+def Point nextShotLeftToRight( Point previousShot, String enemyBoard, int rows, int cols ){
+	int maxCol = cols - 1
+	if(!previousShot)
+		new Point(0, 0)
+	else{
+		int newCol = previousShot.x < maxCol ? previousShot.x + 1 : 0
+		int newRow = previousShot.x < maxCol ? previousShot.y : previousShot.y + 1
+		new Point(newCol, newRow)
+	}
+}
+
+def Point nextShotRightToLeft( Point previousShot, String enemyBoard, int rows, int cols ){
+	int maxCol = cols - 1
+	int maxRow = rows - 1
+	if(!previousShot)
+		new Point(maxCol, maxRow)
+	else{
+		int newCol = previousShot.x > 0 ? previousShot.x - 1 : cols-1
+		int newRow = previousShot.x > 0 ? previousShot.y : previousShot.y - 1
+		new Point(newCol, newRow)
+	}
+}
+
+def Point nextShotRandom( Point previousShot, String enemyBoard, int rows, int cols ){
+	def r = new Random()
+	int newCol = r.nextInt(cols);
+	int newRow = r.nextInt(rows);
+	// generate new shots if we've already tried position
+	while( checkAt(newRow, newCol, enemyBoard, rows, cols) != '?'){
+		newCol = r.nextInt(cols);
+		newRow = r.nextInt(rows);
+	}
+	return new Point(newCol, newRow)
+}
+
+def char checkAt( int row, int col, String enemyBoard, int rows, int cols){
+	return enemyBoard[row * (cols + 1) + col]
+}
+			]]>
+		</script>
+		<transition name="FIRED" to="waitForEnemyFired"/>
+	</scriptAction>
+
+	<wait id="waitForEnemyFired" then="checkDamage">
+		<event>enemyFired</event>
+	</wait>
+
+	<scriptAction id="checkDamage">
+		<script type="groovy">
+			<![CDATA[
+import de.hybris.platform.processengine.BusinessProcessService
+import de.hybris.platform.processengine.helpers.ProcessParameterHelper
+import de.hybris.platform.processengine.model.BusinessProcessModel
+import de.hybris.platform.servicelayer.model.ModelService
+
+import java.awt.Point
+
+println """
+-----------------------------------------------------------------
+--- CheckDamage process: ${process.code}
+-----------------------------------------------------------------
+"""
+
+// services
+ProcessParameterHelper pp = processParameterHelper
+ModelService ms = modelService
+BusinessProcessService bps = businessProcessService
+
+// get from context
+BusinessProcessModel me = process
+
+// get params
+String board = pp.getProcessParameterByName(me, 'board')?.value
+Integer rows = pp.getProcessParameterByName(me, 'rows')?.value
+Integer cols = pp.getProcessParameterByName(me, 'cols')?.value
+BusinessProcessModel enemy = ms.get(pp.getProcessParameterByName(me, 'enemy')?.value)
+
+Point currentEnemyShot = pp.getProcessParameterByName(me, 'currentShot')?.value
+int shotRow = currentEnemyShot.y
+int shotCol = currentEnemyShot.x
+
+String result = 'MISS'
+switch( checkAt(shotRow, shotCol, board, rows, cols) ){
+	case '#':
+		result = 'HIT'
+		break
+	case 'X':
+		result = 'HIT_AGAIN'
+		break
+	case '.':
+		result = 'MISS'
+		break
+	case '_':
+		result = 'MISS_AGAIN'
+		break
+}
+def newBoard = addDamageToBoard(shotRow, shotCol, board, rows, cols)
+pp.setProcessParameter(me, 'board', newBoard)
+
+if( !shipLeft(newBoard)){
+	result = 'ALL_SUNK'
+}
+
+pp.setProcessParameter(me, 'currentResult', result)
+
+println """ Player ${me.code} processed shot ${currentEnemyShot} = ${result} leaving board
+${newBoard}
+"""
+// notify that we checked our damage
+bps.triggerEvent("${enemy.code}_enemyCheckedDamage")
+
+return 'DAMAGE_CHECKED'
+
+def char checkAt( int row, int col, String enemyBoard, int rows, int cols){
+	enemyBoard[row * (cols + 1) + col]
+}
+
+def String addDamageToBoard( int row, int col, String board, int rows, int cols){
+	// hit ?
+	if( board[row * (cols + 1) + col] == '#' ){
+		def char[] chars = board.chars
+		chars[row * (cols + 1) + col]='X'
+		return new String(chars)
+	}
+	// miss !
+	else{
+		def char[] chars = board.chars
+		chars[row * (cols + 1) + col]='_'
+		return new String(chars)
+	}
+}
+
+def boolean shipLeft(String enemyBoard){
+	return enemyBoard.indexOf('#') > -1
+}
+			]]>
+		</script>
+		<transition name="DAMAGE_CHECKED" to="waitForEnemyCheckedDamage"/>
+	</scriptAction>
+
+	<wait id="waitForEnemyCheckedDamage" then="endTurn">
+		<event>enemyCheckedDamage</event>
+	</wait>
+
+	<scriptAction id="endTurn">
+		<script type="groovy">
+			<![CDATA[
+import de.hybris.platform.processengine.BusinessProcessService
+import de.hybris.platform.processengine.helpers.ProcessParameterHelper
+import de.hybris.platform.processengine.model.BusinessProcessModel
+import de.hybris.platform.servicelayer.model.ModelService
+
+import java.awt.Point
+
+println """
+-----------------------------------------------------------------
+--- EndTurn process: ${process.code}
+-----------------------------------------------------------------
+"""
+
+// services
+ProcessParameterHelper pp = processParameterHelper
+ModelService ms = modelService
+BusinessProcessService bps = businessProcessService
+
+// get from context
+BusinessProcessModel me = process
+
+// get params
+String board = pp.getProcessParameterByName(me, 'board')?.value
+
+BusinessProcessModel enemy = ms.get(pp.getProcessParameterByName(me, 'enemy')?.value)
+Integer rows = pp.getProcessParameterByName(enemy, 'rows')?.value
+Integer cols = pp.getProcessParameterByName(enemy, 'cols')?.value
+
+Point currentShot = pp.getProcessParameterByName(enemy, 'currentShot')?.value
+int shotRow = currentShot.y
+int shotCol = currentShot.x
+String currentResult = pp.getProcessParameterByName(enemy, 'currentResult')?.value
+def shotWasHit = currentResult.startsWith('HIT') || currentResult.startsWith('ALL_SUNK')
+
+pp.setProcessParameter(me, 'previousShot',currentShot)
+
+String enemyBoard = pp.getProcessParameterByName(me, 'enemyBoard')?.value
+def newEnemyBoard = addDamageToBoard(shotRow, shotCol, enemyBoard, rows, cols, shotWasHit)
+pp.setProcessParameter(me, 'enemyBoard', newEnemyBoard)
+
+println """ Player ${me.code} got a ${currentResult}, storing previous shot ${currentShot} and enemy board
+${newEnemyBoard}
+"""
+
+if( currentResult.startsWith('ALL_SUNK'))
+	return 'SUNK_ALL_ENEMY_SHIPS'
+else if( shipLeft(board))
+	return 'STILL_ALIVE'
+else
+	return 'NO_SHIP_LEFT'
+
+def String addDamageToBoard( int row, int col, String board, int rows, int cols, boolean hit){
+	if( hit ){
+		def char[] chars = board.chars
+		chars[(row * (cols + 1)) + col] = 'X'
+		return new String(chars)
+	}
+	else{
+		def char[] chars = board.chars
+		chars[(row * (cols + 1)) + col] = '_'
+		return new String(chars)
+	}
+}
+
+def boolean shipLeft(String board){
+	return board.indexOf('#') > -1
+}
+			]]>
+		</script>
+		<transition name="NO_SHIP_LEFT" to="defeated"/>
+		<transition name="STILL_ALIVE" to="fireShot"/>
+		<transition name="SUNK_ALL_ENEMY_SHIPS" to="victory"/>
+	</scriptAction>
+
+	<end id="defeated" state="FAILED"> Shame on me !!! </end>
+	<end id="victory" state="SUCCEEDED"> Victory !!! </end>
+
+	<end id="error" state="ERROR"> Something went wrong! </end>
+
+</process>

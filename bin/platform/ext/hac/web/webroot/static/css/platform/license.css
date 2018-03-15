@@ -1,0 +1,12 @@
+#licenseInfos_wrapper {
+    min-height: 0;
+}
+
+#demoLicence td {
+    font-weight: bolder;
+    font-size: larger;
+}
+
+#demoLicence td {
+    color: red;
+}

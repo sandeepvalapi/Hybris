@@ -1,0 +1,685 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- 
+
+This project contains all macros/targets needed for the junit tests
+
+ -->
+<project name="project.platformadministration">
+
+	<macrodef name="initialize">
+		<sequential>
+			<available file="${ext.core.path}/classes/core/GeneratedTypeInitializer.class" property="coreclasses.present" />
+			<available file="${ext.core.path}/bin/coreserver.jar" property="coreclasses.present" />
+			<if>
+				<equals arg1="${coreclasses.present}" arg2="true" />
+				<then>
+					<foreachext>
+						<do>
+							<callback extname="@{extname}" target="before_initialize" />
+						</do>
+					</foreachext>
+					<if>
+						<not>
+							<isset property="${tenant}" />
+						</not>
+						<then>
+							<input message="Enter valid tenant id" addproperty="tenant" />
+						</then>
+					</if>
+					<if>
+						<isset property="configFile" />
+						<then>
+							<normalize_for_beanshell input="${configFile}" output="normalizedConfigFile"/>
+							<echo message="Using configuration from ${normalizedConfigFile}" />
+							<yrun systeminit="true">
+								de.hybris.ant.taskdefs.AntPerformable p = new de.hybris.ant.taskdefs.InitPlatformAntPerformableImpl("${tenant}", "${normalizedConfigFile}");
+								p.doPerform();
+								de.hybris.platform.util.RedeployUtilities.shutdown();
+							</yrun>
+						</then>
+						<else>
+							<yrun systeminit="true">
+								de.hybris.ant.taskdefs.AntPerformable p = new de.hybris.ant.taskdefs.InitPlatformAntPerformableImpl("${tenant}");
+								p.doPerform();
+								de.hybris.platform.util.RedeployUtilities.shutdown();
+							</yrun>
+						</else>
+					</if>
+
+					<foreachext>
+						<do>
+							<callback extname="@{extname}" target="after_initialize" />
+						</do>
+					</foreachext>
+				</then>
+				<else>
+					<echo message="Cannot initialize the test system - you have to run ant all first" />
+				</else>
+			</if>
+
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="updatesystem">
+		<sequential>
+			<if>
+				<not>
+					<isset property="${tenant}" />
+				</not>
+				<then>
+					<input message="Enter valid tenant id" addproperty="tenant" />
+				</then>
+			</if>
+			<foreachext>
+				<do>
+					<callback extname="@{extname}" target="before_updatesystem" />
+				</do>
+			</foreachext>
+
+			<if>
+				<isset property="configFile" />
+				<then>
+					<echo message="Using configuration from ${configFile}" />
+					<yrun>
+						de.hybris.ant.taskdefs.AntPerformable p = new de.hybris.ant.taskdefs.UpdatePlatformAntPerformableImpl("${tenant}", "${configFile}");
+						p.doPerform();
+						de.hybris.platform.util.RedeployUtilities.shutdown();
+					</yrun>
+				</then>
+				<else>
+					<yrun>
+						de.hybris.ant.taskdefs.AntPerformable p = new de.hybris.ant.taskdefs.UpdatePlatformAntPerformableImpl("${tenant}");
+						p.doPerform();
+						de.hybris.platform.util.RedeployUtilities.shutdown();
+					</yrun>
+				</else>
+			</if>
+			<foreachext>
+				<do>
+					<callback extname="@{extname}" target="after_updatesystem" />
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="initializeTypeSystem" description="Runs Type System initialization in stand-alone mode">
+		<attribute name="tenant"/>
+		<attribute name="dryRun"/>
+		<attribute name="typeSystemOnly"/>
+		<sequential>
+			<input message="Enter valid tenant id" addproperty="tenant" />
+			<yTypeSystemInit
+					tenantId="@{tenant}"
+					dryRun="@{dryRun}"
+					ddlDropFilePath="${HYBRIS_TEMP_DIR}/init_${tenant}_drop_schema.sql"
+					ddlFilePath="${HYBRIS_TEMP_DIR}/init_${tenant}_schema.sql"
+					dmlFilePath="${HYBRIS_TEMP_DIR}/init_${tenant}_data.sql"/>
+			<if>
+				<not>
+					<istrue value="@{dryRun}"/>
+				</not>
+				<then>
+					<echo message="Clearing local media folder for tenant @{tenant}.." />
+					<delete dir="${HYBRIS_DATA_DIR}/media/sys_@{tenant}" failonerror="false"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="updateTypeSystem" description="Runs Type System update in stand-alone mode">
+		<attribute name="tenant"/>
+		<attribute name="dryRun"/>
+		<attribute name="typeSystemOnly"/>
+		<sequential>
+			<taskdef name="yTypeSystemUpdate" classname="de.hybris.ant.taskdefs.init.TypeSystemUpdaterTask">
+				<classpath>
+					<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+					<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+					<fileset dir="${platformhome}/lib/dbdriver">
+						<include name="*.jar" />
+					</fileset>
+					<fileset dir="${platformhome}/ext/core/lib">
+						<include name="**/*.jar" />
+					</fileset>
+					<fileset dir="${platformhome}/lib">
+						<include name="*.jar" />
+					</fileset>
+					<fileset dir="${bundled.tomcat.home}/lib">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+			<input message="Enter valid tenant id" addproperty="tenant" />
+			<yTypeSystemUpdate
+					tenantId="@{tenant}"
+					dryRun="@{dryRun}"
+					ddlFilePath="${HYBRIS_TEMP_DIR}/update_@{tenant}_schema.sql"
+					dmlFilePath="${HYBRIS_TEMP_DIR}/update_@{tenant}_data.sql" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="runcronjob">
+		<sequential>
+			<available file="${ext.core.path}/classes/core/GeneratedTypeInitializer.class" property="coreclasses.present" />
+			<available file="${ext.core.path}/bin/coreserver.jar" property="coreclasses.present" />
+			<if>
+				<equals arg1="${coreclasses.present}" arg2="true" />
+				<then>
+					<foreachext>
+						<do>
+							<callback extname="@{extname}" target="before_initialize" />
+						</do>
+					</foreachext>
+					<input message="Enter existing cron job code" addproperty="cronjob" />
+					<if>
+						<not>
+							<isset property="${tenant}" />
+						</not>
+						<then>
+							<input message="Enter valid tenant id, if you want to use default (master tenant) press enter" addproperty="tenant" />
+						</then>
+					</if>
+					<yrun>
+                        de.hybris.ant.taskdefs.AntPerformable p = new de.hybris.platform.servicelayer.cronjob.impl.CronJobAntPerformableImpl("${cronjob}","${tenant}");
+                        p.doPerform();
+                        de.hybris.platform.util.RedeployUtilities.shutdown();
+                    </yrun>
+
+					<foreachext>
+						<do>
+							<callback extname="@{extname}" target="after_initialize" />
+						</do>
+					</foreachext>
+				</then>
+				<else>
+					<echo message="Cannot initialize the test system - you have to run ant all first" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="set_webservice_nature">
+		<attribute name="extensionname" />
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<equals arg1="@{extname}" arg2="@{extensionname}" />
+						<then>
+							<property name="is.ext" value="true" />
+						</then>
+					</if>
+				</do>
+			</foreachext>
+			<if>
+				<and>
+					<not>
+						<isset property="${is.ext}" />
+					</not>
+					<not>
+						<equals arg1="true" arg2="${is.ext}" />
+					</not>
+				</and>
+				<then>
+					<fail>.
+*************************************************************
+Entered extension '@{extensionname}' for webservice nature is not in list of extensions for a platform :
+${extension.names}
+Please verify enetered extension name and/or extension defined in localextension.xml .
+*************************************************************
+					</fail>
+				</then>
+			</if>
+			<if>
+				<equals arg1="@{extensionname}" arg2="platformwebservices" />
+				<then>
+					<fail>
+*************************************************************
+To use (default) extension as webservice extension ,
+please remove any entries for a key 'webservice.module' from local.properties.
+*************************************************************</fail>
+				</then>
+			</if>
+			<echo>Setting webservice nature for an extension @{extensionname}</echo>
+			<echo>Setting global flag for a platform webservice extension</echo>
+			<if>
+				<or>
+					<not>
+						<isset property="webservice.module" />
+					</not>
+					<equals arg1="${webservice.module}" arg2="platformwebservices" />
+				</or>
+				<then>
+					<property name="write.local.properties" value="true" />
+				</then>
+				<else>
+					<if>
+						<equals arg1="${webservice.module}" arg2="@{extensionname}" />
+						<then>
+							<echo>!!!The extension '@{extensionname}' has already defined a webservice nature!!!</echo>
+						</then>
+						<else>
+							<fail>
+*************************************************************
+There is already other extension ${webservice.module} defined as webservice,
+please verify it and remove manually 'webservice.module' property from local.properties.
+*************************************************************</fail>
+						</else>
+					</if>
+				</else>
+			</if>
+			<echo>Adopting web.xml for a webservice nature</echo>
+			<if>
+				<not>
+					<available file="${ext.@{extensionname}.path}/web/webroot" />
+				</not>
+				<then>
+					<fail>
+*************************************************************
+Extension @{extensionname} seems to don not have a web module,
+please perform this task on extension with web module.
+*************************************************************</fail>
+				</then>
+			</if>
+			<if>
+				<available file="${ext.@{extensionname}.path}/web/webroot/WEB-INF/web.xml" />
+				<then>
+					<echo>
+**************************************************************
+File web.xml is already existing.It will be replaced with new generated one.
+The old web.xml will be stored in web.xml.old.
+**************************************************************</echo>
+					<move file="${ext.@{extensionname}.path}/web/webroot/WEB-INF/web.xml" tofile="${ext.@{extensionname}.path}/web/webroot/WEB-INF/web.xml.old" />
+				</then>
+			</if>
+			<copy todir="${ext.@{extensionname}.path}/web/webroot/WEB-INF/" verbose="true">
+				<fileset dir="${ext.platformwebservices.path}/resources/template/" includes="*web.xml" />
+				<filterset>
+					<filter token="extension_name" value="@{extensionname}" />
+				</filterset>
+				<!-- from template-web.xml to web.xml -->
+				<mapper>
+					<mapper type="regexp" from="(template)-(.*)" to="\2" />
+				</mapper>
+			</copy>
+			<echo>Adopting  @{extensionname}-web-spring.xml for a webservice nature</echo>
+			<if>
+				<available file="${ext.@{extensionname}.path}/resources/@{extensionname}-web-spring.xml" />
+				<then>
+					<echo>File @{extensionname}-web-spring.xml is already existing if You want to generate new one please remove current one.</echo>
+				</then>
+				<else>
+					<copy todir="${ext.@{extensionname}.path}/resources" verbose="true">
+						<fileset dir="${ext.platformwebservices.path}/resources/template" includes="*web-spring.xml" />
+
+						<filterset>
+							<filter token="extension_name" value="@{extensionname}" />
+						</filterset>
+						<!-- from template-web-spring.xml to extensionname-web-spring.xml -->
+						<mapper>
+							<mapper type="regexp" from="(template)-(.*)" to="@{extensionname}-\2" />
+						</mapper>
+					</copy>
+				</else>
+			</if>
+			<if>
+				<equals arg1="true" arg2="${write.local.properties}" />
+				<then>
+					<echo>Setting global flag for a platform webservice extension</echo>
+					<echo append="true" file="${HYBRIS_CONFIG_DIR}/local.properties">
+#####################################################################################
+# 	Global flag for an extension which will be a webservice extension in platform	#
+#####################################################################################
+webservice.module=@{extensionname}</echo>
+					<property name="write.local.properties" value="" />
+				</then>
+			</if>
+			<echo>
+**************************************************************
+Since now extension '@{extensionname}' will have a webservice nature.
+Its web context will become a hybris platform webservice'e endpoint.
+**************************************************************
+			</echo>
+		</sequential>
+	</macrodef>
+
+
+
+	<macrodef name="clearLockFlag">
+		<sequential>
+			<echo message="Checking lock flag for the platform" />
+			<yrun>
+				de.hybris.ant.taskdefs.AntPerformable p = new de.hybris.ant.taskdefs.ClearLockAntPerformable();
+				p.doPerform();
+			</yrun>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="startAdminServer">
+		<sequential>
+			<echo message="Starting AdminServer" />
+			<!-- windows -->
+			<exec dir="${platformhome}" executable="cmd.exe" osfamily="windows">
+				<arg line="/c" />
+				<arg line="adminserver.bat" />
+			</exec>
+
+			<!-- unix -->
+			<exec dir="${platformhome}" executable="sh" osfamily="unix">
+				<arg line="-c ./adminserver.sh" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="startHybrisServer">
+		<sequential>
+            <foreachext>
+                <do>
+                    <callback extname="@{extname}" target="before_startHybrisServer"/>
+                </do>
+            </foreachext>
+
+			<echo message="Checking lock flag for the platform" />
+
+			<if>
+				<os family="windows" />
+				<then>
+					<exec dir="${platformhome}" executable="cmd.exe" osfamily="windows">
+						<arg line="/c" />
+						<arg line="hybrisserver.bat" />
+					</exec>
+				</then>
+				<else>
+					<exec dir="${platformhome}" executable="sh" osfamily="unix">
+						<arg line="-c ./hybrisserver.sh" />
+					</exec>
+				</else>
+			</if>
+
+            <foreachext>
+                <do>
+                    <callback extname="@{extname}" target="after_startHybrisServer"/>
+                </do>
+            </foreachext>
+		</sequential>
+	</macrodef>
+
+	<!-- generic logging for platform; targets are defined here since they should be globally callable-->
+	<target name="startLogging">
+		<startLogging />
+	</target>
+
+	<target name="stopLogging">
+		<stopLogging />
+	</target>
+
+	<macrodef name="startLogging">
+		<attribute name="name" default="ant" />
+		<attribute name="withTimestamp" default="false" />
+		<attribute name="append" default="false" />
+		<sequential>
+
+			<!-- setting defaults -->
+			<property name="logging.name" value="@{name}" />
+			<property name="logging.withTimestamp" value="@{withTimestamp}" />
+			<property name="logging.append" value="@{append}" />
+
+			<tstamp prefix="logging" />
+			<if>
+				<istrue value="${logging.withTimestamp}" />
+				<then>
+					<record action="start" name="${HYBRIS_LOG_DIR}/${logging.name}-${logging.DSTAMP}-${logging.TSTAMP}.log" append="${logging.append}" />
+				</then>
+				<else>
+					<record action="start" name="${HYBRIS_LOG_DIR}/${logging.name}.log" append="${logging.append}" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="stopLogging">
+		<attribute name="name" default="ant" />
+		<attribute name="withTimestamp" default="true" />
+		<attribute name="append" default="false" />
+		<sequential>
+			<!-- setting defaults -->
+			<property name="logging.name" value="@{name}" />
+			<property name="logging.withTimestamp" value="@{withTimestamp}" />
+			<property name="logging.append" value="@{append}" />
+
+			<tstamp prefix="logging" />
+			<if>
+				<istrue value="${logging.withTimestamp}" />
+				<then>
+					<record action="stop" name="${HYBRIS_LOG_DIR}/${logging.name}-${logging.DSTAMP}-${logging.TSTAMP}.log" append="${logging.append}" />
+				</then>
+				<else>
+					<record action="stop" name="${HYBRIS_LOG_DIR}/${logging.name}.log" append="${logging.append}" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="executeScript">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="resource" />
+                </not>
+                <then>
+                    <echo>You must provide valid path to script</echo>
+                </then>
+                <else>
+                    <if>
+                        <isset property="params" />
+                        <then>
+                            <yrun>
+                                import de.hybris.platform.core.Registry;
+                                import de.hybris.platform.scripting.engine.impl.CmdScriptExecutor;
+
+                                CmdScriptExecutor executor = Registry.getApplicationContext().getBean("cmdScriptExecutor", CmdScriptExecutor.class);
+                                executor.execute("${resource}", "${params}");
+
+                                de.hybris.platform.util.RedeployUtilities.shutdown();
+                            </yrun>
+                        </then>
+                        <else>
+                            <yrun>
+                                import de.hybris.platform.core.Registry;
+                                import de.hybris.platform.scripting.engine.impl.CmdScriptExecutor;
+
+                                CmdScriptExecutor executor = Registry.getApplicationContext().getBean("cmdScriptExecutor", CmdScriptExecutor.class);
+                                executor.execute("${resource}");
+
+                                de.hybris.platform.util.RedeployUtilities.shutdown();
+                            </yrun>
+                        </else>
+                    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+	<macrodef name="importImpex">
+		<sequential>
+			<if>
+			<not>
+				<isset property="resource" />
+			</not>
+			<then>
+				<echo>You must provide valid path to impex file</echo>
+			</then>
+			<else>
+                <yrun>
+                    import de.hybris.platform.core.Registry;
+                    import de.hybris.platform.servicelayer.impex.impl.CmdImpExService;
+
+					CmdImpExService service = Registry.getApplicationContext().getBean("cmdImpExService", CmdImpExService.class);
+                    service.importFromFile("${resource}");
+
+                    de.hybris.platform.util.RedeployUtilities.shutdown();
+                </yrun>
+			</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="clearOrphanedTypes">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="clearInstances" />
+                </not>
+                <then>
+                    <property name="clearInstances" value="true" />
+                </then>
+            </if>
+            <if>
+                <not>
+                    <isset property="clearDeployments" />
+                </not>
+                <then>
+                    <property name="clearDeployments" value="true" />
+                </then>
+            </if>
+            <yrun>
+                import de.hybris.platform.cronjob.util.TypeRemovalUtil;
+
+                TypeRemovalUtil.removeOrphanedTypes(Boolean.valueOf("${clearInstances}"), Boolean.valueOf("${clearDeployments}"));
+
+                de.hybris.platform.util.RedeployUtilities.shutdown();
+            </yrun>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="sanitycheck">
+        <sequential>
+            <yrun>
+                import de.hybris.platform.core.Registry;
+                import de.hybris.platform.healthcheck.HealthCheckService;
+                import de.hybris.platform.healthcheck.impl.DefaultHealthCheckService;
+				import de.hybris.platform.healthcheck.impl.cluster.JacksonHealthCheckResultSerializer;
+
+                HealthCheckService service = Registry.getApplicationContext().getBean("healthCheckService", DefaultHealthCheckService.class);
+
+				JacksonHealthCheckResultSerializer serializer = new JacksonHealthCheckResultSerializer();
+                System.out.println("Sanity check result: \n" + serializer.serialize(service.performInstanceHealthCheck()));
+                de.hybris.platform.util.RedeployUtilities.shutdown();
+            </yrun>
+        </sequential>
+    </macrodef>
+
+	<macrodef name="createPlatformImageStructure" description="creates platform docker image structure">
+		<attribute name="productionPackagesDir"/>
+		<attribute name="platformImageDir"/>
+		<attribute name="externalTomcatDir"/>
+		<attribute name="serverXmlTemplate"/>
+		<attribute name="loggingPropertiesTemplate"/>
+		<attribute name="customTomcatFiles"/>
+		<attribute name="platformImageAspects"/>
+		<attribute name="templatesProperties"/>
+		<sequential>
+			<fail message="Cannot find server.xml file under @{serverXmlTemplate}!. Please provide a correct file path or leave it - the default one will be used">
+				<condition>
+					<not>
+						<available file="@{serverXmlTemplate}"/>
+					</not>
+				</condition>
+			</fail>
+			<fail message="Cannot find logging.properties file under @{loggingPropertiesTemplate}!. Please provide a correct file path or leave it - the default one will be used">
+				<condition>
+					<not>
+						<available file="@{loggingPropertiesTemplate}"/>
+					</not>
+				</condition>
+			</fail>
+			<if>
+				<not>
+					<isset property="${externalTomcatDir}"/>
+				</not>
+				<then>
+					<input message="Enter valid external tomcat directory" addproperty="externalTomcatDir"/>
+				</then>
+			</if>
+			<if>
+				<equals arg1="@{platformImageAspects}" arg2=""/>
+				<then>
+					<echo>No platform Image Aspects file provided, only default aspect will be generated</echo>
+				</then>
+				<else>
+					<fail message="Cannot find platform image aspects configuration file under @{platformImageAspects}!. Please provide a correct file path or leave it - the default aspect will be used only">
+						<condition>
+							<not>
+								<available file="@{platformImageAspects}"/>
+							</not>
+						</condition>
+					</fail>
+				</else>
+			</if>
+			<echo>Creating platform image structure...</echo>
+			<echo message="Production packages dir:  @{productionPackagesDir}"/>
+			<echo message="Target platform image dir:  @{platformImageDir}"/>
+			<echo message="External tomcat dir:  @{externalTomcatDir}"/>
+			<echo message="Server.xml from:  @{serverXmlTemplate}"/>
+			<echo message="Logging.properties from:  @{loggingPropertiesTemplate}"/>
+			<echo message="Templates properties: @{templatesProperties}" />
+
+			<ycreateplatformimagestructure
+					productionPackagesDir="@{productionPackagesDir}"
+					platformImageDir="@{platformImageDir}"
+					externalTomcatDir="@{externalTomcatDir}"
+					serverXmlTemplate="@{serverXmlTemplate}"
+					loggingPropertiesTemplate="@{loggingPropertiesTemplate}"
+					customTomcatFiles="@{customTomcatFiles}"
+					platformImageAspects="@{platformImageAspects}"
+					templatesProperties="@{templatesProperties}"
+			/>
+			<echo>Creating platform image structure finished</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="copyFromTemplate" description="Creates directory based on provided template directory and substitutes
+	all variables defined in .tmpl files with provided parameters. -DtemplateDir - (required) path to template directory
+	-DoutputDir - (required) path to output directory -DfilesToCopy - (optional) coma separated list of files/directories that will be additionally copied
+	-Dproperties - (optional) properties file that overrides default template properties">
+		<sequential>
+			<condition property="templateDir" value="">
+				<not>
+					<isset property="templateDir"/>
+				</not>
+			</condition>
+			<condition property="properties" value="">
+				<not>
+					<isset property="properties"/>
+				</not>
+			</condition>
+			<condition property="outputDir" value="">
+				<not>
+					<isset property="outputDir"/>
+				</not>
+			</condition>
+			<condition property="filesToCopy" value="">
+				<not>
+					<isset property="filesToCopy"/>
+				</not>
+			</condition>
+			<ycopyfromtemplate templateDir="${templateDir}"
+							   properties="${properties}" outputDir="${outputDir}"
+								filesToCopy="${filesToCopy}"/>
+		</sequential>
+	</macrodef>
+
+
+</project>

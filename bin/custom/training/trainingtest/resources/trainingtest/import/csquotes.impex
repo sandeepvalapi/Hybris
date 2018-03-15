@@ -1,0 +1,72 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$defaultPassword=12341234
+
+$storeUid=electronics
+$siteUid=electronics
+
+# Create sample users
+INSERT_UPDATE Customer;originalUid[unique=true];uid[unique=true];title(code);name;description;sessionLanguage(isocode);sessionCurrency(isocode);password[default=$defaultPassword]
+;chris.rumple@ehost.com;chris.rumple@ehost.com;;Chris Rumple;Test user Chris Rumple;en;USD;
+;dan.cameron@siteb.com;dan.cameron@siteb.com;;Dan Cameron;Test user Dan Cameron;en;USD;
+;harold.wine@asite.org;harold.wine@asite.org;;Harold Wine;Test user Harold Wine;en;USD;
+;h.williams@peabody.ca;h.williams@peabody.ca;;Hanna Williams;Test user Hanna Williams;en;USD;
+;daisy.smith@irc.uk;daisy.smith@irc.uk;;Daisy Smith;Test user Daisy Smith;en;USD;
+;elena.bulav@internet.ru;elena.bulav@internet.ru;;Elena Bulavintseva;Test user Elena Bulavintseva;en;USD;
+;wei.liu@homemail.ch;wei.liu@homemail.ch;;Wei Liu;Test user Wei Liu;en;USD;
+
+# Create sample quotes
+INSERT_UPDATE Quote;code[unique=true];version[unique=true];currency(isocode);user(uid);date[dateformat=dd.MM.yyyy HH:mm:ss];state(code);net[default=false];calculated[default=false];site(uid);store(uid)
+;TestQuote-00000001;1;USD;chris.rumple@ehost.com;21.10.2016 00:00:00;BUYER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000001;2;USD;chris.rumple@ehost.com;22.10.2016 00:00:00;SELLER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000001;3;USD;chris.rumple@ehost.com;23.10.2016 00:00:00;SELLERAPPROVER_PENDING;;;$siteUid;$storeUid;
+;TestQuote-00000002;1;USD;dan.cameron@siteb.com;26.04.2010 00:00:00;BUYER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000002;2;USD;dan.cameron@siteb.com;27.04.2010 00:00:00;SELLER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000003;1;USD;harold.wine@asite.org;26.04.2010 00:00:00;BUYER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000003;2;USD;harold.wine@asite.org;27.04.2010 00:00:00;SELLER_REQUEST;;;$siteUid;$storeUid;
+;TestQuote-00000004;1;USD;h.williams@peabody.ca;26.04.2010 00:00:00;BUYER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000004;2;USD;h.williams@peabody.ca;27.04.2010 00:00:00;SELLER_REQUEST;;;$siteUid;$storeUid;
+;TestQuote-00000005;1;USD;daisy.smith@irc.uk;26.04.2010 00:00:00;BUYER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000005;2;USD;daisy.smith@irc.uk;27.04.2010 00:00:00;SELLER_REQUEST;;;$siteUid;$storeUid;
+;TestQuote-00000006;1;USD;elena.bulav@internet.ru;26.04.2010 00:00:00;BUYER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000006;2;USD;elena.bulav@internet.ru;27.04.2010 00:00:00;SELLER_REQUEST;;;$siteUid;$storeUid;
+;TestQuote-00000007;1;USD;wei.liu@homemail.ch;26.04.2010 00:00:00;BUYER_SUBMITTED;;;$siteUid;$storeUid;
+;TestQuote-00000007;2;USD;wei.liu@homemail.ch;27.04.2010 00:00:00;SELLER_REQUEST;;;$siteUid;$storeUid;
+
+# Set name and description for the quotes
+UPDATE Quote;code[unique=true];version[unique=true];name;description
+;TestQuote-00000001;1;Quote for Bulk SD Card Order;I want to order SD cards for distribution in our school, possible to get a discount? How many would be minimum?;
+;TestQuote-00000001;2;Quote for Bulk SD Card Order;I want to order SD cards for distribution in our school, possible to get a discount? How many would be minimum?;
+;TestQuote-00000001;3;Quote for Bulk SD Card Order;I want to order SD cards for distribution in our school, possible to get a discount? How many would be minimum?;
+;TestQuote-00000002;1;Camera request;If I order 3 identical cameras for sharing with family members, but it’s not rush to get them, is it possible to get a deal? Possibly last year’s models?;
+;TestQuote-00000002;2;Camera request;If I order 3 identical cameras for sharing with family members, but it’s not rush to get them, is it possible to get a deal? Possibly last year’s models?;
+;TestQuote-00000003;1;Portable power for trips – quote;We hike a photo a lot. We have a need for a lot of portable power… what can be done? We’re a non-profit group so price is sensitive.;
+;TestQuote-00000003;2;Portable power for trips – quote;We hike a photo a lot. We have a need for a lot of portable power… what can be done? We’re a non-profit group so price is sensitive.;
+;TestQuote-00000004;1;Camcorder order;Need camcorders… willing to tell our friends how great your store is :);
+;TestQuote-00000004;2;Camcorder order;Need camcorders… willing to tell our friends how great your store is :);
+;TestQuote-00000005;1;Same brand – discount possible;For our club, if we gather all our orders from members and get same brands, is it possible to get 10 or 15 percent off if we prepay?;
+;TestQuote-00000005;2;Same brand – discount possible;For our club, if we gather all our orders from members and get same brands, is it possible to get 10 or 15 percent off if we prepay?;
+;TestQuote-00000006;1;Recurring order delivery cost reduction;I want to regularly order stuff for resell, could you do something about the delivery cost? It kind of negates the reason to order online;
+;TestQuote-00000006;2;Recurring order delivery cost reduction;I want to regularly order stuff for resell, could you do something about the delivery cost? It kind of negates the reason to order online;
+;TestQuote-00000007;1;Quote request for video lights;If I order all those cameras, was wondering if the lights can be thrown in for free. I often order from your site, I'm a good customer and recommend your shop to friends.;
+;TestQuote-00000007;2;Quote request for video lights;If I order all those cameras, was wondering if the lights can be thrown in for free. I often order from your site, I'm a good customer and recommend your shop to friends.;
+
+# Re-create employees from commerceorgsamplesaddon if it's not installed
+INSERT_UPDATE Employee;name;password[default=$defaultPassword];uid[unique=true]
+;Daniele Sorber;;daniele.sorber@acme.com;
+;Debera Spiller;;debera.spiller@acme.com;
+;Bernardo Coelho;;bernardo.coelho@acme.com;
+
+# Set assignees for some of the quotes
+UPDATE Quote;code[unique=true];version[unique=true];assignee(uid);
+;TestQuote-00000001;3;bernardo.coelho@acme.com;
+;TestQuote-00000003;2;debera.spiller@acme.com;
+;TestQuote-00000005;2;daniele.sorber@acme.com;

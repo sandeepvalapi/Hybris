@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           ">
+
+	<!-- register/unregister all hybris JMX MBeans -->
+	<bean id="mbeanRegisterUtility" class="de.hybris.platform.jmx.MBeanRegisterUtilities">
+		<property name="assembler" ref="assembler"/>
+	</bean>
+	
+	<!-- needed for resolving the annotations in the java class files -->
+	 <bean id="jmxAttributeSource"
+          class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+
+	<!-- needed for resolving the annotations in the java class files -->
+    <!-- will create management interface using annotation metadata -->
+    
+    <!-- bean id="assembler" class="de.hybris.platform.jmx.HybrisMetadataMBeanInfoAssembler"-->        
+    <!-- bean id="assembler" class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler"-->
+    <bean id="assembler" class="de.hybris.platform.jmx.HybrisMetadataMBeanInfoAssembler" >        
+        <property name="attributeSource" ref="jmxAttributeSource"/>  
+    </bean>
+		
+</beans>

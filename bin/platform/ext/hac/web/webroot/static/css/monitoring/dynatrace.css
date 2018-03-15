@@ -1,0 +1,43 @@
+.dashboard {
+		padding: 5px;
+		margin: 5px 0;
+		background-color: rgba(0, 0, 0, 0.2);
+		-moz-border-radius: 5px; /* Firefox */
+		-webkit-border-radius: 5px; /* Safari, Chrome */
+		border-radius: 5px; /* CSS3 */
+		-webkit-transition: background-color 0.3s ease-in-out;
+		-moz-transition: background-color 0.3s ease-in-out;
+		-o-transition: background-color 0.3s ease-in-out;
+		-ms-transition: background-color 0.3s ease-in-out;
+		transition: background-color 0.3s ease-in-out;
+		min-height: 75px;
+	}
+
+	.dashboard:hover {
+		background-color: rgba(0, 0, 0, 0.05);
+	}	
+	
+.dashboard_no_highlight {
+		padding: 5px;
+		margin: 5px 0;
+		background-color: rgba(0, 0, 0, 0.05);
+		-moz-border-radius: 5px; /* Firefox */
+		-webkit-border-radius: 5px; /* Safari, Chrome */
+		border-radius: 5px; /* CSS3 */
+		-webkit-transition: background-color 0.3s ease-in-out;
+		-moz-transition: background-color 0.3s ease-in-out;
+		-o-transition: background-color 0.3s ease-in-out;
+		-ms-transition: background-color 0.3s ease-in-out;
+		transition: background-color 0.3s ease-in-out;
+		min-height: 75px;
+	}	
+	
+	h4, .desc {
+		margin-bottom: 0.25em
+	}
+	
+	.dark {
+		color: #222;
+	}
+	
+	

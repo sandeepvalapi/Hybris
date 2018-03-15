@@ -1,0 +1,64 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#Creates default adhoc template so that it is possible to create adhoc workflows
+#Notice that following variable '$adhocTempateName' is also defined in project properties - if you change it here, change it also in project.properties
+#Notice also that changing quantity/order of steps will influence ahoc workflow behaviour - check class AdhocWorkflowHelper which handles indices of adhoc template actions.
+ 
+$dummyUserName=admin;
+$adhocTempateName=adhoctemplate;
+
+$adhocStepName=Adhoc step;
+$adhocApprovalStepName=Approval;
+$adhocEndStepName=End
+$doneName=Done;
+$approvedName=Approved;
+$notApprovedName=Not approved;
+$endName=End
+
+
+# import special (simple) template for creating adhoc workflows:
+INSERT_UPDATE WorkflowTemplate;code[unique=true];name[lang=en];name[lang=de];description[lang=en];description[lang=de];owner(User.uid);
+;$adhocTempateName;Adhoc template;Adhoc template;Template with one simple tasks;TBT: Template with one simple tasks;$dummyUserName;
+
+# add two simple steps to adhoc template 
+## step one
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=en];name[lang=de];principalAssigned(User.uid);owner(User.uid);workflow(WorkflowTemplate.code);actionType(code)
+;$adhocStepName;Start;Start;$dummyUserName;$dummyUserName;$adhocTempateName;start
+
+## step two
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=en];name[lang=de];principalAssigned(User.uid);owner(User.uid);workflow(WorkflowTemplate.code);actionType(code)
+;$adhocApprovalStepName;Approval;Freigabe;$dummyUserName;$dummyUserName;$adhocTempateName;normal
+
+#decisions for first step
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=en];name[lang=de];actionTemplate(WorkflowActionTemplate.code);
+;$doneName;Done!;Fertig!;$adhocStepName;
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(WorkflowDecisionTemplate.code)[unique=true];target(WorkflowActionTemplate.code)
+;$doneName;$adhocApprovalStepName
+
+#decisions for second step
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=en];name[lang=de];actionTemplate(WorkflowActionTemplate.code);
+;$approvedName;Approval;Freigabe;$adhocApprovalStepName;
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=en];name[lang=de];actionTemplate(WorkflowActionTemplate.code);
+;$notApprovedName;No Approval;Keine Freigabe;$adhocApprovalStepName;
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(WorkflowDecisionTemplate.code)[unique=true];target(WorkflowActionTemplate.code)
+;$notApprovedName;$adhocStepName
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(WorkflowDecisionTemplate.code)[unique=true];target(WorkflowActionTemplate.code)
+;$approvedName;$adhocEndStepName
+
+## step three - final
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=en];name[lang=de];principalAssigned(User.uid);owner(User.uid);workflow(WorkflowTemplate.code);actionType(code)
+;$adhocEndStepName;End;Ende;$dummyUserName;$dummyUserName;$adhocTempateName;end
+
+#decisions for third step
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=en];name[lang=de];actionTemplate(WorkflowActionTemplate.code);
+;$endName;End;Ende;$adhocEndStepName;

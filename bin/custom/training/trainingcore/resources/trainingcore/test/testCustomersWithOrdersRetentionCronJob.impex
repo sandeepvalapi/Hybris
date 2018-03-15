@@ -1,0 +1,91 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$testCategory0-id=testCategory0
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version];;;;;;;;;;;;;;;;;;;;;;
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]));;;;;;;;;;;;;;;;;;;;;;
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator];;;;;;;;;;;;;;;;;;;;;;
+$product=product(code, catalogVersion(catalog(id[default='testCatalog']),version[default='Online']));
+
+#Base Site
+INSERT_UPDATE BaseSite;uid[unique=true];
+;testSite;
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active;;;;;;
+;US;United States of America;true;;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;symbol;
+;USD;US dollars;true;USD;
+
+#Base store
+INSERT_UPDATE BaseStore;uid[unique=true];name[lang=en];cmsSites(uid);currencies(isocode);defaultCurrency(isocode);languages(isoCode);defaultLanguage(isoCode);
+;defaultstore;Default Store;testSite;USD;USD;en;en;
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid);
+;testSite;defaultstore;
+
+INSERT_UPDATE Domain;code[unique=true];name;
+;ticketSystemDomain;Ticket System Domain;
+
+INSERT_UPDATE Component;code[unique=true];name;domain[unique=true](code)
+;ticketSystem;Ticket System;ticketSystemDomain
+
+INSERT_UPDATE CommentType;code[unique=true];name;domain[unique=true](code);metaType(code)
+;customerNote;Customer Note;ticketSystemDomain;CsCustomerEvent
+
+INSERT_UPDATE Address;&addId;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;url;company;fax;department
+;tbrPaymentAddress;user1;tbrPaymentAddress;1;28277;false;Bremen;US;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;;hybris GmbH;
+;ntbrPaymentAddress;user2;ntbrPaymentAddress;3;28277;false;Bremen;US;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;;hybris GmbH;
+
+INSERT_UPDATE CreditCardPaymentInfo;code[unique=true];owner(Customer.uid);user(Customer.uid)[unique=true];ccOwner;number;type(code);validFromMonth;validFromYear;validToMonth;validToYear;subscriptionId;duplicate[default=false];saved[default=true]
+;tbrccid;user1;user1;John Acceptance;4012888888881881;visa;1;2010;12;2013;1231;
+;ntbrccid;user2;user2;John Acceptance;4012888888881881;visa;1;2010;12;2013;1231;
+
+INSERT_UPDATE Comment;code[unique=true];owner(Customer.uid);author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);subject;text
+;tbrComment;user1;user1;ticketSystem;customerNote;'Subject';'Good';
+;ntbrComment;user2;user2;ticketSystem;customerNote;'Subject';'Good, too';
+
+INSERT_UPDATE Vendor;name[lang=en];code[unique=true];
+;Default Vendor;defaultVendor;
+
+INSERT_UPDATE Warehouse;name[lang=en];code[unique=true];default;vendor(code);
+;Default Warehouse;defaultWarehouse;true;defaultVendor;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;deactivationDate[dateformat=dd.MM.yyyy HH:mm];retentionState(code);addresses(&addId);paymentInfos(code);comments(code);ContactInfos(code);carts(code)
+;user1;user1;name;26.01.2012 10:58;;tbrPaymentAddress;tbrccid;tbrComment;;cart1
+;user2;user2;name;26.01.2012 10:58;PROCESSED;ntbrPaymentAddress;ntbrccid;ntbrComment;;cart2
+
+INSERT_UPDATE Cart;user(uid);code[unique=true];currency(isocode);date[dateformat=dd.MM.yyyy HH:mm:ss];net;calculated;site(uid);store(uid);guid;;;;
+;user1;cart1;EUR;27.04.2010 00:00:00;false;false;;;;;;
+;user2;cart2;EUR;27.04.2010 00:00:00;false;false;;;;;;
+
+INSERT_UPDATE PhoneContactInfo;code[unique=true];user(uid);phoneNumber;type(code)
+;phone1;user1;123456789;MOBILE
+;phone2;user2;987654321;MOBILE
+
+INSERT_UPDATE CustomerReview;$product[unique=true];rating[unique=true];user(uid)[unique=true];comment;headline;creationTime[dateformat='yyyy-MM-dd''T''HH:mm:ss'];approvalStatus(code);alias;language(isocode)
+;HW1210-3422;1;user1;comment;headline;2009-01-01T00:00:00;approved;alias;en
+;HW1210-3422;2;user2;comment;headline;2010-01-01T00:00:00;approved;alias;en
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;$supercategories;picture(code);thumbnail(code);normal(code);logo(code);averageRating;manufacturerName;
+;HW1210-3422;;testDE;testEN;pieces;57,95 EUR;approved;dejol;0;$testCategory0-id;;;;;;;
+
+INSERT_UPDATE ConsentTemplate;id[unique=true];name;description;version[unique=true];baseSite(uid)[unique=true];&ConsentTemplateRef
+;CONSENT_TEMPLATE_1;"Newsletter Subscription Consent 1";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";0;testSite;consent_template_record_1
+
+INSERT_UPDATE Consent;code[unique=true];consentTemplate(&ConsentTemplateRef);customer(Customer.uid);consentgivendate[dateformat=dd-MM-yyyy];consentwithdrawndate[dateformat=dd-MM-yyyy]
+;consent0;consent_template_record_1;user1;"01-07-2017"
+;consent1;consent_template_record_1;user2;"02-07-2017"
+
+INSERT_UPDATE Order;code[unique=true];user(uid);date[dateformat=dd.MM.yyyy HH:mm];expirationTime[dateformat=dd.MM.yyyy HH:mm];currency(isocode);net;deliveryMode(code);Discounts(code);calculated;store(uid);site(uid)
+;order1;user1;26.01.2010 10:58;26.01.2012 10:58;USD;false;;;false;defaultstore;testSite
+;order2;user2;26.01.2010 10:58;26.01.2020 10:58;USD;false;;;false;defaultstore;testSite
+
+INSERT_UPDATE StoreFrontCustomerProcess;code[unique=true];processDefinitionName;site(uid);customer(Customer.uid)
+;customerRegistrationEmailProcess_user1;customerRegistrationEmailProcess;testSite;user1
+;customerRegistrationEmailProcess_user2;customerRegistrationEmailProcess;testSite;user2
+
+INSERT_UPDATE ForgottenPasswordProcess;code[unique=true];processDefinitionName;site(uid);customer(Customer.uid)
+;customerForgottenPasswordProcess_user1;customerForgottenPasswordProcess;testSite;user1
+;customerForgottenPasswordProcess_user2;customerForgottenPasswordProcess;testSite;user2

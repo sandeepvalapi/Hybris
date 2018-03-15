@@ -1,0 +1,77 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="test-scripting-cache-spring.xml"/>
+
+    <alias name="defaultScriptingEnginesRegistry" alias="scriptEnginesRegistry"/>
+    <bean id="defaultScriptingEnginesRegistry"
+          class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEnginesRegistry"/>
+
+    <bean id="groovyEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="groovy" c:fileExtension="groovy" c:mime="application/x-groovy"/>
+    <bean id="bshEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="beanshell" c:fileExtension="bsh" c:mime="application/x-bsh"/>
+    <bean id="javascriptEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="javascript" c:fileExtension="js" c:mime="application/x-javascript"/>
+
+    <alias name="defaultScriptRepositoriesRegistry" alias="scriptRepositoriesRegistry"/>
+    <bean id="defaultScriptRepositoriesRegistry"
+          class="de.hybris.platform.scripting.engine.repository.impl.DefaultScriptRepositoriesRegistry"/>
+
+    <bean id="classpathScriptsRepository"
+          class="de.hybris.platform.scripting.engine.repository.impl.TestClasspathScriptsRepository">
+       <property name="supportedProtocols">
+       	<list>
+       		<value>classpath</value>
+       	</list>
+       </property>
+     </bean>
+    <bean id="remoteScriptsRepository"
+          class="de.hybris.platform.scripting.engine.repository.impl.RemoteScriptsRepository">
+       <property name="supportedProtocols">
+       	<list>
+       		<value>http</value>
+       		<value>https</value>
+       		<value>ftp</value>
+       	</list>
+       </property>
+    </bean>
+    <bean id="filesystemScriptsRepository"
+          class="de.hybris.platform.scripting.engine.repository.impl.FileSystemScriptsRepository">
+	       <property name="supportedProtocols">
+       	<list>
+       		<value>file</value>
+       	</list>
+       </property>
+	</bean>
+    
+    <alias name="defaultScriptExecutableCacheService" alias="scriptExecutableCacheService"/>
+    <bean id="defaultScriptExecutableCacheService"
+          class="de.hybris.platform.scripting.engine.internal.cache.impl.DefaultScriptExecutableCacheService">
+        <property name="cacheController" ref="defaultCacheController"/>
+    </bean>
+
+    <alias name="defaultScriptingLanguagesService" alias="scriptingLanguagesService"/>
+    <bean id="defaultScriptingLanguagesService"
+          class="de.hybris.platform.scripting.engine.impl.TestScriptingLanguagesService">
+        <property name="scriptEnginesRegistry" ref="scriptEnginesRegistry"/>
+        <property name="scriptRepositoriesRegistry" ref="scriptRepositoriesRegistry"/>
+        <property name="cacheService" ref="scriptExecutableCacheService"/>
+    </bean>
+
+    <bean id="testBean" class="java.util.HashMap"/>
+
+</beans>

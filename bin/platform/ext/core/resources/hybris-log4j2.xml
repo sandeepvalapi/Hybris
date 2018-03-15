@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- Platform-only xml configuration for Log4j2. Not used by default, can be treated as an example -->
+<!-- To enable set in local.properties: log4j2.config.xml=hybris-log4j2.xml -->
+<!-- Keep in mind that xml configurations cannot be merged together unlike ones set via hybris properties. -->
+<!-- shutdownHook is disabled because we invoke it programatically after shutting down hybris registry -->
+<Configuration status="WARN" shutdownHook="disable" packages="de.hybris.platform.util.logging">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+			<PatternLayout pattern="%highlight{%-5p [%t] %X{RemoteAddr}%X{Tenant}%X{CronJob}[%c{1}] %m%n}"/>
+		</Console>
+	</Appenders>
+	<Loggers>
+		<Logger name="de.hybris.platform.servicelayer.hmc" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+
+		<Logger name="de.hybris.platform.spring.ctx.TenantIgnoreXmlWebApplicationContext" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+		<Logger name="de.hybris.platform.spring.ctx.CloseAwareApplicationContext" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+
+		<Logger name="org.apache.ddlutils.alteration.ModelComparator" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+		<Logger name="hsqldb.db" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+		<Logger name="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+		<Logger name="de.hybris.platform.spring.ctx.ScopeTenantIgnoreDocReader" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+
+		<Logger name="de.hybris.platform.util.logging.LoggingFrameworksBridgeTest" level="ALL" additivity="false">
+			<AppenderRef ref="Console"/>
+		</Logger>
+
+		<Logger name="de.hybris.cronjobtutorial.MyJobPerformable" level="ALL" additivity="false">
+			<AppenderRef ref="Console"/>
+		</Logger>
+
+		<Logger name="org.springframework.aop.framework.Cglib2AopProxy" level="error">
+			<AppenderRef ref="Console"/>
+		</Logger>
+		<Logger name="org.springframework" level="warn">
+			<AppenderRef ref="Console"/>
+		</Logger>
+		<Root level="info">
+			<AppenderRef ref="Console"/>
+		</Root>
+	</Loggers>
+</Configuration>

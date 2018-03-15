@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Media storage configuration (property based) -->
+	<bean id="configValueMappingRegistry" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistry" />
+	
+	<bean id="integerConfigValueConverter" class="de.hybris.platform.media.storage.impl.IntegerValueConverter" />
+	<bean id="booleanConfigValueConverter" class="de.hybris.platform.media.storage.impl.BooleanValueConverter" />
+	<bean id="iterableConfigValueConverter" class="de.hybris.platform.media.storage.impl.IterableValueConverter" />
+
+	<bean id="urlStrategyConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar"  p:key="url.strategy"
+		p:value-ref="iterableConfigValueConverter" />
+	<bean id="localCacheConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar" p:key="local.cache"
+		p:value-ref="booleanConfigValueConverter" />
+	<bean id="mediaSecuredConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar" p:key="secured"
+		p:value-ref="booleanConfigValueConverter" />
+	<bean id="hashingDepthConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar" p:key="hashing.depth"
+		p:value-ref="integerConfigValueConverter" />
+	<bean id="cleanOnInitConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar" p:key="cleanOnInit"
+		p:value-ref="booleanConfigValueConverter" />
+
+	<alias name="defaultMediaStorageConfigService" alias="mediaStorageConfigService" />
+	<bean id="defaultMediaStorageConfigService" class="de.hybris.platform.media.storage.impl.DefaultMediaStorageConfigService">
+		<constructor-arg ref="configValueMappingRegistry" />
+	</bean>
+
+	<!-- Media manager -->
+	<bean id="core.mediaManager" class="de.hybris.platform.jalo.media.MediaManager">
+		<property name="mediaStorageRegistry" ref="mediaStorageRegistry" />
+		<property name="mediaStorageConfigService" ref="mediaStorageConfigService" />
+		<property name="localMediaFileCache" ref="localMediaFileCacheService" />
+		<property name="locationHashService" ref="mediaLocationHashService" />
+		<property name="mimeService" ref="mimeService" />
+		<property name="mediaHeadersRegistry" ref="mediaHeadersRegistry" />
+	</bean>
+
+	<alias name="defaultMimeService" alias="mimeService" />
+	<bean id="defaultMimeService" class="de.hybris.platform.media.services.impl.DefaultMimeService" />
+
+	<alias name="defaultMediaLocationHashService" alias="mediaLocationHashService" />
+	<bean id="defaultMediaLocationHashService" class="de.hybris.platform.media.services.impl.DefaultMediaLocationHashService">
+		<property name="salt" value="${media.default.storage.location.hash.salt}" />
+	</bean>
+
+	<bean id="localFileMediaStorageStrategy" class="de.hybris.platform.media.storage.impl.LocalFileMediaStorageStrategy">
+		<property name="locationHashService" ref="mediaLocationHashService" />
+		<property name="storageConfigService" ref="mediaStorageConfigService" />
+		<property name="mimeService" ref="mimeService" />
+		<property name="mainDataDir" value="#{T(de.hybris.platform.util.MediaUtil).getLocalStorageDataDir()}" />
+		<property name="replicationDirs" value="#{T(de.hybris.platform.util.MediaUtil).getLocalStorageReplicationDirs()}" />
+	</bean>
+
+	<bean id="localFileMediaStorageCleaner" class="de.hybris.platform.media.storage.impl.LocalFileMediaStorageCleaner">
+		<property name="cleanOnInit" value="${media.globalSettings.localFileMediaStorageStrategy.cleanOnInit}" />
+		<property name="replicationDirs" value="#{T(de.hybris.platform.util.MediaUtil).getLocalStorageReplicationDirs()}" />
+    </bean>
+
+	<bean id="localMediaFileCacheService" class="de.hybris.platform.media.storage.impl.DefaultLocalMediaFileCacheService">
+		<property name="cacheRecreator" ref="localMediFileCacheRecreator" />
+		<property name="storageRegistry" ref="mediaStorageRegistry" />
+		<property name="storageStrategy" ref="localFileMediaStorageStrategy" />
+		<property name="storageConfigService" ref="mediaStorageConfigService" />
+		<property name="cacheController" ref="defaultCacheController" />
+		<property name="mainDataDir" value="#{T(de.hybris.platform.util.MediaUtil).getLocalStorageDataDir()}" />
+        <property name="mediaCacheRegion" ref="mediaCacheRegion"/>
+    </bean>
+	
+	<bean id="localMediFileCacheRecreator" class="de.hybris.platform.media.storage.impl.MediaCacheRecreator" init-method="init">
+		<constructor-arg value="#{T(de.hybris.platform.util.MediaUtil).getLocalStorageDataDir()}" />
+		<constructor-arg ref="defaultCacheController" />
+	</bean>
+	
+	<alias name="defaultMediaStorageRegistry" alias="mediaStorageRegistry" />
+	<bean id="defaultMediaStorageRegistry" class="de.hybris.platform.media.storage.impl.DefaultMediaStorageRegistry" />
+
+	<bean id="localMediaWebURLStrategy" class="de.hybris.platform.media.url.impl.LocalMediaWebURLStrategy">
+		<property name="prettyUrlEnabled" value="${media.legacy.prettyURL}" />
+	</bean>
+
+	<alias name="defaultMediaHeadersRegistry" alias="mediaHeadersRegistry" />
+	<bean id="defaultMediaHeadersRegistry" class="de.hybris.platform.media.services.impl.DefaultMediaHeadersRegistry" />
+</beans>

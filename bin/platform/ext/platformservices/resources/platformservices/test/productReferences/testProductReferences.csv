@@ -1,0 +1,45 @@
+$catalogversion=catalogversion(catalog(id[default='photoCatalog']),version[default='Online'])[unique=true,default='photoCatalog:Online']
+$supercategories=supercategories(code,catalogversion(catalog(id),version));
+
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog;
+;photoCatalog;Photo Catalog;Photo Catalog;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;
+;photoCatalog;Online;true;
+
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories
+;cameras;photoCatalog:Online;cameras;cameras;
+;lenses;photoCatalog:Online;lenses;lenses;
+;tripods;photoCatalog:Online;tripods;tripods;
+;batteries;photoCatalog:Online;batteries;batteries;
+;others;photoCatalog:Online;others;others;
+
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);approvalStatus(code);owner(Principal.uid);$supercategories
+;camera1;photoCatalog:Online;camera1;camera1;pieces;approved;admin;cameras:photoCatalog:Online
+;camera2;photoCatalog:Online;camera2;camera2;pieces;approved;admin;cameras:photoCatalog:Online
+
+;batteryAAA;photoCatalog:Online;batteryAAA;batteryAAA;pieces;approved;admin;batteries:photoCatalog:Online
+;batteryAA;photoCatalog:Online;batteryAA;batteryAA;pieces;approved;admin;batteries:photoCatalog:Online
+
+;tripod;photoCatalog:Online;tripod;tripod;pieces;approved;admin;tripods:photoCatalog:Online
+;adapterDC;photoCatalog:Online;adapter;adapter;pieces;approved;admin;others:photoCatalog:Online
+;lense;photoCatalog:Online;lense;lense;pieces;approved;admin;lenses:photoCatalog:Online
+
+INSERT_UPDATE ProductReference;qualifier;source(code, $catalogversion)[unique=true];target(code, $catalogversion)[unique=true];referenceType(code)[unique=true];active;quantity;preselected
+;cam1cam2;camera1;camera2;SIMILAR;true;1;true
+;cam2cam1;camera2;camera1;OTHERS;true;1;true
+
+;cam1battAA;camera1;batteryAA;ACCESSORIES;true;2;true
+;cam2battAAA;camera2;batteryAAA;ACCESSORIES;true;2;true
+;cam1adapter;camera1;adapterDC;ACCESSORIES;false;1;true
+;cam2adapter;camera2;adapterDC;ACCESSORIES;false;1;true
+
+;cam1tripod;camera1;tripod;CROSSELLING;true;1;true
+
+;tripodlense1;tripod;lense;UPSELLING;true;1;true
+
+;tripodlense2;tripod;lense;FOLLOWUP;true;1;true
+
+;cam2lense;camera2;lense;SPAREPART;true;1;true

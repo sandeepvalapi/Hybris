@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<advanced-search xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="advanced-search.xsd">
+	
+	<group name="root" type="abstractpage">
+		<label key="config.general.searchfor" />
+		<group name="general">
+			<label key="cockpit.config.label.General" />
+			<property qualifier="cmsitem.name" sort-enabled="true" visible="true"/>
+			<property qualifier="cmsitem.uid" sort-enabled="true" visible="true"/>
+			<property qualifier="cmsitem.catalogVersion" sort-enabled="true" visible="true"/>
+			<property qualifier="abstractpage.defaultPage" sort-enabled="false"/>
+			<property qualifier="abstractpage.masterTemplate" visible="false"/>
+		</group>
+		<group name="other">
+			<label key="cockpit.config.label.Other" />
+			<property qualifier="item.pk" sort-enabled="true" visible="false"/>
+		</group>
+	</group>
+	
+</advanced-search>

@@ -1,0 +1,93 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="metamacros">
+
+	<!-- these macros can be used for working with meta information in the extensioninfo.xml files -->
+
+	<macrodef name="getextensionsformeta">
+		<attribute name="resultproperty" />
+		<attribute name="metakey" />
+		<attribute name="metavalue" />
+		<sequential>
+			<if>
+				<isset property="@{resultproperty}" />
+				<then>
+					<fail message="Property '@{resultproperty}' is already set!" />
+				</then>
+			</if>
+
+			<!-- iterate over all extensions -->
+			<for list="${extension.names}" param="extname" delimiter=";">
+				<sequential>
+
+					<!-- split the value to support arrays -->
+					<for list="${ext.@{extname}.extension.meta.@{metakey}}" delimiter="," param="value">
+						<sequential>
+							<if>
+								<equals arg1="@{value}" arg2="@{metavalue}" />
+								<then>
+									<if>
+										<isset property="@{resultproperty}" />
+										<then>
+											<var name="@{resultproperty}" value="${@{resultproperty}},@{extname}" />
+										</then>
+										<else>
+											<var name="@{resultproperty}" value="@{extname}" />
+										</else>
+									</if>
+								</then>
+							</if>
+						</sequential>
+					</for>
+				</sequential>
+			</for>
+
+			<!-- set default -->
+			<property name="@{resultproperty}" value="" />
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="getmetavaluesforkey">
+		<attribute name="resultproperty" />
+		<attribute name="metakey" />
+		<sequential>
+			<if>
+				<isset property="@{resultproperty}" />
+				<then>
+					<fail message="Property '@{resultproperty}' is already set!" />
+				</then>
+			</if>
+
+			<for list="${extension.names}" param="extname" delimiter=";">
+				<sequential>
+					<if>
+						<isset property="ext.@{extname}.extension.meta.@{metakey}" />
+						<then>
+							<if>
+								<isset property="@{resultproperty}" />
+								<then>
+									<var name="@{resultproperty}" value="${@{resultproperty}},${ext.@{extname}.extension.meta.@{metakey}}" />
+								</then>
+								<else>
+									<var name="@{resultproperty}" value="${ext.@{extname}.extension.meta.@{metakey}}" />
+								</else>
+							</if>
+						</then>
+					</if>
+				</sequential>
+			</for>
+
+			<!-- set default -->
+			<property name="@{resultproperty}" value="" />
+		</sequential>
+	</macrodef>
+</project>

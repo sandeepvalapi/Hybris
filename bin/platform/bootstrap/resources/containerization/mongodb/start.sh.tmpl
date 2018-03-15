@@ -1,0 +1,12 @@
+#!/bin/bash
+
+mkdir -p /opt/mongodb/${DB_NAME}
+
+if [[ ${REPL_SET_ENABLED} == "true" ]]; then
+    exec /usr/bin/mongod --keyFile /opt/mongodb/mongodb-keyfile --port ${MONGO_PORT} --auth --replSet ${REPL_SET} --dbpath /opt/mongodb/${DB_NAME}
+else
+    exec /usr/bin/mongod --keyFile /opt/mongodb/mongodb-keyfile --port ${MONGO_PORT} --auth --dbpath /opt/mongodb/${DB_NAME}
+fi
+
+
+

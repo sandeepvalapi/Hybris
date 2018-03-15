@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <alias alias="importService" name="defaultImportService"/>
+    <bean id="defaultImportService" class="de.hybris.platform.servicelayer.impex.impl.DefaultImportService"
+          parent="abstractBusinessService">
+        <property name="cronJobService" ref="cronJobService"/>
+        <property name="distributedProcessService" ref="distributedProcessService"/>
+        <property name="importDataDumpStrategy" ref="importDataDumpStrategy"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="mimeService" ref="mimeService"/>
+    </bean>
+
+    <alias alias="exportService" name="defaultExportService"/>
+    <bean id="defaultExportService" class="de.hybris.platform.servicelayer.impex.impl.DefaultExportService"
+          parent="abstractBusinessService">
+        <property name="cronJobService" ref="cronJobService"/>
+    </bean>
+
+    <alias alias="scriptGenerationService" name="defaultScriptGenerationService"/>
+    <bean id="defaultScriptGenerationService"
+          class="de.hybris.platform.servicelayer.impex.impl.DefaultExportScriptGenerationService">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="importCronJobInitDefaultsInterceptor"
+          class="de.hybris.platform.servicelayer.impex.impl.ImportCronJobInitDefaultsInterceptor" autowire="byName"/>
+    <bean id="importCronJobInitDefaultsInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="importCronJobInitDefaultsInterceptor"/>
+        <property name="typeCode" value="ImpExImportCronJob"/>
+    </bean>
+
+    <bean id="exportCronJobInitDefaultsInterceptor"
+          class="de.hybris.platform.servicelayer.impex.impl.ExportCronJobInitDefaultsInterceptor" autowire="byName"/>
+
+    <bean id="impExExportCronJobInitDefaultsInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="exportCronJobInitDefaultsInterceptor"/>
+        <property name="typeCode" value="ImpExExportCronJob"/>
+    </bean>
+
+    <bean id="impExMediaInitDefaultsInterceptor"
+          class="de.hybris.platform.servicelayer.impex.impl.ImpExMediaInitDefaultsInterceptor" autowire="byName"/>
+    <bean id="impExMediaInitDefaultsInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="impExMediaInitDefaultsInterceptor"/>
+        <property name="typeCode" value="ImpExMedia"/>
+    </bean>
+
+    <!-- System Setup -->
+    <bean id="impExSystemSetup" class="de.hybris.platform.impex.systemsetup.ImpExSystemSetup"/>
+
+    <!-- Test Utilities -->
+    <bean name="testImportCsvUtil" class="de.hybris.platform.servicelayer.impex.DefaultTestImportCsvUtil"/>
+
+    <bean id="cmdImpExService" class="de.hybris.platform.servicelayer.impex.impl.CmdImpExService">
+        <property name="importService" ref="importService"/>
+    </bean>
+
+    <!-- Distributed ImpEx -->
+    <alias name="defaultImportDataDumpStrategy" alias="importDataDumpStrategy"/>
+    <bean id="defaultImportDataDumpStrategy"
+          class="de.hybris.platform.impex.distributed.batch.impl.DefaultImportDataDumpStrategy"/>
+
+    <bean id="importBatchParser" class="de.hybris.platform.impex.distributed.batch.impl.ImportBatchParser">
+        <property name="dumpStrategy" ref="importDataDumpStrategy"/>
+    </bean>
+
+    <bean id="processImpexTask" class="de.hybris.platform.impex.distributed.task.ProcessImpexTask">
+        <property name="sessionService" ref="sessionService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="importBatchParser" ref="importBatchParser"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="crudHandlerFactory" ref="crudHandlerFactory"/>
+        <property name="i18nService" ref="i18nService"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <alias name="defaultImportProcessHandler" alias="importProcessHandler"/>
+    <bean id="defaultImportProcessHandler"
+          class="de.hybris.platform.impex.distributed.process.DefaultDistributedImportProcessHandler">
+        <constructor-arg ref="modelService"/>
+        <constructor-arg ref="flexibleSearchService"/>
+        <constructor-arg ref="processImpexTask"/>
+        <constructor-arg ref="distributedImpexLogService"/>
+        <constructor-arg ref="mediaService" />
+    </bean>
+
+    <bean id="distributedImpexLogService" class="de.hybris.platform.impex.distributed.log.DistributedImpexLogService">
+        <property name="clusterService" ref="clusterService"/>
+    </bean>
+
+    <bean id="importBatchContentModelAttributeHandler"
+          class="de.hybris.platform.impex.distributed.model.ImportBatchContentModelAttributeHandler">
+        <property name="flexibleSearchService" ref="flexibleSearchService" />
+    </bean>
+
+    <bean id="abstractBatchingCRUDHandler"
+          class="de.hybris.platform.impex.distributed.batch.impl.AbstractBatchingCRUDHandler" abstract="true">
+        <constructor-arg name="modelService" ref="modelService"/>
+        <constructor-arg name="userService" ref="userService"/>
+    </bean>
+
+    <bean id="batchingDeleteHandler" class="de.hybris.platform.impex.distributed.batch.impl.BatchingDeleteHandler"
+          parent="abstractBatchingCRUDHandler"/>
+    <bean id="batchingInsertHandler" class="de.hybris.platform.impex.distributed.batch.impl.BatchingInsertHandler"
+          parent="abstractBatchingCRUDHandler"/>
+    <bean id="batchingUpdateHandler" class="de.hybris.platform.impex.distributed.batch.impl.BatchingUpdateHandler"
+          parent="abstractBatchingCRUDHandler"/>
+    <bean id="batchingInsertUpdateHandler"
+          class="de.hybris.platform.impex.distributed.batch.impl.BatchingInsertUpdateHandler">
+        <property name="updateHandler" ref="batchingUpdateHandler"/>
+        <property name="insertHandler" ref="batchingInsertHandler"/>
+    </bean>
+
+    <bean id="crudHandlerFactory" class="de.hybris.platform.impex.distributed.batch.impl.CRUDHandlerFactory">
+        <property name="insertUpdateHandler" ref="batchingInsertUpdateHandler"/>
+        <property name="deleteHandler" ref="batchingDeleteHandler"/>
+        <property name="updateHandler" ref="batchingUpdateHandler"/>
+        <property name="insertHandler" ref="batchingInsertHandler"/>
+    </bean>
+
+	<bean id="distributedImpexLoggingCtxProducer"
+		  class="de.hybris.platform.impex.distributed.log.DistributedImpexLoggingCtxProducer">
+		<property name="modelService" ref="modelService"/>
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="logLevel" value="INFO"/>
+		<property name="loggerName" value="DistributedProcessLogger"/>
+	</bean>
+
+	<!-- Value Converter Builders -->
+    <!-- 	<alias name="defaultAbstractValueConverterBuilder" alias="abstractValueConverterBuilder"/>
+         <bean id="defaultAbstractValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.AbstractValueConverterBuilder"
+                 abstract="true">
+          <property name="modelService" ref="modelService" />
+         </bean>
+
+        <alias name="defaultBooleanValueConverterBuilder" alias="booleanValueConverterBuilder"/>
+        <bean id="defaultBooleanValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.BooleanValueConverterBuilder"
+                parent="abstractValueConverterBuilder">
+                <property name="l10nService" ref="l10nService" />
+        </bean>
+
+        <alias name="defaultCharacterValueConverterBuilder" alias="characterValueConverterBuilder"/>
+        <bean id="defaultCharacterValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.CharacterValueConverterBuilder"
+                parent="abstractValueConverterBuilder" />
+
+        <alias name="defaultClassValueConverterBuilder" alias="classValueConverterBuilder"/>
+        <bean id="defaultClassValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.ClassValueConverterBuilder"
+                parent="abstractValueConverterBuilder" />
+
+        <alias name="defaultDateValueConverterBuilder" alias="dateValueConverterBuilder"/>
+        <bean id="defaultDateValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.DateValueConverterBuilder"
+                parent="abstractValueConverterBuilder">
+                <property name="formatFactory" ref="formatFactory" />
+        </bean>
+
+        <alias name="defaultItemModelValueConverterBuilder" alias="itemModelValueConverterBuilder"/>
+        <bean id="defaultItemModelValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.ItemModelValueConverterBuilder"
+                parent="abstractValueConverterBuilder">
+            <property name="typeService" ref="typeService" />
+        </bean>
+
+        <alias name="defaultNumberValueConverterBuilder" alias="numberValueConverterBuilder"/>
+        <bean id="defaultNumberValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.NumberValueConverterBuilder"
+                parent="abstractValueConverterBuilder">
+                <property name="formatFactory" ref="formatFactory" />
+        </bean>
+
+        <alias name="defaultPkValueConverterBuilder" alias="pkValueConverterBuilder"/>
+        <bean id="defaultPkValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.PkValueConverterBuilder"
+                parent="abstractValueConverterBuilder" />
+
+        <alias name="defaultSerializableValueConverterBuilder" alias="serializableValueConverterBuilder"/>
+        <bean id="defaultSerializableValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.SerializableValueConverterBuilder"
+                parent="abstractValueConverterBuilder" />
+
+        <alias name="defaultStandardDateRangeValueConverterBuilder" alias="standardDateRangeValueConverterBuilder"/>
+        <bean id="defaultStandardDateRangeValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.StandardDateRangeValueConvererBuilder"
+                parent="abstractValueConverterBuilder">
+                <property name="formatFactory" ref="formatFactory" />
+                <property name="i18nService" ref="i18nService" />
+        </bean>
+
+        <alias name="defaultStringValueConverterBuilder" alias="stringValueConverterBuilder"/>
+        <bean id="defaultStringValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.StringValueConverterBuilder"
+                parent="abstractValueConverterBuilder" /> -->
+
+    <!--
+    <alias name="defaultCollectionTypeValueConverterBuilder" alias="collectionTypeValueConverterBuilder"/>
+    <bean id="defaultCollectionTypeValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.CollectionTypeValueConverterBuilder"
+            parent="abstractValueConverterBuilder">
+            <lookup-method name="getValueConverterFactory" bean="valueConverterFactory" />
+    </bean>
+     -->
+
+    <!-- 	<bean id="legacyBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.LegacyBuilder">
+            <property name="modelService" ref="modelService"/>
+            <property name="typeService" ref="typeService"/>
+        </bean>
+
+        <bean id="mapValueConverterBuilder" class="de.hybris.platform.impex.converters.factory.builders.impl.MapValueConverterBuilder">
+            <property name="modelService" ref="modelService"/>
+        </bean> -->
+
+    <!-- Value Converters Factory -->
+    <!-- 	<alias name="defaultValueConverterFactory" alias="valueConverterFactory" />
+        <bean id="defaultValueConverterFactory" class="de.hybris.platform.impex.converters.factory.impl.DefaultValueConverterFactory">
+            <property name="builders">
+                <list>
+                    <ref bean="booleanValueConverterBuilder"/>
+                    <ref bean="dateValueConverterBuilder"/>
+                    <ref bean="itemModelValueConverterBuilder"/>
+                    <ref bean="pkValueConverterBuilder"/>
+                    <ref bean="standardDateRangeValueConverterBuilder"/>
+                    <ref bean="stringValueConverterBuilder"/>
+                    <ref bean="characterValueConverterBuilder"/>
+                    <ref bean="classValueConverterBuilder"/>
+                    <ref bean="numberValueConverterBuilder"/>
+                    <ref bean="serializableValueConverterBuilder"/>
+                     <ref bean="collectionTypeValueConverterBuilder"/>
+                    <ref bean="mapValueConverterBuilder"/>
+                </list>
+            </property>
+            <property name="legacyBuilder" ref="legacyBuilder"/>
+        </bean> -->
+
+
+    <!-- default import processor  -->
+    <!-- 	<alias name="defaultExceptionConverter" alias="exceptionConverter"/>
+        <bean id="defaultExceptionConverter" class="de.hybris.platform.impex.util.impl.DefaultImportExportExceptionConverter" /> -->
+
+    <!--
+    TODO: to be removed
+    <alias name="defaultValueLineTranslator" alias="valueLineTranslator"/>
+    <bean id="defaultValueLineTranslator" class="de.hybris.platform.impex.impl.DefaultValueLineTranslator">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+     -->
+
+    <!--
+    TODO: to be removed
+    <alias name="defaultAbstractProcessorStrategy" alias="abstractProcessorStrategy"/>
+    <bean id="defaultAbstractProcessorStrategy" class="de.hybris.platform.impex.strategy.impl.AbstractProcessorStrategy" abstract="true">
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="i18nService" ref="i18nService"/>
+        <property name="exceptionConverter" ref="exceptionConverter"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="valueLineTranslator" ref="valueLineTranslator"/>
+        <property name="resolverCache" ref="existingItemModelResolverCache"/>
+    </bean>
+     -->
+    <!-- 	<alias name="defaultExistingItemModelResolverCache" alias="existingItemModelResolverCache"/>
+        <bean id="defaultExistingItemModelResolverCache" class="de.hybris.platform.impex.resolver.impl.DefaultExistingItemModelResolverCache">
+            <property name="exceptionConverter" ref="exceptionConverter"/>
+            <property name="flexibleSearchService" ref="flexibleSearchService"/>
+            <property name="modelService" ref="modelService"/>
+            <property name="typeService" ref="typeService"/>
+        </bean> -->
+
+    <!--
+     TODO: to be removed
+    <alias name="defaultProcessorStrategyFactory" alias="processorStrategyFactory"/>
+    <bean id="defaultProcessorStrategyFactory" class="de.hybris.platform.impex.impl.DefaultProcessorStrategyFactory">
+        <property name="strategies">
+            <list>
+                <bean id="removeStrategy" class="de.hybris.platform.impex.strategy.impl.RemoveProcessorStrategy" parent="abstractProcessorStrategy" />
+                <bean id="updateStrategy" class="de.hybris.platform.impex.strategy.impl.UpdateProcessorStrategy" parent="abstractProcessorStrategy" />
+                <bean id="insertStrategy" class="de.hybris.platform.impex.strategy.impl.InsertProcessorStrategy" parent="abstractProcessorStrategy" />
+                <bean id="insertUpdateStrategy" class="de.hybris.platform.impex.strategy.impl.InsertUpdateProcessorStrategy" parent="abstractProcessorStrategy" />
+            </list>
+        </property>
+    </bean>
+     -->
+
+    <!-- 	<alias name="defaultImportProcessor" alias="importProcessor"/>
+        <bean id="defaultImportProcessor" class="de.hybris.platform.impex.impl.DefaultModelImportProcessor">
+            <property name="exceptionConverter" ref="exceptionConverter"/>
+            <property name="modelService" ref="modelService"/>
+            <property name="sessionService" ref="sessionService"/>
+            <property name="processorStrategyFactory" ref="processorStrategyFactory" />
+        </bean> -->
+
+    <!-- impex decorators -->
+    <!-- This is used by ImpExReader. The name is hardocoded in the code. -->
+    <!-- 	<alias alias="defaultImpexDecoratorClassSelector" name="impexDecoratorClassSelector" />
+        <bean id="impexDecoratorClassSelector" class="de.hybris.platform.impex.decorators.impl.ImpexDecoratorClassSelector">
+            <property name="configurationService" ref="configurationService"/>
+        </bean>
+
+        <bean id="eClassSuperCategoryDecorator" class="de.hybris.platform.catalog.jalo.classification.eclass.EClassSuperCategoryDecorator"/> -->
+
+    <!-- multitheraded configuration -->
+    <!--alias name="defaultMulitThreadExistingItemModelResolverCache" alias="multiThreadExistingItemModelResolverCache"/>
+    <bean id="defaultMulitThreadExistingItemModelResolverCache" class="de.hybris.platform.impex.resolver.impl.MultiThreadedExistingItemModelResolverCache" parent="existingItemModelResolverCache">
+        <property name="lockableProcessor" ref="multiThreadImportProcessor"/>
+    </bean>
+
+    <alias name="defaultMultiThreadedProcessorStrategyFactory" alias="multiThreadedProcessorStrategyFactory"/>
+    <bean id="defaultMultiThreadedProcessorStrategyFactory" class="de.hybris.platform.impex.impl.DefaultProcessorStrategyFactory" >
+        <property name="strategies">
+            <list>
+                <bean id="mtInsertStrategy" class="de.hybris.platform.impex.strategy.impl.InsertLockableProcessorStrategy" parent="abstractProcessorStrategy"/>
+                <bean id="mtUpdateStrategy" class="de.hybris.platform.impex.strategy.impl.UpdateProcessorStrategy" parent="abstractProcessorStrategy"/>
+                <bean id="mtRemoveStrategy" class="de.hybris.platform.impex.strategy.impl.RemoveProcessorStrategy" parent="abstractProcessorStrategy"/>
+                <bean id="mtInsertUpdateStrategy" class="de.hybris.platform.impex.strategy.impl.InsertUpdateLockableProcessorStrategy" parent="abstractProcessorStrategy"/>
+            </list>
+        </property>
+    </bean>
+    <alias name="defaultMultiThreadImportProcessor" alias="multiThreadImportProcessor"/>
+    <bean id="defaultMultiThreadImportProcessor" class="de.hybris.platform.impex.impl.MultiThreadedImportModelProcessor">
+        <property name="exceptionConverter" ref="exceptionConverter"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="processorStrategyFactory" ref="multiThreadedProcessorStrategyFactory" />
+    </bean-->
+
+</beans>

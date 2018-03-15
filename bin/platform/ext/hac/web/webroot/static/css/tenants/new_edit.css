@@ -1,0 +1,27 @@
+.actions, #update {
+	float: left !important;
+	margin: 0 3px 0 3px;
+}
+
+#update {
+	padding: 2px 14px !important;
+}
+
+#createTenant {
+	overflow: auto;
+}
+
+#extensionsWrapper {
+	height: 250px;
+	width: 95%;
+	overflow: auto;
+}
+
+#extensionsInfo {
+	width: 80%;
+}
+
+#dbUrl {
+	width: 80%;
+	height: 50px;	
+}

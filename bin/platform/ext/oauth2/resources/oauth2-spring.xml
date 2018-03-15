@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:c="http://www.springframework.org/schema/c"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultAuthenticatedUserDataConverter" alias="authenticatedUserDataConverter" />
+	<bean id="defaultAuthenticatedUserDataConverter" parent="abstractPopulatingConverter"
+		p:targetClass="de.hybris.platform.oauth2.data.AuthenticatedUserData"
+		p:populators-ref="authenticatedUserDataPopulatorList" />
+	
+	<alias name="defaultAuthenticatedUserDataPopulatorList" alias="authenticatedUserDataPopulatorList" />
+	<bean id="defaultAuthenticatedUserDataPopulatorList"  parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="displayUserNamePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultDisplayUserNamePopulator" alias="displayUserNamePopulator" />	
+	<bean id="defaultDisplayUserNamePopulator" class="de.hybris.platform.oauth2.data.DisplayUserNamePopulator" />
+
+	<alias name="defaultOauthClientDetailsDao" alias="oauthClientDetailsDao" />
+	<bean id="defaultOauthClientDetailsDao"
+		  class="de.hybris.platform.webservicescommons.oauth2.client.impl.DefaultClientDetailsDao" />
+
+	<alias alias="oauthTokenDao" name="defaultOAuthTokenDao" />
+	<bean id="defaultOAuthTokenDao"
+		  class="de.hybris.platform.webservicescommons.oauth2.token.dao.impl.DefaultOAuthTokenDao"
+		  parent="abstractItemDao" />
+
+	<alias alias="oauthTokenService" name="defaultOAuthTokenService" />
+	<bean id="defaultOAuthTokenService"
+		  class="de.hybris.platform.webservicescommons.oauth2.token.impl.DefaultOAuthTokenService"
+		  parent="abstractBusinessService" p:oauthTokenDao-ref="oauthTokenDao"
+		  p:searchRestrictionService-ref="searchRestrictionService" p:userDao-ref="userDao"
+		  p:clientDetailsDao-ref="oauthClientDetailsDao" />
+
+	<alias name="defaultOauthClientDetails" alias="oauthClientDetails" />
+	<bean id="defaultOauthClientDetails"
+		  class="de.hybris.platform.webservicescommons.oauth2.client.impl.DefaultClientDetailsService"
+		  p:clientDetailsDao-ref="oauthClientDetailsDao" />
+		  
+	<alias name="defaultExternalScopesStrategy" alias="externalScopesStrategy" />
+	<bean id="defaultExternalScopesStrategy"
+		  class="de.hybris.platform.webservicescommons.oauth2.scope.impl.DefaultExternalScopesStrategy"
+		  p:externalScopesDao-ref="externalScopesDao"
+		  p:userService-ref="userService" />
+		  
+	<alias name="defaultExternalScopesDao" alias="externalScopesDao" />
+	<bean id="defaultExternalScopesDao"
+		  class="de.hybris.platform.webservicescommons.oauth2.scope.impl.DefaultExternalScopesDao"
+		  p:flexibleSearchService-ref="flexibleSearchService"/>
+		  
+	<alias name="openIDClientDetails" alias="oauthClientDetails" />
+	<bean id="openIDClientDetails"
+		  class="de.hybris.platform.webservicescommons.oauth2.client.impl.OpenIDClientDetailsService"
+		  p:clientDetailsDao-ref="oauthClientDetailsDao" />
+
+	<alias name="defaultOauthTokenServices" alias="oauthTokenServices" />
+	<bean id="defaultOauthTokenServices"
+		  class="de.hybris.platform.webservicescommons.oauth2.token.provider.HybrisOAuthTokenServices"
+		  p:tokenStore-ref="oauthTokenStore"
+		  p:reuseRefreshToken="${oauthauthorizationserver.tokenServices.reuseRefreshToken}"
+		  p:clientDetailsService-ref="oauthClientDetails"
+		  p:supportRefreshToken="${oauth2.supportRefreshToken}"
+		  p:refreshTokenValiditySeconds="${oauth2.refreshTokenValiditySeconds}"
+		  p:accessTokenValiditySeconds="${oauth2.accessTokenValiditySeconds}" />
+    
+	<alias name="openIDTokenServices" alias="oauthTokenServices" />
+	<bean id="openIDTokenServices"
+		  class="de.hybris.platform.webservicescommons.oauth2.token.provider.HybrisOpenIDTokenServices"
+		  p:tokenStore-ref="oauthTokenStore"
+		  p:reuseRefreshToken="${oauthauthorizationserver.tokenServices.reuseRefreshToken}"
+		  p:supportRefreshToken="${oauth2.supportRefreshToken}"
+		  p:refreshTokenValiditySeconds="${oauth2.refreshTokenValiditySeconds}"
+		  p:accessTokenValiditySeconds="${oauth2.accessTokenValiditySeconds}"
+		  p:externalScopesStrategy-ref="externalScopesStrategy"
+		  p:keyStoreHelper-ref="keyStoreHelper"
+		  p:clientDetailsDao-ref="oauthClientDetailsDao" />
+    
+    <alias name="rsaKeyStoreHelper" alias="keyStoreHelper" />
+	<bean id="rsaKeyStoreHelper"
+		  class="de.hybris.platform.oauth2.jwt.util.RsaKeyStoreHelper"/>
+    
+	<alias name="defaultOauthTokenStore" alias="oauthTokenStore" />
+	<bean id="defaultOauthTokenStore"
+		  class="de.hybris.platform.webservicescommons.oauth2.token.provider.HybrisOAuthTokenStore"
+		  p:oauthTokenService-ref="oauthTokenService" />
+
+	<alias name="defaultOauthClientDetailsUserService" alias="oauthClientDetailsUserService" />
+	<bean id="defaultOauthClientDetailsUserService"
+		  class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService"
+		  c:clientDetailsService-ref="oauthClientDetails" p:passwordEncoder-ref="clientSecretEncoder" />
+
+
+	<alias name="defaultWsUserDetailsService" alias="wsUserDetailsService" />
+	<bean id="defaultWsUserDetailsService"
+		  class="de.hybris.platform.spring.security.CoreUserDetailsService" />
+	<alias name="defaultWsAuthenticationProvider" alias="wsAuthenticationProvider" />
+	<bean id="defaultWsAuthenticationProvider"
+		  class="de.hybris.platform.spring.security.CoreAuthenticationProvider">
+		<property name="userDetailsService" ref="wsUserDetailsService" />
+	</bean>
+
+	<bean id="oauth2ExceptionRender"
+		  class="org.springframework.security.oauth2.provider.error.DefaultOAuth2ExceptionRenderer">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+				<bean class="org.springframework.security.oauth2.http.converter.jaxb.JaxbOAuth2ExceptionMessageConverter" />
+				<bean class="org.springframework.http.converter.StringHttpMessageConverter"
+					  p:writeAcceptCharset="false" />
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+	<bean id="oauthAccessDeniedHandler"
+		  class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler"
+		  p:exceptionRenderer-ref="oauth2ExceptionRender" />
+
+	<alias name="standartPasswordEncoder" alias="clientSecretEncoder" />
+	<bean id="standartPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" p:typeCode="OAuthClientDetails">
+		<property name="interceptor">
+			<bean class="de.hybris.platform.webservicescommons.interceptors.OAuthClientInterceptor"
+				  p:clientSecretEncoder-ref="clientSecretEncoder" />
+		</property>
+	</bean>
+
+	<alias name="defaultAuthorizationCode" alias="oauthAuthorizationCode" />
+	<bean id="defaultAuthorizationCode" class="de.hybris.platform.oauth2.AuthorizationCodeService"
+		  p:flexibleSearchService-ref="flexibleSearchService" p:modelService-ref="modelService" />
+
+	<alias name="defaultCleanupAccessToken" alias="cleanupAccessToken" />
+	<bean id="defaultCleanupAccessToken" class="de.hybris.platform.oauth2.CleanupAccessToken" p:flexibleSearchService-ref="flexibleSearchService"
+		  p:modelService-ref="modelService" p:typeService-ref="typeService" />
+
+    <alias name="defaultOauthUserAuditLoginStrategy" alias="oauthUserAuditLoginStrategy" />
+    <bean id="defaultOauthUserAuditLoginStrategy" class="de.hybris.platform.oauth2.DefaultOauthUserAuditLoginStrategy"
+          parent="abstractUserAuditLoginStrategy">
+        <property name="configurationService" ref="configurationService"/>
+        <property name="clientDetailsDao" ref="oauthClientDetailsDao"/>
+    </bean>
+
+    <alias name="defaultAuthFailureListener" alias="authFailureListener"/>
+    <bean id="defaultAuthFailureListener" class="de.hybris.platform.servicelayer.user.listener.AuthenticationFailureEventListener">
+        <property name="userAuditLoginStrategy" ref="oauthUserAuditLoginStrategy"/>
+    </bean>
+
+    <alias name="defaultAuthSuccessListener" alias="authSuccessListener"/>
+    <bean id="defaultAuthSuccessListener" class="de.hybris.platform.servicelayer.user.listener.AuthenticationSuccessEventListener">
+        <property name="userAuditLoginStrategy" ref="oauthUserAuditLoginStrategy"/>
+    </bean>
+</beans>

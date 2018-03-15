@@ -1,0 +1,409 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- 
+
+XXXX
+
+ -->
+<project name="project.deploying">
+	<!--DE768: for fixing Tomcat 7 precompile problems -->
+	<taskdef name="unifyJspClassTime" classname="de.hybris.ant.util.UnifyClassTimestampsTask">
+		<classpath>
+			<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+			<fileset dir="${platformhome}/lib">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${platformhome}/resources/ant/lib">
+				<include name="**/*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<macrodef name="deploy">
+		<attribute name="destdir" default="${bundled.server.home}/conf/Catalina/localhost"/>
+    	<sequential>
+	    	<if>
+	    		<isfalse value="${de.hybris.platform.ant.production.skip.build}" />
+	    		<then>
+	    			<onlyonce name="deploy">
+						<once>
+							<prepare />
+							<appserver_customdeployment destdir="@{destdir}"/>
+						</once>
+					</onlyonce>
+	    		</then>
+	    		<else>
+	    			<echo message="Running in the production mode. The deploy will be skipped." />
+	    		</else>
+	    	</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="appserver_customdeployment" description="callback once at the begin of the deployment process">
+		<attribute name="destdir" default="${bundled.server.home}/conf/Catalina/localhost"/>
+		<sequential>
+			<!-- determine properties -->
+			<echo>
+Configuring server at ${bundled.server.home}
+Using config set at ${bundled.server.config}
+			</echo>
+
+			<loadproperties srcfile="${bundled.server.home}/conf/catalina.properties" />
+			<property name="bundled.tcserver.id" value="${tcserver.node}" />
+
+			<property file="${platformhome}/bambootomcat.properties">
+			</property>
+
+			<if>
+				<equals arg1="${bundled.server.type}" arg2="tcserver" />
+				<then>
+					<if>
+						<not>
+							<available file="${HYBRIS_LOG_DIR}/tcServer/${bundled.tcserver.id}" />
+						</not>
+						<then>
+							<mkdir dir="${HYBRIS_LOG_DIR}/tcServer/${bundled.tcserver.id}" />
+							<echo message="Created directory for console logs at: ${HYBRIS_LOG_DIR}/tcServer/${bundled.tcserver.id}">
+							</echo>
+						</then>
+					</if>
+					<property name="tomcat.wrapper.logfile" value="${HYBRIS_LOG_DIR}/tcServer/${bundled.tcserver.id}/console-YYYYMMDD.log" />
+				</then>
+				<else>
+					<mkdir dir="${HYBRIS_LOG_DIR}/tomcat" />
+					<property name="tomcat.wrapper.logfile" value="${HYBRIS_LOG_DIR}/tomcat/console-YYYYMMDD.log" />
+
+					<!-- if not already set, HULK-40 -->
+					<property name="tomcat.wrapper.logfile.rollmode" value="DATE" />
+				</else>
+			</if>
+
+			<var name="DEPLOY_VMSTARTDIR" unset="true" />
+			<var name="FILTER_JAVAOPTIONS" unset="true" />
+			<property name="DEPLOY_VMSTARTDIR" location="${bundled.tomcat.home}/bin" />
+			<property name="FILTER_JAVAOPTIONS" value="${tomcat.generaloptions} -Duseconfig=${useconfig} -DHYBRIS_BIN_DIR=&quot;${HYBRIS_BIN_DIR}&quot; -DHYBRIS_CONFIG_DIR=&quot;${HYBRIS_CONFIG_DIR}&quot; -DHYBRIS_DATA_DIR=&quot;${HYBRIS_DATA_DIR}&quot; -DHYBRIS_LOG_DIR=&quot;${HYBRIS_LOG_DIR}&quot; -DHYBRIS_TEMP_DIR=&quot;${HYBRIS_TEMP_DIR}&quot;" />
+
+
+			<yjavaoptionsproperty name="tomcat.wrapper.javaoptions" value="${FILTER_JAVAOPTIONS} ${tomcat.javaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration}" />
+			<yjavaoptionsproperty name="tomcat.wrapper.debugjavaoptions" value="${FILTER_JAVAOPTIONS} ${tomcat.debugjavaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration}" />
+			<yjavaoptionsproperty name="tomcat.wrapper.jprofilerjavaoptions" value='${FILTER_JAVAOPTIONS} -agentpath:${jprofiler.agentpath}=port=8849 -Xbootclasspath/a:"${jprofiler.path}/bin/agent.jar"  ${tomcat.javaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration},nowait' />
+			<yjavaoptionsproperty name="tomcat.wrapper.yourkitprofilerjavaoptions" value="${FILTER_JAVAOPTIONS} -agentlib:yjpagent ${tomcat.javaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration}" />
+
+			<property name="tomcat.wrapper.startport" value="32000" />
+			<property name="tomcat.wrapper.endport" value="32998" />
+
+
+			<mkdir dir="${media.read.dir}" />
+			<!-- copy server configuration -->
+            <echo>copying from ${bundled.server.config} to ${bundled.server.home}</echo>
+			<copy overwrite="true" todir="${bundled.server.home}">
+				<fileset dir="${bundled.server.config}">
+					<include name="**/**" />
+					<exclude name="**/README.txt" />
+				</fileset>
+			</copy>
+
+			<ygeneratetomcatcontexts
+				outputPath="@{destdir}"
+				contextTemplate="${tomcat.context.template}" />
+
+			<copy overwrite="true" todir="${bundled.server.base}">
+				<fileset dir="${bundled.server.config}">
+					<include name="**/*.xml" />
+					<include name="**/*.sh" />
+					<include name="**/*.bat" />
+					<include name="**/*.properties" />
+					<include name="**/*.policy" />
+					<include name="**/*.conf" />
+                    <exclude name="**/catalina.properties"/>
+                    <exclude name="**/wrapper*.conf"/>
+				</fileset>
+				<filterchain>
+					<expandproperties />
+				</filterchain>
+			</copy>
+
+            <if>
+                <available file="${HYBRIS_ROLES_DIR}/${ACTIVE_ROLE}/base/lib"/>
+                <then>
+                    <copy overwrite="true" todir="${bundled.server.base}">
+                        <fileset dir="${bundled.server.config}">
+                            <include name="**/catalina.properties"/>
+                        </fileset>
+                        <filterchain>
+                            <replacestring from="common.loader=${catalina.base}/lib,${catalina.base}/lib/*.jar,${catalina.home}/lib,${catalina.home}/lib/*.jar" to="common.loader=${catalina.base}/lib,${catalina.base}/lib/*.jar,${catalina.home}/lib,${catalina.home}/lib/*.jar,${catalina.base}/../../base/lib/*.jar"/>
+                            <expandproperties />
+                        </filterchain>
+                    </copy>
+
+                    <copy overwrite="true" todir="${bundled.server.base}">
+                        <fileset dir="${bundled.server.config}">
+                            <include name="**/wrapper*.conf"/>
+                        </fileset>
+                        <filterchain>
+                            <replacestring from="set.CATALINA_BASE=.." to="set.CATALINA_BASE=${bundled.server.base}"/>
+                            <expandproperties />
+                        </filterchain>
+                    </copy>
+                    <copy file="${platformhome}/bootstrap/bin/ytomcat.jar" tofile="${HYBRIS_ROLES_DIR}/${ACTIVE_ROLE}/base/lib/ytomcat.jar" overwrite="true" />
+                </then>
+                <else>
+                    <copy overwrite="true" todir="${bundled.server.base}">
+                        <fileset dir="${bundled.server.config}">
+                            <include name="**/wrapper*.conf"/>
+                        </fileset>
+                        <filterchain>
+                            <expandproperties />
+                        </filterchain>
+                    </copy>
+                    <copy file="${platformhome}/bootstrap/bin/ytomcat.jar" tofile="${bundled.server.base}/lib/ytomcat.jar" overwrite="true" />
+                </else>
+            </if>
+
+
+			<!-- redeploy -->
+			<if>
+				<and>
+					<equals arg1="${bundled.tcserver.home}/${bundled.tcserver.instance}" arg2="${bundled.server.home}" />
+					<equals arg1="${bundled.server.type}" arg2="tcserver" />
+					<available file="${bundled.server.home}" />
+				</and>
+				<then>
+					<if>
+						<available file="${HYBRIS_DATA_DIR}/${bundled.tcserver.id}.java.pid" />
+						<then>
+							<loadfile property="java.pid" srcFile="${HYBRIS_DATA_DIR}/${bundled.tcserver.id}.java.pid" />
+							<yrun loadhybris="false">de.hybris.platform.jmx.JmxClient.restartWrapper(${java.pid});</yrun>
+							<echo>
+The tcServer instance ${bundled.tcserver.instance} won't get restarted because of use of old tanuki wrapper implementation (v.3.2).
+Please perform the restart manually.
+						</echo>
+						</then>
+						<else>
+							<echo>
+Embedded tcserver does not seem to be running (no PID found). No restart necessary.
+										</echo>
+						</else>
+					</if>
+				</then>
+				<else>
+					<if>
+						<available file="${HYBRIS_DATA_DIR}/hybristomcat.java.pid" />
+						<then>
+							<loadfile property="java.pid" srcFile="${HYBRIS_DATA_DIR}/hybristomcat.java.pid" />
+							<yrun loadhybris="false">de.hybris.platform.jmx.JmxClient.restartWrapper(${java.pid});</yrun>
+						</then>
+						<else>
+							<echo>
+Embedded server does not seem to be running (no PID found). No restart necessary.
+						</echo>
+						</else>
+					</if>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="appserver_cleanvmstartdir">
+		<sequential>
+			<if>
+				<available file="${DEPLOY_VMSTARTDIR}" />
+				<then>
+					<delete>
+						<fileset dir="${DEPLOY_VMSTARTDIR}">
+							<include name="jdbc.log" />
+							<include name="memoryAwareMap*.csv" />
+						</fileset>
+					</delete>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="appserver_customclean">
+		<sequential>
+			<delete dir="${bundled.tomcat.home}/conf/Catalina" />
+			<delete dir="${bundled.tomcat.home}/temp" />
+			<delete dir="${bundled.tomcat.home}/work" />
+			<delete dir="${bundled.tomcat.home}/webapps/probe" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="appserver_jspclean">
+		<attribute name="extname" />
+		<sequential>
+			<if>
+				<and>
+					<!--simple check if jspcompile should be done (only if webmodule is installed)-->
+					<isset property="ext.@{extname}.webmodule.available" />
+				</and>
+				<then>
+					<if>
+						<or>
+							<equals arg1="" arg2="${ext.@{extname}.extension.webmodule.webroot}" />
+							<equals arg1="/" arg2="${ext.@{extname}.extension.webmodule.webroot}" />
+						</or>
+						<then>
+							<property name="destdir@{extname}" location="${bundled.tomcat.home}/work/Catalina/localhost/_" />
+						</then>
+						<else>
+							<property name="destdir@{extname}" location="${bundled.tomcat.home}/work/Catalina/localhost/${ext.@{extname}.extension.webmodule.webroot}" />
+						</else>
+					</if>
+
+					<if>
+						<available file="${destdir@{extname}}" />
+						<then>
+							<delete>
+								<fileset dir="${destdir@{extname}}">
+									<include name="**" />
+									<exclude name="**/*.jpa" />
+								</fileset>
+							</delete>
+						</then>
+					</if>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="appserver_jspcompile">
+		<attribute name="extname" />
+		<sequential>
+			<trycatch property="jsperror">
+				<try>
+					<if>
+						<or>
+							<equals arg1="" arg2="${ext.@{extname}.extension.webmodule.webroot}" />
+							<equals arg1="/" arg2="${ext.@{extname}.extension.webmodule.webroot}" />
+						</or>
+						<then>
+							<property name="destdir@{extname}" location="${bundled.server.home}/work/Catalina/localhost/_" />
+						</then>
+						<else>
+							<property name="destdir@{extname}" location="${bundled.server.home}/work/Catalina/localhost/${ext.@{extname}.extension.webmodule.webroot}" />
+						</else>
+					</if>
+					<mkdir dir="${destdir@{extname}}" />
+
+					<outofdate>
+						<sourcefiles>
+							<fileset dir="${ext.@{extname}.path}/web/webroot">
+								<include name="**/*.jsp" />
+								<include name="**/*.jspf" />
+								<include name="**/*.inc.jsp" />
+								<include name="**/*.inc" />
+							</fileset>
+						</sourcefiles>
+						<targetfiles path="${destdir@{extname}}/jspcompile_touch" />
+						<sequential>
+							<onlyonce name="jasper2">
+								<once>
+									<mkdir dir="${HYBRIS_TEMP_DIR}/jasper" />
+									<taskdef classname="org.apache.jasper.JspC" name="jasper2">
+										<classpath>
+											<fileset dir="${bundled.tomcat.home}">
+												<include name="lib/**/*.jar" />
+												<!--tomcat60!-->
+												<include name="bin/tomcat-juli.jar" />
+												<!--tomcat60!-->
+											</fileset>
+											<fileset dir="${ext.core.path}/lib">
+												<include name="commons-*.jar" />
+											</fileset>
+											<pathelement path="${HYBRIS_TEMP_DIR}/log4j" />
+											<!-- only for log4j.properties -->
+										</classpath>
+									</taskdef>
+								</once>
+							</onlyonce>
+							<echo message="[jspcompile] generating.." />
+
+							<jasper2 uriroot="${ext.@{extname}.path}/web/webroot/" 
+									outputDir="${destdir@{extname}}" 
+									webXmlFragment="${ext.@{extname}.path}/web/webroot}/WEB-INF/gen_web.xml" 
+									validateTld="false"
+									compile="false"/>
+
+							<!-- touching jsp files that seem to have been changed in the future... -->
+							<property name="tstamp.pattern" value="MM/dd/yyyy HH:mm a" />
+							<tstamp>
+								<format property="tstamp.now" pattern="${tstamp.pattern}" />
+							</tstamp>
+
+							<echo message="[jspcompile] touching jsp files" />
+							<touch>
+								<fileset dir="${ext.@{extname}.path}/web/webroot/">
+									<include name="**/*.jsp" />
+									<include name="**/*.jspf" />
+									<include name="**/*.inc.jsp" />
+									<include name="**/*.inc" />
+									<date datetime="${tstamp.now}" when="after" pattern="${tstamp.pattern}" />
+									<type type="file" />
+								</fileset>
+							</touch>
+
+							<echo message="[jspcompile] compiling.. ${destdir@{extname}}" />
+							<javacompile destdir="${destdir@{extname}}">
+								<source>
+									<pathelement path="${destdir@{extname}}" />
+								</source>
+								<additionalclasspath>
+									<fileset dir="${bundled.tomcat.home}">
+										<include name="lib/*.jar" />
+										<!-- 
+											Some jsp pages use the bootstrap classes.
+											Jsp compilation is executed before copying ytomcat.jar from bootstrap/bin
+											to tomcat/lib. The tomcat/lib/ytomcat.jar is excluded(may be obsolete) 
+											and in that case the well updated bootstrap/bin/ytomcat.jar will be in use.
+										 -->
+										<exclude name="lib/ytomcat.jar" />
+										<!--tomcat60-->
+									</fileset>
+
+									<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF">
+										<include name="lib/*.jar" />
+									</fileset>
+									<pathelement path="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+									<pathelement path="${ext.@{extname}.classpath}"/>
+									<pathelement path="${ext.hmc_jsp_compile.classpath}"/>
+								</additionalclasspath>
+							</javacompile>
+
+							<!--DE768: for fixing Tomcat 7 precompile problems -->
+							<unifyJspClassTime jspCompileTargetDir="${destdir@{extname}}"/>
+
+							<touch file="${destdir@{extname}}/jspcompile_touch" />
+
+						</sequential>
+					</outofdate>
+				</try>
+
+				<catch>
+					<echo>
+					</echo>
+					<echo>
+					</echo>
+					<echo>
+					</echo>
+					<echo>ERROR compiling jsp's for @{extname}: ${jsperror}</echo>
+					<echo>NOTE: To avoid these error(s) you can disable the jsp precompilation</echo>
+					<echo> by setting the jspcompile-tag in your extensioninfo.xml to:  jspcompile="false"</echo>
+					<echo>
+					</echo>
+					<throw>jsp error </throw>
+				</catch>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,743 @@
+{
+  "User": {
+    "addresses": [
+      {
+        "appartment": "apartment_shipping_1",
+        "building": "building_shipping_1",
+        "cellphone": "cellphone_shipping_1",
+        "company": "company_shipping_1",
+        "dateOfBirth": 946684800000,
+        "department": "department_shipping_1",
+        "district": "district_shipping_1",
+        "duplicate": false,
+        "email": "email_shipping@sap.com_1",
+        "fax": "fax_shipping_1",
+        "firstname": "firstname_shipping_1",
+        "gender": "MALE",
+        "lastname": "lastname_shipping_1",
+        "middlename": "middlename_shipping_1",
+        "middlename2": "middlename2_shipping_1",
+        "phone1": "phone1_shipping_1",
+        "phone2": "phone2_shipping_2",
+        "pobox": "pobox_shipping_1",
+        "postalcode": "postalcode_shipping_1",
+        "streetname": "streetname_shipping_1",
+        "streetnumber": "streetnumber_shipping_1",
+        "town": "town_shipping_1"
+      },
+      {
+        "appartment": "apartment_payment_3",
+        "building": "building_payment_1",
+        "cellphone": "cellphone_payment_1",
+        "company": "company_payment_1",
+        "country": {
+          "isocode": "isocode_1",
+          "name": {
+            "en": "name_1"
+          }
+        },
+        "dateOfBirth": 946684800000,
+        "department": "department_payment_1",
+        "district": "district_payment_1",
+        "duplicate": false,
+        "email": "email_payment@sap.com_1",
+        "fax": "fax_payment_1",
+        "firstname": "firstname_payment_1",
+        "gender": "MALE",
+        "lastname": "lastname_payment_1",
+        "middlename": "middlename_payment_1",
+        "middlename2": "middlename2_payment_1",
+        "phone1": "phone1_payment_1",
+        "phone2": "phone2_payment_2",
+        "pobox": "pobox_payment_1",
+        "postalcode": "postalcode_payment_1",
+        "region": {
+          "isocode": "isocode_1",
+          "name": {
+            "en": "name_1"
+          }
+        },
+        "streetname": "streetname_payment_1",
+        "streetnumber": "streetnumber_payment_1",
+        "title": {
+          "code": "code_1",
+          "name": {
+            "en": "name_1"
+          }
+        },
+        "town": "town_payment_1"
+      }
+    ],
+    "carts": [
+      {
+        "calculated": false,
+        "code": "code_cartmodel_1",
+        "currency": {
+          "isocode": "isocode_1",
+          "name": {
+            "en": "name_1"
+          }
+        },
+        "deliveryAddress": {
+          "appartment": "apartment_shipping_1",
+          "building": "building_shipping_1",
+          "cellphone": "cellphone_shipping_1",
+          "company": "company_shipping_1",
+          "dateOfBirth": 946684800000,
+          "department": "department_shipping_1",
+          "district": "district_shipping_1",
+          "duplicate": false,
+          "email": "email_shipping@sap.com_1",
+          "fax": "fax_shipping_1",
+          "firstname": "firstname_shipping_1",
+          "gender": "MALE",
+          "lastname": "lastname_shipping_1",
+          "middlename": "middlename_shipping_1",
+          "middlename2": "middlename2_shipping_1",
+          "phone1": "phone1_shipping_1",
+          "phone2": "phone2_shipping_2",
+          "pobox": "pobox_shipping_1",
+          "postalcode": "postalcode_shipping_1",
+          "streetname": "streetname_shipping_1",
+          "streetnumber": "streetnumber_shipping_1",
+          "town": "town_shipping_1"
+        },
+        "description": "description_cartmodel_1",
+        "entries": [
+          {
+            "entryGroupNumbers": [
+              1,
+              2,
+              3
+            ],
+            "entryNumber": 2,
+            "info": "product \"code_second_1\" with name \"name_second_1\"",
+            "product": {
+              "code": "code_second_1",
+              "name": {
+                "en": "name_second_1"
+              }
+            },
+            "quantity": 2,
+            "totalPrice": 2.0,
+            "unit": {
+              "code": "code_pieces_1",
+              "unitType": "unitType_pieces_1"
+            }
+          },
+          {
+            "entryGroupNumbers": [
+              1,
+              2,
+              3
+            ],
+            "entryNumber": 1,
+            "info": "product \"code_first_1\" with name \"name_first_1\"",
+            "product": {
+              "code": "code_first_1",
+              "name": {
+                "en": "name_first_1"
+              }
+            },
+            "quantity": 1,
+            "totalPrice": 1.0,
+            "unit": {
+              "code": "code_pieces_1",
+              "unitType": "unitType_pieces_1"
+            }
+          }
+        ],
+        "globalDiscountValuesInternal": "[<DV<discount_cartmodel_1#20.0#false#0.0#NULL#false>VD>]",
+        "name": "name_cartmodel_1",
+        "paymentAddress": {
+          "appartment": "apartment_payment_3",
+          "building": "building_payment_1",
+          "cellphone": "cellphone_payment_1",
+          "company": "company_payment_1",
+          "country": {
+            "isocode": "isocode_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "dateOfBirth": 946684800000,
+          "department": "department_payment_1",
+          "district": "district_payment_1",
+          "duplicate": false,
+          "email": "email_payment@sap.com_1",
+          "fax": "fax_payment_1",
+          "firstname": "firstname_payment_1",
+          "gender": "MALE",
+          "lastname": "lastname_payment_1",
+          "middlename": "middlename_payment_1",
+          "middlename2": "middlename2_payment_1",
+          "phone1": "phone1_payment_1",
+          "phone2": "phone2_payment_2",
+          "pobox": "pobox_payment_1",
+          "postalcode": "postalcode_payment_1",
+          "region": {
+            "isocode": "isocode_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "streetname": "streetname_payment_1",
+          "streetnumber": "streetnumber_payment_1",
+          "title": {
+            "code": "code_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "town": "town_payment_1"
+        },
+        "paymentCost": 1.0,
+        "paymentInfo": {
+          "accountNumber": null,
+          "bank": null,
+          "bankIDNumber": null,
+          "baOwner": null,
+          "ccOwner": "ccOwner_creditCard_1",
+          "code": "code_creditCard_1",
+          "duplicate": false,
+          "number": "4111 1111 1111 1111",
+          "type": "VISA",
+          "validFromMonth": "validFromMonth_creditCard_1",
+          "validFromYear": "validFromYear_creditCard_1",
+          "validToMonth": "validToMonth_creditCard_1",
+          "validToYear": "validToYear_creditCard_1"
+        },
+        "paymentMode": {
+          "code": "code_credit_1",
+          "name": {
+            "en": "name_credit_1"
+          }
+        },
+        "totalDiscounts": 1.0,
+        "totalTax": 1.0,
+        "totalTaxValuesInternal": "[<TV<tax_cartmodel_1#10.0#false#0.0#NULL>VT>]"
+      }
+    ],
+    "contactInfos": [
+      {
+        "code": "code_mobile_1",
+        "phoneNumber": "phoneNumber_mobile_2",
+        "type": "MOBILE"
+      },
+      {
+        "code": "code_work_1",
+        "phoneNumber": "phoneNumber_work_1",
+        "type": "WORK"
+      }
+    ],
+    "customerID": "customerID_1",
+    "deactivationDate": 4102444800000,
+    "defaultPaymentAddress": {
+      "appartment": "apartment_payment_3",
+      "building": "building_payment_1",
+      "cellphone": "cellphone_payment_1",
+      "company": "company_payment_1",
+      "country": {
+        "isocode": "isocode_1",
+        "name": {
+          "en": "name_1"
+        }
+      },
+      "dateOfBirth": 946684800000,
+      "department": "department_payment_1",
+      "district": "district_payment_1",
+      "duplicate": false,
+      "email": "email_payment@sap.com_1",
+      "fax": "fax_payment_1",
+      "firstname": "firstname_payment_1",
+      "gender": "MALE",
+      "lastname": "lastname_payment_1",
+      "middlename": "middlename_payment_1",
+      "middlename2": "middlename2_payment_1",
+      "phone1": "phone1_payment_1",
+      "phone2": "phone2_payment_2",
+      "pobox": "pobox_payment_1",
+      "postalcode": "postalcode_payment_1",
+      "region": {
+        "isocode": "isocode_1",
+        "name": {
+          "en": "name_1"
+        }
+      },
+      "streetname": "streetname_payment_1",
+      "streetnumber": "streetnumber_payment_1",
+      "title": {
+        "code": "code_1",
+        "name": {
+          "en": "name_1"
+        }
+      },
+      "town": "town_payment_1"
+    },
+    "defaultShipmentAddress": {
+      "appartment": "apartment_shipping_1",
+      "building": "building_shipping_1",
+      "cellphone": "cellphone_shipping_1",
+      "company": "company_shipping_1",
+      "dateOfBirth": 946684800000,
+      "department": "department_shipping_1",
+      "district": "district_shipping_1",
+      "duplicate": false,
+      "email": "email_shipping@sap.com_1",
+      "fax": "fax_shipping_1",
+      "firstname": "firstname_shipping_1",
+      "gender": "MALE",
+      "lastname": "lastname_shipping_1",
+      "middlename": "middlename_shipping_1",
+      "middlename2": "middlename2_shipping_1",
+      "phone1": "phone1_shipping_1",
+      "phone2": "phone2_shipping_2",
+      "pobox": "pobox_shipping_1",
+      "postalcode": "postalcode_shipping_1",
+      "streetname": "streetname_shipping_1",
+      "streetnumber": "streetnumber_shipping_1",
+      "town": "town_shipping_1"
+    },
+    "description": "description_1",
+    "encodedPassword": "password_2",
+    "name": "name_3",
+    "orders": [
+      {
+        "calculated": false,
+        "code": "code_ordermodel_1",
+        "currency": {
+          "isocode": "isocode_1",
+          "name": {
+            "en": "name_1"
+          }
+        },
+        "deliveryAddress": {
+          "appartment": "apartment_shipping_1",
+          "building": "building_shipping_1",
+          "cellphone": "cellphone_shipping_1",
+          "company": "company_shipping_1",
+          "dateOfBirth": 946684800000,
+          "department": "department_shipping_1",
+          "district": "district_shipping_1",
+          "duplicate": true,
+          "email": "email_shipping@sap.com_1",
+          "fax": "fax_shipping_1",
+          "firstname": "firstname_shipping_1",
+          "gender": "MALE",
+          "lastname": "lastname_shipping_1",
+          "middlename": "middlename_shipping_1",
+          "middlename2": "middlename2_shipping_1",
+          "original": {
+            "appartment": "apartment_shipping_1",
+            "building": "building_shipping_1",
+            "cellphone": "cellphone_shipping_1",
+            "company": "company_shipping_1",
+            "dateOfBirth": 946684800000,
+            "department": "department_shipping_1",
+            "district": "district_shipping_1",
+            "duplicate": false,
+            "email": "email_shipping@sap.com_1",
+            "fax": "fax_shipping_1",
+            "firstname": "firstname_shipping_1",
+            "gender": "MALE",
+            "lastname": "lastname_shipping_1",
+            "middlename": "middlename_shipping_1",
+            "middlename2": "middlename2_shipping_1",
+            "phone1": "phone1_shipping_1",
+            "phone2": "phone2_shipping_2",
+            "pobox": "pobox_shipping_1",
+            "postalcode": "postalcode_shipping_1",
+            "streetname": "streetname_shipping_1",
+            "streetnumber": "streetnumber_shipping_1",
+            "town": "town_shipping_1"
+          },
+          "phone1": "phone1_shipping_1",
+          "phone2": "phone2_shipping_2",
+          "pobox": "pobox_shipping_1",
+          "postalcode": "postalcode_shipping_1",
+          "streetname": "streetname_shipping_1",
+          "streetnumber": "streetnumber_shipping_1",
+          "town": "town_shipping_1"
+        },
+        "description": "description_ordermodel_1",
+        "entries": [
+          {
+            "entryGroupNumbers": [
+              1,
+              2,
+              3
+            ],
+            "entryNumber": 2,
+            "info": "product \"code_second_1\" with name \"name_second_1\"",
+            "product": {
+              "code": "code_second_1",
+              "name": {
+                "en": "name_second_1"
+              }
+            },
+            "quantity": 2,
+            "totalPrice": 2.0,
+            "unit": {
+              "code": "code_pieces_1",
+              "unitType": "unitType_pieces_1"
+            }
+          },
+          {
+            "entryGroupNumbers": [
+              1,
+              2,
+              3
+            ],
+            "entryNumber": 1,
+            "info": "product \"code_first_1\" with name \"name_first_1\"",
+            "product": {
+              "code": "code_first_1",
+              "name": {
+                "en": "name_first_1"
+              }
+            },
+            "quantity": 1,
+            "totalPrice": 1.0,
+            "unit": {
+              "code": "code_pieces_1",
+              "unitType": "unitType_pieces_1"
+            }
+          }
+        ],
+        "globalDiscountValuesInternal": "[<DV<discount_ordermodel_1#20.0#false#0.0#NULL#false>VD>]",
+        "name": "name_ordermodel_1",
+        "paymentAddress": {
+          "appartment": "apartment_payment_3",
+          "building": "building_payment_1",
+          "cellphone": "cellphone_payment_1",
+          "company": "company_payment_1",
+          "country": {
+            "isocode": "isocode_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "dateOfBirth": 946684800000,
+          "department": "department_payment_1",
+          "district": "district_payment_1",
+          "duplicate": true,
+          "email": "email_payment@sap.com_1",
+          "fax": "fax_payment_1",
+          "firstname": "firstname_payment_1",
+          "gender": "MALE",
+          "lastname": "lastname_payment_1",
+          "middlename": "middlename_payment_1",
+          "middlename2": "middlename2_payment_1",
+          "original": {
+            "appartment": "apartment_payment_3",
+            "building": "building_payment_1",
+            "cellphone": "cellphone_payment_1",
+            "company": "company_payment_1",
+            "country": {
+              "isocode": "isocode_1",
+              "name": {
+                "en": "name_1"
+              }
+            },
+            "dateOfBirth": 946684800000,
+            "department": "department_payment_1",
+            "district": "district_payment_1",
+            "duplicate": false,
+            "email": "email_payment@sap.com_1",
+            "fax": "fax_payment_1",
+            "firstname": "firstname_payment_1",
+            "gender": "MALE",
+            "lastname": "lastname_payment_1",
+            "middlename": "middlename_payment_1",
+            "middlename2": "middlename2_payment_1",
+            "phone1": "phone1_payment_1",
+            "phone2": "phone2_payment_2",
+            "pobox": "pobox_payment_1",
+            "postalcode": "postalcode_payment_1",
+            "region": {
+              "isocode": "isocode_1",
+              "name": {
+                "en": "name_1"
+              }
+            },
+            "streetname": "streetname_payment_1",
+            "streetnumber": "streetnumber_payment_1",
+            "title": {
+              "code": "code_1",
+              "name": {
+                "en": "name_1"
+              }
+            },
+            "town": "town_payment_1"
+          },
+          "phone1": "phone1_payment_1",
+          "phone2": "phone2_payment_2",
+          "pobox": "pobox_payment_1",
+          "postalcode": "postalcode_payment_1",
+          "region": {
+            "isocode": "isocode_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "streetname": "streetname_payment_1",
+          "streetnumber": "streetnumber_payment_1",
+          "title": {
+            "code": "code_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "town": "town_payment_1"
+        },
+        "paymentCost": 1.0,
+        "paymentInfo": {
+          "accountNumber": "accountNumber_debit_1",
+          "bank": "bank_debit_1",
+          "bankIDNumber": "bankIDNumber_debit_1",
+          "baOwner": "baOwner_debit_1",
+          "ccOwner": null,
+          "code": "code_debit_1",
+          "duplicate": true,
+          "number": null,
+          "type": null,
+          "validFromMonth": null,
+          "validFromYear": null,
+          "validToMonth": null,
+          "validToYear": null
+        },
+        "paymentMode": {
+          "code": "code_credit_1",
+          "name": {
+            "en": "name_credit_1"
+          }
+        },
+        "totalDiscounts": 1.0,
+        "totalTax": 1.0,
+        "totalTaxValuesInternal": "[<TV<tax_ordermodel_1#10.0#false#0.0#NULL>VT>]"
+      }
+    ],
+    "passwordAnswer": "passwordAnswer_2",
+    "passwordEncoding": "*",
+    "passwordQuestion": "passwordQuestion_2",
+    "paymentInfos": [
+      {
+        "accountNumber": "accountNumber_debit_1",
+        "bank": "bank_debit_1",
+        "bankIDNumber": "bankIDNumber_debit_1",
+        "baOwner": "baOwner_debit_1",
+        "ccOwner": null,
+        "code": "code_debit_1",
+        "duplicate": false,
+        "number": null,
+        "type": null,
+        "validFromMonth": null,
+        "validFromYear": null,
+        "validToMonth": null,
+        "validToYear": null
+      },
+      {
+        "accountNumber": "accountNumber_debit_1",
+        "bank": "bank_debit_1",
+        "bankIDNumber": "bankIDNumber_debit_1",
+        "baOwner": "baOwner_debit_1",
+        "ccOwner": null,
+        "code": "code_debit_1",
+        "duplicate": true,
+        "number": null,
+        "type": null,
+        "validFromMonth": null,
+        "validFromYear": null,
+        "validToMonth": null,
+        "validToYear": null
+      },
+      {
+        "accountNumber": null,
+        "bank": null,
+        "bankIDNumber": null,
+        "baOwner": null,
+        "ccOwner": "ccOwner_creditCard_1",
+        "code": "code_creditCard_1",
+        "duplicate": false,
+        "number": "4111 1111 1111 1111",
+        "type": "VISA",
+        "validFromMonth": "validFromMonth_creditCard_1",
+        "validFromYear": "validFromYear_creditCard_1",
+        "validToMonth": "validToMonth_creditCard_1",
+        "validToYear": "validToYear_creditCard_1"
+      }
+    ],
+    "PrincipalGroupRelation": [
+      {
+        "description": "description_1",
+        "locName": {
+          "en": "locName_1"
+        },
+        "name": "name_1",
+        "uid": "uid_usergroup_1"
+      }
+    ],
+    "quotes": [
+      {
+        "calculated": false,
+        "code": "code_quotemodel_1",
+        "currency": {
+          "isocode": "isocode_1",
+          "name": {
+            "en": "name_1"
+          }
+        },
+        "deliveryAddress": {
+          "appartment": "apartment_shipping_1",
+          "building": "building_shipping_1",
+          "cellphone": "cellphone_shipping_1",
+          "company": "company_shipping_1",
+          "dateOfBirth": 946684800000,
+          "department": "department_shipping_1",
+          "district": "district_shipping_1",
+          "duplicate": false,
+          "email": "email_shipping@sap.com_1",
+          "fax": "fax_shipping_1",
+          "firstname": "firstname_shipping_1",
+          "gender": "MALE",
+          "lastname": "lastname_shipping_1",
+          "middlename": "middlename_shipping_1",
+          "middlename2": "middlename2_shipping_1",
+          "phone1": "phone1_shipping_1",
+          "phone2": "phone2_shipping_2",
+          "pobox": "pobox_shipping_1",
+          "postalcode": "postalcode_shipping_1",
+          "streetname": "streetname_shipping_1",
+          "streetnumber": "streetnumber_shipping_1",
+          "town": "town_shipping_1"
+        },
+        "description": "description_quotemodel_1",
+        "entries": [
+          {
+            "entryGroupNumbers": [
+              1,
+              2,
+              3
+            ],
+            "entryNumber": 2,
+            "info": "product \"code_second_1\" with name \"name_second_1\"",
+            "product": {
+              "code": "code_second_1",
+              "name": {
+                "en": "name_second_1"
+              }
+            },
+            "quantity": 2,
+            "totalPrice": 2.0,
+            "unit": {
+              "code": "code_pieces_1",
+              "unitType": "unitType_pieces_1"
+            }
+          },
+          {
+            "entryGroupNumbers": [
+              1,
+              2,
+              3
+            ],
+            "entryNumber": 1,
+            "info": "product \"code_first_1\" with name \"name_first_1\"",
+            "product": {
+              "code": "code_first_1",
+              "name": {
+                "en": "name_first_1"
+              }
+            },
+            "quantity": 1,
+            "totalPrice": 1.0,
+            "unit": {
+              "code": "code_pieces_1",
+              "unitType": "unitType_pieces_1"
+            }
+          }
+        ],
+        "globalDiscountValuesInternal": "[<DV<discount_quotemodel_1#20.0#false#0.0#NULL#false>VD>]",
+        "name": "name_quotemodel_1",
+        "paymentAddress": {
+          "appartment": "apartment_payment_3",
+          "building": "building_payment_1",
+          "cellphone": "cellphone_payment_1",
+          "company": "company_payment_1",
+          "country": {
+            "isocode": "isocode_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "dateOfBirth": 946684800000,
+          "department": "department_payment_1",
+          "district": "district_payment_1",
+          "duplicate": false,
+          "email": "email_payment@sap.com_1",
+          "fax": "fax_payment_1",
+          "firstname": "firstname_payment_1",
+          "gender": "MALE",
+          "lastname": "lastname_payment_1",
+          "middlename": "middlename_payment_1",
+          "middlename2": "middlename2_payment_1",
+          "phone1": "phone1_payment_1",
+          "phone2": "phone2_payment_2",
+          "pobox": "pobox_payment_1",
+          "postalcode": "postalcode_payment_1",
+          "region": {
+            "isocode": "isocode_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "streetname": "streetname_payment_1",
+          "streetnumber": "streetnumber_payment_1",
+          "title": {
+            "code": "code_1",
+            "name": {
+              "en": "name_1"
+            }
+          },
+          "town": "town_payment_1"
+        },
+        "paymentCost": 1.0,
+        "paymentInfo": {
+          "accountNumber": null,
+          "bank": null,
+          "bankIDNumber": null,
+          "baOwner": null,
+          "ccOwner": "ccOwner_creditCard_1",
+          "code": "code_creditCard_1",
+          "duplicate": false,
+          "number": "4111 1111 1111 1111",
+          "type": "VISA",
+          "validFromMonth": "validFromMonth_creditCard_1",
+          "validFromYear": "validFromYear_creditCard_1",
+          "validToMonth": "validToMonth_creditCard_1",
+          "validToYear": "validToYear_creditCard_1"
+        },
+        "paymentMode": {
+          "code": "code_credit_1",
+          "name": {
+            "en": "name_credit_1"
+          }
+        },
+        "state": "ORDERED",
+        "totalDiscounts": 1.0,
+        "totalTax": 1.0,
+        "totalTaxValuesInternal": "[<TV<tax_quotemodel_1#10.0#false#0.0#NULL>VT>]",
+        "version": 1
+      }
+    ],
+    "uid": "uid_user_1",
+    "userPasswordChangeAudits": [
+      {
+        "changingApplication": null,
+        "changingUser": "anonymous",
+        "encodedPassword": "password_1",
+        "ipAddress": null,
+        "passwordEncoding": "*"
+      }
+    ]
+  }
+}

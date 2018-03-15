@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:util="http://www.springframework.org/schema/util"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+	<!--  Extend this service for the purpose of extended AbstractOrder types (MyOrder). For Order and Cart there are services available out of the box. -->
+	<bean id="abstractOrderService" class="de.hybris.platform.order.impl.DefaultAbstractOrderService" abstract="true"
+			parent="abstractBusinessService">
+		<property name="orderDao" ref="orderDao"/>
+		<property name="abstractOrderEntryService" ref="abstractOrderEntryService"/>
+		<property name="abstractOrderEntryTypeService" ref="abstractOrderEntryTypeService"/>
+		<property name="saveAbstractOrderStrategy" ref="saveAbstractOrderStrategy"/>
+		<property name="cloneAbstractOrderStrategy" ref="cloneAbstractOrderStrategy"/>
+	</bean>
+
+	<!--  Extend this service for the purpose of extended AbstractOrderEntry types (MyOrderEntry). For OrderEntry and CartEntry there are services available out of the box. -->
+	<alias alias="abstractOrderEntryService" name="defaultAbstractOrderEntryService"/>
+	<bean id="defaultAbstractOrderEntryService" class="de.hybris.platform.order.impl.DefaultAbstractOrderEntryService"
+			parent="abstractBusinessService">
+		<property name="abstractOrderEntryTypeService" ref="abstractOrderEntryTypeService"/>
+	</bean>
+
+	<!-- Service resolving order - order entry type mapping -->
+	<alias alias="abstractOrderEntryTypeService" name="defaultAbstractOrderEntryTypeService"/>
+	<bean id="defaultAbstractOrderEntryTypeService" class="de.hybris.platform.order.impl.DefaultAbstractOrderEntryTypeService"
+			parent="abstractBusinessService">
+		<property name="typeService" ref="typeService"/>
+		<!-- You can configure order to order entry type mapping of your choice. If this map is not configured, the service will resolve the type from atomic type of the order's 'entries' collection.
+		<property name="orderType2orderEntryTypeMapping">
+			<map>
+				<entry key="Order" value="OrderEntry"/>
+				<entry key="Cart" value="CartEntry"/>
+			</map>
+		</property>
+		-->
+	</bean>
+
+	<alias alias="cartDao" name="defaultCartDao"/>
+	<bean id="defaultCartDao" parent="abstractItemDao"/>
+
+	<alias alias="orderDao" name="defaultOrderDao"/>
+	<bean id="defaultOrderDao" class="de.hybris.platform.order.daos.impl.DefaultOrderDao" parent="abstractItemDao"/>
+
+	<alias alias="taxDao" name="defaultTaxDao"/>
+	<bean id="defaultTaxDao" class="de.hybris.platform.order.daos.impl.DefaultTaxDao" parent="abstractItemDao"/>
+
+	<alias alias="discountDao" name="defaultDiscountDao"/>
+	<bean id="defaultDiscountDao" class="de.hybris.platform.order.daos.impl.DefaultDiscountDao" parent="abstractItemDao"/>
+
+	<alias alias="deliveryModeDao" name="defaultDeliveryModeDao"/>
+	<bean id="defaultDeliveryModeDao" class="de.hybris.platform.order.daos.impl.DefaultDeliveryModeDao" parent="abstractItemDao"/>
+
+	<alias alias="paymentInfoDao" name="defaultPaymentInfoDao"/>
+	<bean id="defaultPaymentInfoDao" parent="abstractItemDao"/>
+
+	<alias alias="paymentModeDao" name="defaultPaymentModeDao"/>
+	<bean id="defaultPaymentModeDao" class="de.hybris.platform.order.daos.impl.DefaultPaymentModeDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="cartService" name="defaultCartService"/>
+	<bean id="defaultCartService" class="de.hybris.platform.order.impl.DefaultCartService" parent="abstractOrderService">
+		<property name="addToCartStrategy" ref="addToCartStrategy"/>
+		<property name="orderCalculation" ref="orderCalculation"/>
+		<property name="cartFactory" ref="cartFactory"/>
+		<property name="createCartFromQuoteStrategy" ref="createCartFromQuoteStrategy"/>
+	</bean>
+	
+	<alias alias="createCartFromQuoteStrategy" name="defaultCreateCartFromQuoteStrategy"/>
+	<bean id="defaultCreateCartFromQuoteStrategy"
+			class="de.hybris.platform.order.strategies.impl.DefaultCreateCartFromQuoteStrategy" parent="genericAbstractOrderCloningStrategy" />
+
+	<alias alias="paymentModeService" name="defaultPaymentModeService"/>
+	<bean id="defaultPaymentModeService" class="de.hybris.platform.order.impl.DefaultPaymentModeService">
+		<property name="paymentModeDao" ref="paymentModeDao"/>
+	</bean>
+
+	<alias alias="taxService" name="defaultTaxService"/>
+	<bean id="defaultTaxService" class="de.hybris.platform.order.impl.DefaultTaxService" parent="abstractBusinessService">
+		<property name="taxDao" ref="taxDao"/>
+	</bean>
+
+	<alias alias="discountService" name="defaultDiscountService"/>
+	<bean id="defaultDiscountService" class="de.hybris.platform.order.impl.DefaultDiscountService"
+			parent="abstractBusinessService">
+		<property name="discountDao" ref="discountDao"/>
+	</bean>
+
+	<alias alias="deliveryModeService" name="defaultDeliveryModeService"/>
+	<bean id="defaultDeliveryModeService" class="de.hybris.platform.order.impl.DefaultDeliveryModeService"
+			parent="abstractBusinessService">
+		<property name="deliveryModeDao" ref="deliveryModeDao"/>
+	</bean>
+
+	<alias alias="cartFactory" name="defaultCartFactory"/>
+	<bean id="defaultCartFactory" class="de.hybris.platform.order.impl.DefaultCartFactory">
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias alias="orderService" name="defaultOrderService"/>
+	<bean id="defaultOrderService" class="de.hybris.platform.order.impl.DefaultOrderService" parent="abstractOrderService">
+		<property name="placeOrderStrategy" ref="placeOrderStrategy"/>
+		<property name="orderCalculation" ref="orderCalculation"/>
+		<property name="createOrderFromCartStrategy" ref="createOrderFromCartStrategy"/>
+		<property name="submitOrderStrategies">
+			<list>
+				<!-- implementation that sends SubmitOrderEvent -->
+				<!-- <ref bean="eventPublishingSubmitOrderStrategy"/> -->
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="cloneAbstractOrderStrategy" name="defaultCloneAbstractOrderStrategy"/>
+	<bean id="defaultCloneAbstractOrderStrategy"
+			class="de.hybris.platform.order.strategies.ordercloning.impl.DefaultCloneAbstractOrderStrategy">
+		<constructor-arg name="typeService" ref="typeService"/>
+		<constructor-arg name="itemModelCloneCreator" ref="itemModelCloneCreator"/>
+		<constructor-arg name="abstractOrderEntryTypeService" ref="abstractOrderEntryTypeService"/>
+	</bean>
+
+	<!-- deprecated strategy -->
+	<alias alias="orderCalculation" name="defaultOrderCalculation"/>
+	<bean id="defaultOrderCalculation" class="de.hybris.platform.order.strategies.impl.DefaultOrderCalculation"
+			parent="abstractBusinessService">
+		<property name="calculationService" ref="calculationService"/>
+	</bean>
+
+	<alias alias="addToCartStrategy" name="defaultAddToCartStrategy"/>
+	<bean id="defaultAddToCartStrategy" class="de.hybris.platform.order.strategies.impl.DefaultAddToCartStrategy"
+			parent="abstractBusinessService">
+		<property name="productService" ref="productService"/>
+	</bean>
+
+	<!-- obsolete place order strategy. Use submitOrderStrategy -->
+	<alias alias="placeOrderStrategy" name="defaultPlaceOrderStrategy"/>
+	<bean id="defaultPlaceOrderStrategy" class="de.hybris.platform.order.strategies.impl.DefaultPlaceOrderStrategy"
+			parent="abstractBusinessService">
+		<property name="orderCalculation" ref="orderCalculation"/>
+		<property name="cartValidator" ref="cartValidator"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="userService" ref="userService"/>
+		<property name="keyGenerator" ref="systemTimeGenerator"/>
+	</bean>
+
+	<alias alias="createOrderFromCartStrategy" name="defaultCreateOrderFromCartStrategy"/>
+	<bean id="defaultCreateOrderFromCartStrategy"
+			class="de.hybris.platform.order.strategies.impl.DefaultCreateOrderFromCartStrategy">
+		<property name="cartValidator" ref="cartValidator"/>
+		<property name="cloneAbstractOrderStrategy" ref="cloneAbstractOrderStrategy"/>
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+	</bean>
+
+	<bean id="eventPublishingSubmitOrderStrategy"
+			class="de.hybris.platform.order.strategies.impl.EventPublishingSubmitOrderStrategy">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<alias alias="saveAbstractOrderStrategy" name="defaultSaveAbstractOrderStrategy"/>
+	<bean id="defaultSaveAbstractOrderStrategy"
+			class="de.hybris.platform.order.strategies.saving.impl.DefaultSaveAbstractOrderStrategy"
+			parent="abstractBusinessService">
+		<property name="transactionTemplate" ref="orderServiceTransactionTemplate"/>
+	</bean>
+
+	<bean id="systemTimeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.SystemTimeGenerator"/>
+
+	<alias alias="cartValidator" name="defaultCartValidator"/>
+	<bean id="defaultCartValidator" class="de.hybris.platform.order.strategies.impl.NoOpCartValidator"/>
+
+	<alias alias="orderEntryService" name="defaultOrderEntryService"/>
+	<bean id="defaultOrderEntryService" class="de.hybris.platform.order.impl.DefaultOrderEntryService"
+			parent="abstractOrderEntryService"/>
+
+	<alias alias="cartEntryService" name="defaultCartEntryService"/>
+	<bean id="defaultCartEntryService" class="de.hybris.platform.order.impl.DefaultCartEntryService"
+			parent="abstractOrderEntryService"/>
+
+	<alias name="defaultCalculationService" alias="calculationService"/>
+	<bean id="defaultCalculationService" class="de.hybris.platform.order.impl.DefaultCalculationService"
+			parent="abstractBusinessService">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="findPriceStrategy" ref="currentFactoryFindPricingStrategy"/>
+		<property name="findDiscountsStrategies" ref="discountStrategiesFinderList"/>
+		<property name="findTaxesStrategies" ref="taxesStrategiesFinderList"/>
+		<property name="findDeliveryCostStrategy" ref="findDeliveryCostStrategy"/>
+		<property name="findPaymentCostStrategy" ref="findPaymentCostStrategy"/>
+		<property name="orderRequiresCalculationStrategy" ref="orderRequiresCalculationStrategy"/>
+		<property name="taxFreeEntrySupport" value="${abstractorder.taxFreeEntrySupport}"/>
+	</bean>
+
+	<util:list id="discountStrategiesFinderList">
+		<ref bean="currentFactoryFindPricingStrategy"/>
+		<ref bean="findOrderDiscountValuesStrategy"/>
+	</util:list>
+
+	<util:list id="taxesStrategiesFinderList">
+		<ref bean="currentFactoryFindPricingStrategy"/>
+	</util:list>
+
+	<bean id="currentFactoryFindPricingStrategy"
+			class="de.hybris.platform.order.strategies.calculation.impl.FindPricingWithCurrentPriceFactoryStrategy"
+			parent="abstractBusinessService"/>
+
+	<bean id="findOrderDiscountValuesStrategy"
+			class="de.hybris.platform.order.strategies.calculation.impl.FindOrderDiscountValuesStrategy"
+			parent="abstractBusinessService"/>
+
+	<alias name="defaultFindDeliveryCostStrategy" alias="findDeliveryCostStrategy"/>
+	<bean id="defaultFindDeliveryCostStrategy"
+			class="de.hybris.platform.order.strategies.calculation.impl.DefaultFindDeliveryCostStrategy"
+			parent="abstractBusinessService"/>
+
+	<alias name="defaultFindPaymentCostStrategy" alias="findPaymentCostStrategy"/>
+	<bean id="defaultFindPaymentCostStrategy"
+			class="de.hybris.platform.order.strategies.calculation.impl.DefaultFindPaymentCostStrategy"
+			parent="abstractBusinessService"/>
+
+	<alias name="defaultOrderRequiresCalculationStrategy" alias="orderRequiresCalculationStrategy"/>
+	<bean id="defaultOrderRequiresCalculationStrategy"
+			class="de.hybris.platform.order.strategies.calculation.impl.DefaultOrderRequiresCalculationStrategy"/>
+
+	<bean id="orderServiceTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="txManager"/>
+	</bean>
+
+	<alias name="defaultOrderPartOfMembersCloningStrategy" alias="orderPartOfMembersCloningStrategy"/>
+	<bean id="defaultOrderPartOfMembersCloningStrategy"
+			class="de.hybris.platform.order.strategies.ordercloning.impl.DefaultOrderPartOfMembersCloningStrategy"
+			parent="abstractBusinessService">
+		<property name="addressService" ref="addressService"/>
+	</bean>
+
+	<alias name="defaultCreditCardNumberHelper" alias="creditCardNumberHelper"/>
+	<bean id="defaultCreditCardNumberHelper"
+			class="de.hybris.platform.order.strategies.paymentinfo.impl.DefaultCreditCardNumberHelper">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<!-- INTERCEPTORS -->
+
+	<!-- OrderEntry -->
+
+	<alias name="defaultAbstractOrderEntryPreparer" alias="abstractOrderEntryPreparer"/>
+	<bean id="defaultAbstractOrderEntryPreparer" class="de.hybris.platform.order.interceptors.DefaultAbstractOrderEntryPreparer">
+		<property name="typeService" ref="typeService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<!-- optionally, define attributes that, when modified, will reset CALCULATED flag
+		<property name="attributesForOrderRecalculation">
+			<list>
+				<value>product</value>
+				<value>quantity</value>
+				<value>basePrice</value>
+				...
+			</list>
+		</property>
+		 -->
+	</bean>
+
+	<alias name="defaultAbstractOrderEntryRemoveInterceptor" alias="abstractOrderEntryRemoveInterceptor"/>
+	<bean id="defaultAbstractOrderEntryRemoveInterceptor"
+			class="de.hybris.platform.order.interceptors.DefaultAbstractOrderEntryRemoveInterceptor"/>
+
+	<bean id="abstractOrderEntryPrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="abstractOrderEntryPreparer"/>
+		<property name="typeCode" value="AbstractOrderEntry"/>
+	</bean>
+
+	<bean id="abstractOrderEntryRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="abstractOrderEntryRemoveInterceptor"/>
+		<property name="typeCode" value="AbstractOrderEntry"/>
+	</bean>
+
+	<!-- OrderEntry END -->
+
+
+	<!-- AbstractOrder -->
+
+	<alias name="defaultAbstractOrderPrepareInterceptor" alias="abstractOrderPrepareInterceptor"/>
+	<bean id="defaultAbstractOrderPrepareInterceptor"
+			class="de.hybris.platform.order.interceptors.DefaultAbstractOrderPrepareInterceptor">
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<!-- define qualifiers of order attributes, which, when modified, the order and orderEntries need to be recalculated.
+		<property name="attributesForOrderEntriesRecalculation">
+			<list>
+				<value>date</value>
+				<value>user</value>
+				<value>currency</value>
+				<value>net</value>
+			</list>
+		</property>
+		-->
+		<!-- define qualifiers of order attributes, which, when modified, the order needs to be recalculated.
+		<property name="attributesForOrderRecalculation">
+			<list>
+			 	<value>deliveryModel</value>
+			 	<value>deliveryCost</value>
+			 	<value>paymentModel</value>
+			 	<value>paymentCost</value>
+			 	...
+			</list>
+		</property>
+		-->
+	</bean>
+
+	<bean id="defaultAbstractOrderRemoveInterceptor"
+			class="de.hybris.platform.order.interceptors.DefaultAbstractOrderRemoveInterceptor"/>
+
+	<bean id="abstractOrderPrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="abstractOrderPrepareInterceptor"/>
+		<property name="typeCode" value="AbstractOrder"/>
+	</bean>
+
+	<bean id="defaultAbstractOrderRemoveInterceptorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="defaultAbstractOrderRemoveInterceptor"/>
+		<property name="typeCode" value="AbstractOrder"/>
+	</bean>
+
+	<!-- AbstractOrder END -->
+
+	<!-- Order -->
+
+	<alias name="defaultOrderPrepareInterceptor" alias="orderPrepareInterceptor"/>
+	<bean id="defaultOrderPrepareInterceptor" class="de.hybris.platform.order.interceptors.DefaultOrderPrepareInterceptor">
+		<property name="orderPartOfMembersCloningStrategy" ref="orderPartOfMembersCloningStrategy"/>
+	</bean>
+
+	<bean id="orderPrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="orderPrepareInterceptor"/>
+		<property name="typeCode" value="Order"/>
+	</bean>
+
+	<!-- Order END -->
+	
+	<!-- Quote -->
+
+	<alias name="defaultQuotePrepareInterceptor" alias="quotePrepareInterceptor"/>
+	<bean id="defaultQuotePrepareInterceptor" class="de.hybris.platform.order.interceptors.DefaultQuotePrepareInterceptor">
+		<property name="initialVersion" value="1"/>
+		<property name="initialState" value="CREATED"/>
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+	</bean>
+
+	<bean id="quotePrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="quotePrepareInterceptor"/>
+		<property name="typeCode" value="Quote"/>
+	</bean>
+
+	<!-- Quote END -->
+	
+	<!-- DeliverMode -->
+	<bean id="removeDeliveryModeCheckOrdersInterceptor"
+			class="de.hybris.platform.order.interceptors.RemoveDeliveryModeCheckOrdersInterceptor">
+		<property name="orderDao" ref="orderDao"/>
+	</bean>
+
+	<bean id="deliverModeRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDeliveryModeCheckOrdersInterceptor"/>
+		<property name="typeCode" value="DeliveryMode"/>
+	</bean>
+	<!-- DeliverMode END -->
+
+	<!-- ZoneDeliveryMode -->
+
+	<alias alias="zoneDeliveryModeService" name="defaultZoneDeliveryModeService"/>
+	<bean id="defaultZoneDeliveryModeService" class="de.hybris.platform.order.impl.DefaultZoneDeliveryModeService"
+			parent="deliveryModeService">
+		<property name="zoneDeliveryModeDao" ref="zoneDeliveryModeDao"/>
+		<property name="zoneDeliveryModeValueDao" ref="zoneDeliveryModeValueDao"/>
+		<property name="zdmvConsistencyStrategy" ref="zdmvConsistencyStrategy"/>
+	</bean>
+
+	<alias alias="zoneDeliveryModeDao" name="defaultZoneDeliveryModeDao"/>
+	<bean id="defaultZoneDeliveryModeDao" class="de.hybris.platform.order.daos.impl.DefaultZoneDeliveryModeDao"
+			parent="abstractItemDao"/>
+
+	<alias alias="zoneDeliveryModeValueDao" name="defaultZoneDeliveryModeValueDao"/>
+	<bean id="defaultZoneDeliveryModeValueDao" class="de.hybris.platform.order.daos.impl.DefaultZoneDeliveryModeValueDao"/>
+
+	<alias alias="zdmvConsistencyStrategy" name="defaultZDMVConsistencyStrategy"/>
+	<bean id="defaultZDMVConsistencyStrategy"
+			class="de.hybris.platform.order.strategies.deliveryzone.impl.DefaultZDMVConsistencyStrategy">
+		<property name="zoneDeliveryModeDao" ref="zoneDeliveryModeDao"/>
+	</bean>
+
+	<!-- ZoneDeliveryMode END -->
+
+	<!-- ZoneDeliveryModeValue -->
+	<bean id="zoneDeliveryModeValueValidator" class="de.hybris.platform.order.interceptors.ZoneDeliveryModeValueValidator">
+		<property name="zoneDeliveryModeService" ref="zoneDeliveryModeService"/>
+		<property name="zdmvConsistencyStrategy" ref="zdmvConsistencyStrategy"/>
+	</bean>
+
+	<bean id="zoneDeliveryModeValueValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="zoneDeliveryModeValueValidator"/>
+		<property name="typeCode" value="ZoneDeliveryModeValue"/>
+	</bean>
+	<!-- ZoneDeliveryModeValue END -->
+
+	<!-- Zone -->
+	<bean id="clearZDMVZoneRemoveInterceptor" class="de.hybris.platform.order.interceptors.ClearZDMVZoneRemoveInterceptor">
+		<property name="zoneDeliveryModeValueDao" ref="zoneDeliveryModeValueDao"/>
+	</bean>
+
+	<bean id="clearZDMVZoneRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="clearZDMVZoneRemoveInterceptor"/>
+		<property name="typeCode" value="Zone"/>
+	</bean>
+	<!-- Zone END -->
+
+	<!-- PaymentMode -->
+	<bean id="removePaymentModeCheckOrdersInterceptor"
+			class="de.hybris.platform.order.interceptors.RemovePaymentModeCheckOrdersInterceptor">
+		<property name="orderDao" ref="orderDao"/>
+	</bean>
+
+	<bean id="removeDeliverModesOnPaymentModeRemovalInterceptor"
+			class="de.hybris.platform.order.interceptors.RemoveDeliverModesOnPaymentModeRemovalInterceptor">
+		<property name="deliveryModeService" ref="deliveryModeService"/>
+	</bean>
+
+	<bean id="paymentModeRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removePaymentModeCheckOrdersInterceptor"/>
+		<property name="typeCode" value="PaymentMode"/>
+		<property name="order" value="1"/>
+	</bean>
+
+	<bean id="removeDeliveryModesOnPaymentModeRemoveMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDeliverModesOnPaymentModeRemovalInterceptor"/>
+		<property name="typeCode" value="PaymentMode"/>
+	</bean>
+	<!-- PaymentMode END -->
+
+	<!-- PaymentInfo -->
+	<bean id="creditCardPaymentInfoValidator" class="de.hybris.platform.order.interceptors.CreditCardPaymentInfoValidator">
+		<property name="creditCardNumberHelper" ref="creditCardNumberHelper"/>
+	</bean>
+
+	<bean id="creditCardPaymentInfoValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="creditCardPaymentInfoValidator"/>
+		<property name="typeCode" value="CreditCardPaymentInfo"/>
+	</bean>
+	
+	<alias alias="paymentInfoService" name="defaultPaymentInfoService"/>
+	<bean id="defaultPaymentInfoService" class="de.hybris.platform.order.impl.DefaultPaymentInfoService"
+			parent="abstractBusinessService">
+	</bean>
+
+	<!-- PaymentInfo END -->
+
+	<!-- Currency -->
+
+	<alias name="defaultRemoveCurrencyCheckOrdersInterceptor" alias="removeCurrencyCheckOrdersInterceptor"/>
+	<bean id="defaultRemoveCurrencyCheckOrdersInterceptor"
+			class="de.hybris.platform.order.interceptors.RemoveCurrencyCheckOrdersInterceptor">
+		<property name="orderDao" ref="orderDao"/>
+	</bean>
+
+	<bean id="removeCurrencyCheckOrdersInterceptorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeCurrencyCheckOrdersInterceptor"/>
+		<property name="typeCode" value="Currency"/>
+		<property name="order" value="2"/>
+	</bean>
+
+	<bean id="removeDiscountsOnCurrencyRemovalInterceptor"
+			class="de.hybris.platform.order.interceptors.RemoveDiscountsOnCurrencyRemovalInterceptor">
+		<property name="discountService" ref="discountService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!-- this interceptor mapping invokes cascading deletion of Discounts and should be configured to run after all 'remove - allowing' interceptors -->
+	<bean id="removeDiscountsOnCurrencyRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDiscountsOnCurrencyRemovalInterceptor"/>
+		<property name="typeCode" value="Currency"/>
+		<property name="order" value="3"/>
+	</bean>
+
+	<bean id="clearZDMVCurrencyRemoveInterceptor" class="de.hybris.platform.order.interceptors.ClearZDMVCurrencyRemoveInterceptor">
+		<property name="zoneDeliveryModeValueDao" ref="zoneDeliveryModeValueDao"/>
+	</bean>
+
+	<!-- this interceptor mapping invokes cascading deletion of ZDMValues and should be configured to run after all 'remove - allowing' interceptors -->
+	<bean id="clearZDMVCurrencyRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="clearZDMVCurrencyRemoveInterceptor"/>
+		<property name="typeCode" value="Currency"/>
+		<!-- order, here by default MAX_INTEGER -->
+	</bean>
+
+	<!-- Currency END -->
+	
+	<!-- Quote -->
+	<alias alias="quoteService" name="defaultQuoteService"/>
+	<bean id="defaultQuoteService" class="de.hybris.platform.order.impl.DefaultQuoteService">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="createQuoteFromCartStrategy" ref="createQuoteFromCartStrategy"/>
+		<property name="createQuoteSnapshotStrategy" ref="createQuoteSnapshotStrategy"/>
+	</bean>
+	
+	<alias alias="createQuoteFromCartStrategy" name="defaultCreateQuoteFromCartStrategy"/>
+	<bean id="defaultCreateQuoteFromCartStrategy"
+			class="de.hybris.platform.order.strategies.impl.DefaultCreateQuoteFromCartStrategy" parent="genericAbstractOrderCloningStrategy">
+	</bean>
+	
+	<alias alias="createQuoteSnapshotStrategy" name="defaultCreateQuoteSnapshotStrategy"/>
+	<bean id="defaultCreateQuoteSnapshotStrategy"
+			class="de.hybris.platform.order.strategies.impl.DefaultCreateQuoteSnapshotStrategy" parent="genericAbstractOrderCloningStrategy" />
+
+	<bean id="genericAbstractOrderCloningStrategy" abstract="true" class="de.hybris.platform.order.strategies.impl.GenericAbstractOrderCloningStrategy">
+		<property name="cloneAbstractOrderStrategy" ref="cloneAbstractOrderStrategy"/>
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+	</bean>
+	<!-- Quote END -->
+
+	<!--
+		Event listener to change the cart user after changing the current user.
+
+		Event listeners are singletons, therefore the dependency for a bean in tenant-scope
+		must be configured with a lookup method.
+	-->
+	<bean id="defaultAfterSessionUserChangeListener" class="de.hybris.platform.order.events.AfterSessionUserChangeListener"
+			parent="abstractEventListener">
+		<lookup-method name="getUserService" bean="userService"/>
+		<lookup-method name="getCartService" bean="cartService"/>
+	</bean>
+
+	<!--
+		Event listener to change the cart user after changing the current user.
+
+		Event listeners are singletons, therefore the dependency for a bean in tenant-scope
+		must be configured with a lookup method.
+	-->
+	<bean id="defaultSessionCurrencyChangeListener" class="de.hybris.platform.order.events.SessionCurrencyChangeListener"
+			parent="abstractEventListener">
+		<lookup-method name="getCartServiceViaLookup" bean="cartService"/>
+		<lookup-method name="getCommonI18NServiceViaLookup" bean="commonI18NService"/>
+	</bean>
+
+	<!-- Validation interceptor for entryGroup structure when order is being saved -->
+	<bean id="entryGroupValidateInterceptor"
+		  class="de.hybris.platform.order.interceptors.EntryGroupStructureValidateInterceptor"/>
+		  
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="entryGroupValidateInterceptor"/>
+		<property name="typeCode" value="AbstractOrder"/>
+	</bean>
+    
+    <alias name="defaultEntryGroupService" alias="entryGroupService"/>
+    <bean id="defaultEntryGroupService" class="de.hybris.platform.order.impl.DefaultEntryGroupService" >
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+</beans>

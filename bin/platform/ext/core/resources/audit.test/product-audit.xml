@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+
+<audit-report-config name="testConfig" auditRecordsProvider="auditRecordsProvider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="../audit/audit.xsd">
+	<given-root-type>Product</given-root-type>
+	<types>
+		<type code="Product">
+			<atomic-attributes>
+				<atomic-attribute qualifier="code"/>
+				<atomic-attribute qualifier="name"/>
+				<atomic-attribute qualifier="description"/>
+				<atomic-attribute qualifier="catalogVersion"/>
+				<atomic-attribute qualifier="ean"/>
+				<atomic-attribute qualifier="manufacturerName"/>
+				<atomic-attribute qualifier="remarks"/>
+				<atomic-attribute qualifier="onlineDate"/>
+				<atomic-attribute qualifier="offlineDate"/>
+				<atomic-attribute qualifier="approvalStatus"/>
+				<atomic-attribute qualifier="priceQuantity"/>
+				<atomic-attribute qualifier="minOrderQuantity"/>
+				<atomic-attribute qualifier="maxOrderQuantity"/>
+			</atomic-attributes>
+		</type>
+	</types>
+</audit-report-config>

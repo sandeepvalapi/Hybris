@@ -1,0 +1,113 @@
+$productCatalog=productCatalog
+$defaultCurrency=EUR
+$languages=en
+$defaultLanguage=en
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$staged=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default='$productCatalog:Staged']
+$online=catalogVersion(catalog(id[default=$productCatalog]),version[default='Online'])[unique=true,default='$productCatalog:Online']
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;de;true
+;en;true
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$productCatalog;$productCatalog;$productCatalog;true
+
+# Catalog versions for content catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode)
+;$productCatalog;Staged;false;$defaultCurrency;$languages
+;$productCatalog;Online;true;$defaultCurrency;$languages
+
+INSERT_UPDATE Category;$staged;code[unique=true]
+;;category1
+;;category2
+
+INSERT_UPDATE Category;$online;code[unique=true]
+;;category1
+
+#Base Site
+INSERT_UPDATE BaseSite;uid[unique=true];
+;testSite;
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active;;;;;;
+;US;United States of America;true;;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;symbol;
+;USD;US dollars;true;USD;
+
+#Base store
+INSERT_UPDATE BaseStore;uid[unique=true];name[lang=en];cmsSites(uid);currencies(isocode);defaultCurrency(isocode);languages(isoCode);defaultLanguage(isoCode);
+;defaultstore;Default Store;testSite;USD;USD;en;en;
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid);
+;testSite;defaultstore;
+
+INSERT_UPDATE Domain;code[unique=true];name;
+;ticketSystemDomain;Ticket System Domain;
+
+INSERT_UPDATE Component;code[unique=true];name;domain[unique=true](code)
+;ticketSystem;Ticket System;ticketSystemDomain
+
+INSERT_UPDATE CommentType;code[unique=true];name;domain[unique=true](code);metaType(code)
+;customerNote;Customer Note;ticketSystemDomain;CsCustomerEvent
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;url;company;fax;department
+;user1;testStrasse;1;28277;false;Bremen;US;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;;hybris GmbH;
+
+INSERT_UPDATE Address;&addId;owner(Order.code)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;url;company;fax;department
+;otbrPaymentAddress;orderToBeRemoved;otbrPaymentAddress;1;28277;false;Bremen;US;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;;hybris GmbH;
+;otbrDeliveryAddress;orderToBeRemoved;otbrDeliveryAddress;2;28277;false;Bremen;US;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;;hybris GmbH;
+;ontbrPaymentAddress;orderNotToBeRemoved;ontbrPaymentAddress;3;28277;false;Bremen;US;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;;hybris GmbH;
+;ontbrDeliveryAddress;orderNotToBeRemoved;ontbrDeliveryAddress;4;28277;false;Bremen;US;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;;hybris GmbH;
+
+INSERT_UPDATE CreditCardPaymentInfo;code[unique=true];owner(Order.code);user(Customer.uid)[unique=true];ccOwner;number;type(code);validFromMonth;validFromYear;validToMonth;validToYear;subscriptionId;duplicate[default=false];saved[default=true]
+;otbrccid;orderToBeRemoved;user1;John Acceptance;4012888888881881;visa;1;2010;12;2013;1231;
+;ontbrccid;orderNotToBeRemoved;user1;John Acceptance;4012888888881881;visa;1;2010;12;2013;1231;
+
+INSERT_UPDATE Comment;code[unique=true];owner(Order.code);author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);subject;text
+;otbrComment;orderToBeRemoved;user1;ticketSystem;customerNote;'Subject';'Good';
+;ontbrComment;orderNotToBeRemoved;user1;ticketSystem;customerNote;'Subject';'Good, too';
+
+INSERT_UPDATE Vendor;name[lang=en];code[unique=true];
+;Default Vendor;defaultVendor;
+
+INSERT_UPDATE Warehouse;name[lang=en];code[unique=true];default;vendor(code);
+;Default Warehouse;defaultWarehouse;true;defaultVendor;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;type[unique=true](code)
+;user1;user1;name;GUEST;
+
+INSERT_UPDATE Product;$staged;code[unique=true]
+;;product1
+;;product2
+
+INSERT_UPDATE OrderEntry;order(code)[unique=true];product(code)[unique=true];quantity;calculated;unit(code);entryNumber
+;orderToBeRemoved;product1;4;false;pieces;0
+;orderNotToBeRemoved;product2;1;false;pieces;1
+
+INSERT_UPDATE Order;code[unique=true];user(uid);date[dateformat=dd.MM.yyyy HH:mm];expirationTime[dateformat=dd.MM.yyyy HH:mm];currency(isocode);net;deliveryMode(code);Discounts(code);calculated;store(uid);site(uid);paymentAddress(&addId);deliveryAddress(&addId);paymentInfo(code);comments(code)
+;orderToBeRemoved;user1;26.01.2010 10:58;26.09.2007 10:58;USD;false;;;false;defaultstore;testSite;otbrPaymentAddress;otbrDeliveryAddress;otbrccid;otbrComment
+;orderNotToBeRemoved;user1;26.01.2010 10:58;26.01.2020 10:58;USD;false;;;false;defaultstore;testSite;ontbrPaymentAddress;ontbrDeliveryAddress;ontbrccid;ontbrComment
+
+INSERT_UPDATE ConsignmentEntry;consignment(code)[unique=true];quantity[unique=true];orderEntry(entryNumber)[unique=true]
+;con1;1;0
+;con2;1;1
+
+INSERT_UPDATE Consignment;code[unique=true];shippingAddress(&addId);warehouse(code);status(code);order(code)
+;con1;otbrDeliveryAddress;defaultWarehouse;READY;orderToBeRemoved
+;con2;otbrDeliveryAddress;defaultWarehouse;READY;orderNotToBeRemoved
+
+INSERT_UPDATE ConsignmentProcess;code[unique=true];processDefinitionName;consignment(Consignment.code);parentProcess(OrderProcess.code)
+;consignmentProcess_orderToBeRemoved;consignmentProcess;con1;orderProcess_orderToBeRemoved
+;consignmentProcess_orderNotToBeRemoved;consignmentProcess;con2;orderProcess_orderNotToBeRemoved
+
+INSERT_UPDATE OrderProcess;code[unique=true];processDefinitionName;order(Order.code)
+;orderProcess_orderToBeRemoved;orderProcess;orderToBeRemoved
+;orderProcess_orderNotToBeRemoved;orderProcess;orderNotToBeRemoved
+
+INSERT_UPDATE OrderModificationProcess;code[unique=true];processDefinitionName;order(Order.code)
+;orderModificationProcess_orderToBeRemoved;orderModificationProcess;orderToBeRemoved
+;orderModificationProcess_orderNotToBeRemoved;orderModificationProcess;orderNotToBeRemoved

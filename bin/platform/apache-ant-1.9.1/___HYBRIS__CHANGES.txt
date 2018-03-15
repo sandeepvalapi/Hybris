@@ -1,0 +1,2 @@
+
+this is a stripped down version to save space ("manual" folder got deleted, ant src added to docs folder), you can always use the standard Apache Ant 1.9.1 release.

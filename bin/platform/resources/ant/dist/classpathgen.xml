@@ -1,0 +1,525 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="classpathmacros">
+
+	<property name="hybris.javadoc.location" value="https://download.hybris.com/api/${build.version.api}" />
+
+	<macrodef name="create_platform_classpath_file">
+		<attribute name="destinationPlatformhome" />
+		<sequential>
+			<var name="classpathfile" value="@{destinationPlatformhome}/.classpath" />
+			<delete file="${classpathfile}" />
+			<echo file="${classpathfile}" append="true">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;classpath&gt;
+	
+	&lt;!-- General --&gt;
+	&lt;classpathentry exported="false" kind="src" path="/config" /&gt;
+	&lt;classpathentry exported="false" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" /&gt;	
+	&lt;classpathentry exported="false" kind="output" path="eclipsebin/notused" /&gt;</echo>
+
+			<!-- bootstrap -->
+			<add_comment classpathfile="${classpathfile}" comment="bootstrap" />
+			<add_classpath_entry classpathfile="${classpathfile}" targetdirectory="@{destinationPlatformhome}/bootstrap/bin" basedir="@{destinationPlatformhome}" javadoclocation="${hybris.javadoc.location}">
+				<pattern>
+					<include name="**/*.jar" />
+					<exclude name="models.jar" />
+				</pattern>
+			</add_classpath_entry>
+			<add_path classpathfile="${classpathfile}" path="@{destinationPlatformhome}/bootstrap/gensrc" basedir="@{destinationPlatformhome}" />
+
+			<!-- lib -->
+			<add_comment classpathfile="${classpathfile}" comment="general library folder" />
+			<add_classpath_entry classpathfile="${classpathfile}" targetdirectory="@{destinationPlatformhome}/lib" basedir="@{destinationPlatformhome}">
+				<pattern>
+					<include name="**/*.jar" />
+				</pattern>
+			</add_classpath_entry>
+
+			<!-- tomcat -->
+			<add_comment classpathfile="${classpathfile}" comment="tomcat libraries" />
+			<add_classpath_entry classpathfile="${classpathfile}" targetdirectory="@{destinationPlatformhome}/tomcat" basedir="@{destinationPlatformhome}">
+				<pattern>
+					<include name="lib/**/*.jar" />
+					<include name="bin/tomcat-juli**.jar" />
+				</pattern>
+			</add_classpath_entry>
+
+			<!-- all platform extensions -->
+			<if>
+				<available file="@{destinationPlatformhome}/ext" type="dir" />
+				<then>
+					<for param="extpath">
+						<dirset dir="@{destinationPlatformhome}/ext">
+							<depth max="0" min="0" />
+						</dirset>
+						<sequential>
+							<var unset="true" name="extname" />
+							<basename property="extname" file="@{extpath}" />
+							<add_platform_extension_entries classpathfile="${classpathfile}" extensiondirectory="@{extpath}" destinationplatformhome="@{destinationPlatformhome}" extname="${extname}" />
+						</sequential>
+					</for>
+				</then>
+			</if>
+
+
+			<echo file="${classpathfile}" append="true">
+				
+&lt;/classpath&gt;
+				</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="create_extension_classpath_file" description="This macro creates all source and lib entries in an existing extension classpath file">
+		<attribute name="extname" />
+		<attribute name="destdir" default="${ext.@{extname}.path}" />
+		<sequential>
+			<if>
+				<available file="@{destdir}/.classpath" />
+				<then>
+					<!-- tidy up first, we're not using a clean classpath here since some extensions have additional classpathentries in there -->
+					<copy file="@{destdir}/.classpath" tofile="@{destdir}/temp.classpath" overwrite="true">
+						<filterchain>
+							<linecontainsregexp negate="true">
+								<regexp pattern="kind=&quot;src&quot;" />
+							</linecontainsregexp>
+
+							<linecontainsregexp negate="true">
+								<regexp pattern="kind=&quot;lib&quot;" />
+							</linecontainsregexp>
+
+							<linecontainsregexp negate="true">
+								<regexp pattern="/classpath" />
+							</linecontainsregexp>
+						</filterchain>
+					</copy>
+
+					<!-- add extension dependencies -->
+					<if>
+						<isset property="ext.@{extname}.extension.requires-extension.name" />
+						<then>
+							<for list="${ext.@{extname}.extension.requires-extension.name}" param="required.extname">
+								<sequential>
+									<!-- do not add platform/ext extensions -->
+									<if>
+										<available file="${ext.@{required.extname}.path}/.classpath" />
+										<then>
+											<add_path classpathfile="@{destdir}/temp.classpath" path="/@{required.extname}" relative="false" kind="src" exported="true" />
+										</then>
+									</if>
+								</sequential>
+							</for>
+						</then>
+					</if>
+
+					<!-- add libs -->
+					<add_classpath_entry classpathfile="@{destdir}/temp.classpath" targetdirectory="@{destdir}/lib" basedir="@{destdir}" exported="true">
+						<pattern>
+							<include name="**/*.jar" />
+						</pattern>
+					</add_classpath_entry>
+
+					<!-- add webinf libs -->
+					<add_classpath_entry classpathfile="@{destdir}/temp.classpath" targetdirectory="@{destdir}/web/webroot/WEB-INF/lib" basedir="@{destdir}" exported="false">
+						<pattern>
+							<include name="**/*.jar" />
+							<exclude name="**/*hmc.jar" />
+						</pattern>
+					</add_classpath_entry>
+
+					<!-- add webinf classes -->
+					<if>
+						<available file="@{destdir}/web/webroot/WEB-INF/classes" type="dir" />
+						<then>
+							<if>
+								<equals arg1="hmc" arg2="@{extname}" />
+								<then>
+									<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/web/webroot/WEB-INF/classes" basedir="@{destdir}" exported="true" kind="lib" />
+								</then>
+								<else>
+									<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/web/webroot/WEB-INF/classes" basedir="@{destdir}" exported="false" kind="lib" />
+								</else>
+							</if>
+						</then>
+					</if>
+
+					<!-- add webinf libs from backoffice if required -->
+					<if>
+						<and>
+							<istrue value="${ext.@{extname}.extension.meta.backoffice-module}" />
+							<isset property="${ext.backoffice.path}"/>
+						</and>
+						<then>
+							<for param="file">
+								<fileset dir="${ext.backoffice.path}/web/webroot/WEB-INF/lib">
+									<include name="**/*.jar" />
+								</fileset>
+								<sequential>
+									<var unset="true" name="tmp.path" />
+									<var unset="true" name="tmp.path.clean" />
+									<property name="tmp.path" value="@{file}" relative="true" basedir="${ext.backoffice.path}" />
+									<propertyregex property="tmp.path.clean" input="${tmp.path}" regexp="\\" replace="/" global="true" defaultValue="${tmp.path}" />
+									<add_virtual_path classpathfile="@{destdir}/temp.classpath" path="/backoffice/${tmp.path.clean}" exported="true" kind="lib" javadoclocation="${hybris.javadoc.location}" />
+								</sequential>
+							</for>
+						</then>
+					</if>
+										
+					<!-- add webinf libs from hac if required -->
+					<if>
+						<and>
+							<istrue value="${ext.@{extname}.extension.meta.hac-module}" />
+							<isset property="${ext.hac.path}"/>
+						</and>
+						<then>
+							<for param="file">
+								<fileset dir="${ext.hac.path}/web/webroot/WEB-INF/lib">
+									<include name="**/*.jar" />
+								</fileset>
+								<sequential>
+									<var unset="true" name="tmp.path" />
+									<var unset="true" name="tmp.path.clean" />
+									<property name="tmp.path" value="@{file}" relative="true" basedir="${ext.hac.path}" />
+									<propertyregex property="tmp.path.clean" input="${tmp.path}" regexp="\\" replace="/" global="true" defaultValue="${tmp.path}" />
+									<add_virtual_path classpathfile="@{destdir}/temp.classpath" path="/hac/${tmp.path.clean}" exported="true" kind="lib" javadoclocation="${hybris.javadoc.location}" />
+								</sequential>
+							</for>
+						</then>
+					</if>
+
+					<!-- add server jars -->
+					<add_classpath_entry classpathfile="@{destdir}/temp.classpath" targetdirectory="@{destdir}" basedir="@{destdir}" javadoclocation="${hybris.javadoc.location}">
+						<pattern>
+							<include name="bin/**/*.jar" />
+							<include name="hmc/bin/**/*.jar" />
+							<include name="backoffice/bin/**/*.jar" />
+						</pattern>
+					</add_classpath_entry>
+
+					<!-- add resources folder -->
+					<if>
+						<available file="@{destdir}/resources" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/resources" basedir="@{destdir}" />
+						</then>
+					</if>
+
+					<!-- add source folder -->
+					<if>
+						<available file="@{destdir}/src" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/src" basedir="@{destdir}" />
+						</then>
+					</if>
+
+					<!-- add hac source folder -->
+					<if>
+						<available file="@{destdir}/hac/src" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/hac/src" basedir="@{destdir}" />
+						</then>
+					</if>
+					
+					<!-- add hac test source folder -->
+					<if>
+						<available file="@{destdir}/hac/testsrc" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/hac/testsrc" basedir="@{destdir}" />
+						</then>
+					</if>
+					
+					<!-- add hmc source folder -->
+					<if>
+						<available file="@{destdir}/hmc/src" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/hmc/src" basedir="@{destdir}" />
+						</then>
+					</if>
+					
+					<!-- add hmc test source folder -->
+					<if>
+						<available file="@{destdir}/hmc/testsrc" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/hmc/testsrc" basedir="@{destdir}" />
+						</then>
+					</if>
+
+
+					<!-- add web source folder -->
+					<if>
+						<available file="@{destdir}/web/src" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/web/src" basedir="@{destdir}" exported="false" />
+						</then>
+					</if>
+
+					<!-- add web test source folder -->
+					<if>
+						<available file="@{destdir}/web/testsrc" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/web/testsrc" basedir="@{destdir}" exported="false" />
+						</then>
+					</if>
+
+					<!-- add backoffice source folder -->
+					<if>
+						<available file="@{destdir}/backoffice/src" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/backoffice/src" basedir="@{destdir}" />
+						</then>
+					</if>
+
+					<!-- add test source folder -->
+					<if>
+						<available file="@{destdir}/testsrc" type="dir" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/testsrc" basedir="@{destdir}" />
+						</then>
+					</if>
+
+
+					<!-- add gen source folder -->
+					<if>
+						<and>
+							<not>
+								<available file="@{destdir}/bin/@{extname}server.jar" />
+							</not>
+							<istrue value="${ext.@{extname}.extension.coremodule.generated}" />
+						</and>
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/gensrc" basedir="@{destdir}" />
+						</then>
+					</if>
+
+					<!-- exceptions -->
+					<if>
+						<equals arg1="@{extname}" arg2="platformwebservices" />
+						<then>
+							<add_path classpathfile="@{destdir}/temp.classpath" path="@{destdir}/web/gensrc" basedir="@{destdir}" exported="false" />
+						</then>
+					</if>
+					
+					<!-- add platform dependency -->
+					<add_path classpathfile="@{destdir}/temp.classpath" path="/platform" relative="false" kind="src" exported="false" />
+
+					<echo file="@{destdir}/temp.classpath" append="true">
+				
+&lt;/classpath&gt;
+				</echo>
+
+					<move file="@{destdir}/temp.classpath" tofile="@{destdir}/.classpath" overwrite="true" failonerror="true" />
+					<echo message="generated .classpath file : @{destdir}/.classpath" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="add_classpath_entry">
+		<attribute name="classpathfile" />
+		<attribute name="targetdirectory" />
+		<attribute name="basedir" />
+		<element name="pattern" />
+		<attribute name="exported" default="true" />
+		<attribute name="javadoclocation" default="" />
+		<sequential>
+			<if>
+				<available file="@{targetdirectory}" type="dir" />
+				<then>
+					<for param="file">
+						<fileset dir="@{targetdirectory}">
+							<pattern />
+						</fileset>
+						<sequential>
+							<add_path classpathfile="@{classpathfile}" path="@{file}" basedir="@{basedir}" exported="@{exported}" javadoclocation="@{javadoclocation}" />
+						</sequential>
+					</for>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="add_comment">
+		<attribute name="classpathfile" />
+		<attribute name="comment" />
+		<sequential>
+
+			<if>
+				<not>
+					<equals arg1="@{comment}" arg2="" />
+				</not>
+				<then>
+					<echo file="@{classpathfile}" append="true">
+						
+	&lt;!-- @{comment} --&gt;</echo>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="add_platform_extension_entries">
+		<attribute name="classpathfile" />
+		<attribute name="extensiondirectory" />
+		<attribute name="extname" />
+		<attribute name="destinationPlatformhome" />
+		<sequential>
+			<var name="extensionName" unset="true" />
+			<var name="extensionName.clean" unset="true" />
+			<property name="extensionName" value="@{extensiondirectory}" relative="yes" basedir="@{destinationPlatformhome}" />
+			<propertyregex property="extensionName.clean" input="${extensionName}" regexp="\\" replace="/" global="true" defaultValue="${extensionName}" />
+
+			<add_comment classpathfile="@{classpathfile}" comment="${extensionName.clean}" />
+
+			<!-- add all libraries -->
+			<add_classpath_entry classpathfile="@{classpathfile}" targetdirectory="@{extensiondirectory}/lib" basedir="@{destinationPlatformhome}">
+				<pattern>
+					<include name="**/*.jar" />
+				</pattern>
+			</add_classpath_entry>
+
+			<!-- add server jars -->
+			<add_classpath_entry classpathfile="@{classpathfile}" targetdirectory="@{extensiondirectory}/bin" basedir="@{destinationPlatformhome}" javadoclocation="${hybris.javadoc.location}">
+				<pattern>
+					<include name="**/*.jar" />
+				</pattern>
+			</add_classpath_entry>
+
+			<!-- add resources folder -->
+			<if>
+				<available file="@{extensiondirectory}/resources" type="dir" />
+				<then>
+					<add_path classpathfile="@{classpathfile}" path="@{extensiondirectory}/resources" basedir="@{destinationPlatformhome}" />
+				</then>
+			</if>
+
+			<!-- add source folder -->
+			<if>
+				<available file="@{extensiondirectory}/src" type="dir" />
+				<then>
+					<add_path classpathfile="@{classpathfile}" path="@{extensiondirectory}/src" basedir="@{destinationPlatformhome}" />
+				</then>
+			</if>
+
+			<!-- add test source folder -->
+			<if>
+				<available file="@{extensiondirectory}/testsrc" type="dir" />
+				<then>
+					<add_path classpathfile="@{classpathfile}" path="@{extensiondirectory}/testsrc" basedir="@{destinationPlatformhome}" />
+				</then>
+			</if>
+
+
+			<!-- add gen source folder -->
+			<if>
+				<and>
+					<not>
+						<available file="@{extensiondirectory}/bin" type="dir" />
+					</not>
+					<equals arg1="true" arg2="${ext.@{extname}.extension.coremodule.generated}" />
+				</and>
+				<then>
+					<add_path classpathfile="@{classpathfile}" path="@{extensiondirectory}/gensrc" basedir="@{destinationPlatformhome}" />
+				</then>
+			</if>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="add_path">
+		<attribute name="classpathfile" />
+		<attribute name="path" />
+		<attribute name="basedir" default="${basedir}" />
+		<attribute name="exported" default="true" />
+		<attribute name="kind" default="" />
+		<attribute name="relative" default="true" />
+		<attribute name="javadoclocation" default="" />
+		<sequential>
+			<var name="classpath.temp.path" unset="true" />
+			<var name="classpath.temp.path.clean" unset="true" />
+			<property name="classpath.temp.path" value="@{path}" relative="@{relative}" basedir="@{basedir}" />
+			<propertyregex property="classpath.temp.path.clean" input="${classpath.temp.path}" regexp="\\" replace="/" global="true" defaultValue="${classpath.temp.path}" />
+
+			<!-- determine kind -->
+			<var name="classpath.kind" unset="true" />
+			<var name="classpath.output" unset="true" />
+			<if>
+				<equals arg1="" arg2="@{kind}" />
+				<then>
+					<if>
+						<matches pattern=".*src" string="${classpath.temp.path.clean}" />
+						<then>
+							<property name="classpath.kind" value="src" />
+
+							<!--<classpathentry kind="src" output="eclipsebin/ext/catalog/classes" path="ext/catalog/testsrc"/>-->
+							<propertyregex property="classpath.output" input="${classpath.temp.path.clean}" regexp="testsrc|src|gensrc" replace="classes" global="true" />
+							<var name="classpath.output" value=' output="eclipsebin/${classpath.output}"' />
+						</then>
+					</if>
+					<if>
+						<or>
+							<matches pattern=".*jar" string="${classpath.temp.path.clean}" />
+							<matches pattern=".*resources" string="${classpath.temp.path.clean}" />
+							<matches pattern=".*classes" string="${classpath.temp.path.clean}" />
+						</or>
+						<then>
+							<property name="classpath.kind" value="lib" />
+						</then>
+					</if>
+				</then>
+				<else>
+					<property name="classpath.kind" value="@{kind}" />
+				</else>
+			</if>
+			<property name="classpath.output" value="" />
+
+			<echo file="@{classpathfile}" append="true">
+	&lt;classpathentry exported="@{exported}"${classpath.output} kind="${classpath.kind}" path="${classpath.temp.path.clean}" </echo>
+			<if>
+				<equals arg1="" arg2="@{javadoclocation}" />
+				<then>
+					<echo file="@{classpathfile}" append="true">/&gt;</echo>
+				</then>
+				<else>
+					<echo file="@{classpathfile}" append="true">&gt;
+		&lt;attributes&gt;
+			&lt;attribute name="javadoc_location" value="@{javadoclocation}"/&gt;
+		&lt;/attributes&gt;
+	&lt;/classpathentry&gt;</echo>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="add_virtual_path">
+		<attribute name="classpathfile" />
+		<attribute name="path" />
+		<attribute name="exported" default="true" />
+		<attribute name="kind" />
+		<attribute name="javadoclocation" default="" />
+		<sequential>
+			<echo file="@{classpathfile}" append="true">
+	&lt;classpathentry exported="@{exported}" kind="@{kind}" path="@{path}" </echo>
+			<if>
+				<equals arg1="" arg2="@{javadoclocation}" />
+				<then>
+					<echo file="@{classpathfile}" append="true">/&gt;</echo>
+				</then>
+				<else>
+					<echo file="@{classpathfile}" append="true">&gt;
+		&lt;attributes&gt;
+			&lt;attribute name="javadoc_location" value="@{javadoclocation}"/&gt;
+		&lt;/attributes&gt;
+	&lt;/classpathentry&gt;</echo>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+</project>

@@ -1,0 +1,97 @@
+# -------------------------------------------;;;;;;;;;
+# --- create system;;;;;;;;;
+# -------------------------------------------;;;;;;;;;
+# make sure to fail on first error!;;;;;;;;;
+#% impex.setDumpingAllowed( false );;;;;;;;;
+# -------------------------------------------;;;;;;;;;
+
+$systemName=SampleClassification;;;;;;;;;
+$systemVersion=1.0;;;;;;;;;
+
+INSERT_UPDATE ClassificationSystem; id[unique=true]; name[lang=en];;;;;;
+; $systemName ; Sample ClassificationSystem ;;;;;;
+
+INSERT_UPDATE ClassificationSystemversion; catalog(id)[unique=true] ; version[unique=true] ; active ; writeprincipals(uid); languages(isocode); inclPacking[virtual=true,default=true]; inclDuty[virtual=true,default=true]; inclFreight[virtual=true,default=true]; inclAssurance[virtual=true,default=true]
+; $systemName ; $systemVersion ; true ; employeegroup; en ;;;;
+
+
+# -------------------------------------------
+# --- create classes
+# -------------------------------------------
+# Level1
+# +-Level2
+#   +-Level3
+#     +-Level4
+# -------------------------------------------
+
+$sysVer=catalogVersion(catalog(id[default=$systemName]),version[default=$systemVersion]);;;;;;
+$superClass=superCategories(code,$sysVer);;;;;;
+
+INSERT_UPDATE ClassificationClass; code[unique=true]; $superClass; name[lang=en]; hmcXML; $sysVer[virtual=true,unique=true] 
+; level1 ; ; Level 1 ;;;
+; level2 ; level1 ; Level 2 ;;;
+; level3 ; level2 ; Level 3 ;;;
+; level4 ; level3 ; Level 4 ;;;
+
+# assign visibility to all customer;;;;;;
+
+UPDATE ClassificationClass; $sysVer[virtual=true,unique=true] ; code[unique=true]; allowedPrincipals(uid);;;;
+; level1 ; customergroup ;;;;;
+
+
+# -------------------------------------------;;;
+# --- create attributes;;;
+# -------------------------------------------;;;
+
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']);;;;;
+
+INSERT_UPDATE ClassificationAttribute;code[unique=true]; name[lang=en]; defaultAttributeValues(code,$sysVer);$sysVer[virtual=true,unique=true]
+# general attributes;;;;;
+; weight ; Weight;;
+
+# -------------------------------------------;;;
+# --- assign attributes;;;
+# -------------------------------------------;;;
+
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']);;;
+$class=classificationClass(ClassificationClass.code,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']));;;
+$attribute=classificationAttribute(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']));;;
+# ---------------------------------------------------------;;;;;;;;;;;;
+
+INSERT_UPDATE ClassAttributeAssignment[impex.legacy.mode=true]; $class[unique=true]; $attribute[unique=true] ;attributeType(code[default=string]) ; position ; unit(code,$sysVer) ;searchable; listable ;comparable[default=true]; multiValued[default=false] ; range[default=false] ; attributeValues(code,$sysVer); $sysVer[virtual=true,unique=true]
+# general attributes;;;;;;;;;;;;
+; level1 ; weight ; string ;;;;;;;;;
+; level2 ; weight ; string ;;;;;;;;;
+; level3 ; weight ; string ;;;;;;;;;
+; level4 ; weight ; string ;;;;;;;;;
+
+
+
+# now the products
+$catalogVersion=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])[unique=true,default='$systemName:$systemVersion']
+$supercategories=supercategories( code, catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+
+#Create new Category=TestCategory
+INSERT_UPDATE Category;code[unique=true];name[lang=de];name[lang=en];$supercategories;$catalogVersion;description[lang=de];description[lang=en];order;allowedPrincipals(uid)
+;TestCategory1;Beispiel_Kategory;Sample_category;;;Alles rund um dieses Beispiel;all about this Sample;;customergroup;
+;TestCategory2;Beispiel_Kategory;Sample_category;;;Alles rund um dieses Beispiel;all about this Sample;;customergroup;
+;TestCategory3;Beispiel_Kategory;Sample_category;;;Alles rund um dieses Beispiel;all about this Sample;;customergroup;
+;TestCategory4;Beispiel_Kategory;Sample_category;;;Alles rund um dieses Beispiel;all about this Sample;;customergroup;
+
+#Create new Product TestProduct
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;name[lang=de];name[lang=en];unit(code);$supercategories;description[lang=de];description[lang=en];approvalStatus(code); 
+;TestProduct1;;TestProdukt1_Name;TestProduct1_name;pieces;TestCategory1;Beschreibung des Produkt1;Description about product1;approved
+;TestProduct2;;TestProdukt2_Name;TestProduct2_name;pieces;TestCategory2;Beschreibung des Produkt2;Description about product2;approved
+;TestProduct3;;TestProdukt3_Name;TestProduct3_name;pieces;TestCategory3;Beschreibung des Produkt3;Description about product3;approved
+;TestProduct4;;TestProdukt4_Name;TestProduct4_name;pieces;TestCategory4;Beschreibung des Produkt4;Description about product4;approved
+
+$catVer=catalogVersion(version[default='$systemVersion'],catalog(id[default='$systemName']));
+$clSysVer=catalogVersion(version[default='$systemVersion'],catalog(id[default='$systemName']));
+
+$YCL=system='$systemName',version='$systemVersion',translator=de.hybris.platform.catalog.jalo.classification.impex.ClassificationAttributeTranslator;
+
+INSERT_UPDATE Category; $catVer[virtual=true,unique=true]; code[unique=true]; supercategories(code,$clSysVer);
+;TestCategory1;level1;
+;TestCategory2;level2;
+;TestCategory3;level3;
+;TestCategory4;level4;

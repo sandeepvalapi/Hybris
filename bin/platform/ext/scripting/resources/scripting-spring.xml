@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <alias name="defaultScriptingEnginesRegistry" alias="scriptEnginesRegistry"/>
+    <bean id="defaultScriptingEnginesRegistry"
+          class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEnginesRegistry"/>
+
+    <bean id="groovyEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="groovy" c:fileExtension="groovy" c:mime="text/x-groovy" c:cached="true"/>
+    <bean id="bshEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="beanshell" c:fileExtension="bsh" c:mime="text/x-java"/>
+    <bean id="javascriptEngine" class="de.hybris.platform.scripting.engine.internal.impl.DefaultScriptEngineType"
+          c:name="javascript" c:fileExtension="js" c:mime="text/javascript"/>
+
+    <alias name="defaultScriptRepositoriesRegistry" alias="scriptRepositoriesRegistry"/>
+    <bean id="defaultScriptRepositoriesRegistry"
+          class="de.hybris.platform.scripting.engine.repository.impl.DefaultScriptRepositoriesRegistry"/>
+
+    <bean id="databaseScriptsRepository"
+          class="de.hybris.platform.scripting.engine.repository.impl.ModelScriptsRepository">
+        <property name="modelService" ref="modelService"/>
+        <property name="cacheService" ref="scriptExecutableCacheService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="supportedProtocols">
+            <list>
+                <value>model</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="classpathScriptsRepository"
+          class="de.hybris.platform.scripting.engine.repository.impl.ClasspathScriptsRepository">
+        <property name="supportedProtocols">
+            <list>
+                <value>classpath</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="filesystemScriptsRepository"
+          class="de.hybris.platform.scripting.engine.repository.impl.FileSystemScriptsRepository">
+        <property name="supportedProtocols">
+            <list>
+                <value>file</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="remoteScriptsRepository"
+          class="de.hybris.platform.scripting.engine.repository.impl.RemoteScriptsRepository">
+        <property name="supportedProtocols">
+            <list>
+                <value>http</value>
+                <value>https</value>
+                <value>ftp</value>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultScriptExecutableCacheService" alias="scriptExecutableCacheService"/>
+    <bean id="defaultScriptExecutableCacheService"
+          class="de.hybris.platform.scripting.engine.internal.cache.impl.DefaultScriptExecutableCacheService">
+        <property name="cacheController" ref="defaultCacheController"/>
+    </bean>
+
+    <alias name="defaultScriptingLanguagesService" alias="scriptingLanguagesService"/>
+    <bean id="defaultScriptingLanguagesService"
+          class="de.hybris.platform.scripting.engine.impl.DefaultScriptingLanguagesService">
+        <property name="scriptEnginesRegistry" ref="scriptEnginesRegistry"/>
+        <property name="scriptRepositoriesRegistry" ref="scriptRepositoriesRegistry"/>
+        <property name="cacheService" ref="scriptExecutableCacheService"/>
+    </bean>
+
+    <alias name="defaultScriptingEventService" alias="scriptingEventService"/>
+    <bean id="defaultScriptingEventService"
+          class="de.hybris.platform.scripting.events.impl.DefaultScriptingEventService">
+        <property name="eventService" ref="eventService"/>
+        <property name="scriptingLanguagesService" ref="scriptingLanguagesService"/>
+        <property name="tenantService" ref="tenantService"/>
+        <property name="clusterService" ref="clusterService"/>
+    </bean>
+
+    <bean id="cmdScriptExecutor" class="de.hybris.platform.scripting.engine.impl.CmdScriptExecutor">
+        <property name="service" ref="scriptingLanguagesService"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd" >
+
+   <bean id="workflow.mail.context" class="de.hybris.platform.workflow.jalo.WorkflowMailContextImpl" scope="prototype"/>
+   
+   <bean id="new.workflow.mail.context" class="de.hybris.platform.workflow.mail.impl.WorkflowMailContextImpl" scope="prototype" />
+   
+   <bean id="workflowItemAttachmentVoidInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VoidInterceptor"/>
+		<property name="typeCode" value="WorkflowItemAttachment"/>
+		<property name="replacedInterceptors" ref="UniqueAttributesValidator"/>
+	</bean>
+   
+   <bean id="abstractWorkflowActionVoidInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VoidInterceptor"/>
+		<property name="typeCode" value="AbstractWorkflowAction"/>
+		<property name="replacedInterceptors" ref="UniqueAttributesValidator"/>
+	</bean>
+   
+   <bean id="abstractWorkflowDecisionVoidInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VoidInterceptor"/>
+		<property name="typeCode" value="AbstractWorkflowDecision"/>
+		<property name="replacedInterceptors" ref="UniqueAttributesValidator"/>
+	</bean>
+   
+   <bean id="workflowTemplateVoidInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VoidInterceptor"/>
+		<property name="typeCode" value="WorkflowTemplate"/>
+		<property name="replacedInterceptors" ref="UniqueAttributesValidator"/>
+	</bean>
+	
+	<bean id="WorkflowSystemSetup" class="de.hybris.platform.workflow.systemsetup.WorkflowSystemSetup">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="importService" ref="importService" />
+	</bean>
+
+	<!-- DefaultWorkflowService internals -->
+	
+	<bean id="workflowActionsFromWorkflowTemplateFactory" class="de.hybris.platform.workflow.services.internal.impl.ActionsFromWorkflowTemplateFactory">
+		<property name="modelService" ref="modelService"/>
+		<property name="workflowActionService" ref="workflowActionService"/>
+	</bean>
+	
+	<bean id="decisionFromDecisionTemplateFactory" class="de.hybris.platform.workflow.services.internal.impl.DecisionFromDecisionTemplateFactory">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<bean id="decisionsFromActionTemplateFactory" class="de.hybris.platform.workflow.services.internal.impl.DecisionsFromActionTemplateFactory">
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="workflowLinksDao" ref="workflowLinksDao"/>
+		<property name="workflowLinksTemplateDao" ref="workflowLinksTemplateDao"/>
+		<property name="decisionFactory" ref="decisionFromDecisionTemplateFactory" />
+	</bean>
+	
+	<bean id="predecessorsFromActionTemplateFactory" class="de.hybris.platform.workflow.services.internal.impl.ActionPredecessorsFromActionTemplateFactory">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<!--  Services -->
+
+	<!-- Deprecated, please use bean 'newestWorkflowService' -->
+   <alias alias="workflowService" name="defaultWorkflowService"/>
+   <bean id="defaultWorkflowService" class="de.hybris.platform.workflow.services.impl.WorkflowServiceImpl">
+		<property name="modelService" ref="modelService"/>
+		<property name="workflowDao" ref="workflowDao"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<bean id="newestWorkflowService" class="de.hybris.platform.workflow.impl.DefaultWorkflowService">
+		<property name="modelService" ref="modelService"></property>
+		<property name="workflowActionService" ref="workflowActionService"></property>
+		<property name="workflowTemplateService" ref="workflowTemplateService"></property>
+		<property name="workflowDao" ref="defaultWorkflowDao"></property>					
+		<!-- conversion internals -->
+		<property name="actionsWorkflowTemplateFactory" ref="workflowActionsFromWorkflowTemplateFactory"/>
+		<property name="decisionsActionTemplateFactory" ref="decisionsFromActionTemplateFactory"/>
+		<property name="predecessorsActionTemplateFactory" ref="predecessorsFromActionTemplateFactory"/>
+	</bean>
+	
+	<alias alias="workflowProcessingService" name="defaultWorkflowProcessingService"/>
+	<bean id="defaultWorkflowProcessingService" class="de.hybris.platform.workflow.impl.DefaultWorkflowProcessingService">
+		<property name="workflowActionService" ref="workflowActionService" />
+		<property name="modelService" ref="modelService" />
+		<property name="actionActivationStrategy" ref="actionActivationStrategy" />
+		<property name="decideActionStrategy" ref="decideActionStrategy" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="workflowService" ref="newestWorkflowService" />
+		<lookup-method name="lookupAutomatedWorkflowRegistry" bean="automatedWorkflowTemplateRegistry" />
+	</bean>
+	
+	<alias alias="workflowEmailService" name="defaultWorkflowEmailService"/>
+	<bean id="defaultWorkflowEmailService" class="de.hybris.platform.workflow.impl.DefaultEmailService">
+		<property name="rendererService" ref="rendererService"/>
+		<property name="sessionService" ref="sessionService"></property>
+		<property name="l10nService" ref="l10nService"></property>
+        <lookup-method name="createWorkflowMailContext" bean="new.workflow.mail.context" />
+		<property name="velocityTemplateRenderer" ref="velocityTemplateRenderer"></property>
+	</bean>
+	
+	<alias alias="scriptEvaluationService" name="defaultScriptEvaluationService"/>
+	<bean id="defaultScriptEvaluationService" class="de.hybris.platform.workflow.impl.DefaultScriptEvaluationService">
+		<property name="typeService" ref="typeService" />
+		<property name="workflowService" ref="newestWorkflowService" />
+		<property name="workflowTemplateService" ref="workflowTemplateService" />
+		<property name="userService" ref="userService" />
+		<property name="workflowProcessingService" ref="workflowProcessingService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<alias alias="workflowActionService" name="defaultWorkflowActionService"/>
+	<bean id="defaultWorkflowActionService" class="de.hybris.platform.workflow.impl.DefaultWorkflowActionService">	
+		<property name="modelService" ref="modelService"></property>
+		<property name="typeService" ref="typeService"></property>
+		<property name="userService" ref="userService"></property>
+		<property name="i18nService" ref="i18nService"></property>
+		<property name="workflowActionDao" ref="workflowActionDao"></property>
+	</bean>
+	
+	<alias alias="workflowAttachmentService" name="defaultWorkflowAttachmentService"/>
+	<bean id="defaultWorkflowAttachmentService" class="de.hybris.platform.workflow.impl.DefaultWorkflowAttachmentService">
+		<property name="modelService" ref="modelService"></property>
+		<property name="typeService" ref="typeService"></property>
+	</bean>
+	
+	<alias alias="workflowTemplateService" name="defaultWorkflowTemplateService"/>
+	<bean id="defaultWorkflowTemplateService" class="de.hybris.platform.workflow.impl.DefaultWorkflowTemplateService">
+		<property name="workflowTemplateDao" ref="workflowTemplateDao"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<!-- Automated workflow templates -->
+	<bean id="automatedWorkflowTemplateRegistry" class="de.hybris.platform.workflow.services.internal.impl.DefaultAutomatedWorkflowTemplateRegistry" autowire="byType">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="workflowAutomatedAction" class="de.hybris.platform.workflow.jobs.WorkflowAutomatedAction" scope="prototype" />
+	
+	<!-- Strategies -->
+	
+	<bean id="actionActivationStrategy" class="de.hybris.platform.workflow.strategies.impl.DefaultActionActivationStrategy">
+		<property name="emailService" ref="workflowEmailService"></property>
+	</bean>
+	
+	<bean id="decideActionStrategy" class="de.hybris.platform.workflow.strategies.impl.DefaultDecideActionStrategy">
+		<property name="modelService" ref="modelService"></property>
+	</bean>
+	
+	<!-- DAOs -->
+	
+	<!--
+	Could not place here an alias because old WorkflowDAO conflicts
+	alias alias="workflowDao" name="defaultWorkflowDao"/
+	-->
+	
+	<bean id="defaultWorkflowDao" class="de.hybris.platform.workflow.daos.impl.DefaultWorkflowDao">
+		<constructor-arg value="Workflow"></constructor-arg>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="userService" ref="userService"></property>
+		<property name="workflowTemplateDao" ref="workflowTemplateDao"></property>
+	</bean>
+	
+	<alias alias="workflowTemplateDao" name="defaultWorkflowTemplateDao"/>
+	<bean id="defaultWorkflowTemplateDao" class="de.hybris.platform.workflow.daos.impl.DefaultWorkflowTemplateDao">
+		<constructor-arg value="WorkflowTemplate"></constructor-arg>
+		<property name="adHocTemplateName" value="adhoctemplate"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="userService" ref="userService"></property>
+	</bean>
+	
+	<alias alias="workflowActionDao" name="defaultWorkflowActionDao"/>
+	<bean id="defaultWorkflowActionDao" class="de.hybris.platform.workflow.daos.impl.DefaultWorkflowActionDao">
+		<constructor-arg value="WorkflowAction"></constructor-arg>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias alias="workflowLinksDao" name="defaultWorkflowLinksDao"/>
+	<bean id="defaultWorkflowLinksDao" class="de.hybris.platform.workflow.daos.impl.DefaultWorkflowLinksDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias alias="workflowLinksTemplateDao" name="defaultWorkflowLinksTemplateDao"/>
+	<bean id="defaultWorkflowLinksTemplateDao" class="de.hybris.platform.workflow.daos.impl.DefaultWorkflowLinksTemplateDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<!-- Interceptors -->
+	
+	<bean id="workflowTemplateDefaultCodeInterceptor" class="de.hybris.platform.workflow.interceptors.WorkflowTemplateDefaultCodeInterceptor">
+		<property name="keyGenerator"
+			ref="workflowTemplateCodeGenerator">
+		</property>
+	</bean>
+	
+	<bean id="workflowActionDefaultCodeInterceptor" class="de.hybris.platform.workflow.interceptors.WorkflowActionDefaultCodeInterceptor">
+		<property name="keyGenerator"
+			ref="workflowActionCodeGenerator">
+		</property>
+	</bean>
+	
+	<bean id="workflowDecisionDefaultCodeInterceptor" class="de.hybris.platform.workflow.interceptors.WorkflowDecisionDefaultCodeInterceptor">
+		<property name="keyGenerator"
+			ref="workflowDecisionCodeGenerator">
+		</property>
+	</bean>
+	
+	<bean id="workflowItemAttachmentDefaultCodeInterceptor" class="de.hybris.platform.workflow.interceptors.WorkflowItemAttachmentDefaultCodeInterceptor">
+		<property name="keyGenerator"
+			ref="workflowItemAttachmentCodeGenerator">
+		</property>
+	</bean>
+	
+	<bean id="automatedWorkflowActionTemplateValidator" class="de.hybris.platform.workflow.interceptors.AutomatedWorkflowActionTemplateValidator" />
+	
+	<bean id="dynamicProcessDefinitionPrepareInterceptor" class="de.hybris.platform.processengine.interceptors.DynamicProcessDefinitionPrepareInterceptor">
+		<property name="xmlProcessDefinitionsReader" ref="xmlProcessDefinitionsReader" />
+	</bean>
+	
+	<bean id="dynamicProcessDefinitionValidateInterceptor" class="de.hybris.platform.processengine.interceptors.DynamicProcessDefinitionValidateInterceptor">
+		<property name="xmlProcessDefinitionsReader" ref="xmlProcessDefinitionsReader" />
+	</bean>
+	
+	<!-- Interceptor mappings -->
+	
+	<bean id="automatedWorkflowActionTemplateValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="automatedWorkflowActionTemplateValidator" />
+		<property name="typeCode" value="AutomatedWorkflowActionTemplate" />
+	</bean>	
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="workflowTemplateDefaultCodeInterceptor"/>
+		<property name="typeCode" value="WorkflowTemplate"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="workflowActionDefaultCodeInterceptor"/>
+		<property name="typeCode" value="AbstractWorkflowAction"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="workflowDecisionDefaultCodeInterceptor"/>
+		<property name="typeCode" value="AbstractWorkflowDecision"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="workflowItemAttachmentDefaultCodeInterceptor"/>
+		<property name="typeCode" value="WorkflowItemAttachment"/>
+	</bean>
+	
+	<!-- Deprecated, please use bean 'defaultWorkflowDao' -->
+	<bean id="workflowDao" class="de.hybris.platform.workflow.dao.impl.DefaultWorkflowDAO" >
+		<property name="userService" ref="userService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!-- You can extend this definition and simply put templateId property to indicate the workflow to start -->
+	<bean id="abstractStartingWorkflowAction" class="de.hybris.platform.processengine.action.StartingWorkflowAction" abstract="true" parent="abstractAction">
+		<property name="userService" ref="userService"/>
+		<property name="workflowIntegrationService" ref="workflowIntegrationService"/>
+		<property name="workflowAttachmentService" ref="workflowAttachmentService"/>
+	</bean>
+
+	<alias name="defaultWorkflowIntegrationDao" alias="workflowIntegrationDao"/>
+	<bean id="defaultWorkflowIntegrationDao" class="de.hybris.platform.processengine.impl.DefaultWorkflowIntegrationDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias name="defaultWorkflowIntegrationService" alias="workflowIntegrationService"/>
+	<bean id="defaultWorkflowIntegrationService" class="de.hybris.platform.processengine.helpers.impl.DefaultWorkflowIntegrationService">
+		<property name="modelService" ref="modelService"/>
+		<property name="workflowIntegrationDao" ref="workflowIntegrationDao"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<alias name="defaultWorkflowActionCommentService" alias="workflowActionCommentService"/>
+	<bean id="defaultWorkflowActionCommentService" class="de.hybris.platform.workflow.impl.DefaultWorkflowActionCommentService">
+		<property name="modelService" ref="modelService"/>
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<bean id="dynamicProcessDefinitionPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="dynamicProcessDefinitionPrepareInterceptor"/>
+		<property name="typeCode" value="DynamicProcessDefinition"/>
+	</bean>
+	
+	<bean id="dynamicProcessDefinitionValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="dynamicProcessDefinitionValidateInterceptor"/>
+		<property name="typeCode" value="DynamicProcessDefinition"/>
+	</bean>
+
+</beans>

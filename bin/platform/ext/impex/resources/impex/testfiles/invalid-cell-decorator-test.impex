@@ -1,0 +1,24 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+INSERT_UPDATE Language;isocode[unique=true];active;
+;de;true;
+;en;true;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];
+;de;Deutsch;German;
+;en;Englisch;English;
+
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de, cellDecorator=eClassSuperCategoryDecorator, srcCell=1];name[lang=en];active;base;conversion;digits;symbol
+;CHF;Schweizer Franken;Swiss franc;true;false;0,6447;2;SFr.
+;EUR;Euro;Euro;true;true;1;2;€
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+;GBP;Pfund Sterling;Pound Sterling;true;false;0,68;2;£

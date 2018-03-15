@@ -1,0 +1,50 @@
+textarea {
+	width: 100%;
+}
+
+.impexResult {
+	overflow: auto;
+}
+
+.CodeMirror-line-numbers {
+  background-color: lightgray;
+  border-right: 1px solid #eee;
+  min-width: 2em;
+  height: 100%;
+  color: gray;
+  text-align: right;
+  padding: .4em .2em .4em .4em;
+  font-family: "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
+}
+
+#textarea-container {
+	position: relative;
+	border: 1px dashed #666 !important;
+}
+
+.scrollable {
+	overflow: auto;
+}
+
+.cm-impex_var {
+	cursor: help;
+}
+
+#tooltip {
+  font-family: monospace;
+  font-size: 13px;
+  position: absolute;
+  display: none;
+  z-index: 5000;
+  margin-left: 0;
+  max-width: 350px;
+  height: auto;
+  background: #FFFFCE;
+  border-style: solid;
+  border-width:2px;
+  /* border-color: #f0ce87; */
+  border-color: #cdcdcd;
+  word-wrap: break-word;
+  display: inline-block;
+  padding: 5px 5px 5px 5px;
+}

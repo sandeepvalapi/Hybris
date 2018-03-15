@@ -1,0 +1,13 @@
+
+<jboss-app>
+  <loader-repository> 
+  de.hybris:archive=hybris_something_unique.ear
+     <loader-repository-config> 
+		<!-- 
+		<loader-repository-config>
+			java2ParentDelegation=false
+		</loader-repository-config>
+		 -->
+     </loader-repository-config> 
+  </loader-repository>
+</jboss-app>

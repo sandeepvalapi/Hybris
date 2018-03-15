@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>hybris JUnit runner</title>
+
+
+  <style type="text/css">
+	<!--
+		body { background: #4B5367; font-family: Arial, Helvetica, sans-serif; }
+		button,input[type="submit"],input[type="button"],input.submit,.button { padding: 2px 14px; cursor: pointer; background: #2055CC; border: 0; color: #fff; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; }
+		a:link		{ color: black; }
+		a:active	{ color: black; }
+		a:visited	{ color: black; }
+		a:hover		{ color: blue; }
+		.pageTitle	{ font-size: 1em; font-weight: bold;
+						letter-spacing: 0.125em; text-align: center;
+						color: #FFFFFF;background-color: #0052AD }
+		.sectionTitle	{ -moz-text-blink: none;
+    -moz-text-decoration-color: -moz-use-text-color;
+    -moz-text-decoration-line: none;
+    -moz-text-decoration-style: solid;
+    -moz-transition-delay: 0s;
+    -moz-transition-duration: 0.3s;
+    -moz-transition-property: background;
+    -moz-transition-timing-function: ease;
+    background-attachment: scroll;
+    background-color: rgba(255, 255, 255, 0.22);
+    background-image: none;
+    background-position: 0 0;
+    background-repeat: repeat;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    box-shadow: 0 -1px 1px rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.2em;
+    padding-bottom: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.5);
+    text-transform: capitalize; }
+		.cell       	{ color: black; background-color: #CCCCFF }
+		.methodcell       	{ color: black; background-color: #e0e0FF }
+		.methodcell a {text-decoration: none; }
+		.passedcell       	{ color: black; background-color: #CCCCFF }
+		.failedcell       	{ color: black; background-color: #CCCCFF }
+		.message       	{ color: red; }
+		.smallText	{ font-family: lucida, verdana, sans-serif; font-size: 8pt; }
+		.overlay		{ background-color: #454545;
+						position: fixed; top: 0px; left: 0px;
+   					width: 100%; height: 100%;
+   					z-index: 10;
+   					opacity: .8;
+   					filter: alpha(opacity=80);
+   					/* Older than Firefox 0.9 */
+        				-moz-opacity: 0.8;
+        				/* Safari 1.x (pre WebKit!) */
+        				-khtml-opacity: 0.8;
+						}
+		.Msg			{ color: #FFF;
+						font-family: lucida, verdana, sans-serif; font-size: 12pt;
+						width: 600px; height: 200px;
+						position: absolute; top: 100px; left: 50%;
+						margin-left: -300px;
+						vertical-align: middle;
+						text-align:center;
+						z-index: 20;
+						}
+		.details		{ width: 600px;
+						text-align: left; 
+						font-size: 10pt; 
+						background-color: #AFAFAF;
+						color: #000000; 
+						opacity: .8;
+   					filter: alpha(opacity=80);
+   					/* Older than Firefox 0.9 */
+        				-moz-opacity: 0.8;
+        				/* Safari 1.x (pre WebKit!) */
+        				-khtml-opacity: 0.8;
+						border-color: #000000; 
+						border-style:solid; border-width:1px;
+    					-moz-border-radius: 5px;
+						border-radius: 5px;
+						padding: 2px;
+						}
+	-->
+  </style>
+  
+  <script type="text/javascript">
+		function selectByRegexp(regularExpString) {
+			if (regularExpString == '') {
+				return false;
+			}
+			var regularExp = new RegExp(regularExpString);
+			var checkboxes = document.getElementsByTagName('input');
+			unselectAll(checkboxes);
+			for (var i = 0; i < checkboxes.length; i++) {
+				if (checkboxes[i].id.toLowerCase().match(regularExp)) {
+					checkboxes[i].checked = 'checked';
+				}
+			}
+		}
+
+		function unselectAll(checkboxes) {
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].checked = null;
+			}			
+		}
+		
+		function selectAllExtensions()
+		{
+			var extensions = document.getElementsByTagName('input');
+			for (var i = 0; i < extensions.length; i++) 
+			{
+				if (extensions[i].name.match("extensionfilter_.*")) 
+				{
+					extensions[i].checked = 'checked';
+				}
+			}
+		}
+		
+		function selectNoExtensions()
+		{
+			var extensions = document.getElementsByTagName('input');
+			for (var i = 0; i < extensions.length; i++) 
+			{
+				if (extensions[i].name.match("extensionfilter_.*")) 
+				{
+					extensions[i].checked = null;
+				}
+			}
+		}
+		
+		function displayMessage(Msg)
+		{
+			var init = "The system is initializing<br>This could take a few minutes...";
+			var running = "The system is performing some tests<br>Please have patience while they finish...";
+			var overlay = document.createElement("div");
+			overlay.setAttribute("id","overlay");
+			overlay.setAttribute("class", "overlay");
+			document.body.appendChild(overlay);
+			
+			var displayMsg = document.createElement("div");
+			displayMsg.setAttribute("id","Msg");
+			displayMsg.setAttribute("class","Msg");
+			if (Msg == "init") {
+				displayMsg.innerHTML = init;
+			} else if (Msg == "running") {
+				displayMsg.innerHTML = running;
+			} else {
+				displayMsg.innerHTML = Msg;
+			}
+			
+			scrollTo(0,0);
+			document.body.appendChild(displayMsg);
+			if (Msg != "init") {
+				setTimeout("location.reload('true');", 5000);
+			}
+		}
+			
+		function selectAllAnnotations()
+		{
+			var annotations = document.getElementsByTagName('input');
+			for (var i = 0; i < annotations.length; i++) 
+			{
+				if (annotations[i].name.match("annotationfilter_.*")) 
+				{
+					annotations[i].checked = 'checked';
+				}
+			}
+		}
+		
+		function selectNoAnnotations()
+		{
+			var annotations = document.getElementsByTagName('input');
+			for (var i = 0; i < annotations.length; i++) 
+			{
+				if (annotations[i].name.match("annotationfilter_.*")) 
+				{
+					annotations[i].checked = null;
+				}
+			}
+		}
+  </script>  
+</head>
+<body>
+
+  <table cellspacing="0" cellpadding="0" width="100%">
+    <tbody>
+      <tr><td class="pageTitle"><h1>hybris JUnit runner</h1></td></tr>
+    </tbody>
+  </table>
+
+  <br>
+  <span class="message">
+<!-- message -->
+  </span>
+  <br>
+
+
+
+  <form>
+    <table border="0" cellspacing="2" cellpadding="3" width="100%">
+      <tbody>
+        <tr><td class="sectionTitle">Initialize system for unittests</td></tr>
+        <tr><td class="failedcell"><input type="submit" value="Initialize" onkeydown="displayMessage('init')" onclick="displayMessage('init')"> (This will create new tables with prefix junit_ and will NOT destroy your data.)</td></tr>
+        <tr><td>&nbsp;<input type="hidden" name="initialize" value="true"></td></tr>
+      </tbody>
+    </table>
+  </form>
+
+<!-- 
+  <form>
+    <table border="0" cellspacing="2" cellpadding="3" width="100%">
+      <tbody>
+        <tr><td class="sectionTitle">Run all tests</td></tr>
+        <tr><td class="failedcell"><input type="submit" value="Run all" onkeydown="displayMessage('running')" onclick="displayRunMessage('running')">&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="thread" value="true">&nbsp;&nbsp;Threaded mode</td></tr>
+        <tr><td>&nbsp;<input type="hidden" name="all" value="true"></td></tr>
+      </tbody>
+    </table>
+  </form>
+   -->
+  
+  <form>
+    <table border="0" cellspacing="2" cellpadding="3" width="100%">
+      <tbody>
+        <tr>
+        	<td class="sectionTitle" colspan="3">Test Execution Filter Settings</td>
+        </tr>
+
+        <tr>
+        	<td class="failedcell" width="200px">
+        		Annotations
+        	</td>
+        	<td class="failedcell">
+        		<input type="checkbox" name="annotationfilter_unittests" checked /> Unit Tests 
+        		<input type="checkbox" name="annotationfilter_integrationtests" checked /> Integration Tests
+        		<input type="checkbox" name="annotationfilter_demotests" checked /> Demo Tests
+        		<input type="checkbox" name="annotationfilter_performancetests" /> Performance Tests 
+        		<input type="checkbox" name="annotationfilter_bugprooftests" /> BugProof Tests 
+        		<input type="checkbox" name="annotationfilter_manualtests" /> Manual Tests 
+        	</td>
+        	<td class="failedcell" width="100px">
+       			&nbsp;<span class="smallText">select :
+       			<a href="#" onclick="selectAllAnnotations()" >all</a> 
+       			<a href="#" onclick="selectNoAnnotations()" >none</a>
+       			</span> 
+       		</td>
+       	</tr>
+       	<tr>
+       		<td class="failedcell">
+       			Package Filter
+       		</td>
+       		<td class="failedcell">
+       		 	<input type="text" name="packagefilter" size="80" />
+       		</td>
+       		<td class="failedcell" />
+       	</tr>
+		<tr>
+       		<td class="failedcell" valign="top">
+       			Extensions <br/>
+       			&nbsp;<span class="smallText">select :
+       			<a href="#" onclick="selectAllExtensions()" >all</a> 
+       			<a href="#" onclick="selectNoExtensions()" >none</a>
+       			</span> 
+       		</td>
+       		<td class="failedcell">
+       		 	##extensioncheckboxes##
+       		</td>
+       			<td class="failedcell" width="100px" valign="top">
+       			&nbsp;<span class="smallText">select :
+       			<a href="#" onclick="selectAllExtensions()" >all</a> 
+       			<a href="#" onclick="selectNoExtensions()" >none</a>
+       			</span> 
+       		</td>
+       	</tr>       	
+       	<tr>
+       		<td class="failedcell" colspan="3">
+					<input type="submit" value="Run" onkeydown="displayMessage('running')" onclick="displayMessage('running')">
+       		</td>
+       	</tr>
+      </tbody>
+    </table>
+	<input type="hidden" name="testclassesutil" value="yes" />
+  </form>
+  
+  
+
+  <form>
+    <table border="0" cellspacing="2" cellpadding="3" width="100%">
+      <tbody>
+        <tr><td class="sectionTitle">Enter the name of a test suite to run </td></tr>
+        <tr><td class="failedcell"><input name="suite" size="80">&nbsp;&nbsp;<input type="submit" value="Run" onkeydown="displayMessage('running')" onclick="displayMessage('running')"></td></tr>
+        <tr><td>&nbsp;</td></tr>
+      </tbody>
+    </table>
+  </form>
+  
+  <table border="0" cellspacing="2" cellpadding="3" width="100%">
+    <tbody>
+      <tr><td class="sectionTitle">Enter part of the name of a test suite to select </td></tr>
+        <tr>
+          <td class="failedcell">
+            <input name="suite" size="80" id="regexp">&nbsp;&nbsp;
+            <input type="button" value="Select" onclick="selectByRegexp(document.getElementById('regexp').value); return false;">
+            <input type="button" value="Unselect All" onclick="unselectAll(document.getElementsByTagName('input')); return false;">
+          </td>
+        </tr>
+      <tr><td>&nbsp;</td></tr>
+    </tbody>
+  </table>
+
+<!-- beginList
+  <form>
+    <table border="0" cellspacing="2" cellpadding="3" width="100%">
+      <tbody>
+        <tr><td class="sectionTitle">Select test suite(s) to run
+##show/hide
+        </td></tr>
+        <tr><td class="cell"><input type="submit" value="Run" onkeydown="displayMessage('running')" onclick="displayMessage('running')"></td></tr>
+###
+        <tr><td class="cell"><input type="checkbox" name="all" value="true">&nbsp;&nbsp;Run all tests</td></tr>
+        <tr><td class="cell"><input type="submit" value="Run" onkeydown="displayMessage('running')" onclick="displayMessage('running')"></td></tr>
+        <tr><td>&nbsp;</td></tr>
+      </tbody>
+    </table>
+  </form>
+endList -->
+
+
+
+</body>
+</html>

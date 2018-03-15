@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!--  Event Handling -->	
+		
+	<!-- Framework for registering listeners for standard and custom events.  
+			 You can register listeners either via API (see eventlistener) or by placing a bean that implements 
+			 org.springframework.context.ApplicationListener as bean definition inside your extension. --> 
+		
+	<!--
+		Register a new SimpleApplicationEventMulticaster to replace Spring's
+		default one. The id of the bean *must* be
+		"applicationEventMulticaster".
+	-->
+	<bean id="applicationEventMulticaster"	class="de.hybris.platform.servicelayer.event.impl.HybrisApplicationEventMulticaster"/>	
+		
+	<!-- The Event Service can be used to register listeners and publish (custom) events.  -->
+	<alias alias="eventService" name="defaultEventService"/>
+	<bean id="defaultEventService" class="de.hybris.platform.servicelayer.event.impl.DefaultEventService" scope="singleton" parent="abstractService">
+		<property name="tenantService" ref="tenantService"/>	<!-- events are tenant based -->
+		<property name="clusterService" ref="clusterService"/>
+		<property name="applicationEventMulticaster" ref="applicationEventMulticaster"/>								
+		<property name="eventSender" ref="platformClusterEventSender"/>
+	</bean>	
+
+	<!-- This event multiplexer listens to Spring events (implements ApplicationListener) and is used by the event service
+	     deprecated !!!	 
+	<bean id="hybrisEventMultiplexer" class="de.hybris.platform.servicelayer.event.impl.EventMultiplexer">
+		<property name="clusterService" ref="clusterService"/>
+	</bean>	
+	-->
+
+	<!-- sends events internally with spring-->
+	<bean id="springEventSender" class="de.hybris.platform.servicelayer.event.impl.SpringEventSender"/>
+	
+	<bean id="platformClusterEventSender" class="de.hybris.platform.servicelayer.event.impl.PlatformClusterEventSender">
+		<property name="serializationService" ref="serializationService"/>
+		<property name="tenant" ref="tenantFactory"/>
+		
+		<!-- If this property is set, ALL local events will be sent asynchronously by the specified Executor -->
+		<!-- 
+		<property name="executor">
+			<bean class="java.util.concurrent.Executors" factory-method="newCachedThreadPool"/>
+		</property>
+		 -->
+	</bean>		
+	
+	<!--  The SerializationService takes care of sending objects to other cluster node -->
+	<alias alias="serializationService" name="jdkSerializationService"/>
+	<bean id="jdkSerializationService" class="de.hybris.platform.servicelayer.event.impl.JDKSerializationService"/>
+
+	<bean class="de.hybris.platform.servicelayer.event.impl.ContextRefreshedEventListener"/>
+		
+</beans>

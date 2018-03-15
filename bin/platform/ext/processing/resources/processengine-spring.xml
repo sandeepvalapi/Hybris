@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd">
+           
+
+
+	<alias name="defaultProcessDefinitionFactory" alias="processDefinitionFactory"/>
+	<bean id="defaultProcessDefinitionFactory" lazy-init="false" class="de.hybris.platform.processengine.definition.DefaultProcessDefinitionFactory">
+		<property name="definitionsCache" ref="processDefinitionsCache" />
+		<property name="xmlDefinitionsReader" ref="xmlProcessDefinitionsReader"/>
+	</bean>
+
+	<bean id="processDefinitionsCache" class="de.hybris.platform.processengine.definition.ProcessDefinitionsCache">
+		<property name="processDefinitionsProvider" ref="processDefinitionsProvider" />
+	</bean>
+
+	<bean id="xmlProcessDefinitionsReader" class="de.hybris.platform.processengine.definition.XMLProcessDefinitionsReader">
+		<constructor-arg ref="scriptingLanguagesService" />
+	</bean>
+	
+	<bean id="processDefinitionsProvider" class="de.hybris.platform.processengine.definition.ProcessDefinitionsProvider">
+		<constructor-arg ref="xmlProcessDefinitionsReader" />
+		<constructor-arg ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="abstractAction" class="de.hybris.platform.processengine.action.AbstractAction" abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+	</bean>
+
+	<bean id="noAction" class="de.hybris.platform.processengine.standard.NoAction" />
+	
+	<bean id="processengine.taskExecutionTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="txManager"/>
+	</bean>
+
+    <!-- ================ Dynamic Attribute Handlers ============ -->
+    <bean id="businessProcessProcessStateDynamicHandler" class="de.hybris.platform.processengine.model.BusinessProcessProcessStateDynamicHandler">
+        <property name="factory" ref="processDefinitionFactory"/>
+        <property name="dao" ref="businessProcessServiceDao"/>
+    </bean>
+
+	<!-- ================ DAO Definitions ======================= -->
+	<alias name="defaultBusinessProcessServiceDao" alias="businessProcessServiceDao"/>
+	<bean id="defaultBusinessProcessServiceDao" class="de.hybris.platform.processengine.impl.DefaultBusinessProcessServiceDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!-- ================ Helpers =============================== -->
+	<alias name="defaultProcessFactory" alias="processFactory"/>
+	<bean id="defaultProcessFactory" class="de.hybris.platform.processengine.helpers.impl.DefaultProcessFactory">
+		<property name="processDefinitionFactory" ref="processDefinitionFactory"/>
+	</bean>
+
+	<bean id="processParameterHelper" class="de.hybris.platform.processengine.helpers.impl.DefaultProcessParameterHelper">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!-- ================ Service Definitions =================== -->
+
+	<alias name="defaultBusinessProcessService" alias="businessProcessService"/>
+	<bean id="defaultBusinessProcessService" class="de.hybris.platform.processengine.impl.DefaultBusinessProcessService" parent="abstractBusinessService">
+		<property name="processDefinitionFactory" ref="processDefinitionFactory" />
+		<property name="processFactory" ref="processFactory" />
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+		<property name="taskService" ref="taskService"/>
+		<property name="businessProcessServiceDao" ref="businessProcessServiceDao"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="transactionTemplate">
+			<bean class="org.springframework.transaction.support.TransactionTemplate">
+				<property name="transactionManager" ref="txManager" />
+				<!-- just to make sure: -->
+				<property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
+				<property name="isolationLevelName" value="ISOLATION_READ_COMMITTED"/>
+				<property name="readOnly" value="false"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="taskRunner" class="de.hybris.platform.processengine.process.ProcessengineTaskRunner">
+		<property name="transactionTemplate" ref="processengine.taskExecutionTransactionTemplate"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="processDefinitionFactory" ref="processDefinitionFactory"/>
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+        <property name="userService" ref="userService"/>
+        <property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<!-- ================ Action Framework Plugin =================== -->
+	<bean id="processActionExecutionStrategy" class="de.hybris.platform.processengine.actionstrategy.ProcessActionExecutionStrategy" parent="abstractBusinessService">
+		<property name="processService" ref="businessProcessService"/>
+		<property name="processCodeGenerator" ref="processCodeGenerator"/>
+	</bean>
+
+	<bean id="processengineTaskExecutionStrategy" class="de.hybris.platform.processengine.task.impl.ProcessengineTaskExecutionStrategy" parent="defaultTaskExecutionStrategy">
+		<property name="runnerClass" value="de.hybris.platform.processengine.process.ProcessengineTaskRunner"/>
+	</bean>
+
+	<bean id="retentionItemsProviderFactory" class="de.hybris.platform.retention.RetentionItemsProviderFactory" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<bean id="basicRemoveCleanupAction" class="de.hybris.platform.retention.impl.BasicRemoveCleanupAction">
+	    <property name="modelService" ref="modelService"/>
+	    <property name="writeAuditGateway" ref="writeAuditGateway"/>
+	</bean>
+	
+	<!--  A hook strategy to run custom code to erase related objects for item cleanup. -->
+	<alias name="defaultAbstractExtensibleRemoveCleanupAction" alias="abstractExtensibleRemoveCleanupAction"/>
+	<bean id="defaultAbstractExtensibleRemoveCleanupAction" class="de.hybris.platform.retention.impl.AbstractExtensibleRemoveCleanupAction" abstract="true">
+	    <property name="modelService" ref="modelService"/>
+	    <property name="writeAuditGateway" ref="writeAuditGateway"/>
+	    <property name="auditScopeInvalidator" ref="auditScopeInvalidator"/>
+	</bean>
+	
+	<alias name="defaultExtensibleRemoveCleanupAction" alias="extensibleRemoveCleanupAction"/>
+	<bean id="defaultExtensibleRemoveCleanupAction" class="de.hybris.platform.retention.impl.DefaultExtensibleRemoveCleanupAction" parent="abstractExtensibleRemoveCleanupAction">
+		<property name="itemCleanupHooks">
+			<list/>
+		</property>
+	</bean>
+	<util:list id="orderCleanupHooks" value-type="de.hybris.platform.retention.hook.ItemCleanupHook"/>	
+	<util:list id="customerCleanupHooks" value-type="de.hybris.platform.retention.hook.ItemCleanupHook"/>
+</beans>

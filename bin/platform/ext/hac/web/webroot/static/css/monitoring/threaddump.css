@@ -1,0 +1,28 @@
+#content {
+	margin-left: 5px !important;
+	margin-right: 5px !important;
+	width: 940px;
+}
+
+textarea {
+	width: 100%;
+}
+
+.CodeMirror-line-numbers {
+	color: gray;
+	background-color: lightgray;
+	padding: 5px;
+	margin-right: 5px;
+	font-family: "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
+	font-size: 12px; /*1em*/
+}
+
+.border {
+	background-color: #FAFAFF;
+	border: 1px solid darkgray;
+}
+
+#textarea-container {
+	position: relative;
+	border: 1px dashed #666 !important;
+}

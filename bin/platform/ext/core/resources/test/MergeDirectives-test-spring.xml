@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:annotation-config />
+
+	<bean id="listMergeBeanPostProcessor"
+		class="de.hybris.platform.spring.config.ListMergeDirectiveBeanPostProcessor" />
+	<bean id="listMergeDirective" class="de.hybris.platform.spring.config.ListMergeDirective"
+		abstract="true" />
+	<bean id="mapMergeBeanPostProcessor"
+		class="de.hybris.platform.spring.config.MapMergeDirectiveBeanPostProcessor" />
+	<bean id="mapMergeDirective" class="de.hybris.platform.spring.config.MapMergeDirective"
+		abstract="true" />
+
+
+	<bean id="mergeFieldTestBean" class="de.hybris.platform.spring.config.MergeTestBean">
+		<property name="stringList">
+			<list>
+				<value>aaa</value>
+				<value>ddd</value>
+			</list>
+		</property>
+		<property name="objectList">
+			<list>
+				<value type="java.lang.String">aaa</value>
+				<value type="java.lang.Integer">555</value>
+			</list>
+		</property>
+		<property name="decimalList">
+			<list>
+				<ref bean="decimal0" />
+				<ref bean="decimal3" />
+			</list>
+		</property>
+
+		<property name="stringMap">
+			<map>
+				<entry key="aaa" value="111" />
+				<entry key="bbb" value="222" />
+			</map>
+		</property>
+		<property name="multiMap">
+			<map>
+				<entry key="aaa">
+					<list>
+						<value>1</value>
+						<value>2</value>
+					</list>
+				</entry>
+				<entry key="bbb">
+					<list>
+						<value>3</value>
+						<value>4</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="mergeTestBean" class="de.hybris.platform.spring.config.MergeTestBean">
+		<property name="stringList" ref="stringList" />
+		<property name="objectList" ref="objectList" />
+		<property name="decimalList" ref="decimalList" />
+		<property name="stringMap" ref="stringMap" />
+		<property name="multiMap" ref="multiMap" />
+	</bean>
+
+	<util:list id="stringList" value-type="java.lang.String">
+		<value>aaa</value>
+		<value>ddd</value>
+	</util:list>
+
+	<util:list id="objectList" value-type="java.lang.Object">
+		<value type="java.lang.String">aaa</value>
+		<value type="java.lang.Integer">555</value>
+	</util:list>
+
+	<bean id="decimal0" class="java.math.BigDecimal">
+		<constructor-arg value="1" />
+	</bean>
+	<bean id="decimal1" class="java.math.BigDecimal">
+		<constructor-arg value="2.0" />
+	</bean>
+	<bean id="decimal2" class="java.math.BigDecimal">
+		<constructor-arg value="3.01" />
+	</bean>
+	<bean id="decimal3" class="java.math.BigDecimal">
+		<constructor-arg value="40.002" />
+	</bean>
+	<bean id="decimal4" class="java.math.BigDecimal">
+		<constructor-arg value="500.003" />
+	</bean>
+	<bean id="decimal5" class="java.math.BigDecimal">
+		<constructor-arg value="987" />
+	</bean>
+	
+	<util:list id="decimalList" value-type="java.math.BigDecimal">
+		<ref bean="decimal0" />
+		<ref bean="decimal3" />
+	</util:list>
+
+
+
+	<util:map id="stringMap" map-class="java.util.HashMap">
+		<entry key="aaa" value="111" />
+		<entry key="bbb" value="222" />
+	</util:map>
+
+	<util:map id="multiMap" map-class="java.util.HashMap">
+		<entry key="aaa">
+			<list>
+				<value>1</value>
+				<value>2</value>
+			</list>
+		</entry>
+		<entry key="bbb">
+			<list>
+				<value>3</value>
+				<value>4</value>
+			</list>
+		</entry>
+	</util:map>
+
+	<import resource="ListMergeDirectives-test-spring.xml"/>
+	<import resource="MapMergeDirectives-test-spring.xml"/>
+	
+</beans>

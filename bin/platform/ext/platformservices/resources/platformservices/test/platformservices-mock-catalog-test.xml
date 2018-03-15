@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+
+    <!--  the mocked i18n services  -->
+
+
+	<alias alias="catalogService" name="defaultCatalogService"/>
+	<bean id="defaultCatalogService" class="de.hybris.platform.catalog.impl.DefaultCatalogService" parent="abstractBusinessService" scope="tenant">
+		<property name="catalogDao" ref="catalogDao"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+	
+	<alias alias="catalogVersionService" name="defaultCatalogVersionService"/>
+	<bean id="defaultCatalogVersionService" class="de.hybris.platform.catalog.impl.DefaultCatalogVersionService" parent="abstractBusinessService" scope="tenant">
+		<property name="catalogVersionDao" ref="catalogVersionDao"/>
+	</bean>
+	
+	<bean id="catalogDao" class="de.hybris.platform.catalog.CatalogMockDao" scope="tenant"/>
+	
+	<bean id="catalogVersionDao" class="de.hybris.platform.catalog.CatalogVersionMockDao" scope="tenant"/>
+	
+    <!-- 
+	<alias alias="languageService" name="defaultLanguageService"/>
+	<bean id="defaultLanguageService" parent="abstractBusinessService" 
+		class="de.hybris.platform.servicelayer.i18n.impl.DefaultLanguageService" scope="tenant">
+		<property name="languageDao" ref="languageDao"/>
+	</bean>
+	<alias alias="languageDao" name="defaultLanguageDao"/>
+	<bean id="defaultLanguageDao"  
+		class="de.hybris.platform.servicelayer.test.i18n.LanguageDaoMock" scope="tenant">
+	</bean>
+ 	-->
+
+	
+</beans>

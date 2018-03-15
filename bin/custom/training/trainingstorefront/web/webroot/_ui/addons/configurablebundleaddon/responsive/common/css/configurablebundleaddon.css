@@ -1,0 +1,73 @@
+/*
+ * [y] hybris Platform
+ *
+ * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+ *
+ * This software is the confidential and proprietary information of SAP
+ * ("Confidential Information"). You shall not disclose such Confidential
+ * Information and shall use it only in accordance with the terms of the
+ * license agreement you entered into with SAP.
+ */
+.submitRemoveBundle {
+    color: #ff0000;
+}
+.cart-bundle-remove .iconRemove {
+    font-size: 0;
+    color: transparent;
+    display: block;
+    margin-top: 5px;
+}
+
+.cartItemHeader .cart-bundle-package .cart-bundle-name {
+    font-size: 1.428em;
+    margin-bottom: 5px;
+}
+.cartItem {
+    margin-top: 10px;
+}
+.cartItemHeader {
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-top: 15px;
+}
+.cartItem .cart-bundle-editable {
+    font-size: .857em;
+    font-weight: normal;
+    text-decoration: underline;
+    display: block;
+    color: #999;
+}
+.cartItem .invalid-cartitem .cart-bundle-editable {
+    font-size: .923em;
+    color: #0073e4;
+    text-decoration: none;
+}
+.cartItem .cart-bundle-itemPrice del {
+    display: block;
+}
+
+/* cart notification (uncompleted guided selling ) */
+.notification {
+    border: 1px solid #ffbc0e;
+    margin-bottom: 50px;
+}
+.notification .notification_headline {
+    font-size: 1.286em;
+    padding: 10px 15px 0;
+    color: #ffbc0e;
+}
+.notification .notification_content {
+    padding: 15px;
+    font-size: 1em;
+}
+.notification .notification_content h3 {
+    font-size: 1.428em;
+    margin-bottom: 10px;
+}
+.notification .notification_content p {
+    margin-bottom: 5px;
+}
+.notification .notification_content a {
+    color: #0073e4;
+}
+

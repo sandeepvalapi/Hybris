@@ -1,0 +1,570 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="coreplusmodulegenmacros" >
+
+    <macrodef name="loadExtgenProps">
+        <attribute name="propertyFile"/>
+        <sequential>
+            <if>
+                <not>
+                    <available file="@{propertyFile}"/>
+                </not>
+                <then>
+                    <fail message="@{propertyFile} in source extension not found! this is not a template!"/>
+                </then>
+            </if>
+
+            <property file="@{propertyFile}"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+    ###########################
+    generated build callback hooks
+    ###########################
+    -->
+
+
+    <macrodef name="coreplus_modulegen_prepare" description="checks whether all prerequisites for core plus project are met">
+        <sequential>
+        	<__coreplus_modulegen_prepare template="${input.template}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="__coreplus_modulegen_prepare">
+    	<attribute name="template"/>
+        <sequential>
+            <loadExtgenProps propertyFile="${ext.@{template}.path}/extgen.properties" />
+            <if>
+                <not>
+                    <and>
+                        <isset property="build.mvn.path"/>
+                        <available file="${build.mvn.home}" type="dir" />
+                    </and>
+                </not>
+                <then>
+                    <fail>
+
+Generation of the core plus project can not be continued.
+Please provide a maven configuration in order to generate a core plus project from archetype.
+Run extension generation as soon the '${build.mvn.path}' points to existing maven 3.x version.
+                    </fail>
+                </then>
+            </if>
+
+            <input validargs="${@{template}.spring.supported.archetypes}" addproperty="core.plus.custom.prototype">
+Provide a archetype proto project used for generation.
+            </input>
+
+            <local name="group"/>
+            <property name="group" value="${core.plus.custom.prototype}.ycoreplus.extgen.archetype.group"/>
+
+            <loadExtgenProps propertyFile="${ext.@{template}.path}/resources/extgen/${core.plus.custom.prototype}-extgen.properties" />
+
+            <if>
+                <isset property="@{template}.extgen.archetype.args"/>
+                <then>
+                    <sequential>
+
+                        <input addproperty="core.plus.artifactid" defaultvalue="${default.core.plus.artifactid}">
+Enter valid core plus project name (artifact id). This will be also used as sub folder of service
+folder inside generated extension
+Press [Enter] to use the default value
+                        </input>
+
+                        <if>
+                            <isset property="extgen.extension.package"/>
+                            <then>
+                                <input validargs="y,n" addproperty="core.plus.custom.artifact">
+The main package for generation of the extension ${input.name} is ${input.package}.
+Are you satisfied with this package to be its groupid for embedded core plus project ?
+                                </input>
+                                <if>
+                                    <equals arg1="${core.plus.custom.artifact}" arg2="y"/>
+                                    <then>
+                                        <property name="core.plus.groupid" value="${input.package}"/>
+                                    </then>
+                                    <else>
+                                        <input addproperty="core.plus.groupid" defaultvalue="${default.core.plus.groupid}">
+Enter valid group id. This will be also used as main java package inside generated core plus project
+Press [Enter] to use the default value
+                                        </input>
+                                    </else>
+                                </if>
+                            </then>
+                        </if>
+
+                        <input addproperty="core.plus.version" defaultvalue="${default.core.plus.version}">
+Enter valid artifact version. This will be also used as artifact version for generated core plus project
+Press [Enter] to use the default value
+                        </input>
+                    </sequential>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="coreplus_modulegen_generate" description="generates the new core plus project">
+        <sequential>
+        	<__coreplus_modulegen_generate template="${input.template}"/>
+        </sequential>
+    </macrodef>
+    	
+    <macrodef name="__coreplus_modulegen_generate">
+    	<attribute name="template"/>
+        <sequential>
+
+            <callback extname="@{template}" target="before_generate_${@{template}.extgen.archetype.proto}" />
+
+            <local name="target.dir"/>
+            <property name="target.dir" value="${extgen.extension.path}/${extgen.extension.name}" />
+
+            <evaluateArchetypeSpecificProperties />
+
+            <if>
+                <isset property="@{template}.extgen.archetype.args"/>
+                <then>
+
+                        <if>
+                            <not>
+                                <available
+                                        file="${target.dir}/service/${core.plus.artifactid}"/>
+                            </not>
+                            <then>
+                                <sequential>
+                                    <mkdir dir="${target.dir}/service"/>
+                                    <echo>
+Running archetype generation command using maven :
+mvn ${@{template}.extgen.archetype.args} -DgroupId=${core.plus.groupid} -DartifactId=${core.plus.artifactid} -Dversion=${core.plus.version}
+                                    </echo>
+
+                                    <ymvn dir="${target.dir}/service/" >
+                                               <arguments>
+                                                   <arg line="${@{template}.extgen.archetype.args}" />
+                                                   <arg value="-DgroupId=${core.plus.groupid}" />
+                                                   <arg value="-DartifactId=${core.plus.artifactid}" />
+                                                   <arg value="-Dversion=${core.plus.version}" />
+                                               </arguments>
+                                     </ymvn>
+
+                                    <replaceProto from="@{generated.archetype.proto}" to="${@{template}.extgen.archetype.proto}" />
+
+                                    <replace file="${target.dir}/resources/${extgen.extension.name}-embedded_client-application-context.xml"
+                                            token="${extgen.extension.name}-${@{template}.spring.dummy.spring}" value="classpath:/META-INF/${core.plus.artifactid}-client-onpremise-spring.xml"/>
+
+                                    <replace file="${target.dir}/resources/${extgen.extension.name}-ondemand_client-application-context.xml"
+                                            token="${extgen.extension.name}-${@{template}.spring.dummy.spring}" value="classpath:/META-INF/${core.plus.artifactid}-client-ondemand-spring.xml"/>
+
+                                    <replace file="${target.dir}/resources/${extgen.extension.name}-onpremise_client-application-context.xml"
+                                            token="${extgen.extension.name}-${@{template}.spring.dummy.spring}" value="classpath:/META-INF/${core.plus.artifactid}-client-onpremise-spring.xml"/>
+
+
+                                    <delete file="${target.dir}/resources/${extgen.extension.name}-${@{template}.spring.dummy.spring}" />
+
+                                    <!-- props replacements -->
+
+                                    <replaceProperties propertyFile="${target.dir}/project.properties" />
+
+                                </sequential>
+                            </then>
+                        </if>
+                </then>
+                <else>
+
+                    <replacePropertiesWithDefaults propertyFile="${target.dir}/project.properties"  />
+
+                    <echo>
+################ Important ################
+Skipped maven archetype generation. Provide correct '@{template}.extgen.archetype.args' property to use maven archetype mechanism.
+                    </echo>
+                </else>
+            </if>
+
+            <echo>
+Removing yempty extension dependency
+            </echo>
+            <xmltask source="${extension.directory.target}/extensioninfo.xml" dest="${extension.directory.target}/extensioninfo.xml">
+                <remove path="//*[@name='yempty']" />
+            </xmltask>
+        	
+            <delete dir="${extgen.extension.path}/${extgen.extension.name}/resources/extgen"  />
+
+            <move todir="${extgen.extension.path}/${extgen.extension.name}/src" includeemptydirs="false">
+                <fileset dir="${extgen.extension.path}/${extgen.extension.name}/src"/>
+                <mapper type="glob" from="*.java.template" to="*.java"/>
+             </move>
+
+            <callback extname="@{template}" target="after_generate_${@{template}.extgen.archetype.proto}" />
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="coreplus_before_build" >
+        <attribute name="extension"/>
+        <sequential>
+            <if>
+                <and>
+                    <available
+                            file="${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-client"/>
+                </and>
+                <then>
+                    <copyCorePlusConfig propertyFilter="${@{extension}.client.artifactid}."
+                                        targetFileName="${@{extension}.client.propertiesfile}"
+                                        targetPath="${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-client/src/main/resources"/>
+                </then>
+                <else>
+                    <echo>
+#####################################################
+WARNING : Possible coreplus [@{extension}] extension misconfiguration
+Client module at ${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-client is not existing.
+#####################################################
+                    </echo>
+                </else>
+            </if>
+            <if>
+                <and>
+                    <available
+                            file="${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-web"/>
+                </and>
+                <then>
+                    <copyCorePlusConfig propertyFilter="${@{extension}.web.artifactid}." targetFileName="${@{extension}.web.propertiesfile}"
+                                        targetPath="${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-web/src/main/resources"/>
+                </then>
+                <else>
+                    <echo>
+#####################################################
+WARNING : Possible coreplus [@{extension}] extension misconfiguration
+Web module at ${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-client is not existing.
+#####################################################
+                    </echo>
+                </else>
+            </if>
+        </sequential>
+
+    </macrodef>
+
+   <macrodef name="coreplus_before_compile_core" >
+       <attribute name="extension"/>
+        <sequential>
+        <if>
+                <available file="${ext.@{extension}.path}/${@{extension}.service.path}/pom.xml"/>
+                <then>
+                    <!-- call maven , fail on error -->
+                    <echo>
+                    	Building core+ project using maven 
+                    	pom : ${ext.@{extension}.path}/${@{extension}.service.path}/pom.xml
+                    	args : ${@{extension}.build.pom.args}
+                    	</echo>
+                    <ymvn  pom="${ext.@{extension}.path}/${@{extension}.service.path}/pom.xml"  >
+                        <arguments>
+                            <arg line="${@{extension}.build.pom.args}"/>
+                       </arguments>
+                    </ymvn>
+                </then>
+                <else>
+                    <echo>
+#####################################################
+WARNING : Possible coreplus [@{extension}] extension misconfiguration
+Main project pom.xml at ${ext.@{extension}.path}/${@{extension}.service.path}/pom.xml is not existing.
+#####################################################
+                    </echo>
+                </else>
+            </if>
+            <if>
+                <available file="${ext.@{extension}.path}/${@{extension}.web.war.path}"/>
+                <then>
+                    <unzip dest="${ext.@{extension}.path}/web/webroot/"
+                           src="${ext.@{extension}.path}/${@{extension}.web.war.path}"/>
+                </then>
+                <else>
+                    <echo>
+#####################################################
+WARNING : Possible coreplus [@{extension}] extension misconfiguration
+Web project war as ${ext.@{extension}.path}/${@{extension}.web.war.path} is not available.
+HINT: Check if the project version [${@{extension}.version}] is equal with coreplus project version from pom.xml.
+#####################################################
+                    </echo>
+                </else>
+            </if>
+                    <if>
+                        <available file="${ext.@{extension}.path}/${@{extension}.api.jar.path}"/>
+                        <then>
+                            <copy  todir="${ext.@{extension}.path}/lib">
+                                <globmapper from="*.jar" to="generated-*.jar"/>
+                                <fileset  file="${ext.@{extension}.path}/${@{extension}.api.jar.path}" />
+                            </copy>
+							<!-- trigger refresh of the global class path due to libs being changed ! -->
+							<ysetplatformproperties/>
+                        </then>
+                        <else>
+                            <echo>
+#####################################################
+WARNING : Possible coreplus [@{extension}] extension misconfiguration
+Api project jar as  ${ext.@{extension}.path}/${@{extension}.api.jar.path} is not available.
+HINT: Check if the project version [${@{extension}.version}] is equal with coreplus project version from pom.xml.
+#####################################################
+                            </echo>
+                        </else>
+                    </if>
+                    <if>
+                        <available file="${ext.@{extension}.path}/${@{extension}.client.jar.path}"/>
+                        <then>
+                            <copy  todir="${ext.@{extension}.path}/lib">
+                                <globmapper from="*.jar" to="generated-*.jar"/>
+                                <fileset file="${ext.@{extension}.path}/${@{extension}.client.jar.path}" />
+                            </copy>
+							<!-- trigger refresh of the global class path due to libs being changed ! -->
+							<ysetplatformproperties/>
+                        </then>
+                        <else>
+                            <echo>
+#####################################################
+WARNING : Possible coreplus [@{extension}] extension misconfiguration
+Client project jar as  ${ext.@{extension}.path}/${@{extension}.client.jar.path} is not available.
+HINT: Check if the project version [${@{extension}.version}] is equal with coreplus project version from pom.xml.
+#####################################################
+                            </echo>
+                        </else>
+                    </if>
+
+            <!-- copies client api jars into  lib folder -->
+            <if>
+            	<and>
+                    <isset property="@{extension}.copy-dependencies.pom.args"/>
+                	<available file="${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-client/pom.xml"/>
+            	</and>
+                <then>
+                    <echo message="Downloading required libraries for core+ extension @{extension} via maven '${@{extension}.copy-dependencies.pom.args}'.."/>
+                    <ymvn  dir="${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-client"  >
+                        <arguments>
+                            <arg line="${@{extension}.copy-dependencies.pom.args}"/>
+                        </arguments>
+                    </ymvn>
+                    <copy todir="${ext.@{extension}.path}/lib">
+                        <!-- this possible has to be adjusted per project since there we know what dependencies are -->
+                        <globmapper from="*.jar" to="generated-*.jar"/>
+                        <fileset
+                                dir="${ext.@{extension}.path}/${@{extension}.service.path}/${@{extension}.service.name}-client/target/dependency">
+                            <include name="*.jar"/>
+                        </fileset>
+                    </copy>
+					<!-- trigger refresh of the global class path due to libs being changed ! -->
+					<ysetplatformproperties/>
+                </then>
+            	<else>
+            	   <echo message="Copying dependent client libs is not enabled for extension @{extension}. In case you need them please define proper maven dependency args in '@{extension}.copy-dependencies.pom.args'." />
+            	</else>
+            </if>
+            <property name="ext.@{extension}.additionalclasspath"  value="\lib\generated-*.jar" />
+            <echo>Calculated additional classpath :${ext.@{extension}.additionalclasspath}</echo>
+        </sequential>
+   </macrodef>
+
+    <macrodef name="coreplus_after_clean" >
+        <attribute name="extension"/>
+        <sequential>
+            <if>
+                <available file="${ext.@{extension}.path}/${@{extension}.service.path}/pom.xml"/>
+                <then>
+                    <echo>
+                    	Cleaning core+ project using maven 
+                    	pom : ${ext.@{extension}.path}/${@{extension}.service.path}/pom.xml
+                    	args : ${@{extension}.clean.pom.args}
+                    </echo>
+                    <ymvn  pom="${ext.@{extension}.path}/${@{extension}.service.path}/pom.xml"  >
+                       <arguments>
+                           <arg line="${@{extension}.clean.pom.args}"/>
+                       </arguments>
+                   </ymvn>
+                </then>
+            </if>
+
+            <if>
+                <available file="${ext.@{extension}.path}/web/webroot"/>
+                <then>
+                    <delete includeemptydirs="true">
+                        <fileset dir="${ext.@{extension}.path}/web/webroot">
+                            <include name="**/*"/>
+                        </fileset>
+                    </delete>
+                </then>
+            </if>
+            <!-- this will not work on windows machines -->
+            <if>
+                <available file="${ext.@{extension}.path}/lib"/>
+                <then>
+                    <delete failonerror="false"  >
+                        <fileset dir="${ext.@{extension}.path}/lib">
+                            <include name="generated-*.jar"/>
+                        </fileset>
+                    </delete>
+					<!-- trigger refresh of the global class path due to libs being changed ! -->
+					<ysetplatformproperties/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="coreplus_before_initialize" >
+        <attribute name="extension"/>
+            <sequential>
+            <if>
+                <and>
+                    <available file="${ext.@{extension}.path}/${@{extension}.initapp.pom.dir}/pom.xml"/>
+                    <equals arg1="${@{extension}.deployment.mode}" arg2="embedded"/>
+                </and>
+                <then>
+                    <sequential>
+                        <echo message="Started initialization with maven command : ${@{extension}.initapp.init.pom.args}"/>
+
+                        <ymvn  pom="${ext.@{extension}.path}/${@{extension}.initapp.pom.dir}/pom.xml"  >
+                                                                  <arguments>
+                                                                      <arg line="${@{extension}.initapp.init.pom.args}"/>
+                                                                  </arguments>
+                                                              </ymvn>
+                    </sequential>
+                </then>
+            </if>
+            </sequential>
+    </macrodef>
+
+    <macrodef name="coreplus_before_updatesystem" >
+            <attribute name="extension"/>
+                <sequential>
+                <if>
+                    <and>
+                        <available file="${ext.@{extension}.path}/${@{extension}.initapp.pom.dir}/pom.xml"/>
+                        <equals arg1="${@{extension}.deployment.mode}" arg2="embedded"/>
+                    </and>
+                    <then>
+                        <sequential>
+                            <echo message="Started update with maven command : ${@{extension}.initapp.update.pom.args}"/>
+
+                            <ymvn pom="${ext.@{extension}.path}/${@{extension}.initapp.pom.dir}/pom.xml">
+                                <arguments>
+                                    <arg line="${@{extension}.initapp.update.pom.args}"/>
+                                </arguments>
+                            </ymvn>
+                        </sequential>
+                    </then>
+                </if>
+                </sequential>
+    </macrodef>
+
+    <!--
+        ###########################
+        generated build callback hooks
+        ###########################
+        -->
+
+
+    <macrodef name="replaceProto" description="Evaluates a prototype expression generated.archetype.proto, replaces it with choosen archetype proto ">
+        <attribute name="from" />
+        <attribute name="to" />
+        <sequential>
+            <echo>Replacing props from @{from} to @{to} at   ${target.dir}/resources/${extgen.extension.name} ... </echo>
+            <!-- spring client configuration -->
+            <replace file="${target.dir}/resources/${extgen.extension.name}-common-embedded_client-application-context.xml"
+                     token="@{from}" value="@{to}"/>
+
+            <replace file="${target.dir}/resources/${extgen.extension.name}-common-onpremise_client-application-context.xml"
+                                                         token="@{from}" value="@{to}"/>
+
+            <replace file="${target.dir}/resources/${extgen.extension.name}-common-ondemand_client-application-context.xml"
+                                                         token="@{from}" value="@{to}"/>
+
+            <replace
+                    file="${target.dir}/resources/${extgen.extension.name}-embedded_client-application-context.xml"
+                    token="@{from}" value="@{to}"/>
+
+            <replace
+                    file="${target.dir}/resources/${extgen.extension.name}-onpremise_client-application-context.xml"
+                    token="@{from}" value="@{to}"/>
+
+            <replace
+                    file="${target.dir}/resources/${extgen.extension.name}-ondemand_client-application-context.xml"
+                    token="@{from}" value="@{to}"/>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="replaceProperties" description="Evaluates a property placeholders for given property file">
+        <attribute name="propertyFile"/>
+        <sequential>
+
+            <!-- adds additional spring source file property ycoreplus.application-context to load commons spring configuration from :
+             <extenions>-initapp-application-context.xml
+             <extenions>-${mode}_client-application-context.xml
+             <extenions>-common-${mode}_client-application-context.xml
+             -->
+
+
+            <replace file="@{propertyFile}" token="${extgen.extension.name}-${ycoreplus.spring.dummy.spring}"
+                     value="${extgen.extension.name}-initapp-application-context.xml,${extgen.extension.name}-$${${extgen.extension.name}.deployment.mode}_client-application-context.xml,${extgen.extension.name}-common-$${${extgen.extension.name}.deployment.mode}_client-application-context.xml"/>
+
+            <!-- replace properties -->
+            <replace file="@{propertyFile}" token="@{generated.package.name}"
+                     value="${core.plus.groupid}"/>
+            <replace file="@{propertyFile}" token="@{generated.project.name}"
+                     value="${core.plus.artifactid}"/>
+            <replace file="@{propertyFile}" token="@{generated.project.version}"
+                     value="${core.plus.version}"/>
+            <replace file="@{propertyFile}" token="@{generated.web.artifactid}"
+                     value="${core.plus.artifactid}-web"/>
+            <replace file="@{propertyFile}" token="@{generated.client.artifactid}"
+                     value="${core.plus.artifactid}-client"/>
+
+            <replace file="@{propertyFile}" token="@{generated.archetype.proto}" value="${ycoreplus.extgen.archetype.proto}"/>
+            <replace file="@{propertyFile}" token="@{generated.archetype.proto.groupid}" value="${ycoreplus.extgen.archetype.proto.groupid}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="replacePropertiesWithDefaults" description="Evaluates a property placeholders using default values for given property file">
+        <attribute name="propertyFile"/>
+        <sequential>
+
+            <replace file="@{propertyFile}" token="@{generated.package.name}"
+                     value="${default.core.plus.groupid}"/>
+            <replace file="@{propertyFile}" token="@{generated.project.name}"
+                     value="${default.core.plus.artifactid}"/>
+            <replace file="@{propertyFile}" token="@{generated.project.version}"
+                     value="${default.core.plus.version}"/>
+            <replace file="@{propertyFile}" token="@{generated.web.artifactid}"
+                     value="${default.core.plus.artifactid}-web"/>
+            <replace file="@{propertyFile}" token="@{generated.client.artifactid}"
+                     value="${default.core.plus.artifactid}-client"/>
+
+            <replace file="@{propertyFile}" token="@{generated.archetype.proto}" value="${ycoreplus.extgen.archetype.proto}"/>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="evaluateArchetypeSpecificProperties">
+        <sequential>
+            <local name="source.property"/>
+            <local name="target.property"/>
+
+            <property name="target.property" value="${extgen.extension.path}/${extgen.extension.name}/project.properties" />
+            <property name="source.property" value="${extgen.extension.path}/${extgen.extension.name}/resources/extgen/${core.plus.custom.prototype}-project.properties" />
+
+                <echo>
+Evaluating custom prototype [${core.plus.custom.prototype}] properties from ${source.property}  to ${target.property} </echo>
+
+                            <loadfile  property="local.props"  srcFile="${source.property}"  />
+
+                            <replace file="${target.property}" token="@{generated.custom.properties}" value="${local.props}"/>
+
+            </sequential>
+    </macrodef>
+
+</project>

@@ -1,0 +1,13 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+insert_update Media;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];alttext;catalogVersion(catalog(id),version)[unique=true,allownull=true];code[unique=true];description;mime;owner(&Item)[forceWrite=true];realfilename;removable;url;url2
+;8451056861293105.jpg;;;1017895.jpg;;image/jpeg;;1017895.jpg;true;/medias/fromjar/testdata/media/shoes/allstarhip/1017895.jpg;/medias/fromjar/testdata/media/shoes/allstarhip/1017895.jpg
+;8451056861289107.jpg;;;1017896_blue.jpg;;image/jpeg;;1017896_blue.jpg;true;/medias/fromjar/testdata/media/shoes/allstarhip/1017896_blue.jpg;/medias/fromjar/testdata/media/shoes/allstarhip/1017896_blue.jpg

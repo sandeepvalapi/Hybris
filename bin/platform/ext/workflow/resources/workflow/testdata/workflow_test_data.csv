@@ -1,0 +1,104 @@
+INSERT_UPDATE UserGroup; uid[unique=true];locname[lang=de];locname[lang=en];groups(uid);;;;;;;
+;productmanagergroup;Produktmanager-Gruppe;Can edit product data.;;;;;;;;
+;;;;;;;;;;;
+INSERT_UPDATE User;uid[unique=true];groups(uid)
+;workflowTestUser;productmanagergroup,employeegroup
+
+INSERT_UPDATE Employee;UID[unique=true];description;name;groups(uid);password;;;;;;
+;productmanager_wf1;Workflow Product manager demouser 1. Can access workflow actions and workflows;Workflow Product Manager Demouser 1;productmanagergroup;1234;;;;;;
+;productmanager_wf2;Workflow Product manager demouser 2. Can access workflow actions and workflows;Workflow Product Manager Demouser 2;productmanagergroup;1234;;;;;;
+;productmanager_wf3;Workflow Product manager demouser 3. Can access workflow actions and workflows;Workflow Product Manager Demouser 3;productmanagergroup;1234;;;;;;
+;;;;;;;;;;;
+$START_USERRIGHTS;;;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm;;
+UserGroup;productmanagergroup;employeegroup;;;;;;;;;
+;;;;WorkflowTemplate;+;-;-;-;-;;
+;;;;Workflow;+;-;-;-;-;;
+;;;;AbstractWorkflowAction;+;-;-;-;-;;
+;;;;WorkflowActionTemplate;+;-;-;-;-;;
+;;;;WorkflowAction;+;+;-;-;-;;
+;;;;WorkflowAction.principalAssigned;+;-;-;-;-;;
+;;;;WorkflowAction.name;+;-;-;-;-;;
+;;;;WorkflowAction.activated;+;-;-;-;-;;
+;;;;WorkflowAction.actionType;+;-;-;-;-;;
+;;;;WorkflowAction.firstActivated;+;-;-;-;-;;
+;;;;WorkflowAction.sendEmail;+;-;-;-;-;;
+;;;;WorkflowAction.emailAddress;+;-;-;-;-;;
+;;;;WorkflowAction.description;+;-;-;-;-;;
+;;;;WorkflowAction.attachments;+;-;-;-;-;;
+;;;;WorkflowAction.predecessors;+;-;-;-;-;;
+;;;;WorkflowAction.successors;+;-;-;-;-;;
+;;;;WorkflowAction.status;+;-;-;-;-;;
+;;;;WorkflowAction.owner;+;-;-;-;-;;
+;;;;WorkflowAction.itemtype;+;-;-;-;-;;
+;;;;InboxView;+;-;-;-;-;;
+;;;;WorkflowItemAttachment;+;-;-;-;-;;
+;;;;WorkflowActionStatus;+;-;-;-;-;;
+;;;;User;+;;;;;;
+;;;;UserGroup;+;;;;;;
+;;;;WorkflowActionComment ;+;-;-;-;-;;
+;;;;WorkflowDecision ;+;-;-;-;-;;
+;;;;WorkflowActionLinkRelation ;+;-;-;-;-;;
+$END_USERRIGHTS;;;;;;;;;;;
+;;;;;;;;;;;
+INSERT_UPDATE  Media;code[unique=true];catalogVersion(catalog(id),version);mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];;;;;;
+;productValidation_de;testCatalog:Online;plain/text;productValidation_de.vm;jar:/workflow/testdata/productValidation_de.vm;;;;;;
+;productValidation_en;testCatalog:Online;plain/text;productValidation_en.vm;jar:/workflow/testdata/productValidation_en.vm;;;;;;
+;;;;;;;;;;;
+INSERT_UPDATE RendererTemplate;code[unique=true];description[lang=de];description[lang=en];content(code,catalogVersion(catalog(id),version))[lang=de];content(code,catalogVersion(catalog(id),version))[lang=en];contextClass;outputMimeType;rendererType(itemtype(code),code);;;
+;productValidation;Velocity-Vorlage für Validierungs-Aufgabe des Beispiels-Workflows;Velocity template for sample data validation action;productValidation_en:testCatalog:Online;productValidation_en:testCatalog:Online;de.hybris.platform.workflow.mail.WorkflowMailContext;plain/text;RendererTypeEnum:velocity;;;
+;;;;;;;;;;;
+INSERT_UPDATE WorkflowTemplate;code[unique=true];name[lang=de];name[lang=en];owner(uid);description[lang=de];description[lang=en];activationscript;;;;
+;SampleWorkflowPredecessor;Neues Produkt;New Product;admin;Dies ist eine exemplarische Vorlage für einen Workflow, der nach dem Hinzufügen eines Produktes gestartet werden soll. Das einfache Hinzufügen eines Produktes zieht üblicherweise mehrere Schritte nach sich. Diese Schritte sind diesem Workflow exemplarisch zugeordnet. Das neu angelegte Produkt soll als Anlage der jeweiligen Workflow-Instanz hinzugefügt werden.;This is an examplary workflow template which would be started after the addition of a new product to the platform. The addition of a new product is usually followed by further steps to take. These steps are associated with this workflow template exemplarily. The newly added product would be assigned to the respective workflow instance as an attachment.;;;;;
+;adhoctemplate;;;workflowTestUser
+;SampleWorkflow2;Neues Produkt;New Product;admin;Dies ist eine exemplarische Vorlage für einen Workflow, der nach dem Hinzufügen eines Produktes gestartet werden soll. Das einfache Hinzufügen eines Produktes zieht üblicherweise mehrere Schritte nach sich. Diese Schritte sind diesem Workflow exemplarisch zugeordnet. Das neu angelegte Produkt soll als Anlage der jeweiligen Workflow-Instanz hinzugefügt werden.;This is an examplary workflow template which would be started after the addition of a new product to the platform. The addition of a new product is usually followed by further steps to take. These steps are associated with this workflow template exemplarily. The newly added product would be assigned to the respective workflow instance as an attachment.;;;;;
+
+
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=de];name[lang=en];description[lang=de];description[lang=en];principalAssigned(uid);workflow(code)[unique=true];sendEmail;emailAddress;predecessors(code);rendererTemplate(code)
+;SampleActionPre1;Kategorisierung;Categorization;Bitte ordnen Sie das angehängte Produkt in den Kategoriebaum ein.;Please assign the attached product to the category structure.;productmanager_wf1;SampleWorkflowPredecessor;false;wf1@hybris.de;;
+;SampleActionPre2;Bepreisung;Pricing;Bitte bepreisen Sie das angehängte Produkt.;Please price the attached product.;productmanager_wf2;SampleWorkflowPredecessor;false;w2@hybris.de;;
+;SampleActionPre3;Übersetzung;Translation;Bitte übersetzen Sie die vorhandene Produktbeschreibung für alle verfügbaren Sprachen.;Please translate the existing product description to all available languages.;productmanager_wf3;SampleWorkflowPredecessor;false;w3@hybris.de;;
+;SampleActionPre4;Validierung;Validation;Bitte überprüfen Sie die Ergebnisse der vorherigen Schritte;Please validate the result of the completed steps.;productmanagergroup;SampleWorkflowPredecessor;true;productmanagergroup@hybris.de;SampleActionPre1,SampleActionPre2,SampleActionPre3;productValidation
+;;;;;;;;;;;
+# new Workflow Model;;;;;;;;;;;
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=de];name[lang=en];description[lang=de];description[lang=en];principalAssigned(uid);workflow(code)[unique=true];sendEmail;emailAddress;rendererTemplate(code);actionType(code)
+;SampleAction1;Kategorisierung;Categorization;Bitte ordnen Sie das angehängte Produkt in den Kategoriebaum ein.;Please assign the attached product to the category structure.;productmanager_wf1;SampleWorkflowPredecessor;false;wf1@hybris.de;;start
+;SampleAction3;Übersetzung;Translation;Bitte übersetzen Sie die vorhandene Produktbeschreibung für alle verfügbaren Sprachen.;Please translate the existing product description to all available languages.;productmanager_wf3;SampleWorkflowPredecessor;false;w3@hybris.de;;start
+;SampleAction4;Validierung der Kategorisierung;Validation of Categorization;Bitte überprüfen Sie das Ergebnis der Kategorisierung;Please validate the result of the categorization.;productmanagergroup;SampleWorkflowPredecessor;true;productmanagergroup@hybris.de;productValidation;normal
+;SampleAction5;Validierung der Bepreisung;Validation of Pricing;Bitte überprüfen Sie das Ergebnis der Bepreisung;Please validate the result of the pricing.;productmanagergroup;SampleWorkflowPredecessor;true;productmanagergroup@hybris.de;productValidation;normal
+;SampleAction6;Validierung der Übersetzung;Validation of Translation;Bitte überprüfen Sie das Ergebnis der Übersetzung;Please validate the result of the translation.;productmanagergroup;SampleWorkflowPredecessor;true;productmanagergroup@hybris.de;productValidation;normal
+;SampleAction7;Ende;End;An dieser Stelle endet der Workflow;Here the workflow ends.;productmanagergroup;SampleWorkflowPredecessor;true;productmanagergroup@hybris.de;productValidation;end
+;;;;;;;;;;;
+# new Workflow Model;;;;;;;;;;;
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=de];name[lang=en];actionTemplate(code);description[allownull=true];;;;;;
+;SampleDecision4;Validierung der Kategorisierung erfolgreich;Validation of Categorization successful;SampleAction4;;;;;;;
+;SampleDecision5;Validierung der Bepreisung erfolgreich;Validation of Pricing successful;SampleAction5;;;;;;;
+;SampleDecision6;Validierung der Übersetzung erfolgreich;Validation of Translation successful;SampleAction6;;;;;;;
+;SampleDecision7;Kategorisierung abgelehnt;reject Categorization;SampleAction4;;;;;;;
+;SampleDecision8;Bepreisung abgelehnt;reject Pricing;SampleAction5;;;;;;;
+;SampleDecision9;Übersetzung abgelehnt;reject Translation;SampleAction6;;;;;;;
+;;;;;;;;;;;
+# new Workflow Model;;;;;;;;;;;
+insert_update WorkflowActionTemplateLinkTemplateRelation;source(code)[unique=true];target(code)[unique=true];andConnectionTemplate;qualifier;;;;;;;
+;SampleDecision4;SampleAction7;true;WorkflowActionTemplateLinkTemplateRelation;;;;;;;
+;SampleDecision5;SampleAction7;true;WorkflowActionTemplateLinkTemplateRelation;;;;;;;
+;SampleDecision6;SampleAction7;true;WorkflowActionTemplateLinkTemplateRelation;;;;;;;
+
+INSERT_UPDATE Workflow;code[unique=true];job(code);owner(uid);creationtime[forceWrite=true];modifiedtime[forceWrite=true]
+;workflow1;SampleWorkflowPredecessor;workflowTestUser;20.10.2010 00:00:00;20.10.2010 00:00:00
+;workflow2;SampleWorkflowPredecessor;workflowTestUser;25.11.2010 00:00:00;25.11.2010 00:00:00
+;workflow3;adhoctemplate;workflowTestUser;25.11.2010 00:00:00;25.11.2010 00:00:00
+
+INSERT_UPDATE WorkflowItemAttachment;code[unique=true];item(User.uid)[allowNull=true];workflow(code);typeOfItem(code)
+;att1;workflowTestUser;workflow1;User
+;att2;workflowTestUser;workflow1;Product
+
+INSERT_UPDATE WorkflowAction;code[unique=true];actionType(code);workflow(code);template(code);status(code);principalAssigned(uid)
+;action01;end;workflow1;SampleAction1;in_progress;workflowTestUser
+;action02;start;workflow1;SampleAction1;in_progress;workflowTestUser
+;action03;normal;workflow1;SampleAction1;in_progress;workflowTestUser
+;action04;normal;workflow1;SampleAction1;in_progress;workflowTestUser
+
+INSERT_UPDATE WorkflowActionItemAttachmentRelation;source(code)[unique=true];target(code)[unique=true]
+;action01;att1
+;action01;att2

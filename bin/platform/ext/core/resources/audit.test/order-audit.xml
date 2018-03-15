@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+
+<audit-report-config name="testConfig" auditRecordsProvider="auditRecordsProvider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="../audit/audit.xsd">
+	<given-root-type>Order</given-root-type>
+	<types>
+		<type code="Order">
+			<atomic-attributes>
+				<atomic-attribute qualifier="code"/>
+				<atomic-attribute qualifier="date"/>
+			</atomic-attributes>
+
+
+			<virtual-attributes>
+				<virtual-attribute expression="order" type="OrderEntry" many="true" displayName="entries"/>
+			</virtual-attributes>
+		</type>
+
+		<type code="OrderEntry">
+			<atomic-attributes>
+				<atomic-attribute qualifier="quantity"/>
+			</atomic-attributes>
+			<reference-attributes>
+				<reference-attribute qualifier="unit" displayName="unit" type="Unit"/>
+				<reference-attribute qualifier="product" displayName="product" type="Product"/>
+			</reference-attributes>
+		</type>
+
+		<type code="Unit">
+			<atomic-attributes>
+				<atomic-attribute qualifier="code"/>
+				<atomic-attribute qualifier="unitType"/>
+			</atomic-attributes>
+		</type>
+
+		<type code="Product">
+			<atomic-attributes>
+				<atomic-attribute qualifier="code"/>
+				<atomic-attribute qualifier="name"/>
+			</atomic-attributes>
+		</type>
+
+	</types>
+</audit-report-config>

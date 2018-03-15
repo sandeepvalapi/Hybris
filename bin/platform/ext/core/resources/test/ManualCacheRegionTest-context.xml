@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           ">
+
+   <bean name="typesystemRegion" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="typesystemRegion" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes">
+			<array>
+				<value>system1</value>
+				<value>system2</value>
+				<value>__NO_QUERY__</value>
+			</array>
+		</property>
+   </bean>
+   
+   <bean name="entityRegion" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="entityRegion" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes">
+			<array>
+				<value>__ALL_TYPES__</value>
+				<value>__NO_QUERY__</value>
+			</array>
+		</property>
+   </bean>
+
+   <bean name="queryRegion" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="queryRegion" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes">
+			<array>
+				<value>__QUERY_CACHE__</value>
+			</array>
+		</property>
+   </bean>
+
+   <bean name="manualRegion" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="manualRegion" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes" >
+			<null/>
+		</property>
+   </bean>
+
+   <!-- Not supported -->
+   <bean name="manualRegionNoQuery" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="manualRegionNoQuery" />
+   		<constructor-arg name="maxEntries" value="1000" />
+		<property name="handledTypes" >
+			<value>__NO_QUERY__</value>
+		</property>
+   </bean>
+
+	<bean name="CacheRegionResolver" class="de.hybris.platform.regioncache.region.HintedCacheRegionResolver" scope="singleton" >
+		<constructor-arg name="cacheRegionProvider" ref="cacheRegionProvider" />
+		<constructor-arg name="manualOnlyInvalidations" value="true" />
+	</bean>
+   
+   	<bean name="CacheController" class="de.hybris.platform.regioncache.DefaultCacheController" >
+	</bean>
+	
+	<bean name="cacheConfiguration" class="de.hybris.platform.regioncache.DefaultCacheConfiguration" >
+		<constructor-arg name="regions" ref="regionsList" />
+		
+		<constructor-arg name="invalidationFilters">
+			<null/>
+		</constructor-arg>
+		
+		<constructor-arg name="resolvers">
+			<list>
+				<ref bean="CacheRegionResolver"/>	
+			</list>
+		</constructor-arg>		
+	</bean>
+	
+	<bean id="regionsList" class="java.util.ArrayList">
+	    <constructor-arg>
+			<list>
+				<ref bean="typesystemRegion"/>
+				<ref bean="entityRegion"/>
+				<ref bean="queryRegion"/>
+				<ref bean="manualRegion"/>
+				<ref bean="manualRegionNoQuery"/>
+			</list>
+	    </constructor-arg>
+	</bean>
+	
+	<bean name="cacheRegionProvider" class="de.hybris.platform.regioncache.region.impl.DefaultCacheRegionProvider" >
+		<constructor-arg name="cacheRegions" ref="regionsList" />
+	</bean>	
+	
+</beans>

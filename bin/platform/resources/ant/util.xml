@@ -1,0 +1,539 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="util">
+
+	<property name="platformhome" location="${basedir}/../.." />
+
+	<macrodef name="foreachext">
+		<element name="do" optional="false" />
+		<attribute name="param" default="extname" />
+		<sequential>
+			<for list="${extension.names}" param="@{param}" delimiter=";">
+				<sequential>
+					<do />
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="foreachextIf">
+		<element name="test" optional="false" />
+		<element name="do" optional="false" />
+		<attribute name="param" default="extname" />
+		<sequential>
+			<for list="${extension.names}" param="@{param}" delimiter=";">
+				<sequential>
+					<if>
+						<test/>
+						<then>
+							<do />
+						</then>
+					</if>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="foreachextparallel">
+		<element name="do" optional="false" />
+		<sequential>
+			<for list="${extension.names.parallel}" param="extnames" delimiter=";">
+				<sequential>
+					<for list="@{extnames}" param="extname" delimiter="," parallel="true" threadCount="10">
+						<sequential>
+							<do />
+						</sequential>
+					</for>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="onlyonce">
+		<attribute name="name" />
+		<element name="once" optional="false" />
+		<sequential>
+			<if>
+				<not>
+					<istrue value="${@{name}_executed}" />
+				</not>
+				<then>
+					<once />
+					<var name="@{name}_executed" value="true" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="onlyonce_reset">
+		<attribute name="name" />
+		<sequential>
+			<var name="@{name}_executed" value="false" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="javacompile">
+		<element name="additionalclasspath" optional="true" />
+		<attribute name="compiler" default="${build.compiler}" />
+		<attribute name="memoryMaximumSize" default="64m" />
+		<attribute name="destdir" />
+		<element name="source" />
+		<sequential>
+			<yjavac fork="false" destdir="@{destdir}" includeAntRuntime="false" debug="${build.debug}" nowarn="${build.nowarn}" deprecation="${build.deprecation}" verbose="${build.verbose}" source="${build.source}" target="${build.target}" encoding="${build.encoding}" compiler="@{compiler}">
+				<!--<compilerarg value="-Xlint:deprecation"/>
+				<compilerarg value="-Xlint:unchecked"/>-->
+				<src>
+					<source />
+				</src>
+				<classpath>
+					<additionalclasspath />
+					<pathelement path="${build.classpath}" />
+					<pathelement path="${HYBRIS_BOOTSTRAP_BIN_DIR}/models.jar" />
+					<fileset dir="${bundled.tomcat.home}">
+						<include name="lib/jsp-api.jar" />
+						<include name="lib/servlet-api.jar" />
+						<include name="lib/el-api.jar" />
+						<include name="lib/wrapper*.jar" />
+						<include name="lib/catalina.jar" />
+					</fileset>
+					<pathelement path="${HYBRIS_TEMP_DIR}/log4j" />
+					<!-- for the log4j stuff -->
+				</classpath>
+				<compilerclasspath>
+					<pathelement path="${platformhome}/resources/ant/lib/ecj-4.4.2.jar" />
+				</compilerclasspath>
+			</yjavac>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="yvalidatexml" description="macro for validating xmlfile">
+		<attribute name="source" />
+		<attribute name="schema" />
+		<attribute name="id" />
+
+		<sequential>
+			<property name="schemaURL_@{id}" location="@{schema}" />
+			<property name="sourceURL_@{id}" location="@{source}" />
+			<if>
+				<not>
+					<isset property="ext.@{extname}.warextension" />
+				</not>
+				<then>
+					<schemavalidate file="${sourceURL_@{id}}" noNamespaceFile="${schemaURL_@{id}}" />
+				</then>
+			</if>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="callback" description="Tries to call a macro defined in the extensions buildcallback.xml file. If the macro is not found, NO error is thrown.">
+		<attribute name="extname" />
+		<attribute name="target" />
+		<sequential>
+			<trycatch property="e@{extname}_@{target}" reference="eref@{extname}_@{target}">
+				<try>
+					<ycallmacro name="@{extname}_@{target}" />
+				</try>
+				<catch>
+					<if>
+						<not>
+							<contains string="${e@{extname}_@{target}}" substring="macro not found" />
+						</not>
+						<then>
+							<throw refid="eref@{extname}_@{target}" />
+						</then>
+					</if>
+				</catch>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
+	<!-- ************************** environment stuff ******************************* -->
+	<macrodef name="printenv">
+		<sequential>
+			<osfamily property="osfamily" />
+			<property name="dir.platform" location="." />
+						
+			<echo level="warn" message="---------------------------------------------------------------" />
+			<echo level="warn" message="hybris Platform Environment" />
+			<echo level="warn" message="---------------------------------------------------------------" />
+			<echo level="warn" message="OS family:                 ${osfamily}" />
+			<echo level="warn" message="Java platform:             ${java.runtime.name}, ${java.runtime.version}" />
+			<echo level="warn" message="Java compiler:             ${build.compiler}" />
+			<echo level="warn" message="Build target:              ${build.target}" />
+			<if>
+				<istrue value="${build.strict.compilation.mode}"/>
+				<then>
+					<echo level="warn" message="Compilation mode:          strict" />
+				</then>
+				<else>
+					<echo level="warn" message="Compilation mode:          relaxed" />
+				</else>
+			</if>
+			<echo level="warn" message="hybris Platform directory: ${dir.platform}" />
+			<echo level="warn" message="hybris Platform version:   ${hybris.build.version}" />
+			<echo level="warn" message="Ant version:               ${ant.version}" />
+			<echo level="warn" message="Ant memory settings:       ${env.ANT_OPTS}" />
+
+			<if>
+				<isset property="hybris.build.revision" />
+				<then>
+					<echo level="warn" message="Revision: ${hybris.build.revision}" />
+				</then>
+			</if>
+			<echo level="warn" message="---------------------------------------------------------------" />
+			<if>
+				<available file="${HYBRIS_CONFIG_DIR}/localextensions.xml" />
+				<then>
+					<echo message="Extension file used: ${HYBRIS_CONFIG_DIR}/localextensions.xml" />
+				</then>
+				<else>
+					<echo message="Extension file used: ${platformhome}/extensions.xml" />
+				</else>
+			</if>
+			<echo level="warn" message="Platform home: ${platformhome}" />
+			<echo level="warn" message="Log folder: ${HYBRIS_LOG_DIR}" />
+			<echo level="warn" message="Data folder: ${HYBRIS_DATA_DIR}" />
+			<echo level="warn" message="Config folder: ${HYBRIS_CONFIG_DIR}" />
+			<echo level="warn" message="Bin folder: ${HYBRIS_BIN_DIR}" />
+			<echo level="warn" message="Temp folder: ${HYBRIS_TEMP_DIR}" />
+			<echo level="warn" message="Boostrap bin folder: ${HYBRIS_BOOTSTRAP_BIN_DIR}" />
+			<echo level="warn" message="Roles folder: ${HYBRIS_ROLES_DIR}" />
+
+			<echo level="warn" message="${extensions.info}" />
+			<echo level="warn" message=" " />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="checkenv">
+		<sequential>
+			<if>
+				<and>
+					<not>
+						<equals arg1="${platformhome}" arg2="${HYBRIS_CONFIG_DIR}" />
+					</not>
+					<available file="${platformhome}/local.properties" />
+				</and>
+				<then>
+					<fail message="Please move your local${useconfig}.properties to the config folder ${HYBRIS_CONFIG_DIR}" />
+				</then>
+			</if>
+
+			<antversion property="ant.version.running" />
+			<fail>
+**** WRONG ANT VERSION ****	
+
+ Environment check failed: You are using a not supported version of Ant. 
+ Please make sure you are using Ant >= 1.9.1.
+
+ You are currently using: ${ant.version.running}.
+	
+ TIP: Use the ant version shipped with hybris Platform by simply
+ executing the "setenv.bat" (windows) or ". ./setenv.sh" (unix) 
+ batch file in the platform directory. After this the correct version 
+ is used and you can call ant again.
+	
+ If you are using eclipse you can configure a different ANT_HOME under
+ Windows->Preferences->Ant->Runtime->Ant Home... Button.	
+				<condition>
+			    	<not>
+			        	<antversion atleast="1.9.1" />
+					</not>
+				</condition>
+			</fail>
+			
+			<if>
+				<not>
+                    <or>
+					    <contains string="${java.version}" substring="1.7" />
+                        <contains string="${java.version}" substring="1.8" />
+                    </or>
+				</not>
+				<then>
+					<fail>-
+ 
+**** WRONG JAVA VERSION ****	
+
+ Environment check failed: You are using a not supported version of Java. 
+ Please make sure you are using Java version 1.7 or later.
+ Your current Java version is: ${java.version}
+	
+ TIP: If you are using eclipse you can configure a different JVM under
+ Preferences->Java->Installed JREs.	
+					
+					</fail>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="loadenv">
+		<sequential>
+
+			<property environment="env" />
+
+			<condition property="HYBRIS_LOG_DIR" value="${env.HYBRIS_LOG_DIR}">
+				<isset property="env.HYBRIS_LOG_DIR" />
+			</condition>
+			<condition property="HYBRIS_DATA_DIR" value="${env.HYBRIS_DATA_DIR}">
+				<isset property="env.HYBRIS_DATA_DIR" />
+			</condition>
+			<condition property="HYBRIS_CONFIG_DIR" value="${env.HYBRIS_CONFIG_DIR}">
+				<isset property="env.HYBRIS_CONFIG_DIR" />
+			</condition>
+			<condition property="HYBRIS_BIN_DIR" value="${env.HYBRIS_BIN_DIR}">
+				<isset property="env.HYBRIS_BIN_DIR" />
+			</condition>
+			<condition property="HYBRIS_TEMP_DIR" value="${env.HYBRIS_TEMP_DIR}">
+				<isset property="env.HYBRIS_TEMP_DIR" />
+			</condition>
+            <condition property="HYBRIS_BOOTSTRAP_BIN_DIR" value="${env.HYBRIS_BOOTSTRAP_BIN_DIR}">
+                <isset property="env.HYBRIS_BOOTSTRAP_BIN_DIR" />
+            </condition>
+            <condition property="HYBRIS_ROLES_DIR" value="${env.HYBRIS_ROLES_DIR}">
+                <isset property="env.HYBRIS_ROLES_DIR" />
+            </condition>
+
+			<if>
+				<available file="${platformhome}/env.properties"/>
+				<then>
+					<if>
+						<available file="${platformhome}/active-role-env.properties"/>
+						<then>
+							<loadproperties srcFile="${platformhome}/active-role-env.properties">
+								<filterchain>
+									<prefixlines prefix="loc."/>
+								</filterchain>
+							</loadproperties>
+						</then>
+					</if>
+					<loadproperties srcFile="${platformhome}/env.properties">
+						<filterchain>
+							<prefixlines prefix="loc." />
+						</filterchain>
+					</loadproperties>
+				</then>
+				<else>
+					<if>
+						<available file="${platformhome}/active-role-env.properties"/>
+						<then>
+							<loadproperties srcFile="${platformhome}/active-role-env.properties">
+								<filterchain>
+									<prefixlines prefix="loc."/>
+								</filterchain>
+							</loadproperties>
+						</then>
+					</if>
+				</else>
+			</if>
+
+            <property name="HYBRIS_BIN_DIR" location="${loc.HYBRIS_BIN_DIR}" />
+			<property name="HYBRIS_LOG_DIR" location="${loc.HYBRIS_LOG_DIR}" />
+			<property name="HYBRIS_DATA_DIR" location="${loc.HYBRIS_DATA_DIR}" />
+			<property name="HYBRIS_CONFIG_DIR" location="${loc.HYBRIS_CONFIG_DIR}" />
+			<property name="HYBRIS_TEMP_DIR" location="${loc.HYBRIS_TEMP_DIR}" />
+			
+			<!-- We cannot assume that HYBRIS_BOOTSTRAP_BIN_DIR and HYBRIS_ROLES_DIR are present in env.properties because:
+			     a) customers may have historical env.properties files
+			     b) the hybris maven plugin produces env.properties files without them 
+			     Therefore we're adding fallback values here!  
+			  --> 
+            <condition property="HYBRIS_BOOTSTRAP_BIN_DIR" value="${loc.HYBRIS_BOOTSTRAP_BIN_DIR}" else="${platformhome}/bootstrap/bin">
+                <isset property="loc.HYBRIS_BOOTSTRAP_BIN_DIR" />
+            </condition>
+            <condition property="HYBRIS_ROLES_DIR" value="${loc.HYBRIS_ROLES_DIR}" else="${platformhome}/../../roles">
+                <isset property="loc.HYBRIS_ROLES_DIR" />
+            </condition>
+
+            <if>
+                <isset property="loc.CATALINA_BASE"/>
+                <then>
+                    <property name="CATALINA_BASE" location="${loc.CATALINA_BASE}"/>
+                </then>
+                <else>
+                    <property name="CATALINA_BASE" location="${platformhome}/tomcat"/>
+                </else>
+            </if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="createenv">
+		<sequential>
+			<mkdir dir="${HYBRIS_LOG_DIR}" />
+			<mkdir dir="${HYBRIS_DATA_DIR}" />
+			<mkdir dir="${HYBRIS_BIN_DIR}" />
+            <mkdir dir="${HYBRIS_TEMP_DIR}" />
+            <mkdir dir="${HYBRIS_ROLES_DIR}" />
+
+			<if>
+				<available file="${HYBRIS_CONFIG_DIR}" />
+				<then>
+					<property name="config.message" value="Config folder already exists."/>
+				</then>
+				<else>
+					<if>
+						<and>
+							<isset property="input.template"/>
+							<not>
+								<equals arg1="${input.template}" arg2="develop"/>
+							</not>
+							<not>
+								<equals arg1="${input.template}" arg2="production"/>
+							</not>
+						</and>
+						<then>
+							<fail message="Configuration template ${input.template} does not exist."/>
+						</then>
+					</if>
+					<input addproperty="input.template" defaultvalue="develop" validargs="develop,production">
+ **** NO CONFIG FOLDER FOUND ****
+				
+ No config folder was found at ${HYBRIS_CONFIG_DIR}.
+ A "fresh" folder containing basic configuration files and the hybris 
+ demo licence will be created for your convenience.
+ Please adjust and review the configuration files (and license) and 
+ call 'ant' again. This directory will never be overridden or 
+ touched again. Always use this configuration folder for configuration 
+ of platform, do not change anything within the platform folder.
+
+ Please choose the configuration template. 
+ Press [Enter] to use the default value</input>
+
+					<if>
+						<equals arg1="production" arg2="${input.template}" />
+						<then>
+							<input addproperty="JAVAMEM" defaultvalue="3G">
+ Used Java memory. This depends on the memory available on the host 
+ and the operating system used.  
+ You can always modify the setting later in your config/local.properties.
+ Press [Enter] to use the default value</input>
+						</then>
+					</if>
+
+					<copy todir="${HYBRIS_CONFIG_DIR}">
+						<fileset dir="${platformhome}/resources/configtemplates/${input.template}">
+							<include name="*/**" />
+						</fileset>
+					</copy>
+					<copy file="${platformhome}/extensions.xml" tofile="${HYBRIS_CONFIG_DIR}/localextensions.xml" />
+
+					<if>
+						<isset property="JAVAMEM" />
+						<then>
+							<replace file="${HYBRIS_CONFIG_DIR}/local.properties" token="@JAVAMEM@" value="${JAVAMEM}" />
+						</then>
+					</if>
+					<property name="config.message" value="Config was created in ${HYBRIS_CONFIG_DIR}."/>
+				</else>
+			</if>
+
+			<if>
+				<and>
+					<available file="${HYBRIS_CONFIG_DIR}/licence" />
+					<available file="${HYBRIS_CONFIG_DIR}/tomcat" />
+				</and>
+				<then />
+				<else>
+					<echo level="error">
+**** CORRUPT CONFIG FOLDER FOUND ****
+
+Rename your existing config folder and call "ant" to create a new config folder. Afterwards copy back your config files.
+					</echo>
+					<fail message="See message above" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="load_build_number">
+		<sequential>
+
+			<if>
+				<and>
+					<isset property="platform.pom.build.number"/>
+					<available file="${platformhome}/resources/build.number"/>
+				</and>
+				<then>
+					<propertyfile file="${platformhome}/resources/build.number">
+						<entry key="version" value="${platform.pom.build.number}"/>
+					</propertyfile>
+				</then>
+			</if>
+
+			<if>
+				<available file="${platformhome}/resources/build.number" />
+				<then>
+					<property file="${platformhome}/resources/build.number" prefix="hybris.build" />
+					<property name="build" value="${DSTAMP} ${TSTAMP}" />
+				</then>
+				<elseif>
+					<available file="${platformhome}/build.number" />
+					<then>
+						<property file="${platformhome}/build.number" prefix="hybris.build" />
+					</then>
+				</elseif>
+				<else>
+					<echo level="error" message="No platform version file can be found!!" />
+				</else>
+			</if>
+
+			<var name="hybris.build.builddate" value="${DSTAMP} ${TSTAMP}" />
+
+			<echoproperties destfile="${HYBRIS_DATA_DIR}/build.number" description="Generated build number file">
+				<propertyset>
+					<propertyref prefix="hybris.build" />
+					<filtermapper>
+						<replacestring from="hybris.build." to="build." />
+					</filtermapper>
+				</propertyset>
+			</echoproperties>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="clean_codegen_flag">
+		<attribute name="resourcedir" />
+		<sequential>
+			<if>
+				<available file="@{resourcedir}/global_code_gen.touch" />
+				<then>
+					<delete>
+						<fileset dir="@{resourcedir}">
+							<include name="global_code_gen.touch" />
+						</fileset>
+					</delete>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="containsExact">
+		<element name="do" optional="false" />
+		<attribute name="string" />
+		<attribute name="separator" default="," />
+		<attribute name="substring" />
+		<sequential>
+			<for list="@{string}" param="subset" delimiter="@{separator}">
+				<sequential>
+					<if>
+						<equals arg1="@{subset}" arg2="@{substring}" />
+						<then>
+							<do />
+						</then>
+					</if>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+</project>

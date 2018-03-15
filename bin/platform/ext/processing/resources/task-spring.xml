@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <alias name="defaultTaskService" alias="taskService"/>
+    <bean id="defaultTaskService" class="de.hybris.platform.task.impl.DefaultTaskService">
+        <property name="modelService" ref="modelService"/>
+        <property name="eventService" ref="eventService"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="scheduleAndTriggerStrategy" ref="scheduleAndTriggerStrategy"/>
+        <property name="taskDao" ref="taskDao"/>
+        <property name="metricRegistry" ref="metricRegistry"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+
+    <bean id="taskDao" class="de.hybris.platform.task.impl.TaskDAO">
+        <constructor-arg ref="tenantFactory" />
+    </bean>
+
+    <bean id="scheduleAndTriggerStrategy" class="de.hybris.platform.task.impl.DefaultScheduleAndTriggerStrategy">
+        <property name="modelService" ref="modelService"/>
+        <property name="taskDao" ref="taskDao"/>
+    </bean>
+
+    <bean id="defaultTaskExecutionStrategy" class="de.hybris.platform.task.impl.DefaultTaskExecutionStrategy">
+        <property name="modelService" ref="modelService"/>
+        <property name="runnerClass" value="de.hybris.platform.task.TaskRunner"/>
+    </bean>
+
+    <bean id="repollListener" class="de.hybris.platform.task.impl.RepollListener" />
+
+    <bean id="taskActionExecutionStrategy" class="de.hybris.platform.task.action.TaskActionExecutionStrategy" parent="abstractBusinessService">
+        <property name="taskService" ref="taskService"/>
+        <property name="creationStrategy" ref="actionTaskCreationStrategy">
+        </property>
+    </bean>
+
+    <alias alias="actionTaskCreationStrategy" name="defaultActionTaskCreationStrategy"/>
+    <bean id="defaultActionTaskCreationStrategy" class="de.hybris.platform.task.action.DefaultActionTaskCreationStrategy"/>
+
+    <bean id="actionPerformableTaskRunner" class="de.hybris.platform.task.action.ActionPerformableTaskRunner">
+        <property name="executionStrategy" ref="plainActionExecutionStrategy"/>
+    </bean>
+
+    <!-- Actions -->
+    <alias alias="actionService" name="defaultActionService" />
+    <bean id="defaultActionService" class="de.hybris.platform.servicelayer.action.impl.DefaultActionService" parent="abstractBusinessService">
+        <property name="executionStrategyRegistry" ref="actionExecutionStrategyRegistry" />
+    </bean>
+
+    <bean id="actionExecutionStrategyRegistry" class="de.hybris.platform.servicelayer.action.impl.DefaultActionExecutionStrategyRegistry" />
+
+    <bean id="plainActionExecutionStrategy" class="de.hybris.platform.servicelayer.action.plain.PlainActionExecutionStrategy" parent="abstractBusinessService" />
+
+    <bean id="scriptingTaskRunner" class="de.hybris.platform.task.action.ScriptingTaskRunner">
+        <property name="scriptingLanguagesService" ref="scriptingLanguagesService"/>
+    </bean>
+
+    <bean id="triggerTaskRunner" class="de.hybris.platform.task.action.TriggerTaskRunner">
+        <property name="modelService" ref="modelService"/>
+        <property name="triggerService" ref="triggerService"/>
+    </bean>
+
+    <bean id="executeCronJobTaskRunner" class="de.hybris.platform.cronjob.task.ExecuteCronJobTaskRunner">
+        <property name="cronJobService" ref="cronJobService"/>
+    </bean>
+
+    <bean id="triggerTaskExecutionStrategy" class="de.hybris.platform.task.impl.TriggerTaskExecutionStrategy" parent="defaultTaskExecutionStrategy">
+        <property name="runnerClass" value="de.hybris.platform.task.action.TriggerTaskRunner"/>
+    </bean>
+
+</beans>

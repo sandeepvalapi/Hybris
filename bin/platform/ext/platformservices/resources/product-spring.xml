@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<alias alias="productService" name="defaultProductService"/>
+	<bean id="defaultProductService" class="de.hybris.platform.product.impl.DefaultProductService"
+			parent="abstractBusinessService">
+		<property name="productDao" ref="productDao"/>
+		<property name="unitDao" ref="unitDao"/>
+		<property name="priceService" ref="priceService"/>
+    </bean>
+
+    <alias name="defaultConfiguratorSettingsService" alias="configuratorSettingsService" />
+    <bean id="defaultConfiguratorSettingsService" class="de.hybris.platform.product.impl.DefaultConfiguratorSettingsService">
+        <property name="configuratorSettingsResolutionStrategy" ref="configuratorSettingsResolutionStrategy" />
+    </bean>
+
+    <alias name="defaultConfiguratorSettingsResolutionStrategy" alias="configuratorSettingsResolutionStrategy" />
+    <bean name="defaultConfiguratorSettingsResolutionStrategy"
+          class="de.hybris.platform.product.impl.DefaultConfiguratorSettingsResolutionStrategy">
+        <property name="categoryService" ref="categoryService"/>
+    </bean>
+
+	<alias alias="priceService" name="defaultPriceService"/>
+	<bean id="defaultPriceService" class="de.hybris.platform.product.impl.DefaultPriceService" parent="abstractBusinessService">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="timeService" ref="timeService"/>
+	</bean>
+
+	<alias alias="productDao" name="defaultProductDao"/>
+	<bean id="defaultProductDao" class="de.hybris.platform.product.daos.impl.DefaultProductDao">
+		<constructor-arg value="Product"/>
+	</bean>
+
+	<alias alias="unitService" name="defaultUnitService"/>
+	<bean id="defaultUnitService" class="de.hybris.platform.product.impl.DefaultUnitService" parent="abstractBusinessService">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="unitDao" ref="unitDao"/>
+	</bean>
+
+	<alias alias="unitDao" name="defaultUnitDao"/>
+	<bean id="defaultUnitDao" class="de.hybris.platform.product.daos.impl.DefaultUnitDao">
+		<constructor-arg value="Unit"/>
+	</bean>
+
+	<alias alias="variantTypeDao" name="defaultVariantTypeDao"/>
+	<bean id="defaultVariantTypeDao" class="de.hybris.platform.product.daos.impl.DefaultVariantTypeDao">
+		<constructor-arg value="VariantType"/>
+	</bean>
+
+	<alias alias="variantsService" name="defaultVariantsService"/>
+	<bean id="defaultVariantsService" class="de.hybris.platform.product.impl.DefaultVariantsService"
+			parent="abstractBusinessService">
+		<property name="typeService" ref="typeService"/>
+		<property name="variantTypeDao" ref="variantTypeDao"/>
+	</bean>
+
+	<bean id="pdtProductModificationMarker" class="de.hybris.platform.product.impl.PDTProductModificationMarker">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<!-- price row interceptor -->
+	<bean id="priceRowPrepareInterceptor" class="de.hybris.platform.product.impl.PriceRowPrepareInterceptor"
+			parent="pdtRowPrepareInterceptor">
+	</bean>
+
+	<bean id="priceRowValidateInterceptor" class="de.hybris.platform.product.impl.PriceRowValidateInterceptor"/>
+
+	<bean id="globalDiscountRowPrepareInterceptor" class="de.hybris.platform.product.impl.GlobalDiscountRowPrepareInterceptor"
+			parent="pdtRowPrepareInterceptor">
+	</bean>
+
+	<bean id="discountRowPrepareInterceptor" class="de.hybris.platform.product.impl.DiscountRowPrepareInterceptor"
+			parent="pdtRowPrepareInterceptor">
+	</bean>
+
+	<bean id="taxRowPrepareInterceptor" class="de.hybris.platform.product.impl.TaxRowPrepareInterceptor"
+			parent="pdtRowPrepareInterceptor">
+	</bean>
+
+	<bean id="pdtRowPrepareInterceptor" class="de.hybris.platform.product.impl.PDTRowPrepareInterceptor" abstract="true">
+		<property name="typeService" ref="typeService"/>
+		<property name="catalogTypeService" ref="catalogTypeService"/>
+		<property name="pdtProductModificationMarker" ref="pdtProductModificationMarker"/>
+	</bean>
+
+	<bean id="pdtRowRemoveInterceptor" class="de.hybris.platform.product.impl.PDTRowRemoveInterceptor">
+		<property name="pdtProductModificationMarker" ref="pdtProductModificationMarker"/>
+	</bean>
+
+	<bean id="pdtRowRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="pdtRowRemoveInterceptor"/>
+		<property name="typeCode" value="PDTRow"/>
+	</bean>
+
+	<bean id="taxRowPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="taxRowPrepareInterceptor"/>
+		<property name="typeCode" value="TaxRow"/>
+	</bean>
+
+	<bean id="discountRowPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="discountRowPrepareInterceptor"/>
+		<property name="typeCode" value="DiscountRow"/>
+	</bean>
+
+	<bean id="globalDiscountRowPrepareInterceptorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="globalDiscountRowPrepareInterceptor"/>
+		<property name="typeCode" value="GlobalDiscountRow"/>
+	</bean>
+	<bean id="priceRowPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="priceRowPrepareInterceptor"/>
+		<property name="typeCode" value="PriceRow"/>
+	</bean>
+
+	<bean id="priceRowValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="priceRowValidateInterceptor"/>
+		<property name="typeCode" value="PriceRow"/>
+	</bean>
+
+	<!-- the variant type prepare interceptor -->
+	<bean id="VariantTypePrepareInterceptor" class="de.hybris.platform.product.interceptors.VariantTypePrepareInterceptor">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<bean id="VariantTypePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VariantTypePrepareInterceptor"/>
+		<property name="typeCode" value="VariantType"/>
+	</bean>
+
+	<!-- the variant type remove interceptor -->
+	<bean id="VariantTypeRemoveInterceptor" class="de.hybris.platform.product.interceptors.VariantTypeRemoveInterceptor">
+		<property name="variantTypeDao" ref="variantTypeDao"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<bean id="VariantTypeRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VariantTypeRemoveInterceptor"/>
+		<property name="typeCode" value="VariantType"/>
+	</bean>
+
+	<!-- the variant product validate interceptor -->
+	<bean id="VariantProductValidateInterceptor" class="de.hybris.platform.product.interceptors.VariantProductValidateInterceptor">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<bean id="VariantProductValidateInterceptorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VariantProductValidateInterceptor"/>
+		<property name="typeCode" value="VariantProduct"/>
+	</bean>
+	
+	<!-- the variant product remove interceptor -->
+	<bean id="VariantProductRemoveInterceptor" class="de.hybris.platform.product.interceptors.VariantProductRemoveInterceptor" />
+
+	<bean id="VariantProductRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VariantProductRemoveInterceptor" />
+		<property name="typeCode" value="VariantProduct" />
+	</bean>
+	
+	<!-- the variant product prepare interceptor -->
+	<bean id="VariantProductPrepareInterceptor" class="de.hybris.platform.product.interceptors.VariantProductPrepareInterceptor" />
+
+	<bean id="VariantProductPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VariantProductPrepareInterceptor" />
+		<property name="typeCode" value="VariantProduct" />
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.internal.converter.impl.ModelConverterMapping">
+		<property name="typeCode" value="VariantProduct"/>
+		<property name="modelClass"
+					 value="de.hybris.platform.variants.model.VariantProductModel"/>
+		<property name="converter">
+			<bean class="de.hybris.platform.servicelayer.internal.converter.impl.VariantProductModelConverter">
+				<constructor-arg ref="modelService"/>
+				<constructor-arg ref="i18nService"/>
+				<constructor-arg ref="commonI18NService"/>
+				<constructor-arg value="VariantProduct"/>
+				<constructor-arg
+						value="de.hybris.platform.variants.model.VariantProductModel"/>
+				<constructor-arg ref="leanSerializationStrategy"/>
+				<constructor-arg ref="sourceTransformer"/>
+				<constructor-arg ref="selfHealingService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="Product_classificationClassesAttributeHandler" class="de.hybris.platform.product.dynamic.ProductClassificationClassesAttributeHandler">
+		<property name="classificationClassesResolverStrategy" ref="classificationClassesResolverStrategy"/>
+	</bean>
+
+</beans>

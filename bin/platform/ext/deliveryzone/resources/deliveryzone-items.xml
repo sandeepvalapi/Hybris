@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<atomictypes/>
+
+	<collectiontypes>	
+		<collectiontype code="CountryCollection" elementtype="Country" autocreate="true" generate="false"/>
+		<collectiontype code="ZoneDeliveryModeValueCollection" elementtype="ZoneDeliveryModeValue" autocreate="true" generate="false"/>
+	</collectiontypes>
+
+	<enumtypes/>	
+
+	<maptypes/>
+
+	<relations>
+	
+		<relation code="ZoneCountryRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="Zone2Country" typecode="1204"/>
+			<sourceElement type="Zone" qualifier="zones" collectiontype="set" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" optional="true" search="true"/>
+			</sourceElement>
+			<targetElement type="Country" qualifier="countries" collectiontype="set" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" optional="true" search="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="ModeValuesRelation" generate="true" localized="false" autocreate="true">
+			<sourceElement type="ZoneDeliveryMode" qualifier="deliveryMode" cardinality="one">
+				<modifiers read="true" write="false" optional="false" search="true" initial="true" unique="true"/>
+			</sourceElement>
+			<targetElement type="ZoneDeliveryModeValue" qualifier="values" collectiontype="set" cardinality="many">
+				<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+	
+	
+		<itemtype code="ZoneDeliveryMode"
+					 extends="DeliveryMode"
+					 jaloclass="de.hybris.platform.deliveryzone.jalo.ZoneDeliveryMode"
+					 autocreate="true"
+					 generate="true">
+			<attributes>
+				<attribute qualifier="propertyName" type="java.lang.String" autocreate="true" >
+					<defaultvalue>de.hybris.platform.deliveryzone.constants.ZoneDeliveryModeConstants.PRICE_PROPERTY_NAME</defaultvalue>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" initial="false"/>
+				</attribute>
+				<attribute qualifier="net" type="java.lang.Boolean" autocreate="true" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" initial="false"/>
+				</attribute>
+			</attributes>		 
+		</itemtype>
+	
+		<itemtype code="ZoneDeliveryModeValue"
+					 extends="GenericItem"
+					 jaloclass="de.hybris.platform.deliveryzone.jalo.ZoneDeliveryModeValue"
+					 autocreate="true"
+					 generate="true" >
+            <deployment table="ZoneDeliveryModeValues" typecode="1202"/>
+			<attributes>
+				<attribute qualifier="currency" type="Currency" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" unique="true"/>
+				</attribute>
+				<attribute qualifier="minimum" type="java.lang.Double" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" unique="true"/>
+				</attribute>
+				<attribute qualifier="value" type="java.lang.Double" autocreate="true">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+				</attribute>
+				<attribute qualifier="zone" type="Zone" autocreate="true">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" unique="true"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="IdentityIDX" unique="true">
+					<key attribute="deliveryMode"/>
+					<key attribute="zone"/>
+					<key attribute="currency"/>
+					<key attribute="minimum"/>
+				</index>
+				<index name="ModeIDX">
+					<key attribute="deliveryMode"/>
+				</index>
+				<index name="ZoneIDX">
+					<key attribute="zone"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="Zone"
+					 extends="GenericItem"
+					 jaloclass="de.hybris.platform.deliveryzone.jalo.Zone"
+					 autocreate="true"
+					 generate="true">
+            <deployment table="Zones" typecode="1203"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String" autocreate="true">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" unique="true"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="IdentityIDX" unique="true">
+					<key attribute="code"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+	</itemtypes>		
+
+</items>
+
+

@@ -1,0 +1,8 @@
+/**
+* Codemirror3 threaddump theme
+*/
+
+.cm-s-default .cm-dump_header {color: #f00;}
+.cm-s-default .cm-dump_state {color: #292;}
+.cm-s-default .cm-dump_main {color: #00F;}
+.cm-s-default .cm-dump_locked {color: #a50;}

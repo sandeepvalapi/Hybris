@@ -1,0 +1,6 @@
+# settings file for ant production packages validation
+;include ext
+;exclude ext
+;exclude dir
+testsrc
+#src - disabled for now - hmc or platformwebservices contain such directories after ant producton

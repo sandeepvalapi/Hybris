@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="localization" default="localization_zip" basedir=".">
+
+
+	<property name="platformhome" location="${basedir}/../.." />
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${platformhome}/lib/ant-contrib-1.0b3.jar" />
+
+	<!-- setting the localization.allextensions property to true (e.g. via -Dlocalization.allextensions=true)
+				will result in all extensions from dist-extensions.xml being used.
+				otherwise the existing (local)extensions.xml will be used.
+				an existing localextensions.xml would be backed up as localextensions.xml.bak -->
+	
+		<property name="localization.allextensions" value="false" />
+		<if>
+			<istrue value="${localization.allextensions}" />
+			<then>
+				
+				<echo>Backing up old localextensions.xml to localextensions.xml.bak</echo>
+				<copy file="${platformhome}/../../config/localextensions.xml" tofile="${platformhome}/../../config/localextensions.xml.bak" overwrite="true" failonerror="false" />
+				
+				<echo>Copying dist-extensions.xml to localextensions.xml in the config folder</echo>
+				<copy file="${platformhome}/../../integration/bamboo/resources/extensionfiles/dist-extensions.xml" tofile="${platformhome}/../../config/localextensions.xml" overwrite="true" />
+			
+			</then>
+		</if>		
+
+
+	<import file="${platformhome}/resources/ant/antmacros.xml" />
+	<import file="${platformhome}/resources/ant/util.xml" />
+	
+	
+	<!--
+		
+			'localization_zip' will create a zip file containing all localization properties files for the given language iso code,
+				provided as 'lang' property (defaults to "en,de,fr,ja,pt,it,zh" which is the current list of languages we support).
+				The files are based on the current set of extensions (from extensions.xml or localextensions.xml).
+				For the 'lang' property you can also use a comma seperated list (e.g. "en,de,fr,ja" to create a zip for all currently known languages).
+		
+	-->
+	
+	<target name="localization_zip" description="Creates a zip containing all localization files for the given language (provided via &quot;-Dlang=&quot; parameter." >
+		<trycatch property="error.message">
+			<try>
+				<createLocZip />
+			</try>
+			<catch>
+		   	<echo message="Localization-file extraction failed"/>
+			</catch>
+		</trycatch>
+	</target>
+	
+	<macrodef name="createLocZip" description="Create zip with all localization files">
+		
+			<sequential>
+			
+				<delete includeEmptyDirs="true" quiet="true">
+					<fileset dir="${HYBRIS_TEMP_DIR}/localization"/>
+				</delete>
+		  		<property name="lang" value="en,de,fr,ja,pt,it,zh,ru" />
+				<property name="addBOM" value="false" />
+	
+		  		<echo>Collecting localization files from following extensions:</echo>
+		  			
+		  		<foreachext>
+		  			<do>
+		  				<echo>@{extname}</echo>
+		  			</do>
+		  		</foreachext>
+		  			
+		  		<tstamp prefix="localization" />
+	
+	  			<for list="${lang}" param="lang">	
+	  				<sequential>
+	  					<dump_localization_files language="@{lang}" addBOM="${addBOM}"/>
+	  				</sequential>
+	  			</for>
+	
+			</sequential>
+		
+	</macrodef>
+	
+	<target name="localization_convert" description="Prepares localized files for re-integration into the platform. The files must be placed in {HYBRIS_TEMP_DIR}/localization in their correct folder-structure." >
+
+		<echo>Preparing files within ${HYBRIS_TEMP_DIR}/localization for re-integration.</echo>	
+		<localeimport path="${HYBRIS_TEMP_DIR}/localization" />
+			
+	</target>
+
+
+
+	<macrodef name="dump_localization_files">
+		<attribute name="language" />
+		<attribute name="addBOM" />
+		<sequential>
+
+			<echo> Creating localization zip file for '@{language}' ...</echo>
+
+			<var name="processing.en" unset="true"/>
+			<condition property="processing.en">
+				<equals arg1="en" arg2="@{language}"/>
+			</condition>
+
+			<foreachext>
+				<do>
+					<echo>Adding localization files for '@{extname}'...</echo>
+					<echo>Extensionfolder of '@{extname}' is '${ext.@{extname}.path}'</echo>
+
+					<!-- finding the extension's relative path (in relation to the hybris/bin folder) -->
+					<var name="relativeextfolder" unset="true"/>
+					<property name="relativeextfolder" value="${ext.@{extname}.path}" relative="true" basedir="${HYBRIS_BIN_DIR}" />
+
+					<copy todir="${HYBRIS_TEMP_DIR}/localization/@{language}" >
+						<fileset dir="${HYBRIS_BIN_DIR}" casesensitive="false">
+
+							<!-- core and hmc  -->
+							<include name="${relativeextfolder}/**/*locales*_@{language}.properties" />
+							<exclude name="**/hmc/web/webroot/WEB-INF/classes/**/*" />
+							<exclude name="**/unittest/**/*" />
+						
+							<!-- cockpit (ng) -->
+							<include name="${relativeextfolder}/**/i3-label_@{language}.properties"/>
+							<include name="${relativeextfolder}/**/labels_@{language}.properties" />
+							<include if="processing.en" name="${relativeextfolder}/**/i3-label.properties" />
+							<include if="processing.en" name="${relativeextfolder}/**/labels.properties" />
+						
+							<!-- messages -->
+							<include name="${relativeextfolder}/**/*messages_@{language}.properties" />
+							<include if="processing.en" name="${relativeextfolder}/**/*messages.properties" />
+						
+							<!-- frontend properties files in WEB-INF/messages folder -->
+							<include name="${relativeextfolder}/**/WEB-INF/messages/*_@{language}.properties" />
+								
+							<!-- csv and impex -->
+							<include name="${relativeextfolder}/**/*_@{language}.csv" />
+							<include name="${relativeextfolder}/**/*_@{language}.impex" />
+							
+							<include name="${relativeextfolder}/**/lang-@{language}.properties" />
+
+							<!-- email localizations from yacceleratorcore -->
+							<include name="${relativeextfolder}/resources/**/messages/*_@{language}.properties" />
+							
+						</fileset>
+					</copy>
+
+				</do>
+			</foreachext>
+
+			<localeexport path="${HYBRIS_TEMP_DIR}/localization/@{language}" addBom="${addBOM}" />
+			
+			<zip destfile="${HYBRIS_TEMP_DIR}/localization-prop-@{language}-${localization.DSTAMP}-${localization.TSTAMP}.zip" 
+				  basedir="${HYBRIS_TEMP_DIR}/localization/@{language}"
+				  includes="**/*.properties"/>
+
+			<zip destfile="${HYBRIS_TEMP_DIR}/localization-impex-@{language}-${localization.DSTAMP}-${localization.TSTAMP}.zip" 
+				  basedir="${HYBRIS_TEMP_DIR}/localization/@{language}"
+				  includes="**/*.impex, **/*.csv"/>
+
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="combine_localization_zips">
+		<sequential>
+		<delete quiet="true">
+			<fileset dir="${HYBRIS_TEMP_DIR}/localization/temp"/>
+		</delete>
+		<mkdir dir="${HYBRIS_TEMP_DIR}/localization/temp"/>
+		<foreach  target="unzip_file" param="file">
+			<path>
+				<fileset dir="${HYBRIS_TEMP_DIR}">
+					<include name="localization*.zip"/>
+				</fileset>
+			</path>
+		</foreach>
+		<echo message="creating langpack.zip"/>
+		<zip destfile="${HYBRIS_TEMP_DIR}/langpack.zip" basedir="${HYBRIS_TEMP_DIR}/localization/temp"/>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="clear_localization_zips">
+		<sequential>
+			<delete quiet="true">
+				<fileset dir="${HYBRIS_TEMP_DIR}/localization/temp">
+					<include name="localization*.zip"/>
+				</fileset>
+			</delete>
+		</sequential>
+	</macrodef>
+	
+	<target name="langpack" description="extracting lang pack">
+		<antcall target="localization_zip"/>
+		<combine_localization_zips/>
+	</target>
+	
+	<target name="create_en_langpack" description="creates 'en' only langpack.zip">
+		<clear_localization_zips/>
+		<antcall target="localization_zip">
+			<param name="lang" value="en"/>
+		</antcall>
+		<combine_localization_zips/>
+	</target>
+	
+	<target name="unzip_file">
+		<echo message="unzipping ${file}"/>
+		<unzip src="${file}" dest="${HYBRIS_TEMP_DIR}/localization/temp" />
+	</target>
+</project>

@@ -1,0 +1,51 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+INSERT_UPDATE Usergroup;uid[unique=true];
+;hac_platform_tenants;
+;hac_platform_configuration;
+;hac_platform_configuration_limited;
+;hac_platform_system;
+;hac_platform_logging;
+;hac_platform_logging_limited;
+;hac_platform_extensions;
+;hac_platform_initialization;
+;hac_platform_update;
+;hac_platform_sqlscripts;
+;hac_platform_license;
+;hac_platform_support;
+;hac_platform_pkanalyzer;
+;hac_platform_classpathanalyzer;
+;hac_maintenance_cleanup;
+;hac_maintenance_cleanup_limited;
+;hac_maintenance_encryptionkeys;
+;hac_maintenance_encryptionkeys_limited;
+;hac_maintenance_deployment;
+;hac_monitoring_cache;
+;hac_monitoring_cache_limited;
+;hac_monitoring_cluster;
+;hac_monitoring_database;
+;hac_monitoring_database_limited;
+;hac_monitoring_cronjobs;
+;hac_monitoring_cronjobs_limited;
+;hac_monitoring_jmx;
+;hac_monitoring_jmx_limited;
+;hac_monitoring_memory;
+;hac_monitoring_memory_limited;
+;hac_monitoring_threaddump;
+;hac_monitoring_performance;
+;hac_monitoring_suspendresume;
+;hac_console_scriptinglanguages;
+;hac_console_flexiblesearch;
+;hac_console_impeximport;
+;hac_console_impexexport;
+;hac_console_ldap;
+
+

@@ -1,0 +1,107 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<expressions>
+	<expression name="entity">
+		<parseClass>de.hybris.platform.commons.translator.parsers.HtmlSimpleEntityParser</parseClass>
+		<start><![CDATA[&#?([a-zA-Z]|\d){2,10};]]></start>
+	</expression>
+	<expression name="div">
+		<start>div</start>
+	</expression>
+	<expression name="paragraph">
+		<start>p</start>
+	</expression>
+		<expression name="span">
+		<start>span</start>
+	</expression>
+
+
+	<expression name="bold">
+		<start>b</start>
+	</expression>
+	<expression name="strong">
+		<start>strong</start>
+	</expression>
+
+	<expression name="italic">
+		<start>i</start>
+	</expression>
+
+	<expression name="underline">
+		<start>u</start>
+	</expression>
+
+	<expression name="strike">
+		<start>s</start>
+	</expression>
+	<expression name="strike">
+		<start>strike</start>
+	</expression>
+
+	<expression name="superscript">
+		<start>sup</start>
+	</expression>
+
+	<expression name="subscript">
+		<start>sub</start>
+	</expression>
+
+	<expression name="newLine">
+		<start>br</start>
+	</expression>
+
+
+	<expression name="heading1">
+		<start>h1</start>
+	</expression>
+	<expression name="heading2">
+		<start>h2</start>
+	</expression>
+	<expression name="heading3">
+		<start>h3</start>
+	</expression>
+	<expression name="heading4">
+		<start>h4</start>
+	</expression>
+	<expression name="heading5">
+		<start>h5</start>
+	</expression>
+	<expression name="heading6">
+		<start>h6</start>
+	</expression>
+
+	<expression name="table">
+		<parseClass>de.hybris.platform.commons.translator.parsers.HtmlTableParser</parseClass>
+		<start>table</start>
+	</expression>
+
+	<expression name="orderedList">
+		<parseClass>de.hybris.platform.commons.translator.parsers.HtmlListParser</parseClass>
+		<start>ol</start>
+	</expression>
+	<expression name="unorderedList">
+		<parseClass>de.hybris.platform.commons.translator.parsers.HtmlListParser</parseClass>
+		<start>ul</start>
+	</expression>
+
+	<expression name="itemlink">
+		<parseClass>de.hybris.platform.print.util.translator.ItemlinkParser</parseClass>
+		<start><![CDATA[<\s*?a\s*?href\s*?=\s*?['"]item://(([^>])*)?['"]>]]></start>
+	</expression>
+
+	<expression name="image">
+		<parseClass>de.hybris.platform.print.util.translator.ImageParser</parseClass>
+		<start>img</start>
+	</expression>
+</expressions>
+
+
+

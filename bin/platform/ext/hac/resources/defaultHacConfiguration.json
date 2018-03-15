@@ -1,0 +1,267 @@
+[
+  {
+    "basePath": "/platform",
+    "mainTabLabel": "platform",
+    "subTabs": [
+      {
+        "path": "/tenants",
+        "label": "tenants",
+        "roles": [
+          "ROLE_HAC_PLATFORM_TENANTS"
+        ],
+        "skipPrefix": true
+      },
+      {
+        "path": "/config",
+        "label": "configuration",
+        "roles": [
+          "ROLE_HAC_PLATFORM_CONFIGURATION",
+          "ROLE_HAC_PLATFORM_CONFIGURATION_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/system",
+        "label": "system",
+        "roles": [
+          "ROLE_HAC_PLATFORM_SYSTEM"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/log4j",
+        "label": "logging",
+        "roles": [
+          "ROLE_HAC_PLATFORM_LOGGING",
+          "ROLE_HAC_PLATFORM_LOGGING_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/extensions",
+        "label": "extensions",
+        "roles": [
+          "ROLE_HAC_PLATFORM_EXTENSIONS"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/init",
+        "label": "initialization",
+        "roles": [
+          "ROLE_HAC_PLATFORM_INITIALIZATION"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/update",
+        "label": "update",
+        "roles": [
+          "ROLE_HAC_PLATFORM_UPDATE"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/dryrun",
+        "label": "SQL scripts",
+        "roles": [
+          "ROLE_HAC_PLATFORM_SQLSCIPTS"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/license",
+        "label": "license",
+        "roles": [
+          "ROLE_HAC_PLATFORM_LICENSE"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/support",
+        "label": "support",
+        "roles": [
+          "ROLE_HAC_PLATFORM_SUPPORT"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/pkanalyzer",
+        "label": "PK analyzer",
+        "roles": [
+          "ROLE_HAC_PLATFORM_PKANALYZER"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/jars",
+        "label": "classpath analyzer",
+        "roles": [
+          "ROLE_HAC_PLATFORM_CLASSPATHANALYZER"
+        ],
+        "skipPrefix": false
+      }
+    ]
+  },
+  {
+    "basePath": "/monitoring",
+    "mainTabLabel": "monitoring",
+    "subTabs": [
+      {
+        "path": "/cache",
+        "label": "cache",
+        "roles": [
+          "ROLE_HAC_MONITORING_CACHE",
+          "ROLE_HAC_MONITORING_CACHE_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/cluster",
+        "label": "cluster",
+        "roles": [
+          "ROLE_HAC_MONITORING_CLUSTER"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/database",
+        "label": "database",
+        "roles": [
+          "ROLE_HAC_MONITORING_DATABASE",
+          "ROLE_HAC_MONITORING_DATABASE_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/cronjobs",
+        "label": "cron jobs",
+        "roles": [
+          "ROLE_HAC_MONITORING_CRONJOBS",
+          "ROLE_HAC_MONITORING_CRONJOBS_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/jmx",
+        "label": "JMX MBeans",
+        "roles": [
+          "ROLE_HAC_MONITORING_JMX",
+          "ROLE_HAC_MONITORING_JMX_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/memory",
+        "label": "memory",
+        "roles": [
+          "ROLE_HAC_MONITORING_MEMORY",
+          "ROLE_HAC_MONITORING_MEMORY_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/threaddump",
+        "label": "thread dump",
+        "roles": [
+          "ROLE_HAC_MONITORING_THREADDUMP"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/performance",
+        "label": "performance",
+        "roles": [
+          "ROLE_HAC_MONITORING_PERFORMANCE"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/suspendresume",
+        "label": "suspend",
+        "roles": [
+          "ROLE_HAC_MONITORING_SUSPENDRESUME"
+        ],
+        "skipPrefix": false
+      }
+    ]
+  },
+  {
+    "basePath": "/maintain",
+    "mainTabLabel": "maintenance",
+    "subTabs": [
+      {
+        "path": "/cleanup",
+        "label": "cleanup",
+        "roles": [
+          "ROLE_HAC_MAINTENANCE_CLEANUP",
+          "ROLE_HAC_MAINTENANCE_CLEANUP_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/keys",
+        "label": "encryption keys",
+        "roles": [
+          "ROLE_HAC_MAINTENANCE_ENCRYPTIONKEYS",
+          "ROLE_HAC_MAINTENANCE_ENCRYPTIONKEYS_LIMITED"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/deployments",
+        "label": "deployment",
+        "roles": [
+          "ROLE_HAC_MAINTENANCE_DEPLOYMENT"
+        ],
+        "skipPrefix": false
+      }
+    ]
+  },
+  {
+    "basePath": "/console",
+    "mainTabLabel": "console",
+    "subTabs": [
+      {
+        "path": "/scripting",
+        "label": "scripting languages",
+        "roles": [
+          "ROLE_HAC_CONSOLE_SCRIPTINGLANGUAGES"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/flexsearch",
+        "label": "flexibleSearch",
+        "roles": [
+          "ROLE_HAC_CONSOLE_FLEXIBLESEARCH"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/impex/import",
+        "label": "ImpEx import",
+        "roles": [
+          "ROLE_HAC_CONSOLE_IMPEXIMPORT"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/impex/export",
+        "label": "ImpEx export",
+        "roles": [
+          "ROLE_HAC_CONSOLE_IMPEXEXPORT"
+        ],
+        "skipPrefix": false
+      },
+      {
+        "path": "/ldap",
+        "label": "LDAP",
+        "roles": [
+          "ROLE_HAC_CONSOLE_LDAP"
+        ],
+        "skipPrefix": false
+      }
+    ]
+  }
+]

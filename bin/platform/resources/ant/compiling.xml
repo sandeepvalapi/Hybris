@@ -1,0 +1,1093 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- 
+
+XXXX
+
+ -->
+<project name="project.compiling" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+    <!--
+      the next line is added allow eclipse resolving the 'platformhome' property.
+      It is not needed for the normal build process, since platformhome is always set from the outside.
+      -->
+    <property name="platformhome" location="../../.." />
+
+    <taskdef name="replace_dto_resource" classname="de.hybris.ant.taskdefs.ReplaceDTOResource">
+        <classpath>
+            <pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+        </classpath>
+    </taskdef>
+
+    <!-- for maven ant task and the maven xml namespace -->
+	<if>
+		<not>
+			<isset property="mvn-init.called"/>
+		</not>
+		<then>
+		    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant">
+		        <classpath>
+		            <pathelement path="${platformhome}/resources/ant/lib/maven-ant-tasks-2.1.3.jar" />
+		        </classpath>
+		    </typedef>
+		</then>
+	</if>
+	
+    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${platformhome}/resources/ant/lib/xmltask-1.16.jar" />
+
+    <macrodef name="check_deployments">
+        <sequential>
+            <if>
+                <istrue value="${build.development.mode}" />
+                <then>
+            		<echo message="Validation of *-items.xml files is enabled. It can be disabled by setting build.development.mode to false in local.properties file."/>
+                	<echo message="Validation - Step 1: Deployments"/>
+                    <foreachext>
+                        <do>
+                            <extension_check_deployments extname="@{extname}" />
+                        </do>
+                    </foreachext>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+	
+	<macrodef name="check_jalo_types">
+        <sequential>
+            <if>
+                <istrue value="${build.development.mode}" />
+                <then>
+	                	<echo message="Validation - Step 2: JaloOnly Types"/>
+                    <foreachext>
+                        <do>
+	                            <extension_check_jalo_types extname="@{extname}" />
+                        </do>
+                    </foreachext>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="build">
+    	<sequential>
+	    	<if>
+	    		<isfalse value="${de.hybris.platform.ant.production.skip.build}" />
+	    		<then>
+	    			<stopwatch name="build" />
+		            <createenv />
+		            <check_deployments />
+		            <gensource />
+		            <models_build />
+		            <extensions_build />
+			         <if>
+				         <isfalse value="${build.strict.compilation.mode}"/>
+				         <then>
+					         <taskdef name="ycheckjalotypes" classname="de.hybris.ant.taskdefs.compiling.checkitemsxml.CheckJaloTypes">
+						         <classpath>
+							         <pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+							         <pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+							         <fileset dir="${platformhome}/lib/dbdriver">
+								         <include name="*.jar" />
+							         </fileset>
+							         <fileset dir="${platformhome}/ext/core/lib">
+								         <include name="**/*.jar" />
+							         </fileset>
+							         <fileset dir="${platformhome}/lib">
+								         <include name="*.jar" />
+							         </fileset>
+							         <fileset dir="${bundled.tomcat.home}/lib">
+								         <include name="*.jar" />
+							         </fileset>
+							         <pathelement path="${build.classpath}" />
+						         </classpath>
+					        </taskdef>
+			            </then>
+			         </if>
+		            <check_jalo_types />
+		            <stopwatch name="build" action="total" />
+	    		</then>
+	    		<else>
+	    			<echo message="Running in the production mode. The build will be skipped." />
+	    		</else>
+	    	</if>
+    	</sequential>
+    </macrodef>
+
+    <macrodef name="extensions_build" description="build extension">
+        <sequential>
+
+            <if>
+                <istrue value="${build.parallel}" />
+                <then>
+                    <foreachextparallel>
+                        <do>
+                            <if>
+                                <not>
+                                    <isset property="ext.@{extname}.warextension" />
+                                </not>
+                                <then>
+                                    <extension_build extname="@{extname}" />
+                                </then>
+                                <else>
+                                    <external_extension_build extname="@{extname}"/>
+                                </else>
+                            </if>
+                        </do>
+                    </foreachextparallel>
+                </then>
+                <else>
+                    <foreachext>
+                        <do>
+                            <if>
+                                <not>
+                                    <isset property="ext.@{extname}.warextension" />
+                                </not>
+                                <then>
+                                    <extension_build extname="@{extname}" />
+                                </then>
+                                <else>
+                                    <external_extension_build extname="@{extname}"/>
+                                </else>
+                            </if>
+                        </do>
+                    </foreachext>
+                </else>
+            </if>
+
+            <!--special hmc handling: do jspcompile after all other extensions
+                have copied there jsps to the hmc
+             -->
+            <if>
+                <and>
+                    <istrue value="${ext.hmc.installed}" />
+                </and>
+                <then>
+                    <ybuildhmcscripts filetype="js" />
+                    <ybuildhmcscripts filetype="css" />
+                </then>
+            </if>
+            <if>
+                <and>
+                    <istrue value="${ext.hmc.extension.webmodule.jspcompile}" />
+                    <istrue value="${build.jspcompile}" />
+                </and>
+                <then>
+                    <appserver_jspcompile extname="hmc" />
+                </then>
+            </if>
+
+            <!-- backoffice special handling: delete bof tmp folder -->
+            <delete dir="${HYBRIS_TEMP_DIR}/bofs" failonerror="false" includeemptydirs="true" quiet="true" />
+
+            <!-- allowing extensions to implement 'second pass' features like web-addons -->
+            <if>
+                <istrue value="${build.parallel}" />
+                <then>
+                    <foreachextparallel>
+                        <do>
+                            <callback extname="@{extname}" target="after_build_all_extensions"/>
+                        </do>
+                    </foreachextparallel>
+                </then>
+                <else>
+                    <foreachext>
+                        <do>
+                            <callback extname="@{extname}" target="after_build_all_extensions"/>
+                        </do>
+                    </foreachext>
+                </else>
+            </if>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="hmc_special_handling">
+        <sequential>
+            <onlyonce name="hmc_special_handling">
+                <once>
+                    <echo message="configuring hmc.." />
+                    <if>
+                        <istrue value="${ext.hmc.extension.hmcmodule.sourceavailable}" />
+                        <then>
+                            <property name="ext.hmc.xml.target" location="${ext.hmc.path}/web/src" />
+                        </then>
+                        <else>
+                            <property name="ext.hmc.xml.target" location="${ext.hmc.path}/web/webroot/WEB-INF/classes" />
+                        </else>
+                    </if>
+
+                    <copy todir="${ext.hmc.xml.target}/de/hybris/platform/hmc/">
+                        <fileset dir="${ext.hmc.path}/resources/hmc" includes="locales*.properties" />
+                        <fileset dir="${ext.hmc.path}/resources" includes="hmc.xsd" />
+                    </copy>
+
+                    <copy todir="${ext.hmc.xml.target}">
+                        <fileset dir="${ext.hmc.path}/resources">
+                            <include name="wysiwyg.xsd" />
+                            <include name="wysiwygdefault.css" />
+                            <include name="wysiwygdefault.xml" />
+                        </fileset>
+                    </copy>
+
+                    <copy file="${ext.hmc.xml.target}/de/hybris/platform/hmc/locales_en.properties" tofile="${ext.hmc.xml.target}/de/hybris/platform/hmc/locales.properties" overwrite="yes" />
+                    <ybuildhmcxml filename="${ext.hmc.xml.target}/de/hybris/platform/hmc/hmc.xml" />
+
+                    <ybuildhmcscripts filetype="js" />
+                    <ybuildhmcscripts filetype="css" />
+
+                    <!-- absolute path -->
+                    <yvalidatexml id="hmcxml" source="${ext.hmc.xml.target}/de/hybris/platform/hmc/hmc.xml" schema="${ext.hmc.xml.target}/de/hybris/platform/hmc/hmc.xsd" />
+
+                    <mkdir dir="${ext.hmc.xml.target}/de/hybris/platform/hmc/extension" />
+                    <echo file="${ext.hmc.xml.target}/de/hybris/platform/hmc/extension/hmcextensions.xml" message="${extensions.hmcextensions}" />
+                </once>
+            </onlyonce>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extensions_jspcompile">
+        <sequential>
+            <foreachext>
+                <do>
+                    <if>
+                        <and>
+                            <istrue value="${ext.@{extname}.extension.webmodule.jspcompile}" />
+                            <isset property="ext.@{extname}.webmodule.available" />
+                        </and>
+                        <then>
+                            <echo message="compiling @{extname} jsps..." />
+                            <appserver_jspcompile extname="@{extname}" />
+                        </then>
+                    </if>
+                </do>
+            </foreachext>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_build">
+        <attribute name="extname" />
+        <sequential>
+
+            <prepare />
+
+            <echo message="building extension '@{extname}'..." />
+
+            <callback extname="@{extname}" target="before_build" />
+            <outofdate>
+                <sourcefiles>
+                    <fileset dir="${ext.@{extname}.path}">
+                        <include name="src/**/*.java" />
+                        <include name="gensrc/**/*.java" />
+                        <include name="resources/*-items.xml" />
+                        <include name="testsrc/**" />
+                        <include name="web/src/**" />
+                        <include name="web/testsrc/**" />
+                        <include name="web/gensrc/**/*.java" />
+                        <include name="custom/src/**" />
+                        <include name="hmc/src/**" />
+                        <include name="hmc/resources/**" />
+                        <include name="hmc/jsp/**" />
+                    	<include name="hmc/testsrc/**" />
+                        <include name="backoffice/src/**" />
+                        <include name="backoffice/resources/**" />
+                        <include name="hac/src/**" />
+                    	<include name="hac/testsrc/**" />
+                        <include name="hac/resources/**" />
+                        <include name="*.properties" />
+                        <exclude name="platformhome.properties" />
+                        <include name="*.xml" />
+                    </fileset>
+                    <fileset dir="${platformhome}">
+                        <include name="*.properties" />
+                        <include name="resources/ext_build.xml" />
+                        <include name="*.xml" />
+                    </fileset>
+                    <fileset dir="${ext.@{extname}.path}">
+                        <include name="${ext.@{extname}.additional.src.dir}/**"/>
+                        <include name="${ext.@{extname}.additional.testsrc.dir}/**"/>
+                        <include name="${ext.@{extname}.additional.websrc.dir}/**"/>
+                        <include name="${ext.@{extname}.additional.webtestsrc.dir}/**"/>
+                    </fileset>
+                </sourcefiles>
+                <sequential>
+                    <if>
+                        <not>
+                            <isset property="ext.@{extname}.warextension" />
+                        </not>
+                        <then>
+                            <extension_prepare extname="@{extname}" />
+                            <extension_compile extname="@{extname}" />
+                            <mkdir dir="${HYBRIS_TEMP_DIR}/touch" />
+                            <touch file="${HYBRIS_TEMP_DIR}/touch/@{extname}_srctouch" />
+                        </then>
+                    </if>
+                </sequential>
+                <targetfiles path="${HYBRIS_TEMP_DIR}/touch/@{extname}_srctouch"/>
+            </outofdate>
+
+            <!-- Create TestClasses Files -->
+            <outofdate>
+                <sourcefiles>
+                    <fileset dir="${ext.@{extname}.path}">
+                        <include name="testsrc/**" />
+                        <include name="web/testsrc/**" />
+                    	<include name="hmc/testsrc/**" />
+                    	<include name="hac/testsrc/**" />
+                        <include name="${ext.@{extname}.additional.testsrc.dir}/**"/>
+                        <include name="${ext.@{extname}.additional.webtestsrc.dir}/**"/>
+                    	<include name="${ext.@{extname}.additional.hmctestsrc.dir}/**"/>
+                    	<include name="${ext.@{extname}.additional.hactestsrc.dir}/**"/>
+                    </fileset>
+                </sourcefiles>
+                <targetfiles path="${HYBRIS_TEMP_DIR}/touch/@{extname}_testsrctouch" />
+                <sequential>
+                    <mkdir dir="${ext.@{extname}.path}/resources/@{extname}" />
+                    <testClassesScanner extension="@{extname}" fileExtensions="java,groovy,${ext.@{extname}.native.file.extension}"
+                                        testSourceFolders="testsrc,${ext.@{extname}.additional.testsrc.dir}" />
+                    <mkdir dir="${HYBRIS_TEMP_DIR}/touch" />
+                    <touch file="${HYBRIS_TEMP_DIR}/touch/@{extname}_testsrctouch" />
+                </sequential>
+            </outofdate>
+
+            <callback extname="@{extname}" target="after_build" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="external_extension_build">
+        <attribute name="extname" />
+        <sequential>
+            <prepare />
+            <echo message="building external extension '@{extname}'..." />
+            <if>
+                <or>
+                    <not>
+                        <available file="${HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}/.lastupdate"/>
+                    </not>
+                    <uptodate targetfile="${ext.@{extname}.extension.meta.war}" srcfile="${HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}/.lastupdate" />
+                </or>
+                <then>
+                    <if>
+                        <available file="${ext.@{extname}.extension.meta.war}" type="file"/>
+                        <then>
+                            <delete dir="${HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}" failonerror="false" includeemptydirs="true"/>
+                            <unzip src="${ext.@{extname}.extension.meta.war}" dest="${HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}"/>
+                            <touch file="${loc.HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}/.lastupdate"/>
+                        </then>
+                        <else>
+                            <if>
+                                <available file="${ext.@{extname}.extension.meta.war}" type="dir"/>
+                                <then>
+                                    <if>
+                                        <not>
+                                            <available file="${HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}" type="dir"/>
+                                        </not>
+                                        <then>
+                                            <copy todir="${loc.HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}">
+                                                <fileset dir="${ext.@{extname}.extension.meta.war}"/>
+                                            </copy>
+                                            <touch file="${loc.HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}/.lastupdate"/>
+                                        </then>
+                                    </if>
+                                </then>
+                            </if>
+                        </else>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="compile_and_copy_web_addon" description="Special macro allowing to compile java code in some folder, package it with additional resources and copy it as jar to another extension's WEB-INF/lib">
+        <attribute name="tgtExt"/>
+        <attribute name="srcExt"/>
+        <attribute name="addonFolder"/>
+        <sequential>
+
+            <!-- source mode: check outdated and compile -->
+            <if>
+                <available file="${ext.@{srcExt}.path}/@{addonFolder}/src" type="dir" />
+                <then>
+                    <outofdate>
+                        <sourcefiles>
+                            <fileset dir="${ext.@{srcExt}.path}/@{addonFolder}">
+                                <include name="src/**" />
+                                <include name="gensrc/**" />
+                                <include name="testsrc/**" />
+                            </fileset>
+                        </sourcefiles>
+                        <targetfiles path="${ext.@{tgtExt}.path}/web/webroot/WEB-INF/lib/@{srcExt}_@{addonFolder}.jar" />
+                        <sequential>
+
+                            <echo message="Building web-addon from '@{srcExt}'..." />
+
+                            <mkdir dir="${ext.@{srcExt}.path}/@{addonFolder}/classes" />
+                            <mkdir dir="${ext.@{srcExt}.path}/@{addonFolder}/bin"/>
+                            <mkdir dir="${ext.@{srcExt}.path}/@{addonFolder}/classes/META-INF/resources/WEB-INF" />
+
+                            <javacompile destdir="${ext.@{srcExt}.path}/@{addonFolder}/classes">
+                                <additionalclasspath>
+                                    <fileset dir="${ext.@{tgtExt}.path}/web/webroot/WEB-INF" >
+                                        <include name="lib/*.jar" />
+                                    </fileset>
+                                    <pathelement path="${ext.@{tgtExt}.path}/web/webroot/WEB-INF/classes" />
+                                    <pathelement path="${ext.@{srcExt}.classpath}" />
+                                </additionalclasspath>
+                                <source>
+                                    <dirset dir="${ext.@{srcExt}.path}/@{addonFolder}">
+                                        <include name="src" />
+                                        <include name="resources" />
+                                    </dirset>
+                                </source>
+                            </javacompile>
+
+                            <!-- copy resources -->
+
+                            <copy todir="${ext.@{srcExt}.path}/@{addonFolder}/classes/META-INF/resources/WEB-INF" failonerror="false">
+                                <fileset dir="${ext.@{srcExt}.path}/@{addonFolder}/resources/" excludes="static/**" />
+                            </copy>
+
+                            <copy todir="${ext.@{srcExt}.path}/@{addonFolder}/classes/META-INF/resources" failonerror="false">
+                                <fileset dir="${ext.@{srcExt}.path}/@{addonFolder}/resources/" includes="static/**" />
+                            </copy>
+
+                            <!-- packaging -->
+
+                            <jar destfile="${ext.@{srcExt}.path}/@{addonFolder}/bin/@{srcExt}_@{addonFolder}.jar"
+                                 basedir="${ext.@{srcExt}.path}/@{addonFolder}/classes" />
+
+                            <!-- move to target folder -->
+
+                            <copy file="${ext.@{srcExt}.path}/@{addonFolder}/bin/@{srcExt}_@{addonFolder}.jar"
+                                  todir="${ext.@{tgtExt}.path}/web/webroot/WEB-INF/lib" overwrite="true"/>
+
+                        </sequential>
+                    </outofdate>
+                </then>
+                <!-- binary mode: check outdated and copy -->
+                <else>
+                    <outofdate>
+                        <sourcefiles>
+                            <file name="${ext.@{srcExt}.path}/@{addonFolder}/bin/@{srcExt}_@{addonFolder}.jar"/>
+                        </sourcefiles>
+                        <targetfiles path="${ext.@{tgtExt}.path}/web/webroot/WEB-INF/lib/@{srcExt}_@{addonFolder}.jar" />
+                        <sequential>
+                            <copy file="${ext.@{srcExt}.path}/@{addonFolder}/bin/@{srcExt}_@{addonFolder}.jar"
+                                  todir="${ext.@{tgtExt}.path}/web/webroot/WEB-INF/lib" overwrite="true"/>
+                        </sequential>
+                    </outofdate>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_compile">
+        <attribute name="extname" />
+        <sequential>
+            <extension_compile_core extname="@{extname}" />
+            <extension_generate_deployment extname="@{extname}" />
+            <extension_compile_web extname="@{extname}" />
+            <extension_compile_hmc extname="@{extname}" />
+            <extension_compile_backoffice extname="@{extname}" />
+        	<extension_compile_hac extname="@{extname}" />
+        </sequential>
+    </macrodef>
+
+	<macrodef name="extension_check_jalo_types">
+        <attribute name="extname" />
+        <sequential>
+            <if>
+                <available file="${ext.@{extname}.path}/resources/@{extname}-items.xml" />
+                <then>
+	                 <if>
+		                 <istrue value="${build.strict.compilation.mode}"/>
+		                 <then>
+		                    <taskdef name="ycheckjalotypes" classname="de.hybris.ant.taskdefs.compiling.checkitemsxml.CheckJaloTypes">
+		                        <classpath>
+		                            <pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+		                            <pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+		                            <pathelement path="${ext.@{extname}.classpath}" />
+		                        </classpath>
+		                    </taskdef>
+		                 </then>
+	                 </if>
+	                 <echo>checking file: ${ext.@{extname}.path}/resources/@{extname}-items.xml</echo>
+                    <ycheckjalotypes filename="${ext.@{extname}.path}/resources/@{extname}-items.xml"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+	
+    <macrodef name="extension_check_deployments">
+        <attribute name="extname" />
+        <sequential>
+            <if>
+                <available file="${ext.@{extname}.path}/resources/@{extname}-items.xml" />
+                <then>
+	                <echo>checking file: ${ext.@{extname}.path}/resources/@{extname}-items.xml</echo>
+                    <ycheckdeployments filename="${ext.@{extname}.path}/resources/@{extname}-items.xml"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_compile_core">
+        <attribute name="extname" />
+        <sequential>
+            <if>
+                <isset property="ext.@{extname}.coremodule.available" />
+                <then>
+                    <callback extname="@{extname}" target="before_compile_core" />
+
+                    <!--<mkdir dir="${DEPLOY_BASEDIR_@{extname}}" /> -->
+                    <if>
+                        <istrue value="${ext.@{extname}.extension.coremodule.sourceavailable}" />
+                        <then>
+                            <mkdir dir="${ext.@{extname}.path}/classes" />
+                            <!-- SOURCE RELEASE: compile source files -->
+
+                            <javacompile destdir="${ext.@{extname}.path}/classes">
+                                <additionalclasspath>
+                                    <fileset dir="${ext.@{extname}.path}">
+                                        <include name="${ext.@{extname}.additionalclasspath}" />
+                                    </fileset>
+                                    <pathelement path="${ext.@{extname}.classpath}"/>
+                                </additionalclasspath>
+                                <source>
+                                    <dirset dir="${ext.@{extname}.path}">
+                                        <include name="src" />
+                                        <include name="gensrc" />
+                                        <include name="testsrc" />
+                                    </dirset>
+                                </source>
+                            </javacompile>
+                        </then>
+                    </if>
+                    <!--source available -->
+                    <callback extname="@{extname}" target="after_compile_core" />
+                </then>
+            </if>
+            <!-- is core module -->
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_compile_web">
+        <attribute name="extname" />
+        <sequential>
+            <if>
+                <isset property="ext.@{extname}.webmodule.available" />
+                <then>
+                    <callback extname="@{extname}" target="before_compile_web" />
+
+                    <if>
+                        <istrue value="${ext.@{extname}.extension.webmodule.sourceavailable}" />
+                        <then>
+                            <if>
+                                <!-- SOURCE RELEASE: compile the sources and copy resources... -->
+                                <available file="${ext.@{extname}.path}/web/src" />
+                                <then>
+                                    <mkdir dir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+                                    <javacompile destdir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes">
+                                        <source>
+                                            <dirset dir="${ext.@{extname}.path}/web">
+                                                <include name="src" />
+                                                <!-- platformwebservices -->
+                                                <include name="gensrc" />
+                                            </dirset>
+                                        </source>
+                                        <additionalclasspath>
+                                            <fileset dir="${ext.@{extname}.path}/web/webroot">
+                                                <include name="WEB-INF/lib/**.jar" />
+                                            </fileset>
+                                            <fileset dir="${ext.@{extname}.path}">
+                                                <include name="bin/*.jar" />
+                                            </fileset>
+                                            <pathelement path="${ext.@{extname}.classpath}"/>
+                                        </additionalclasspath>
+                                    </javacompile>
+
+                                    <if>
+                                        <available file="${ext.@{extname}.path}/web/testsrc" />
+                                        <then>
+                                            <mkdir dir="${ext.@{extname}.path}/web/testclasses" />
+
+                                            <javacompile destdir="${ext.@{extname}.path}/web/testclasses">
+                                                <source>
+                                                    <dirset dir="${ext.@{extname}.path}/web">
+                                                        <include name="testsrc" />
+                                                    </dirset>
+                                                </source>
+                                                <additionalclasspath>
+                                                    <fileset dir="${ext.@{extname}.path}/web/webroot">
+                                                        <include name="WEB-INF/lib/**.jar" />
+                                                    </fileset>
+                                                    <fileset dir="${ext.@{extname}.path}">
+                                                        <include name="bin/*.jar" />
+                                                    </fileset>
+                                                    <dirset dir="${ext.@{extname}.path}/web/webroot/WEB-INF">
+                                                        <include name="classes" />
+                                                    </dirset>
+                                                     <pathelement path="${ext.@{extname}.classpath}"/>
+                                                </additionalclasspath>
+                                            </javacompile>
+                                        </then>
+                                    </if>
+                                    <!-- TODO: needed... copy resources to classes/ -->
+                                    <copy todir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes">
+                                        <fileset dir="${ext.@{extname}.path}/web/src">
+                                            <exclude name="**/*.java" />
+                                            <exclude name="**/*.groovy" />
+                                            <exclude name="**/*.scala" />
+                                            <exclude name="**/*.${ext.@{extname}.native.file.extension}" />
+                                        </fileset>
+                                    </copy>
+                                </then>
+                            </if>
+                        </then>
+                        <else>
+                            <!-- BINARY RELEASE: copy compiled classes from local classes dir to web -->
+							<if>
+                        		<available file="${ext.@{extname}.path}/web"/>
+	                        	<then>
+		                        	<copy todir="${ext.@{extname}.path}/web/webroot/WEB-INF">
+		                                <fileset dir="${ext.@{extname}.path}/web">
+		                                    <include name="classes/**" />
+		                                </fileset>
+		                            </copy>
+	                        	</then>
+                        	</if>
+                        </else>
+
+                    </if>
+
+                    <if>
+                        <istrue value="${webxml.validation}" />
+                        <then>
+                            <schemavalidate file="${ext.@{extname}.path}/web/webroot/WEB-INF/web.xml" />
+                        </then>
+                    </if>
+
+
+                    <if>
+                        <available file="${ext.@{extname}.path}/web/resources" />
+                        <then>
+                            <copy todir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes">
+                                <fileset dir="${ext.@{extname}.path}/web/resources" />
+                            </copy>
+                        </then>
+                    </if>
+
+                    <!-- do jspcompile in the following cases:
+                            a) jspcompile has to be activated AND
+                            b) do it not if the extension is hmc and we are called from the
+                               platform project and not from the extension project
+
+                         b) is due to the fact that we want to call the jspcompile of the hmc
+                            not during the extensions buildprocess but at the end of that.
+                            (we deactivate here and activate in extensions_build macro, see there)
+
+                     -->
+                    <if>
+                        <and>
+                            <istrue value="${ext.@{extname}.extension.webmodule.jspcompile}" />
+                            <or>
+                                <not>
+                                    <equals arg1="@{extname}" arg2="hmc" />
+                                </not>
+                                <not>
+                                    <equals arg1="${ant.project.name}" arg2="platform" />
+                                </not>
+                            </or>
+                        </and>
+                        <then>
+                            <if>
+                                <istrue value="${build.jspcompile}" />
+                                <then>
+                                    <appserver_jspcompile extname="@{extname}" />
+                                </then>
+                            </if>
+                        </then>
+                    </if>
+                    <callback extname="@{extname}" target="after_compile_web" />
+                </then>
+            </if>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_compile_hmc">
+        <attribute name="extname" />
+        <sequential>
+            <if>
+                <and>
+                    <istrue value="${ext.hmc.installed}" />
+                    <isset property="ext.@{extname}.hmcmodule.available" />
+                </and>
+                <then>
+                    <callback extname="@{extname}" target="before_compile_hmc" />
+
+                    <hmc_special_handling />
+                    <copy file="${ext.hmc.path}/resources/hmc.xsd" tofile="${ext.@{extname}.path}/hmc/resources/hmc.xsd" />
+
+                    <if>
+                        <istrue value="${ext.@{extname}.extension.hmcmodule.sourceavailable}" />
+                        <then>
+                            <if>
+                                <available file="${ext.@{extname}.path}/hmc/src" />
+                                <then>
+                                    <mkdir dir="${ext.@{extname}.path}/hmc/classes" />
+
+                                    <javacompile destdir="${ext.@{extname}.path}/hmc/classes">
+                                        <source>
+                                            <pathelement path="${ext.@{extname}.path}/hmc/src" />
+                                        </source>
+                                        <additionalclasspath>
+                                            <fileset dir="${ext.hmc.path}/web/webroot/WEB-INF/lib">
+                                                <include name="*.jar" />
+                                            </fileset>
+                                            <pathelement path="${ext.hmc.path}/web/webroot/WEB-INF/classes" />
+                                            <fileset dir="${ext.@{extname}.path}">
+                                                <include name="bin/*.jar" />
+                                            </fileset>
+                                             <pathelement path="${ext.@{extname}.classpath}"/>
+                                        </additionalclasspath>
+                                    </javacompile>
+                                	
+                                	<if>
+                                        <available file="${ext.@{extname}.path}/hmc/testsrc" />
+                                        <then>
+                                            <mkdir dir="${ext.@{extname}.path}/hmc/testclasses" />
+
+                                            <javacompile destdir="${ext.@{extname}.path}/hmc/testclasses">
+                                                <source>
+                                                    <dirset dir="${ext.@{extname}.path}/hmc">
+                                                        <include name="testsrc" />
+                                                    </dirset>
+                                                </source>
+                                                <additionalclasspath>
+                                                	<pathelement path="${ext.@{extname}.path}/hmc/classes" />
+                                                	<fileset dir="${ext.hmc.path}/web/webroot/WEB-INF/lib">
+    	                                                <include name="*.jar" />
+    	                                            </fileset>
+    	                                            <pathelement path="${ext.hmc.path}/web/webroot/WEB-INF/classes" />
+    	                                            <fileset dir="${ext.@{extname}.path}">
+    	                                                <include name="bin/*.jar" />
+    	                                            </fileset>
+    	                                            <pathelement path="${ext.@{extname}.classpath}"/>
+                                                </additionalclasspath>
+                                            </javacompile>
+                                        </then>
+                                    </if>
+
+                                    <echoxml file="${ext.@{extname}.path}/hmc/classes/rebel.xml" namespacePolicy="elementsOnly">
+                                        <application xmlns="http://www.zeroturnaround.com">
+                                            <classpath>
+                                                <dir name="${ext.@{extname}.path}/hmc/classes"/>
+                                            </classpath>
+                                        </application>
+                                    </echoxml>
+
+                                    <mkdir dir="${ext.@{extname}.path}/hmc/bin" />
+                                    <jar destfile="${ext.@{extname}.path}/hmc/bin/@{extname}hmc.jar" basedir="${ext.@{extname}.path}/hmc/classes">
+                                    </jar>
+                                </then>
+                            </if>
+                            <mkdir dir="${ext.@{extname}.path}/hmc/bin" />
+                            <jar update="true" destfile="${ext.@{extname}.path}/hmc/bin/@{extname}hmc.jar">
+                                <fileset dir="${ext.@{extname}.path}/hmc/resources" excludes="hmc.xml,hmc.xsd" />
+                            </jar>
+
+                        </then>
+                    </if>
+
+                    <!-- updating resources (and localizations in particular) in the hmc jars, even if sources are not available, see ECPX-57 -->
+                    <if>
+                       <and>
+                          <available file="${ext.@{extname}.path}/hmc/bin/@{extname}hmc.jar" />
+                          <available file="${ext.@{extname}.path}/hmc/resources" />
+                       </and>
+                       <then>
+                          <jar update="true" destfile="${ext.@{extname}.path}/hmc/bin/@{extname}hmc.jar">
+                             <fileset dir="${ext.@{extname}.path}/hmc/resources" excludes="hmc.xml,hmc.xsd" />
+                          </jar>
+                       </then>
+                    </if>
+
+                    <if>
+                        <available file="${ext.@{extname}.path}/hmc/jsp" />
+                        <then>
+                            <copy todir="${ext.hmc.path}/web/webroot" preservelastmodified="true">
+                                <fileset dir="${ext.@{extname}.path}/hmc/jsp" />
+                            </copy>
+                        </then>
+                    </if>
+
+                    <if>
+                        <available file="${ext.@{extname}.path}/hmc/bin/@{extname}hmc.jar" />
+                        <then>
+                            <copy file="${ext.@{extname}.path}/hmc/bin/@{extname}hmc.jar" todir="${ext.hmc.path}/web/webroot/WEB-INF/lib" />
+                        </then>
+                    </if>
+
+                    <callback extname="@{extname}" target="after_compile_hmc" />
+
+                </then>
+            </if>
+
+        </sequential>
+    </macrodef>
+
+	<macrodef name="extension_compile_backoffice">
+		<attribute name="extname" />
+		<sequential>
+			<if>
+				<istrue value="${ext.@{extname}.extension.meta.backoffice-module}" />
+				<then>
+					<if>
+						<available file="${ext.@{extname}.path}/backoffice/src" type="dir" />
+						<then>
+							<echo message="Building backoffice-module '@{extname}'..." />
+							<mkdir dir="${HYBRIS_TEMP_DIR}/bofs" />
+							<for list="${required.extensions.for.@{extname}}" delimiter="," param="reqExtName">
+								<sequential>
+									<if>
+										<istrue value="${ext.@{reqExtName}.extension.meta.backoffice-module}" />
+										<then>
+											<copy todir="${HYBRIS_TEMP_DIR}/bofs" failonerror="false" file="${ext.@{reqExtName}.path}/resources/backoffice/@{reqExtName}_bof.jar" />
+										</then>
+									</if>
+								</sequential>
+							</for>
+
+							<callback extname="@{extname}" target="before_compile_backoffice" />
+
+							<mkdir dir="${ext.@{extname}.path}/backoffice/classes" />
+							<javacompile destdir="${ext.@{extname}.path}/backoffice/classes">
+								<additionalclasspath>
+									<fileset dir="${ext.backoffice.path}/web/webroot/WEB-INF/lib">
+										<include name="*.jar" />
+									</fileset>
+									<pathelement path="${ext.backoffice.path}/web/webroot/WEB-INF/classes" />
+									<fileset dir="${HYBRIS_TEMP_DIR}/bofs">
+										<include name="*_bof.jar" />
+									</fileset>
+									<pathelement path="${ext.@{extname}.classpath}"/>
+								</additionalclasspath>
+								<source>
+									<dirset dir="${ext.@{extname}.path}/backoffice">
+										<include name="src" />
+										<include name="gensrc" />
+										<include name="testsrc" />
+									</dirset>
+								</source>
+							</javacompile>
+
+							<if>
+								<available file="${ext.@{extname}.path}/backoffice/resources" type="dir" />
+								<then>
+									<mkdir dir="${ext.@{extname}.path}/backoffice/classes/cockpitng" />
+									<copy todir="${ext.@{extname}.path}/backoffice/classes/cockpitng">
+										<fileset dir="${ext.@{extname}.path}/backoffice/resources" />
+									</copy>
+								</then>
+							</if>
+
+							<echoxml file="${ext.@{extname}.path}/backoffice/classes/rebel.xml" namespacePolicy="elementsOnly">
+								<application xmlns="http://www.zeroturnaround.com">
+									<classpath>
+										<dir name="${ext.@{extname}.path}/backoffice/classes"/>
+									</classpath>
+								</application>
+							</echoxml>
+
+							<jar destfile="${ext.@{extname}.path}/resources/backoffice/@{extname}_bof.jar" basedir="${ext.@{extname}.path}/backoffice/classes" excludes="**/rebel.xml" />
+							<callback extname="@{extname}" target="after_compile_backoffice" />
+						</then>
+					</if>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="extension_compile_hac">
+        <attribute name="extname" />
+        <sequential>
+            <if>
+                <istrue value="${ext.@{extname}.extension.meta.hac-module}" />
+                <then>
+                    <if>
+                        <available file="${ext.@{extname}.path}/hac/src" type="dir" />
+                        <then><echo message="Building hac-module '@{extname}'..." />
+                            <callback extname="@{extname}" target="before_compile_hac" />
+                            <mkdir dir="${ext.@{extname}.path}/hac/classes" />
+
+                            <javacompile destdir="${ext.@{extname}.path}/hac/classes">
+                                <additionalclasspath>
+                                    <fileset dir="${ext.hac.path}/web/webroot/WEB-INF/lib">
+                                        <include name="*.jar" />
+                                    </fileset>
+                                	<pathelement path="${ext.hac.path}/web/webroot/WEB-INF/classes" />
+                                    <pathelement path="${ext.@{extname}.classpath}"/>
+                                </additionalclasspath>
+                                <source>
+                                    <dirset dir="${ext.@{extname}.path}/hac">
+                                        <include name="src" />
+                                        <include name="gensrc" />
+                                        <include name="testsrc" />
+                                    </dirset>
+                                </source>
+                            </javacompile>
+                        	
+                        	<if>
+                                <available file="${ext.@{extname}.path}/hac/testsrc" />
+                                <then>
+                                    <mkdir dir="${ext.@{extname}.path}/hac/testclasses" />
+
+                                    <javacompile destdir="${ext.@{extname}.path}/hac/testclasses">
+                                        <source>
+                                            <dirset dir="${ext.@{extname}.path}/hac">
+                                                <include name="testsrc" />
+                                            </dirset>
+                                        </source>
+                                        <additionalclasspath>
+                                        	<pathelement path="${ext.@{extname}.path}/hac/classes" />
+                                        	<fileset dir="${ext.hac.path}/web/webroot/WEB-INF/lib">
+                                                <include name="*.jar" />
+                                            </fileset>
+                                            <pathelement path="${ext.hac.path}/web/webroot/WEB-INF/classes" />
+                                            <fileset dir="${ext.@{extname}.path}">
+                                                <include name="bin/*.jar" />
+                                            </fileset>
+                                            <pathelement path="${ext.@{extname}.classpath}"/>
+                                        </additionalclasspath>
+                                    </javacompile>
+                                </then>
+                            </if>
+                        	
+                            <mkdir dir="${ext.@{extname}.path}/hac/classes/META-INF/resources/WEB-INF" />
+                            <copy todir="${ext.@{extname}.path}/hac/classes/META-INF/resources/WEB-INF" failonerror="false">
+                                <fileset dir="${ext.@{extname}.path}/hac/resources/">
+									<exclude name="static/**"/>
+									<exclude name="messages*.properties"/>
+								</fileset>
+                            </copy>
+
+                            <copy todir="${ext.@{extname}.path}/hac/classes/META-INF/resources/WEB-INF" failonerror="false">
+                                <fileset dir="${ext.@{extname}.path}/hac/resources/">
+									<include name="messages*.properties"/>
+								</fileset>
+								<regexpmapper from="^messages(.*)\.properties$$" to="messages-@{extname}\1.properties"/>
+                            </copy>
+                        	
+                            <copy todir="${ext.@{extname}.path}/hac/classes/META-INF/resources" failonerror="false">
+                                <fileset dir="${ext.@{extname}.path}/hac/resources/" includes="static/**"/>
+                            </copy>
+
+                            <jar destfile="${platformhome}/ext/hac/web/webroot/WEB-INF/lib/@{extname}_hac.jar" basedir="${ext.@{extname}.path}/hac/classes" />
+                        	
+                            <callback extname="@{extname}" target="after_compile_hac" />
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- prepare custom dtos that override the generated dtos -->
+    <macrodef name="extension_customdtos">
+        <attribute name="extname" />
+        <attribute name="webservice.extname" />
+        <sequential>
+            <property name="customsrc@{extname}" value="custom/src" />
+            <if>
+                <and>
+                    <available file="${ext.@{extname}.path}/${customsrc@{extname}}" />
+                    <isset property="ext.@{webservice.extname}.path" />
+                </and>
+                <then>
+                    <sequential>
+                        <property name="customdto@{extname}" value="customdto" />
+                        <property name="dto@{extname}" value="dto" />
+                        <property name="customresource@{extname}" value="customresource" />
+                        <property name="resource@{extname}" value="resource" />
+                        <!-- copying custom dtos/resources to the folder with generated dtos/resources -->
+                        <copy todir="${ext.@{webservice.extname}.path}/web/gensrc" includeEmptyDirs="false">
+                            <fileset dir="${ext.@{extname}.path}/${customsrc@{extname}}">
+                                <include name="**/${customdto@{extname}}/**" />
+                                <include name="**/${customresource@{extname}}/**" />
+                            </fileset>
+                        </copy>
+                        <!-- replacement phase 1: import package improvement -->
+                        <replace dir="${ext.@{webservice.extname}.path}/web/gensrc" token=".${customdto@{extname}}" value=".${dto@{extname}}" includes="**/*.java" />
+                        <replace dir="${ext.@{webservice.extname}.path}/web/gensrc" token=".${customresource@{extname}}" value=".${resource@{extname}}" includes="**/*.java" />
+                        <!-- replacement phase 2: directory structure improvement -->
+                        <replace_dto_resource customsrc="${ext.@{extname}.path}/${customsrc@{extname}}" gensrc="${ext.@{webservice.extname}.path}/web/gensrc" replaceDtoPathSegFrom="${customdto@{extname}}" replaceDtoPathSegTo="${dto@{extname}}" replaceResourcePathSegFrom="${customresource@{extname}}" replaceResourcePathSegTo="${resource@{extname}}" />
+                        <!-- compiling the webservice extension -->
+                        <extension_compile extname="@{webservice.extname}" />
+                    </sequential>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="extension_prepare">
+        <attribute name="extname" />
+        <sequential>
+
+            <!--platformhome.properties -->
+            <echo file="${ext.@{extname}.path}/platformhome.properties"># this file is automatically generated by platform build process
+
+                # the extension name
+
+                extname=@{extname}
+
+                # path to the hybris platform installation directory
+                platformhome=${platformhome_unix_slash}
+
+            </echo>
+
+            <!--copy platform ext_build.xml to extension build.xml -->
+            <filter token="extname" value="@{extname}" />
+            <copy filtering="true" file="${platformhome}/resources/ext_build.xml" tofile="${ext.@{extname}.path}/build.xml" verbose="false" />
+
+            <!--extensioninfo.xml -->
+            <copy todir="${ext.@{extname}.path}" file="${platformhome}/resources/schemas/extensioninfo.xsd" failonerror="false" />
+            <yvalidatexml id="@{extname}extensioninfo" source="${ext.@{extname}.path}/extensioninfo.xml" schema="${platformhome}/resources/schemas/extensioninfo.xsd" />
+
+            <property name="@{extname}.items.xml" location="${ext.@{extname}.path}/resources/@{extname}-items.xml" />
+            <!-- TODO this line removing? used in antmacros static block! -->
+            <if>
+                <!-- @deprecated remove this if block in the 5.0 version -->
+                <available file="${ext.@{extname}.path}/resources/items.xml" />
+                <then>
+                    <three_one_update_items_xml path="${ext.@{extname}.path}/resources/items.xml" destiny="${@{extname}.items.xml}" />
+                </then>
+            </if>
+
+            <if>
+                <!-- @deprecated remove this if block in the 5.0 version -->
+                <available file="${ext.@{extname}.path}/resources/jar" type="dir" />
+                <then>
+                    <three_one_update_jar jarpath="${ext.@{extname}.path}/resources/jar" destiny="${ext.@{extname}.path}/resources" />
+                </then>
+            </if>
+
+            <!-- call gensource -->
+            <gensource />
+            <models_build />
+            <!-- prepare custom dtos that override the generated dtos -->
+
+            <extension_customdtos extname="@{extname}" webservice.extname="platformwebservices" />
+
+        </sequential>
+    </macrodef>
+
+</project>

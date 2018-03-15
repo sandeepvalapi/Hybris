@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- User Handling -->
+
+    <!-- User Service -->
+    <alias alias="userService" name="defaultUserService"/>
+    <bean id="defaultUserService" class="de.hybris.platform.servicelayer.user.impl.DefaultUserService"
+          parent="abstractBusinessService">
+        <property name="userDao" ref="userDao"/>
+        <property name="userGroupDao" ref="userGroupDao"/>
+        <property name="titleDao" ref="titleDao"/>
+        <property name="userAuditDao" ref="userAuditDao"/>
+        <property name="searchRestrictionService" ref="searchRestrictionService"/>
+        <property name="eventService" ref="eventService"/>
+        <property name="passwordEncoderService" ref="passwordEncoderService"/>
+        <property name="passwordPolicyService" ref="passwordPolicyService"/>
+        <property name="defaultPasswordEncoding" value="${default.password.encoding:*}"></property>
+    </bean>
+
+    <alias name="defaultContactInfoService" alias="contactInfoService"/>
+    <bean id="defaultContactInfoService" class="de.hybris.platform.servicelayer.user.impl.DefaultContactInfoService"/>
+
+    <!-- Address Service -->
+    <alias alias="addressService" name="defaultAddressService"/>
+    <bean id="defaultAddressService" class="de.hybris.platform.servicelayer.user.impl.DefaultAddressService"
+          parent="abstractBusinessService">
+        <property name="addressDao" ref="addressDao"/>
+    </bean>
+
+    <alias name="defaultPasswordEncoderService" alias="passwordEncoderService"/>
+    <bean id="defaultPasswordEncoderService"
+          class="de.hybris.platform.servicelayer.user.impl.DefaulPasswordEncoderService">
+        <property name="encoderFactory" ref="core.passwordEncoderFactory"/>
+    </bean>
+
+
+    <alias name="defaultPasswordPolicyService" alias="passwordPolicyService"/>
+    <bean id="defaultPasswordPolicyService"
+          class="de.hybris.platform.servicelayer.user.impl.DefaultPasswordPolicyService"/>
+
+    <bean id="regexPasswordPolicy" class="de.hybris.platform.servicelayer.user.impl.RegexPasswordPolicy">
+        <constructor-arg name="policyName" value="regex"/>
+        <property name="l10NService" ref="l10nService"/>
+    </bean>
+
+    <bean id="blacklistPasswordPolicy" class="de.hybris.platform.servicelayer.user.impl.BlacklistFilePasswordPolicy">
+        <constructor-arg name="policyName" value="blacklist"/>
+        <property name="l10NService" ref="l10nService"/>
+    </bean>
+
+    <bean id="userDao" class="de.hybris.platform.servicelayer.user.daos.impl.DefaultUserDao"/>
+    <bean id="userGroupDao" class="de.hybris.platform.servicelayer.user.daos.impl.DefaultUserGroupDao"/>
+    <bean id="titleDao" class="de.hybris.platform.servicelayer.user.daos.impl.DefaultTitleDao"/>
+    <bean id="addressDao" class="de.hybris.platform.servicelayer.user.daos.impl.DefaultAddressDao"/>
+    <bean id="userAuditDao" class="de.hybris.platform.servicelayer.user.daos.impl.DefaultUserAuditDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <!-- interceptors -->
+    <bean id="groupsCycleCheckValidator"
+          class="de.hybris.platform.servicelayer.user.interceptors.GroupsCycleCheckValidator"/>
+    <bean id="groupsCycleCheckValidatorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="groupsCycleCheckValidator"/>
+        <property name="typeCode" value="PrincipalGroup"/>
+    </bean>
+
+    <bean id="userPasswordEncodingPreparer"
+          class="de.hybris.platform.servicelayer.user.interceptors.UserPasswordEncodingPreparer">
+        <property name="passwordEncoderService" ref="passwordEncoderService"/>
+    </bean>
+    <bean id="UserPasswordEncodingPreparerMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="userPasswordEncodingPreparer"/>
+        <property name="typeCode" value="User"/>
+    </bean>
+
+    <alias name="defaultUserAuditFactory" alias="userAuditFactory"/>
+    <bean id="defaultUserAuditFactory" class="de.hybris.platform.servicelayer.user.impl.UserAuditFactory">
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="abstractUserAuditLoginStrategy"
+          class="de.hybris.platform.servicelayer.user.impl.AbstractUserAuditLoginStrategy" abstract="true">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultUserAuditLoginStrategy" alias="userAuditLoginStrategy"/>
+    <bean id="defaultUserAuditLoginStrategy"
+          class="de.hybris.platform.servicelayer.user.impl.DefaultUserAuditLoginStrategy"
+          parent="abstractUserAuditLoginStrategy">
+        <property name="userAuditFactory" ref="userAuditFactory"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <bean id="userAuditPrepareInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor">
+            <bean class="de.hybris.platform.servicelayer.user.interceptors.UserPasswordChangeAuditPrepareInterceptor">
+                <property name="userAuditFactory" ref="userAuditFactory"/>
+            </bean>
+        </property>
+        <property name="typeCode" value="User"/>
+    </bean>
+
+    <bean id="userHasOrderRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="userHasOrderRemoveInterceptor"/>
+        <property name="typeCode" value="User"/>
+        <property name="order" value="0"/>
+    </bean>
+
+    <bean id="userHasOrderRemoveInterceptor"
+          class="de.hybris.platform.servicelayer.user.interceptors.UserRemoveInterceptor"/>
+
+    <bean id="userPasswordEncodingValidator"
+          class="de.hybris.platform.servicelayer.user.interceptors.UserPasswordEncodingValidator">
+        <property name="passwordEncoderService" ref="passwordEncoderService"/>
+    </bean>
+    <bean id="userPasswordEncodingValidatorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="userPasswordEncodingValidator"/>
+        <property name="typeCode" value="User"/>
+    </bean>
+
+    <bean id="userAuthenticationTokensRemover"
+          class="de.hybris.platform.servicelayer.user.interceptors.UserAuthenticationTokensRemovePrepareInterceptor" >
+        <constructor-arg index="0" ref="timeService" />
+    </bean>
+    <bean id="userAuthenticationTokensRemoverMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="userAuthenticationTokensRemover"/>
+        <property name="typeCode" value="User"/>
+    </bean>
+
+    <bean id="modifySystemUsersInterceptor"
+          class="de.hybris.platform.servicelayer.user.interceptors.ModifySystemUsersInterceptor">
+        <property name="userService" ref="userService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="searchRestrictionService" ref="searchRestrictionService"/>
+    </bean>
+    <bean id="modifySystemUsersInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="modifySystemUsersInterceptor"/>
+        <property name="typeCode" value="Principal"/>
+    </bean>
+
+    <bean id="principalCatalogVersionsPrepareInterceptor"
+          class="de.hybris.platform.servicelayer.user.interceptors.PrincipalCatalogVersionsPrepareInterceptor"/>
+    <bean id="principalCatalogVersionsInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="principalCatalogVersionsPrepareInterceptor"/>
+        <property name="typeCode" value="Principal"/>
+    </bean>
+
+    <bean id="contactInfoPrepareInterceptor"
+          class="de.hybris.platform.servicelayer.user.interceptors.ContactInfoPrepareInterceptor">
+        <property name="keyGenerator" ref="contactInfoCodeGenerator"/>
+    </bean>
+    <bean id="contactInfoPrepareInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="contactInfoPrepareInterceptor"/>
+        <property name="typeCode" value="AbstractContactInfo"/>
+    </bean>
+
+
+    <!--
+    <bean id="customerIDPrepareInterceptor" class="de.hybris.platform.servicelayer.user.interceptors.CustomerIDPrepareInterceptor">
+        <property name="keyGenerator" ref="customerIDGenerator"/>
+    </bean>
+
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="customerIDPrepareInterceptor"/>
+        <property name="typeCode" value="Customer"/>
+    </bean>
+     -->
+
+</beans>

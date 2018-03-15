@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="hac_buildcallbacks" >
+
+	<macrodef name="hac_after_clean">
+		<sequential>
+			<echo level="info" message="Deleting hac extension jars"/>
+			<delete quiet="true">
+				<fileset dir="${ext.hac.path}/web/webroot/WEB-INF/lib">
+					<include name="*_hac.jar"/>
+				</fileset>
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<patternset id="extension.hac.source.filter">
+		<patternset refid="extension.source.filter" />
+		<exclude name="web/webroot/WEB-INF/lib/*_hac.jar"/>
+	</patternset>
+
+	<patternset id="extension.hac.binary.filter">
+		<patternset refid="extension.binary.filter" />
+		<exclude name="web/webroot/WEB-INF/lib/*_hac.jar"/>
+	</patternset>
+
+</project>

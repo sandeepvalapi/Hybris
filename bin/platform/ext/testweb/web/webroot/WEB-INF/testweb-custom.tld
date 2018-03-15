@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+		  version="2.1">
+
+	<tlib-version>1.2</tlib-version>
+	<short-name>testweb</short-name>
+
+	<tag>
+		<name>boolean</name>
+		<description>Renders img tag with boolean representation of state attribute.</description>
+		<tag-class>de.hybris.platform.testweb.taglib.BooleanRepresentationTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>state</name>
+			<required>true</required>
+			<type>boolean</type>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>cssClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>duration</name>
+		<description>Formats time duration into human readable form</description>
+		<tag-class>de.hybris.platform.testweb.taglib.DurationTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>value</name>
+			<required>true</required>
+			<type>long</type>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>format</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+</taglib>

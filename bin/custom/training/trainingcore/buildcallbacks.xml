@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+--><!--
+ All hybris buildcallbacks.xml macrodefinitions:
+ 
+ Build/Documentation
+ 
+	 before/after ant macro "clean"
+		 <macrodef name="trainingcore_before_clean"/>
+		 <macrodef name="trainingcore_after_clean"/>
+
+	 before/after ant macro "build"
+		 <macrodef name="trainingcore_before_build"/>
+		 <macrodef name="trainingcore_after_build"/>
+
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="trainingcore_before_compile_core">
+		 <macrodef name="trainingcore_after_compile_core">
+
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="trainingcore_before_compile_web" />
+		 <macrodef name="trainingcore_after_compile_web" />
+
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="trainingcore_before_compile_hmc" />
+		 <macrodef name="trainingcore_after_compile_hmc" />
+ 
+ Preparing extension
+ 
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)
+		 <macrodef name="trainingcore_only_once_prepare"/>
+ 
+ Creating ear module/production
+ 
+	 before/after ant macro "ear"
+		 <macrodef name="trainingcore_before_ear"/>
+		 <macrodef name="trainingcore_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="trainingcore_before_production" />
+		 <macrodef name="trainingcore_after_production" />
+ 
+ JUnit Test
+ 
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="trainingcore_before_yunitinit" />
+		 <macrodef name="trainingcore_after_yunitinit" />
+
+	 before/after ant macro "yunit"
+		 <macrodef name="trainingcore_before_yunit" />
+		 <macrodef name="trainingcore_after_yunit" /> 
+
+ Distribution package
+ 
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="trainingcore_after_dist"/>
+		 <macrodef name="trainingcore_before_dist"/>
+
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="trainingcore_before_dist_copy"/>
+		 <macrodef name="trainingcore_after_dist_copy"/>
+
+--><project name="trainingcore_buildcallbacks">
+
+	<macrodef name="trainingcore_after_build">
+		<sequential>
+			<impexGenerate extname="trainingcore"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="trainingcore_after_clean">
+		<sequential>
+			<delete failonerror="false" file="${ext.trainingcore.path}/resources-lang/touch_impexgen"/>
+		</sequential>
+	</macrodef>
+	
+	<!-- exclude impex files from localization --> 
+	<patternset id="trainingcore.localization.pattern">
+		<patternset refid="localization.defaultpattern"/>
+		<exclude name="**/*.impex"/>
+	</patternset>
+	
+
+</project>

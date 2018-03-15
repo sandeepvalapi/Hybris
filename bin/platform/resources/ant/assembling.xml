@@ -1,0 +1,1098 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- 
+
+XXXX
+
+ -->
+<project name="project.assembling">
+
+	<macrodef name="buildwar">
+		<attribute name="extname" />
+		<attribute name="destdir" default="WAR" />
+		<sequential>
+			<!-- Create temp folder, make like for ear-->
+			<delete dir="${HYBRIS_TEMP_DIR}/@{destdir}" failonerror="false" />
+			<!-- copy platform resources, make like for ear  -->
+			<ear_copy_resources destdir="@{destdir}" />
+			<yAppendJars2Manifest earPath="${HYBRIS_TEMP_DIR}/@{destdir}" manifest="${HYBRIS_TEMP_DIR}/@{destdir}/warmanifest.tmpl" />
+			<ear_copy_extension extname="@{extname}" destdir="${HYBRIS_TEMP_DIR}/@{destdir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ear_copy_resources">
+		<attribute name="destdir" />
+		<sequential>
+			<if>
+				<isset property="glassfish" />
+				<then>
+					<property name="lib_dest_dir" value="lib" />
+				</then>
+				<else>
+					<property name="lib_dest_dir" value="libs" />
+				</else>
+			</if>
+
+			<filter token="extensions.ear.webmodules" value="${extensions.ear.webmodules}" />
+			<!-- Merge preferrerd application packages for WebLogic from all extensions -->
+            <ygenweblogicpackages/>
+            <filter token="weblogic.prefer-application-packages" value="${weblogic.prefer-application-packages}" />
+
+			<!--libs folder-->
+			<copy filtering="false" todir="${HYBRIS_TEMP_DIR}/@{destdir}/${lib_dest_dir}">
+				<fileset dir="${platformhome}/lib/dbdriver">
+					<include name="**/**" />
+				</fileset>
+			</copy>
+
+			<!-- platform folder -->
+			<copy filtering="false" todir="${HYBRIS_TEMP_DIR}/@{destdir}/bin/platform">
+				<fileset file="${platformhome}/project.properties" />
+				<fileset file="${platformhome}/extensions.xml" />
+				<fileset file="${platformhome}/tenant_*.properties" />
+			</copy>
+
+			<copy filtering="false" todir="${HYBRIS_TEMP_DIR}/@{destdir}/${lib_dest_dir}">
+				<fileset file="${HYBRIS_BOOTSTRAP_BIN_DIR}/models.jar" />
+			</copy>
+
+			<copy filtering="false" todir="${HYBRIS_TEMP_DIR}/@{destdir}/bin/platform/resources">
+				<fileset file="${platformhome}/resources/advanced.properties" />
+			</copy>
+
+			<!--repack because manifest of original bootstrap.jar cannot be read by websphere -->
+			<jar jarfile="${HYBRIS_TEMP_DIR}/@{destdir}/${lib_dest_dir}/hybrisbootstrap.jar">
+				<zipfileset src="${platformhome}/bootstrap/bin/ybootstrap.jar">
+				</zipfileset>
+			</jar>
+
+			<!--META-INF folder-->
+			<if>
+				<isset property="glassfish" />
+				<then>
+					<copy filtering="true" todir="${HYBRIS_TEMP_DIR}/@{destdir}">
+						<fileset dir="${platformhome}/resources/ear">
+							<include name="META-INF/**" />
+							<exclude name="META-INF/weblogic-application.xml" />
+							<exclude name="META-INF/jboss-app.xml" />
+						</fileset>
+					</copy>
+				</then>
+				<else>
+					<copy filtering="true" todir="${HYBRIS_TEMP_DIR}/@{destdir}">
+						<fileset dir="${platformhome}/resources/ear">
+							<include name="META-INF/**" />
+						</fileset>
+					</copy>
+				</else>
+			</if>
+
+			<!--config folder-->
+			<if>
+				<isset property="glassfish" />
+				<then>
+					<copy todir="${HYBRIS_TEMP_DIR}/@{destdir}/lib" verbose="true">
+						<fileset dir="${HYBRIS_CONFIG_DIR}/licence">
+							<include name="**" />
+						</fileset>
+					</copy>
+					<copy todir="${HYBRIS_TEMP_DIR}/@{destdir}/config" verbose="true">
+						<fileset dir="${HYBRIS_CONFIG_DIR}">
+							<include name="security/**" />
+                            <include name="solr/**" />
+							<include name="localextensions.xml" />
+							<include name="local.properties" />
+						</fileset>
+					</copy>
+				</then>
+				<else>
+					<copy todir="${HYBRIS_TEMP_DIR}/@{destdir}/config" verbose="true">
+						<fileset dir="${HYBRIS_CONFIG_DIR}">
+							<include name="licence/**" />
+							<include name="security/**" />
+                            <include name="solr/**" />
+							<include name="localextensions.xml" />
+							<include name="local.properties" />
+						</fileset>
+					</copy>
+				</else>
+			</if>
+
+			<echo append="true" file="${HYBRIS_TEMP_DIR}/@{destdir}/config/local.properties">
+
+# Generated properties needed for production mode
+hmc.debug.showjspcomments=false
+hmc.developermode=false</echo>
+
+			<!--data folder-->
+			<copy todir="${HYBRIS_TEMP_DIR}/@{destdir}/data">
+				<fileset dir="${HYBRIS_DATA_DIR}">
+					<include name="build.number" />
+				</fileset>
+			</copy>
+
+			<!-- create other env folders -->
+			<mkdir dir="${HYBRIS_TEMP_DIR}/@{destdir}/bin" />
+			<mkdir dir="${HYBRIS_TEMP_DIR}/@{destdir}/log" />
+			<mkdir dir="${HYBRIS_TEMP_DIR}/@{destdir}/temp" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="buildear">
+		<attribute name="destdir" default="EAR" />
+		<attribute name="tempdir" default="temp_ear" />
+        <attribute name="tempwardir" default="temp_war" />
+		<sequential>
+			<echo message="Building platform before EAR creation" />
+			<build />
+
+			<echo message="Building 'EAR' file" />
+
+			<!-- Create temp folder -->
+			<mkdir dir="${HYBRIS_TEMP_DIR}/@{tempdir}" />
+            <mkdir dir="${HYBRIS_TEMP_DIR}/@{tempwardir}" />
+
+			<!-- copy platform resources -->
+			<ear_copy_resources destdir="@{tempdir}" />
+
+			<!-- Build extensions -->
+			<foreachext>
+				<do>
+					<extension_build_jar extname="@{extname}" earlibdir="${HYBRIS_TEMP_DIR}/@{tempdir}/lib" />
+				</do>
+			</foreachext>
+
+			<!-- Create manifests -->
+			<if>
+				<isset property="glassfish" />
+				<then>
+					<echo file="${HYBRIS_TEMP_DIR}/@{tempdir}/warmanifest.tmpl">Manifest-Version: 1.0
+Created-By: hybris Platform (hybris AG)</echo>
+					<echo file="${HYBRIS_TEMP_DIR}/@{tempdir}/earmanifest.tmpl">Manifest-Version: 1.0
+Created-By: hybris Platform (hybris AG)</echo>
+				</then>
+				<else>
+					<if>
+						<equals arg1="${appserver}" arg2="weblogic"/>
+						<then>
+							<!-- Create default weblogic.xml template -->
+							<echo file="${HYBRIS_TEMP_DIR}/@{tempdir}/weblogic-xml.tmpl"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app">
+    <container-descriptor>
+        <prefer-web-inf-classes>true</prefer-web-inf-classes>
+    </container-descriptor>
+</weblogic-web-app>]]></echo>
+						</then>
+						<else>
+							<yAppendJars2Manifest earPath="${HYBRIS_TEMP_DIR}/@{tempdir}" manifest="${HYBRIS_TEMP_DIR}/@{tempdir}/warmanifest.tmpl" />
+							<yAppendJars2Manifest earPath="${HYBRIS_TEMP_DIR}/@{tempdir}" manifest="${HYBRIS_TEMP_DIR}/@{tempdir}/earmanifest.tmpl" />
+						</else>
+					</if>
+				</else>
+			</if>
+
+	<echo file="${HYBRIS_TEMP_DIR}/@{tempdir}/warmanifest.tmpl">Manifest-Version: 1.0
+Created-By: hybris Platform (hybris AG)</echo>
+			<echo file="${HYBRIS_TEMP_DIR}/@{tempdir}/earmanifest.tmpl">Manifest-Version: 1.0
+Created-By: hybris Platform (hybris AG)</echo>
+
+
+			<!-- Copy extensions -->
+			<foreachext>
+				<do>
+					<if>
+						<or>
+							<not>
+								<isset property="ext.@{extname}.warextension"/>
+							</not>
+							<isfalse value="${ext.@{extname}.warextension}"/>
+						</or>
+						<then>
+							<ear_copy_extension extname="@{extname}" destdir="${HYBRIS_TEMP_DIR}/@{tempdir}" />
+						</then>
+					</if>
+				</do>
+			</foreachext>
+
+			<!-- notify all extensions -->
+			<property name="ear.path" value="${HYBRIS_TEMP_DIR}/@{tempdir}" />
+			<foreachext>
+				<do>
+					<callback extname="@{extname}" target="before_ear" />
+				</do>
+			</foreachext>
+
+			<!-- remove old groovy library (from btg) -->
+			<if>
+				<and>
+					<isset property="glassfish" />
+					<available file="${HYBRIS_TEMP_DIR}/@{tempdir}/lib/groovy-1.7.4.jar" />
+				</and>
+				<then>
+					<delete file="${HYBRIS_TEMP_DIR}/@{tempdir}/lib/groovy-1.7.4.jar" />
+				</then>
+			</if>
+
+			<!--  create resources.jar -->
+			<if>
+				<and>
+					<isset property="glassfish" />
+					<available file="${HYBRIS_TEMP_DIR}/@{tempdir}/impexdata" />
+				</and>
+				<then>
+					<echo message="creatig resources.jar" />
+					<jar manifest="${HYBRIS_TEMP_DIR}/@{tempdir}/earmanifest.tmpl" file="${HYBRIS_TEMP_DIR}/@{tempdir}/lib/resources.jar">
+						<fileset dir="${HYBRIS_TEMP_DIR}/@{tempdir}/impexdata" />
+					</jar>
+					<delete dir="${HYBRIS_TEMP_DIR}/@{tempdir}/impexdata" />
+				</then>
+			</if>
+
+            <!-- create hybris-weblogic manifest-only jar -->
+            <if>
+                <equals arg1="${appserver}" arg2="weblogic"/>
+                <then>
+					<echo file="${HYBRIS_TEMP_DIR}/@{tempdir}/weblogicmanifest.tmpl">Manifest-Version: 1.0
+Created-By: hybris Platform (hybris AG)</echo>
+
+					<yAppendJars2Manifest earPath="${HYBRIS_TEMP_DIR}/@{tempdir}" manifest="${HYBRIS_TEMP_DIR}/@{tempdir}/weblogicmanifest.tmpl" />
+
+					<mkdir dir="${HYBRIS_TEMP_DIR}/@{tempdir}/lib" />
+					<jar manifest="${HYBRIS_TEMP_DIR}/@{tempdir}/weblogicmanifest.tmpl" destfile="${HYBRIS_TEMP_DIR}/@{tempdir}/lib/hybris-weblogic.jar"/>
+				</then>
+			</if>
+
+			<!-- zip the complete ear -->
+			<mkdir dir="${HYBRIS_TEMP_DIR}/@{destdir}" />
+			<jar manifest="${HYBRIS_TEMP_DIR}/@{tempdir}/earmanifest.tmpl" file="${HYBRIS_TEMP_DIR}/@{destdir}/hybrisplatform.ear" zip64mode="as-needed">
+				<fileset dir="${HYBRIS_TEMP_DIR}/@{tempdir}">
+					<exclude name="hybrisplatform.ear" />
+					<exclude name="earmanifest.tmpl" />
+					<exclude name="warmanifest.tmpl" />
+                    <exclude name="weblogicmanifest.tmpl" />
+                    <exclude name="weblogic-xml.tmpl" />
+				</fileset>
+			</jar>
+
+			<echo message="*********************************************************" />
+			<echo message="EAR file built successful. Placed to ${HYBRIS_TEMP_DIR}/@{destdir}." />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ear_copy_extension">
+		<attribute name="extname" />
+		<attribute name="destdir" />
+        <attribute name="tempdir" default="temp_ear" />
+        <attribute name="tempwardir" default="temp_war" />
+
+		<sequential>
+			<propertyregex regexp="\\" input="@{destdir}/bin" replace="/" property="destdir.normalized" override="true" defaultValue="@{destdir}/bin" />
+			<propertyregex regexp="\\" input="${HYBRIS_BIN_DIR}" replace="/" property="HYBRIS_BIN_DIR.normalized" override="true" defaultValue="${HYBRIS_BIN_DIR}" />
+			<propertyregex regexp="\\" input="${ext.@{extname}.path}" replace="/" property="extension.normalized" override="true" defaultValue="${ext.@{extname}.path}" />
+			<propertyregex casesensitive="false" regexp="${HYBRIS_BIN_DIR.normalized}[/,\\]" input="${extension.normalized}" replace="${destdir.normalized}/" property="destdir.extension" override="true" defaultValue="${destdir.normalized}/@{extname}" />
+
+            <propertyregex regexp="\\" input="@{extname}" replace="/" property="extname" override="true" defaultValue="@{extname}" />
+            <propertyregex regexp="\\" input="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}/WEB-INF/" replace="/" property="ext.tempwar.webinf" override="true" defaultValue="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}/WEB-INF/" />
+            <propertyregex regexp="\\" input="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}/WEB-INF/tags" replace="/" property="ext.tempwar.tagspath" override="true" defaultValue="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}/WEB-INF/tags" />
+			<if>
+				<isset property="glassfish" />
+				<then>
+					<copy todir="${destdir.extension}">
+						<fileset dir="${extension.normalized}">
+							<exclude name="bin/**" />
+							<exclude name="lib/**" />
+							<exclude name="web/**" />
+							<exclude name="hmc/**" />
+							<exclude name="buildcallbacks.xml" />
+							<exclude name="resources/**" />
+							<include name="extensioninfo.xml" />
+							<include name="project.properties" />
+							<include name="tenant_*.properties" />
+							<include name="acceleratoraddon/**" />
+						</fileset>
+					</copy>
+					<if>
+						<available file="${extension.normalized}/lib" />
+						<then>
+							<copy todir="@{destdir}/lib">
+								<fileset dir="${extension.normalized}/lib">
+									<include name="**" />
+								</fileset>
+							</copy>
+						</then>
+					</if>
+					<if>
+						<available file="${extension.normalized}/resources/security" />
+						<then>
+							<copy todir="@{destdir}/config/security">
+								<fileset dir="${extension.normalized}/resources/security">
+									<include name="**" />
+								</fileset>
+							</copy>
+						</then>
+					</if>
+					<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/lib/@{extname}resources.jar">
+						<fileset dir="${extension.normalized}/resources">
+							<!-- <exclude name="impex/**"/> -->
+						</fileset>
+					</jar>
+					<if>
+						<available file="${extension.normalized}/resources" />
+						<then>
+							<var name="prop.directory.contents" unset="true" />
+							<var name="prop.directory.contents.newline.separated" unset="true" />
+							<fileset id="directory.contents" dir="${extension.normalized}/resources" includes="**" />
+							<property name="prop.directory.contents" refid="directory.contents" />
+							<propertyregex property="prop.directory.contents.newline.separated" input="${prop.directory.contents}" regexp=";" replace="${line.separator}" global="true" />
+							<echo file="@{destdir}/impexdata/@{extname}.index.txt">${prop.directory.contents.newline.separated}</echo>
+							<!-- <copy todir="@{destdir}/impexdata/@{extname}">
+						<fileset dir="${extension.normalized}/resources/impex"/>
+					</copy> -->
+						</then>
+					</if>
+				</then>
+				<else>
+					<copy todir="${destdir.extension}">
+						<fileset dir="${extension.normalized}">
+							<include name="bin/**" />
+							<include name="lib/**" />
+							<include name="resources/**" />
+							<exclude name="resources/commons-logging.properties" />
+							<exclude name="web/**" />
+							<exclude name="hmc/**" />
+							<exclude name="buildcallbacks.xml" />
+							<include name="extensioninfo.xml" />
+							<include name="project.properties" />
+							<include name="tenant_*.properties" />
+							<include name="acceleratoraddon/**" />
+						</fileset>
+					</copy>
+				</else>
+			</if>
+			<callback extname="@{extname}" target="before_war" />
+			<if>
+				<isset property="ext.@{extname}.webmodule.available" />
+				<then>
+					<if>
+						<isset property="war.exclude.filter" />
+						<then>
+							<echo>Filtering libraries in war :${war.exclude.filter}</echo>
+							<if>
+								<and>
+									<isset property="glassfish" />
+									<equals arg1="@{extname}" arg2="platformwebservices" />
+								</and>
+								<then>
+									<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/@{extname}.war">
+										<fileset dir="${ext.@{extname}.path}/web/webroot">
+											<exclude name="sys_*/**" />
+											<exclude name="WEB-INF/lib/**" />
+											<exclude name="WEB-INF/classes/**" />
+											<exclude name="*/**/hmc.xsd" />
+											<exclude name="${war.exclude.filter}" />
+											<!-- do not include content -->
+										</fileset>
+									</jar>
+									<if>
+										<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" />
+										<then>
+											<copy todir="@{destdir}/lib">
+												<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" />
+											</copy>
+										</then>
+									</if>
+									<if>
+										<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+										<then>
+											<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/lib/@{extname}server.jar">
+												<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+											</jar>
+										</then>
+									</if>
+								</then>
+								<else>
+									<ygenmissingtldfiles implicitTldTemplate="${platformhome}/bootstrap/resources/implicit.tld"/>
+									<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/@{extname}.war">
+										<fileset dir="${ext.@{extname}.path}/web/webroot">
+											<exclude name="sys_*/**" />
+											<exclude name="*/**/hmc.xsd" />
+											<exclude name="${war.exclude.filter}" />
+											<!-- do not include content -->
+										</fileset>
+									</jar>
+								</else>
+							</if>
+						</then>
+						<else>
+							<if>
+								<and>
+									<isset property="glassfish" />
+									<equals arg1="@{extname}" arg2="platformwebservices" />
+								</and>
+								<then>
+									<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/@{extname}.war">
+										<fileset dir="${ext.@{extname}.path}/web/webroot">
+											<exclude name="sys_*/**" />
+											<exclude name="WEB-INF/lib/**" />
+											<exclude name="WEB-INF/classes/**" />
+											<exclude name="*/**/hmc.xsd" />
+											<!-- do not include content -->
+										</fileset>
+									</jar>
+									<if>
+										<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" />
+										<then>
+											<copy todir="@{destdir}/lib">
+												<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" />
+											</copy>
+										</then>
+									</if>
+									<if>
+										<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+										<then>
+											<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/lib/@{extname}server.jar">
+												<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes" />
+											</jar>
+										</then>
+									</if>
+								</then>
+								<else>
+									<if>
+										<!-- each extensions needs weblogic.xml descriptor -->
+										<equals arg1="${appserver}" arg2="weblogic"/>
+										<then>
+											<!-- Copy extension to temp directory in order to add weblogic.xml descriptor before creating war -->
+											<copy todir="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}">
+												<fileset dir="${ext.@{extname}.path}/web/webroot">
+													<exclude name="sys_*/**" />
+													<exclude name="*/**/hmc.xsd" />
+													<!-- do not include content -->
+												</fileset>
+											</copy>
+
+											<if>
+												<not>
+													<available file="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}/WEB-INF/weblogic.xml"/>
+												</not>
+												<then>
+													<!-- extension does not provide custom weblogic.xml file so we copy default  -->
+													<copy file="${HYBRIS_TEMP_DIR}/@{tempdir}/weblogic-xml.tmpl" tofile="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}/WEB-INF/weblogic.xml" overwrite="false"/>
+												</then>
+											</if>
+
+											<ygenmissingtldfiles implicitTldTemplate="${platformhome}/bootstrap/resources/implicit.tld"/>
+											<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/@{extname}.war">
+												<fileset dir="${HYBRIS_TEMP_DIR}/@{tempwardir}/@{extname}"/>
+											</jar>
+										</then>
+										<else>
+											<jar manifest="@{destdir}/warmanifest.tmpl" destfile="@{destdir}/@{extname}.war">
+												<fileset dir="${ext.@{extname}.path}/web/webroot">
+													<exclude name="sys_*/**" />
+													<exclude name="*/**/hmc.xsd" />
+													<!-- do not include content -->
+												</fileset>
+											</jar>
+										</else>
+									</if>
+
+								</else>
+							</if>
+						</else>
+					</if>
+				</then>
+			</if>
+			<callback extname="@{extname}" target="after_war" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="cleanear">
+		<attribute name="destdir" default="EAR" />
+		<attribute name="tempdir" default="temp_ear" />
+        <attribute name="tempwardir" default="temp_war" />
+		<sequential>
+			<delete dir="${HYBRIS_TEMP_DIR}/@{tempdir}" />
+			<delete dir="${HYBRIS_TEMP_DIR}/@{destdir}">
+				<include name="hybrisplatform.ear" />
+			</delete>
+            <delete dir="${HYBRIS_TEMP_DIR}/@{tempwardir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="cleanwar">
+		<attribute name="extname" />
+		<attribute name="destdir" default="WAR" />
+		<sequential>
+			<delete file="${HYBRIS_TEMP_DIR}/@{destdir}/@{extname}.war" failonerror="false" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="cleanproduction">
+		<attribute name="destdir" default="${production.output.path}" />
+		<sequential>
+			<delete dir="@{destdir}/bin" />
+			<delete dir="@{destdir}/config" failonerror="false" />
+			<delete dir="@{destdir}/tomcat" failonerror="false" />
+			<delete dir="@{destdir}/temp" failonerror="false" />
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="production">
+		<attribute name="destdir" default="${production.output.path}" />
+		<sequential>
+			<if>
+				<and>
+					<istrue value="${production.legacy.mode}"/>
+					<isfalse value="${production.include.tomcat}"/>
+				</and>
+				<then>
+					<fail message="Error - production.legacy.mode flag is set to true but production.include.tomcat flag is NOT set to true. Exiting."/>
+				</then>
+			</if>
+			<if>
+				<isfalse value="${production.testbuild}" />
+				<then>
+					<echo message="Building hybris Server Production Zips to '@{destdir}'" />
+					<cleanproduction />
+					<build />
+					<!-- loading packaging files in order -->
+					<property file="${HYBRIS_CONFIG_DIR}/packaging.properties" />
+					<property file="${platformhome}/resources/ant/dist/packaging.properties" />
+					<if>
+						<isfalse value="${production.legacy.mode}"/>
+						<then>
+							<typedef name="platformHome.replace.filter" classname="de.hybris.ant.taskdefs.PlatformHomeReplaceFilter" classpath="${platformhome}/bootstrap/bin/yant.jar;${platformhome}/bootstrap/bin/ybootstrap.jar;${platformhome}/ext/core/lib/guava-21.0.jar"/>
+							<mkdir dir="@{destdir}/temp/tomcat/conf"/>
+							<var name="production.generate.contextes" unset="true"/>
+							<property name="production.generate.contextes" value="true"/>
+							<var name="setplatformprops_executed" unset="true"/>
+							<ysetplatformproperties/>
+							<var name="DEPLOY_VMSTARTDIR" unset="true"/>
+							<var name="FILTER_JAVAOPTIONS" unset="true"/>
+							<property name="DEPLOY_VMSTARTDIR" location="${bundled.tomcat.home}/bin" />
+							<property name="FILTER_JAVAOPTIONS" value="${tomcat.generaloptions} -DPLATFORM_HOME=&quot;%PLATFORM_HOME%&quot; -Duseconfig=${useconfig} -DHYBRIS_BIN_DIR=&quot;${HYBRIS_BIN_DIR}&quot; -DHYBRIS_CONFIG_DIR=&quot;${HYBRIS_CONFIG_DIR}&quot; -DHYBRIS_DATA_DIR=&quot;${HYBRIS_DATA_DIR}&quot; -DHYBRIS_LOG_DIR=&quot;${HYBRIS_LOG_DIR}&quot; -DHYBRIS_TEMP_DIR=&quot;${HYBRIS_TEMP_DIR}&quot;" />
+
+
+							<yjavaoptionsproperty name="tomcat.wrapper.javaoptions" value="${FILTER_JAVAOPTIONS} ${tomcat.javaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration}" />
+							<yjavaoptionsproperty name="tomcat.wrapper.debugjavaoptions" value="${FILTER_JAVAOPTIONS} ${tomcat.debugjavaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration}" />
+							<yjavaoptionsproperty name="tomcat.wrapper.jprofilerjavaoptions" value='${FILTER_JAVAOPTIONS} -agentlib:jprofilerti=port=8849 -Xbootclasspath/a:"${jprofiler.path}/bin/agent.jar"  ${tomcat.javaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration}' />
+							<yjavaoptionsproperty name="tomcat.wrapper.yourkitprofilerjavaoptions" value="${FILTER_JAVAOPTIONS} -agentlib:yjpagent ${tomcat.javaoptions} -Ddeployed.server.type=${bundled.server.type} ${ltw.configuration}" />
+
+							<property name="tomcat.wrapper.startport" value="32000" />
+							<property name="tomcat.wrapper.endport" value="32998" />
+
+							<if>
+								<istrue value="${tomcat.legacy.deployment}"/>
+								<then>
+									<ygeneratetomcatcontexts
+											outputPath="@{destdir}/temp/tomcat/conf/"
+											contextTemplate="${tomcat.context.template}" />
+								</then>
+								<else>
+									<ygeneratetomcatcontexts
+											outputPath="@{destdir}/temp/tomcat/conf/Catalina/localhost/"
+											contextTemplate="${tomcat.context.template}" />
+								</else>
+							</if>
+							<copy overwrite="true" todir="@{destdir}/temp/tomcat">
+								<fileset dir="${bundled.server.config}">
+									<include name="conf/wrapper*.conf" />
+								</fileset>
+								<filterchain>
+									<expandproperties />
+									<platformHome.replace.filter from="${platformhome}" to="%PLATFORM_HOME%" binDir="${HYBRIS_BIN_DIR}" bootstrapBinDir="${HYBRIS_BOOTSTRAP_BIN_DIR}" configDir="${HYBRIS_CONFIG_DIR}" dataDir="${HYBRIS_DATA_DIR}" logDir="${HYBRIS_LOG_DIR}" rolesDir="${HYBRIS_ROLES_DIR}" tempDir="${HYBRIS_TEMP_DIR}"/>
+								</filterchain>
+							</copy>
+							<copy overwrite="true" todir="@{destdir}/temp/tomcat">
+								<fileset dir="${bundled.server.config}">
+									<include name="conf/*.xml" />
+								</fileset>
+								<filterchain>
+									<expandproperties />
+									<platformHome.replace.filter from="${platformhome}" to="${PLATFORM_HOME}" binDir="${HYBRIS_BIN_DIR}" bootstrapBinDir="${HYBRIS_BOOTSTRAP_BIN_DIR}" configDir="${HYBRIS_CONFIG_DIR}" dataDir="${HYBRIS_DATA_DIR}" logDir="${HYBRIS_LOG_DIR}" rolesDir="${HYBRIS_ROLES_DIR}" tempDir="${HYBRIS_TEMP_DIR}"/>
+								</filterchain>
+							</copy>
+							<var name="production.generate.contextes" unset="true"/>
+						</then>
+					</if>
+				</then>
+				<else>
+					<echo message="Building hybris Server Production Zips to '@{destdir}' (TESTING BUILD MODE)" />
+				</else>
+			</if>
+			<mkdir dir="@{destdir}/bin" />
+
+			<echo message="Building hybris Server Production Zip to '@{destdir}'" />
+
+			<!-- platform base -->
+			<var name="platform.production.patternset" unset="true"/>
+			<if>
+				<istrue value="${production.include.tomcat}"/>
+				<then>
+					<property name="platform.production.patternset" value="platform.production.filter"/>
+				</then>
+				<else>
+					<property name="platform.production.patternset" value="platform.production.filter.without.appservers"/>
+				</else>
+			</if>
+
+			<copy todir="@{destdir}/bin/platform" preservelastmodified="true">
+				<fileset dir="${HYBRIS_BIN_DIR}/platform">
+					<patternset refid="${platform.production.patternset}" />
+				</fileset>
+			</copy>
+
+			<copy todir="@{destdir}/bin/platform/resources" preservelastmodified="true">
+				<fileset dir="${HYBRIS_BIN_DIR}/platform">
+					<patternset refid="build.number.include.filter" />
+				</fileset>
+			</copy>
+
+
+			<var name="production.packages" value="" />
+			<property name="production.packages.delimiter" value="~;~" />
+			<property name="production.packages.destdir" location="@{destdir}/temp/prod_packages" />
+
+			<if>
+				<istrue value="${production.mutable.platform.separate}" />
+				<then>
+					<move preservelastmodified="true" todir="${production.packages.destdir}/${production.mutable.platform.package}/bin/platform">
+						<fileset dir="@{destdir}/bin/platform">
+							<include name="bootstrap/bin/models.jar"/>
+						</fileset>
+					</move>
+					<var name="production.packages" value="${production.packages}${production.packages.delimiter}${production.mutable.platform.package}" />
+				</then>
+			</if>
+
+			<!-- config folder -->
+			<mkdir dir="@{destdir}/config" />
+			<copy todir="@{destdir}/config" preservelastmodified="true">
+				<fileset dir="${HYBRIS_CONFIG_DIR}">
+					<patternset refid="platform.production.config.filter"/>
+				</fileset>
+				<!-- copy licence -->
+				<fileset dir="${HYBRIS_CONFIG_DIR}">
+					<patternset refid="platform.production.licence.filter"/>
+				</fileset>
+			</copy>
+			<if>
+				<istrue value="${production.generate.extensionsxml}"/>
+				<then>
+					<generateExtensionsXML production="true"/>
+					<copy file="${HYBRIS_TEMP_DIR}/localextensions-production.xml" tofile="@{destdir}/config/localextensions.xml" overwrite="true"/>
+					<delete file="${HYBRIS_TEMP_DIR}/localextensions-production.xml"/>
+				</then>
+			</if>
+
+			<!-- copy each extension as binary -->
+			<foreachext>
+				<do>
+					<if>
+						<contains string="${ext.@{extname}.path}" substring="${HYBRIS_BIN_DIR}" casesensitive="false" />
+						<!-- TODO search for ant task which compares file paths -->
+						<then>
+							<var name="destdir" unset="true" />
+							<property name="destdir" location="${ext.@{extname}.productionpath}" />
+						</then>
+						<else>
+							<var name="destdir" unset="true" />
+							<if>
+								<not>
+									<isset property="ext.@{extname}.package" />
+								</not>
+								<then>
+									<echo message="setting ext.@{extname}.package=custom" level="warning" />
+									<property name="ext.@{extname}.package" value="custom" />
+								</then>
+							</if>
+							<property name="destdir" location="@{destdir}/bin/${ext.@{extname}.package}/@{extname}" />
+						</else>
+					</if>
+					<if>
+						<isset property="ant.production.package.@{extname}" />
+						<then>
+							<var name="extlocation" unset="true" />
+							<pathconvert property="extlocation">
+								<map from="@{destdir}" to="${production.packages.destdir}/${ant.production.package.@{extname}}" />
+								<path location="${destdir}" />
+							</pathconvert>
+							<var name="destdir" unset="true" />
+							<property name="destdir" location="${extlocation}" />
+							<if>
+								<not>
+									<contains string="${production.packages}" substring="${production.packages.delimiter}${ant.production.package.@{extname}}" casesensitive="false" />
+								</not>
+								<then>
+									<var name="production.packages" value="${production.packages}${production.packages.delimiter}${ant.production.package.@{extname}}" />
+								</then>
+							</if>
+						</then>
+					</if>
+					<callback extname="@{extname}" target="before_production" />
+					<if>
+						<istrue value="${ext.@{extname}.warextension}"/>
+						<then>
+							<copy_external_extension_for_hybris_server extname="@{extname}" srcdir="${HYBRIS_BIN_DIR}/${ext.@{extname}.productionpath}" destdir="${destdir}" />
+						</then>
+						<else>
+							<copy_extension_for_hybris_server extname="@{extname}" srcdir="${ext.@{extname}.path}" destdir="${destdir}" />
+						</else>
+					</if>
+
+					<callback extname="@{extname}" target="after_production" />
+				</do>
+			</foreachext>
+
+			<var name="platform.production.tomcat.patternset" unset="true"/>
+			<if>
+				<istrue value="${tomcat.legacy.deployment}"/>
+				<then>
+					<if>
+						<istrue value="${production.include.tomcat}"/>
+						<then>
+							<property name="platform.production.tomcat.patternset" value="platform.production.tomcat.config.with.wrapper.filter"/>
+						</then>
+						<else>
+							<property name="platform.production.tomcat.patternset" value="platform.production.tomcat.config.filter"/>
+						</else>
+					</if>
+				</then>
+				<else>
+					<if>
+						<istrue value="${production.include.tomcat}"/>
+						<then>
+							<property name="platform.production.tomcat.patternset" value="platform.production.tomcat.context.with.wrapper.filter"/>
+						</then>
+						<else>
+							<property name="platform.production.tomcat.patternset" value="platform.production.tomcat.context.filter"/>
+						</else>
+					</if>
+				</else>
+			</if>
+
+			<!-- context folder -->
+			<delete dir="@{destdir}/tomcat" />
+			<mkdir dir="@{destdir}/tomcat" />
+			<if>
+				<isfalse value="${production.legacy.mode}"/>
+				<then>
+					<copy todir="@{destdir}/tomcat" preservelastmodified="true">
+						<fileset dir="@{destdir}/temp/tomcat">
+							<patternset refid="${platform.production.tomcat.patternset}"/>
+						</fileset>
+						<filterchain>
+							<expandproperties/>
+							<platformHome.replace.filter from="${platformhome}" to="${PLATFORM_HOME}" binDir="${HYBRIS_BIN_DIR}" bootstrapBinDir="${HYBRIS_BOOTSTRAP_BIN_DIR}" configDir="${HYBRIS_CONFIG_DIR}" dataDir="${HYBRIS_DATA_DIR}" logDir="${HYBRIS_LOG_DIR}" rolesDir="${HYBRIS_ROLES_DIR}" tempDir="${HYBRIS_TEMP_DIR}"/>
+						</filterchain>
+					</copy>
+					<copy todir="@{destdir}/tomcat" preservelastmodified="true">
+						<fileset dir="${bundled.server.home}">
+							<patternset refid="platform.production.tomcat.lib.filter"/>
+						</fileset>
+					</copy>
+				</then>
+			</if>
+
+			<if>
+				<isfalse value="${production.testbuild}" />
+				<then>
+					<var name="production.timestamp.value" unset="true"/>
+					<if>
+						<istrue value="${production.timestamp}"/>
+						<then>
+							<tstamp>
+								<format property="production.timestamp.value" pattern="-yyyyMMdd.HHmmss"/>
+							</tstamp>
+						</then>
+						<else>
+							<property name="production.timestamp.value" value="" />
+						</else>
+					</if>
+					<if>
+						<istrue value="${production.legacy.mode}"/>
+						<then>
+							<copy overwrite="true" todir="@{destdir}/bin/platform/tomcat">
+								<fileset dir="${production.output.path}/tomcat">
+									<patternset refid="${platform.production.tomcat.patternset}"/>
+								</fileset>
+								<fileset dir="${production.output.path}/tomcat">
+									<patternset refid="platform.production.tomcat.lib.filter"/>
+								</fileset>
+							</copy>
+							<if>
+								<istrue value="${production.create.zip}"/>
+								<then>
+									<zip destfile="${production.output.path}/hybrisServer-Platform${production.timestamp.value}.zip">
+										<zipfileset dir="@{destdir}/bin" includes="platform/**" prefix="hybris/bin" excludes="platform/**/*.sh" />
+										<zipfileset dir="@{destdir}/bin" includes="platform/**/*.sh" prefix="hybris/bin" filemode="755"/>
+									</zip>
+								</then>
+							</if>
+						</then>
+						<else>
+							<if>
+								<istrue value="${production.include.tomcat}"/>
+								<then>
+									<copy todir="@{destdir}/bin/platform/tomcat">
+										<fileset dir="@{destdir}/tomcat" >
+											<patternset refid="${platform.production.tomcat.patternset}"/>
+										</fileset>
+										<fileset dir="@{destdir}/tomcat" >
+											<patternset refid="platform.production.tomcat.lib.filter"/>
+										</fileset>
+									</copy>
+									<if>
+										<istrue value="${production.create.zip}"/>
+										<then>
+											<zip destfile="@{destdir}/hybrisServer-Platform${production.timestamp.value}.zip">
+												<zipfileset dir="@{destdir}/bin" includes="platform/**" prefix="hybris/bin" excludes="platform/**/*.sh"/>
+												<zipfileset dir="@{destdir}/bin" includes="platform/**/*.sh" prefix="hybris/bin" filemode="755"/>
+											</zip>
+										</then>
+									</if>
+								</then>
+								<else>
+									<if>
+										<istrue value="${production.create.zip}"/>
+										<then>
+											<zip destfile="@{destdir}/hybrisServer-Platform${production.timestamp.value}.zip">
+												<zipfileset dir="@{destdir}/bin" includes="platform/**" prefix="hybris/bin" excludes="platform/tomcat/** platform/**/*.sh"/>
+												<zipfileset dir="@{destdir}/bin" includes="platform/**/*.sh" prefix="hybris/bin" filemode="755"/>
+											</zip>
+											<zip destfile="@{destdir}/hybrisServer-TomcatConfig${production.timestamp.value}.zip">
+												<zipfileset dir="@{destdir}/tomcat" >
+													<patternset refid="${platform.production.tomcat.patternset}"/>
+												</zipfileset>
+												<zipfileset dir="@{destdir}/tomcat" >
+													<patternset refid="platform.production.tomcat.lib.filter"/>
+												</zipfileset>
+											</zip>
+										</then>
+									</if>
+								</else>
+							</if>
+						</else>
+					</if>
+
+					<if>
+						<istrue value="${production.create.zip}"/>
+						<then>
+							<zip destfile="@{destdir}/hybrisServer-AllExtensions${production.timestamp.value}.zip">
+								<zipfileset dir="@{destdir}/bin" excludes="platform/**" prefix="hybris/bin" />
+							</zip>
+
+							<zip destfile="@{destdir}/hybrisServer-Config${production.timestamp.value}.zip">
+								<zipfileset dir="@{destdir}/config" prefix="hybris/config" >
+									<patternset refid="platform.production.config.filter"/>
+								</zipfileset>
+							</zip>
+
+							<zip destfile="@{destdir}/hybrisServer-Licence${production.timestamp.value}.zip">
+								<zipfileset dir="@{destdir}/config" prefix="hybris/config" >
+									<patternset refid="platform.production.licence.filter"/>
+								</zipfileset>
+							</zip>
+
+
+							<property name="production.packages.output.path" location="@{destdir}" />
+
+							<foreach list="${production.packages}" delimiter="${production.packages.delimiter}"
+								target="zipproductionpackage" param="package" inheritall="true" trim="true" />
+
+							<copy overwrite="true" todir="@{destdir}">
+								<fileset dir="${platformhome}/resources/hybrisserver" includes="**" />
+							</copy>
+							<cleanproduction />
+							<if>
+								<istrue value="${production.validate.packages}"/>
+								<then>
+									<script language="javascript">
+									<![CDATA[
+										var prodPackages = project.getProperty("production.packages")
+										var delimiter = project.getProperty("production.packages.delimiter")
+										var prefix = project.getProperty("production.packages.output.path") + "/hybrisServer-"
+										var suffix = project.getProperty("production.timestamp.value") + ".zip"
+										var result = prodPackages.
+											split(delimiter).
+											filter(function(pckg){
+												return pckg && pckg.length()
+											}).map(function(pckg){
+												return prefix + pckg + suffix
+											}).join(";")
+										project.setProperty("production.archives", result)
+									]]>
+									</script>
+									<property name="archives.to.validate" value="${production.archives};@{destdir}/hybrisServer-Platform${production.timestamp.value}.zip;@{destdir}/hybrisServer-AllExtensions${production.timestamp.value}.zip" />
+									<yvalidateantproduction settingsFileName="${platformhome}/resources/ant/validation.txt" filesToValidate="${archives.to.validate}" />
+								</then>
+							</if>
+							<if>
+								<istrue value="${production.packages.unzip}"/>
+								<then>
+									<mkdir dir="${production.packages.output.path}/unzipped"/>
+									<unzip src="${production.packages.output.path}/hybrisServer-Platform${production.timestamp.value}.zip" dest="${production.packages.output.path}/unzipped" />
+									<unzip src="${production.packages.output.path}/hybrisServer-AllExtensions${production.timestamp.value}.zip" dest="${production.packages.output.path}/unzipped" />
+									<unzip src="${production.packages.output.path}/hybrisServer-Licence${production.timestamp.value}.zip" dest="${production.packages.output.path}/unzipped" />
+									<unzip src="${production.packages.output.path}/hybrisServer-Config${production.timestamp.value}.zip" dest="${production.packages.output.path}/unzipped" />
+									<foreach list="${production.packages}" delimiter="${production.packages.delimiter}"
+															target="unzipproductionpackage" param="package" inheritall="true" trim="true" />
+									<if>
+										<available file="@{destdir}/hybrisServer-TomcatConfig${production.timestamp.value}.zip" />
+										<then>
+											<unzip src="@{destdir}/hybrisServer-TomcatConfig${production.timestamp.value}.zip" dest="@{destdir}/unzipped" />
+										</then>
+									</if>
+									<!--chmod, because unzip task doens't preserve permissions-->
+									<chmod dir="@{destdir}/unzipped/hybris/bin" perm="755" includes="platform/**/*.sh"/>
+								</then>
+							</if>
+						</then>
+					</if>
+				</then>
+			</if>
+			<if>
+				<istrue value="${production.create.zip}"/>
+				<then>
+					<echo message="Finished creation of '@{destdir}/hybrisServer-*.zip'" />
+				</then>
+				<else>
+					<echo message="Finished" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<target name="zipproductionpackage">
+		<zip destfile="${production.packages.output.path}/hybrisServer-${package}${production.timestamp.value}.zip">
+			<zipfileset dir="${production.packages.destdir}/${package}/bin" prefix="hybris/bin" />
+		</zip>
+	</target>
+
+	<target name="unzipproductionpackage">
+		<unzip src="${production.packages.output.path}/hybrisServer-${package}${production.timestamp.value}.zip" dest="${production.packages.output.path}/unzipped" />
+	</target>
+
+	<macrodef name="copy_extension_for_hybris_server">
+	<attribute name="srcdir" />
+	<attribute name="destdir" />
+	<attribute name="extname" />
+	<sequential>
+		<echo level="info" message=" " />
+		<echo level="info" message="*************************************************" />
+		<echo level="info" message="- copy_extension_for_hybris_server" />
+		<echo level="info" message="-------------------------------------------------" />
+		<echo level="info" message="- srcdir:   @{srcdir}" />
+		<echo level="info" message="- destdir:  @{destdir}" />
+		<echo level="info" message="- extname:  @{extname}" />
+		<echo level="info" message="*************************************************" />
+		<echo level="info" message=" " />
+
+		<if>
+			<isreference refid="extension.@{extname}.production.filter" />
+			<then>
+				<copy todir="@{destdir}" preservelastmodified="true">
+					<fileset dir="@{srcdir}">
+						<patternset refid="extension.@{extname}.production.filter" />
+					</fileset>
+				</copy>
+			</then>
+			<else>
+				<copy todir="@{destdir}" preservelastmodified="true">
+					<fileset dir="@{srcdir}">
+						<patternset refid="extension.production.filter" />
+					</fileset>
+				</copy>
+			</else>
+		</if>
+
+		<extension_build_jar extname="@{extname}" destdir="@{destdir}" />
+
+	</sequential>
+</macrodef>
+
+	<macrodef name="copy_external_extension_for_hybris_server">
+		<attribute name="srcdir" />
+		<attribute name="destdir" />
+		<attribute name="extname" />
+		<sequential>
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- copy_external_extension_for_hybris_server" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- srcdir:   @{srcdir}" />
+			<echo level="info" message="- destdir:  @{destdir}" />
+			<echo level="info" message="- extname:  @{extname}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<if>
+				<available file="@{srcdir}" type="dir"/>
+				<then>
+					<echo message="copying dir @{srcdir}"/>
+					<copy todir="@{destdir}">
+						<fileset dir="@{srcdir}"/>
+					</copy>
+				</then>
+				<elseif>
+					<available file="@{srcdir}" type="file"/>
+					<then>
+						<echo message="copying file @{srcdir}"/>
+						<copy todir="@{destdir}">
+							<fileset file="@{srcdir}"/>
+						</copy>
+					</then>
+				</elseif>
+				<else>
+					<fail/>
+				</else>
+			</if>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_build_jar">
+		<attribute name="extname" />
+		<attribute name="destdir" default="${ext.@{extname}.path}" />
+		<attribute name="earlibdir" default="" />
+		<sequential>
+			<if>
+				<isset property="ext.@{extname}.coremodule.available" />
+				<then>
+					<if>
+						<available file="${ext.@{extname}.path}/classes" />
+						<then>
+							<if>
+								<isset property="glassfish" />
+								<then>
+									<jar destfile="@{earlibdir}/@{extname}server.jar">
+										<fileset dir="${ext.@{extname}.path}/classes" />
+									</jar>
+								</then>
+								<else>
+									<mkdir dir="@{destdir}/bin" />
+									<jar destfile="@{destdir}/bin/@{extname}server.jar">
+										<fileset dir="${ext.@{extname}.path}/classes" />
+									</jar>
+								</else>
+							</if>
+
+						</then>
+					</if>
+
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

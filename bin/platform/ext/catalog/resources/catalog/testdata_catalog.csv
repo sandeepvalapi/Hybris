@@ -1,0 +1,82 @@
+"# SampleDate for Testing RemoveCatalogAndCatalogVersions";;;;;;;;
+;;;;;;;;
+;;;;;;;;
+"INSERT_UPDATE Language";"isocode[unique=true]";"active";;;;;;
+;"de";"true";;;;;;
+;"en";"true";;;;;;
+;;;;;;;;
+"UPDATE Language";"isocode[unique=true]";"name[lang=de]";"name[lang=en]";;;;;
+;"de";"Deutsch";"German";;;;;
+;"en";"Englisch";"English";;;;;
+;;;;;;;;
+;;;;;;;;
+"INSERT_UPDATE Unit";"unitType[unique=true]";"code[unique=true]";"name[lang=de]";"name[lang=en]";;;;
+;"weight";"kg";"Kilogramm";"kilogram";;;;
+;;;;;;;;
+;;;;;;;;
+"INSERT_UPDATE Catalog";"id[unique=true]";"name[lang=de]";"name[lang=en]";"defaultCatalog";;;;
+;"CatalogA";"viele Daten";"viele Daten";"true";;;;
+;"CatalogB";"wenig Daten";"wenig Daten";"false";;;;
+;"CatalogC";"Daten aus anderen Katalogen";"Daten aus anderen Katalogen";"true";;;;
+;"CatalogD";"kompett leer";"kompett leer";"false";;;;
+;;;;;;;;
+"INSERT_UPDATE CatalogVersion";"catalog(id)[unique=true]";"version[unique=true]";"languages(isocode)";"inclAssurance";"inclDuty";"inclFreight";"inclPacking";"active"
+;"CatalogA";"CatalogVersionA1";"de,en";" true";"true";"true";"false";"true"
+;"CatalogA";"CatalogVersionA2";"de,en";"false";"false";"false";"false";"false"
+;"CatalogA";"CatalogVersionA3";"de,en";" true";"true";"true";"false";"false"
+;"CatalogB";"CatalogVersionB1";"de,en";"false";"false";"false";"false";"false"
+;"CatalogB";"CatalogVersionB2";"de,en";" true";"true";"true";"false";"true"
+;"CatalogC";"CatalogVersionC1";"de,en";"false";"false";"false";"false";"false"
+;;;;;;;;
+"INSERT_UPDATE Category";"code[unique=true]";"name[lang=de]";"name[lang=en]";"supercategories( code, catalogVersion(catalog(id),version))";"catalogVersion(catalog(id),version)[unique=true,allowNull=true]";;;
+;"CategoryA1-1";"CategoryA1-1";"CategoryA1-1";;"CatalogA:CatalogVersionA1";;;
+;"CategoryA1-11";"CategoryA1-11";"CategoryA1-11";"CategoryA1-1:CatalogA:CatalogVersionA1";"CatalogA:CatalogVersionA1";;;
+;"CategoryA1-12";"CategoryA1-12";"CategoryA1-12";"CategoryA1-1:CatalogA:CatalogVersionA1";"CatalogA:CatalogVersionA1";;;
+;"CategoryA1-2";"CategoryA1-2";"CategoryA1-2";;"CatalogA:CatalogVersionA1";;;
+;"CategoryA2-1";"CategoryA2-1";"CategoryA2-1";;"CatalogA:CatalogVersionA2";;;
+;"CategoryA2-11";"CategoryA2-11";"CategoryA2-11";"CategoryA2-1:CatalogA:CatalogVersionA2";"CatalogA:CatalogVersionA2";;;
+;"CategoryA2-12";"CategoryA2-12";"CategoryA2-12";"CategoryA2-1:CatalogA:CatalogVersionA2";"CatalogA:CatalogVersionA2";;;
+;"CategoryA2-2";"CategoryA2-2";"CategoryA2-2";;"CatalogA:CatalogVersionA2";;;
+;"CategoryA-8";"CategoryA-8";"CategoryA-8";;"CatalogA:CatalogVersionA3";;;
+;"CategoryA-81";"CategoryA-81";"CategoryA-81";"CategoryA1-1:CatalogA:CatalogVersionA1, CategoryA2-1:CatalogA:CatalogVersionA2, CategoryA-8:CatalogA:CatalogVersionA3";"CatalogA:CatalogVersionA3";;;
+;"CategoryB1-1";"CategoryB1-1";"CategoryB1-1";;"CatalogB:CatalogVersionB1";;;
+;"CategoryB1-11";"CategoryB1-11";"CategoryB1-11";"CategoryB1-1:CatalogB:CatalogVersionB1";"CatalogB:CatalogVersionB1";;;
+;"CategoryB1-111";"CategoryB1-111";"CategoryB1-111";"CategoryB1-11:CatalogB:CatalogVersionB1";"CatalogB:CatalogVersionB1";;;
+;"CategoryB1-1111";"CategoryB1-1111";"CategoryB1-1111";"CategoryB1-111:CatalogB:CatalogVersionB1";"CatalogB:CatalogVersionB1";;;
+;"Category-nowhere-1";"Category-nowhere-1";"Category-nowhere-1";;;;;
+;"Category-nowhere-2";"Category-nowhere-2";"Category-nowhere-2";"CategoryA1-1:CatalogA:CatalogVersionA1";;;;
+;;;;;;;;
+"INSERT_UPDATE Product";"code[unique=true]";"catalogVersion(catalog(id),version)[unique=true,allowNull=true]";"name[lang=de]";"name[lang=en]";"unit(code)";"supercategories( code, catalogVersion(catalog(id),version))";"approvalStatus(code)";
+;"Product-A1-1";"CatalogA:CatalogVersionA1";"Product-A1-1";"Product-A1-1";"kg";"CategoryA1-1:CatalogA:CatalogVersionA1";"approved";
+;"Product-A1-11";"CatalogA:CatalogVersionA1";"Product-A1-11";"Product-A1-11";"kg";"CategoryA1-11:CatalogA:CatalogVersionA1";"approved";
+;"Product-A1-12";"CatalogA:CatalogVersionA1";"Product-A1-12";"Product-A1-12";"kg";"CategoryA1-12:CatalogA:CatalogVersionA1";"approved";
+;"Product-A1-2";"CatalogA:CatalogVersionA1";"Product-A1-2";"Product-A1-2";"kg";"CategoryA1-2:CatalogA:CatalogVersionA1";"approved";
+;"Product-A-11";"CatalogA:CatalogVersionA1";"Product-A-11";"Product-A-11";"kg";"CategoryA1-11:CatalogA:CatalogVersionA1, CategoryA2-11:CatalogA:CatalogVersionA2, CategoryA-81:CatalogA:CatalogVersionA3";"approved";
+;"Product-B-5555";"CatalogB:CatalogVersionB1";"Product-B-5555";"Product-B-5555";"kg";"CategoryB1-1:CatalogB:CatalogVersionB1, CategoryB1-11:CatalogB:CatalogVersionB1, CategoryB1-111:CatalogB:CatalogVersionB1, CategoryB1-1111:CatalogB:CatalogVersionB1";"approved";
+;"Product-AB-inA";"CatalogA:CatalogVersionA1";"Product-AB-inA";"Product-AB-inA";"kg";"CategoryA1-1:CatalogA:CatalogVersionA1, CategoryB1-1:CatalogB:CatalogVersionB1";"approved";
+;"Product-AB-inB";"CatalogB:CatalogVersionB1";"Product-AB-inB";"Product-AB-inB";"kg";"CategoryA1-1:CatalogA:CatalogVersionA1, CategoryB1-1:CatalogB:CatalogVersionB1";"approved";
+;"Product-AB-inC";"CatalogC:CatalogVersionC1";"Product-AB-inC";"Product-AB-inC";"kg";"CategoryA1-1:CatalogA:CatalogVersionA1, CategoryB1-1:CatalogB:CatalogVersionB1";"approved";
+;"Product-AB-nowhere";;"Product-AB-nowhere";"Product-AB-nowhere";"kg";"CategoryA1-1:CatalogA:CatalogVersionA1, CategoryB1-1:CatalogB:CatalogVersionB1";"approved";
+;"Product-A2-2";"CatalogA:CatalogVersionA2";"Product-A2-2";"Product-A2-2";"kg";"CategoryA2-1:CatalogA:CatalogVersionA2";"approved";
+;;;;;;;;
+;;;;;;;;
+"INSERT_UPDATE Keyword";"keyword[unique=true]";"language(isocode)[unique=true]";"catalogVersion(catalog(id),version)[unique=true,allowNull=true]";"products(code, catalogVersion(catalog(id),version))";"categories(code, catalogVersion(catalog(id),version))";;;
+;"A1-De";"de";"CatalogA:CatalogVersionA1";;;;;
+;"A1-En";"en";"CatalogA:CatalogVersionA1";;;;;
+;"A1-De-Product-A1-1";"de";"CatalogA:CatalogVersionA1";"Product-A1-1:CatalogA:CatalogVersionA1";;;;
+;"A1-De-CategoryA1-1";"de";"CatalogA:CatalogVersionA1";;"CategoryA1-1:CatalogA:CatalogVersionA1";;;
+;"A2-de-prod-a1+cat-a1";"de";"CatalogA:CatalogVersionA2";"Product-A1-1:CatalogA:CatalogVersionA1";"CategoryA1-1:CatalogA:CatalogVersionA1";;;
+;"B1-keyword1";"en";"CatalogB:CatalogVersionB1";"Product-A1-1:CatalogA:CatalogVersionA1";"CategoryA1-1:CatalogA:CatalogVersionA1";;;
+;"B1-keyword2";"en";"CatalogB:CatalogVersionB2";"Product-A1-1:CatalogA:CatalogVersionA1";"CategoryA1-1:CatalogA:CatalogVersionA1";;;
+;;;;;;;;
+"INSERT_UPDATE ProductReference";"qualifier[unique=true]";"source(code, catalogVersion(catalog(id),version))";"target(code, catalogVersion(catalog(id),version))";"active";"preselected";;;
+;"pr1";"Product-A1-1:CatalogA:CatalogVersionA1";"Product-A1-2:CatalogA:CatalogVersionA1";"true";"true";;;
+;"pr2";"Product-A1-1:CatalogA:CatalogVersionA1";"Product-A2-2:CatalogA:CatalogVersionA2";"true";"true";;;
+;"pr3";"Product-A2-2:CatalogA:CatalogVersionA2";"Product-A1-1:CatalogA:CatalogVersionA1";"true";"true";;;
+;"pr4";"Product-A1-11:CatalogA:CatalogVersionA1";"Product-B-5555:CatalogB:CatalogVersionB1";"true";"true";;;
+;"pr5";"Product-A1-12:CatalogA:CatalogVersionA1";"Product-AB-inB:CatalogB:CatalogVersionB1";"true";"true";;;
+;"pr6";"Product-A2-2:CatalogA:CatalogVersionA2";"Product-AB-inB:CatalogB:CatalogVersionB1";"true";"true";;;
+;"pr7";"Product-A-11:CatalogA:CatalogVersionA1";"Product-A1-11:CatalogA:CatalogVersionA1";"true";"true";;;
+;"pr8";"Product-AB-inB:CatalogB:CatalogVersionB1";"Product-B-5555:CatalogB:CatalogVersionB1";"true";"true";;;
+;"pr9";"Product-A1-1:CatalogA:CatalogVersionA1";"Product-AB-inC:CatalogC:CatalogVersionC1";"true";"true";;;
+;"pr10";"Product-B-5555:CatalogB:CatalogVersionB1";"Product-A2-2:CatalogA:CatalogVersionA2";"true";"true";;;

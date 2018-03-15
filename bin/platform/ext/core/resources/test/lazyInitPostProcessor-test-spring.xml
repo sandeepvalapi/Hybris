@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+	default-lazy-init="true"	
+	>
+
+	<context:annotation-config />
+
+	<bean class="de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessor">
+		<property name="eagerlyLoadedClasses">
+			<list>
+				<value>de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessorTest$InnerA</value>
+				<value>de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessorTest$InnerC</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessorTest$Inner" />
+	<bean class="de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessorTest$InnerA" />
+	<bean class="de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessorTest$InnerB" />
+
+	<bean id="innerC" abstract="true" class="de.hybris.platform.spring.LazyInitOverrideBeanFactoryPostProcessorTest$InnerC" />
+	<bean parent="innerC" />
+	
+</beans>

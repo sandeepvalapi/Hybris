@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  [y] hybris Platform
+  ~
+  ~  Copyright (c) 2000-2017 SAP SE
+  ~  All rights reserved.
+  ~
+  ~  This software is the confidential and proprietary information of SAP
+  ~  Hybris ("Confidential Information"). You shall not disclose such
+  ~  Confidential Information and shall use it only in accordance with the
+  ~  terms of the license agreement you entered into with SAP Hybris.
+  -->
+<audit-report-config name="PersonalDataReport">
+    <given-root-type>User</given-root-type>
+    <types>
+        <type code="User">
+            <atomic-attributes>
+                <atomic-attribute qualifier="deactivationDate" displayName="deactivationDate"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="customerID" displayName="customerID"/>
+                <atomic-attribute qualifier="encodedPassword" displayName="encodedPassword"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="passwordEncoding" displayName="passwordEncoding"/>
+                <atomic-attribute qualifier="passwordAnswer" displayName="passwordAnswer"/>
+                <atomic-attribute qualifier="passwordQuestion" displayName="passwordQuestion"/>
+                <atomic-attribute qualifier="uid" displayName="uid"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="defaultPaymentAddress" displayName="defaultPaymentAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="defaultShipmentAddress" displayName="defaultShipmentAddress"
+                                     type="Address"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="user" type="AbstractContactInfo" many="true" displayName="contactInfos"/>
+                <virtual-attribute expression="owner" type="Address" many="true" displayName="addresses"/>
+                <virtual-attribute expression="user" type="Cart" many="true" displayName="carts"/>
+                <virtual-attribute expression="user" type="Order" many="true" displayName="orders"/>
+                <virtual-attribute expression="user" type="PaymentInfo" many="true" displayName="paymentInfos"/>
+                <virtual-attribute expression="user" type="Quote" many="true" displayName="quotes"/>
+                <virtual-attribute expression="userPK=beanName(pkAsLongVirtualReferenceValuesExtractor)"
+                                   type="UserPasswordChangeAudit"
+                                   many="true"
+                                   displayName="userPasswordChangeAudits"/>
+            </virtual-attributes>
+            <relation-attributes>
+                <relation-attribute relation="PrincipalGroupRelation" displayName="PrincipalGroupRelation" many="true"
+                                    type="UserGroup"/>
+            </relation-attributes>
+        </type>
+        <type code="AbstractContactInfo" displayName="AbstractContactInfo">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="phoneNumber" displayName="phoneNumber"/>
+                <atomic-attribute qualifier="type" displayName="type"/>
+            </atomic-attributes>
+        </type>
+        <type code="Address" displayName="Address">
+            <atomic-attributes>
+                <atomic-attribute qualifier="appartment" displayName="appartment"/>
+                <atomic-attribute qualifier="building" displayName="building"/>
+                <atomic-attribute qualifier="cellphone" displayName="cellphone"/>
+                <atomic-attribute qualifier="company" displayName="company"/>
+                <atomic-attribute qualifier="dateOfBirth" displayName="dateOfBirth"/>
+                <atomic-attribute qualifier="department" displayName="department"/>
+                <atomic-attribute qualifier="district" displayName="district"/>
+                <atomic-attribute qualifier="duplicate" displayName="duplicate"/>
+                <atomic-attribute qualifier="email" displayName="email"/>
+                <atomic-attribute qualifier="fax" displayName="fax"/>
+                <atomic-attribute qualifier="firstname" displayName="firstname"/>
+                <atomic-attribute qualifier="gender" displayName="gender"/>
+                <atomic-attribute qualifier="lastname" displayName="lastname"/>
+                <atomic-attribute qualifier="middlename" displayName="middlename"/>
+                <atomic-attribute qualifier="middlename2" displayName="middlename2"/>
+                <atomic-attribute qualifier="phone1" displayName="phone1"/>
+                <atomic-attribute qualifier="phone2" displayName="phone2"/>
+                <atomic-attribute qualifier="pobox" displayName="pobox"/>
+                <atomic-attribute qualifier="postalcode" displayName="postalcode"/>
+                <atomic-attribute qualifier="streetname" displayName="streetname"/>
+                <atomic-attribute qualifier="streetnumber" displayName="streetnumber"/>
+                <atomic-attribute qualifier="town" displayName="town"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="country" displayName="country" type="Country"/>
+                <reference-attribute qualifier="original" displayName="original" type="Address"/>
+                <reference-attribute qualifier="region" displayName="region" type="Region"/>
+                <reference-attribute qualifier="title" displayName="title" type="Title"/>
+            </reference-attributes>
+        </type>
+        <type code="Cart" displayName="Cart">
+            <atomic-attributes>
+                <atomic-attribute qualifier="calculated" displayName="calculated"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="globalDiscountValuesInternal"
+                                  displayName="globalDiscountValuesInternal"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="paymentCost" displayName="paymentCost"/>
+                <atomic-attribute qualifier="totalDiscounts" displayName="totalDiscounts"/>
+                <atomic-attribute qualifier="totalTax" displayName="totalTax"/>
+                <atomic-attribute qualifier="totalTaxValuesInternal" displayName="totalTaxValuesInternal"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="currency" displayName="currency" type="Currency"/>
+                <reference-attribute qualifier="deliveryAddress" displayName="deliveryAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="paymentAddress" displayName="paymentAddress" type="Address"/>
+                <reference-attribute qualifier="paymentInfo" displayName="paymentInfo" type="PaymentInfo"/>
+                <reference-attribute qualifier="paymentMode" displayName="paymentMode" type="PaymentMode"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="order" type="CartEntry" many="true" displayName="entries"/>
+            </virtual-attributes>
+        </type>
+        <type code="CartEntry" displayName="CartEntry">
+            <atomic-attributes>
+                <atomic-attribute qualifier="entryGroupNumbers" displayName="entryGroupNumbers"/>
+                <atomic-attribute qualifier="entryNumber" displayName="entryNumber"/>
+                <atomic-attribute qualifier="info" displayName="info"/>
+                <atomic-attribute qualifier="quantity" displayName="quantity"/>
+                <atomic-attribute qualifier="totalPrice" displayName="totalPrice"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="product" displayName="product" type="Product"/>
+                <reference-attribute qualifier="unit" displayName="unit"
+                                     type="Unit"/>
+            </reference-attributes>
+        </type>
+        <type code="Country" displayName="Country">
+            <atomic-attributes>
+                <atomic-attribute qualifier="isocode" displayName="isocode"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Currency" displayName="Currency">
+            <atomic-attributes>
+                <atomic-attribute qualifier="isocode" displayName="isocode"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Order" displayName="Order">
+            <atomic-attributes>
+                <atomic-attribute qualifier="calculated" displayName="calculated"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="globalDiscountValuesInternal"
+                                  displayName="globalDiscountValuesInternal"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="paymentCost" displayName="paymentCost"/>
+                <atomic-attribute qualifier="totalDiscounts" displayName="totalDiscounts"/>
+                <atomic-attribute qualifier="totalTax" displayName="totalTax"/>
+                <atomic-attribute qualifier="totalTaxValuesInternal" displayName="totalTaxValuesInternal"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="currency" displayName="currency" type="Currency"/>
+                <reference-attribute qualifier="deliveryAddress" displayName="deliveryAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="paymentAddress" displayName="paymentAddress" type="Address"/>
+                <reference-attribute qualifier="paymentInfo" displayName="paymentInfo" type="PaymentInfo"/>
+                <reference-attribute qualifier="paymentMode" displayName="paymentMode" type="PaymentMode"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="order" type="OrderEntry" many="true" displayName="entries"/>
+            </virtual-attributes>
+        </type>
+        <type code="OrderEntry" displayName="OrderEntry">
+            <atomic-attributes>
+                <atomic-attribute qualifier="entryGroupNumbers" displayName="entryGroupNumbers"/>
+                <atomic-attribute qualifier="entryNumber" displayName="entryNumber"/>
+                <atomic-attribute qualifier="info" displayName="info"/>
+                <atomic-attribute qualifier="quantity" displayName="quantity"/>
+                <atomic-attribute qualifier="totalPrice" displayName="totalPrice"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="product" displayName="product" type="Product"/>
+                <reference-attribute qualifier="unit" displayName="unit"
+                                     type="Unit"/>
+            </reference-attributes>
+        </type>
+        <type code="PaymentInfo" displayName="PaymentInfo">
+            <atomic-attributes>
+                <atomic-attribute qualifier="accountNumber" displayName="accountNumber"/>
+                <atomic-attribute qualifier="bank" displayName="bank"/>
+                <atomic-attribute qualifier="bankIDNumber" displayName="bankIDNumber"/>
+                <atomic-attribute qualifier="baOwner" displayName="baOwner"/>
+                <atomic-attribute qualifier="ccOwner" displayName="ccOwner"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="duplicate" displayName="duplicate"/>
+                <atomic-attribute qualifier="number" displayName="number"/>
+                <atomic-attribute qualifier="validFromMonth" displayName="validFromMonth"/>
+                <atomic-attribute qualifier="validFromYear" displayName="validFromYear"/>
+                <atomic-attribute qualifier="validToMonth" displayName="validToMonth"/>
+                <atomic-attribute qualifier="validToYear" displayName="validToYear"/>
+                <atomic-attribute qualifier="type" displayName="type"/>
+            </atomic-attributes>
+        </type>
+        <type code="PaymentMode" displayName="PaymentMode">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Product" displayName="Product">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Quote" displayName="Quote">
+            <atomic-attributes>
+                <atomic-attribute qualifier="calculated" displayName="calculated"/>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="globalDiscountValuesInternal"
+                                  displayName="globalDiscountValuesInternal"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="paymentCost" displayName="paymentCost"/>
+                <atomic-attribute qualifier="state" displayName="state"/>
+                <atomic-attribute qualifier="totalDiscounts" displayName="totalDiscounts"/>
+                <atomic-attribute qualifier="totalTax" displayName="totalTax"/>
+                <atomic-attribute qualifier="totalTaxValuesInternal" displayName="totalTaxValuesInternal"/>
+                <atomic-attribute qualifier="version" displayName="version"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="currency" displayName="currency" type="Currency"/>
+                <reference-attribute qualifier="deliveryAddress" displayName="deliveryAddress"
+                                     type="Address"/>
+                <reference-attribute qualifier="paymentAddress" displayName="paymentAddress" type="Address"/>
+                <reference-attribute qualifier="paymentInfo" displayName="paymentInfo" type="PaymentInfo"/>
+                <reference-attribute qualifier="paymentMode" displayName="paymentMode" type="PaymentMode"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="order" type="QuoteEntry" many="true" displayName="entries"/>
+            </virtual-attributes>
+        </type>
+        <type code="QuoteEntry" displayName="QuoteEntry">
+            <atomic-attributes>
+                <atomic-attribute qualifier="entryGroupNumbers" displayName="entryGroupNumbers"/>
+                <atomic-attribute qualifier="entryNumber" displayName="entryNumber"/>
+                <atomic-attribute qualifier="info" displayName="info"/>
+                <atomic-attribute qualifier="quantity" displayName="quantity"/>
+                <atomic-attribute qualifier="totalPrice" displayName="totalPrice"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="product" displayName="product" type="Product"/>
+                <reference-attribute qualifier="unit" displayName="unit"
+                                     type="Unit"/>
+            </reference-attributes>
+        </type>
+        <type code="Region" displayName="Region">
+            <atomic-attributes>
+                <atomic-attribute qualifier="isocode" displayName="isocode"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Title" displayName="Title">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+            </atomic-attributes>
+        </type>
+        <type code="Unit" displayName="Unit">
+            <atomic-attributes>
+                <atomic-attribute qualifier="code" displayName="code"/>
+                <atomic-attribute qualifier="unitType" displayName="unitType"/>
+            </atomic-attributes>
+        </type>
+        <type code="UserGroup">
+            <atomic-attributes>
+                <atomic-attribute qualifier="description" displayName="description"/>
+                <atomic-attribute qualifier="locName" displayName="locName"/>
+                <atomic-attribute qualifier="name" displayName="name"/>
+                <atomic-attribute qualifier="uid" displayName="uid"/>
+            </atomic-attributes>
+        </type>
+        <type code="UserPasswordChangeAudit" displayName="UserPasswordChangeAudit">
+            <atomic-attributes>
+                <atomic-attribute qualifier="changingUser" displayName="changingUser"/>
+                <atomic-attribute qualifier="changingApplication"
+                                  displayName="changingApplication"/>
+                <atomic-attribute qualifier="encodedPassword"
+                                  displayName="encodedPassword"/>
+                <atomic-attribute qualifier="ipAddress" displayName="ipAddress"/>
+                <atomic-attribute qualifier="passwordEncoding" displayName="passwordEncoding"/>
+            </atomic-attributes>
+        </type>
+    </types>
+</audit-report-config>

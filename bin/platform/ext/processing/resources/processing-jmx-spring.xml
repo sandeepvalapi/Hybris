@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           ">
+	
+	<!-- Main Cache JMX MBean -->
+	
+	<!-- bean name="myBean" class="de.hybris.platform.jmx.mbeans.Simple" >
+		<property name="jmxPath" value="agent=james bond 007, main=Bond"/>
+	</bean-->
+
+	<bean id="cronJobInfo" class="de.hybris.platform.cronjob.mbeans.impl.CronJobsInfoMBeanImpl">
+		<property name="jmxPath" value="cronjob=CronJobs"/>  
+		<property name="beanInterface" value="de.hybris.platform.cronjob.mbeans.CronJobsInfoMBean"/>
+		<property name="cronJobService" ref="cronJobService"/>		 
+	</bean>
+
+	<bean id="taskQueueSizeCollector" class="de.hybris.platform.task.impl.TaskQueueSizeStatisticsCollector">
+		<property name="metricRegistry" ref="metricRegistry"/>
+	</bean>
+
+	<bean id="taskQueueSizeChart" class="de.hybris.platform.servicelayer.stats.chart_impl.DefaultStatisticsChart" lazy-init="false">
+		<constructor-arg name="name" value="#{'taskQueueSizeChart_'.concat(tenantService.currentTenantId) }" />
+		<constructor-arg name="unit" value="Tasks" />
+		<constructor-arg name="statisticsService" ref="statisticsService" />
+		<property name="basicLines">
+			<list>
+				<ref bean="taskQueueSizeCollector" />
+			</list>			
+		</property>
+	</bean>
+
+	<bean id="taskQueuePoolingSizeCollector" class="de.hybris.platform.task.impl.TaskQueuePoolingQueueSizeStatisticsCollector">
+		<property name="metricRegistry" ref="metricRegistry"/>
+	</bean>
+
+	<bean id="taskQueuePoolingSizeChart" class="de.hybris.platform.servicelayer.stats.chart_impl.DefaultStatisticsChart" lazy-init="false">
+		<constructor-arg name="name" value="#{'taskQueuePoolingSizeChart_'.concat(tenantService.currentTenantId) }" />
+		<constructor-arg name="unit" value="Tasks" />
+		<constructor-arg name="statisticsService" ref="statisticsService" />
+		<property name="basicLines">
+			<list>
+				<ref bean="taskQueuePoolingSizeCollector" />
+			</list>			
+		</property>
+	</bean>
+	
+	
+	<bean id="dbConnectionsInUseChart" class="de.hybris.platform.task.impl.DBConnectionsInUseStatsticsChart">
+		<constructor-arg name="name" value="#{'dbConnectionsInUseChart_'.concat(tenantService.currentTenantId) }" />
+		<constructor-arg name="unit" value="" />
+		<constructor-arg name="statisticsService" ref="statisticsService" />
+		<property name="basicLines">
+			<list>
+			</list>
+		</property>
+		<property name="views">
+			<map>
+				<entry key="poll">
+					<list>
+					</list>
+				</entry>
+				<entry key="zoom">
+					<list>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

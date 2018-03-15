@@ -1,0 +1,122 @@
+.ASM_customer360-modal .asm-customer360-tab .asm-customer360-promotions h3{
+    display: block;
+    float: none !important;
+    text-align: center;
+    font-size: 22px !important;
+    text-transform: uppercase;
+    border-bottom: 1px solid #d4d7dc;
+    padding-bottom: 20px;
+    margin-bottom: 25px !important;
+    font-family: Dosis, sans-serif;
+    margin-top: 40px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+}
+
+.asm-customer360-promotions .asm-customer360-promotions-addToCart{
+    float: right;
+    margin: 0;
+    display: inline-block;
+    font-size: 13px;
+    color: #fff !important;
+    line-height: 24px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 35px;
+    padding-right: 35px;
+    text-transform: uppercase;
+    font-family: Dosis, sans-serif;
+    font-weight: normal !important;
+    font-size: 18px;
+    background: #3f5875;
+    margin-top: -8px;
+}
+
+.asm-customer360-promotions .asm-customer360-promotions-removefromCart{
+    float: right;
+    margin: 0;
+    display: inline-block;
+    font-size: 10px;
+    color: #18bc33 !important;
+    line-height: 24px;
+    text-transform: uppercase;
+    font-weight: normal !important;
+    font-size: 13px;
+    background: url("../images/check.png") no-repeat left center ;
+    padding-left: 22px;
+}
+
+.asm-customer360-promotions .asm-customer360-promotions-removefromCart .asm-customer360-promotions-removefromCart-pipe{
+    display: inline-block;
+    padding-left: 15px;
+    padding-right: 12px;
+    color: #d5dee8 !important;
+}
+
+
+.asm-customer360-promotions .asm-customer360-promotions-removefromCart .asm-customer360-promotions-removefromCart-remove{
+    color: #ff3a35 !important;
+}
+
+.asm-customer360-promotions .asm-customer360-promotions-item{
+    margin-bottom: 25px;
+    border-bottom: 1px solid #d4d7dc;
+    padding-bottom: 25px;
+    padding-left: 30px;
+    
+}
+
+.asm-customer360-promotions .asm-customer360-promotions-item-title{
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 17px;
+    color: #313440;
+}
+
+.asm-customer360-promotions .asm-customer360-promotions-item-desc{
+    margin-right: 250px;
+    font-size: 15px;
+    color: #313440;
+}
+
+.asm-customer360-promotions .asm-customer360-promotions-item-firedMessage{
+    
+    display: inline-block;
+    font-size: 10px;
+    color: #18bc33 !important;
+    line-height: 24px;
+    text-transform: uppercase;
+    font-weight: normal !important;
+    font-size: 13px;
+    
+    padding-left: 22px;
+}
+
+.asm__customer360-noCoupons{
+    font-size: 15px;
+    color: #313440;
+}
+
+
+
+@media (max-width: 767px) {
+    .asm-customer360-promotions .asm-customer360-promotions-item{
+        padding-left: 0;
+    }
+
+    .asm-customer360-promotions .asm-customer360-promotions-item-desc{
+        margin-right: 0;
+
+    }
+    .asm-customer360-promotions .asm-customer360-promotions-addToCart,
+    .asm-customer360-promotions .asm-customer360-promotions-removefromCart{
+        float: none;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+}
+
+.asm-customer360-promotions-removefromCart-remove,.asm-customer360-promotions-addToCart:hover{
+	cursor:pointer;
+}

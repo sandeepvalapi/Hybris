@@ -1,0 +1,21 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+INSERT_UPDATE Usergroup;uid[unique=true];members(uid);locname[lang=en];
+;childgroup;;Child Group;
+;parentgroup;childgroup;Parent Group;
+
+INSERT_UPDATE Employee;UID[unique=true];name;groups(uid);
+;testagent;Test Agent;parentgroup;
+;testagent2;Test Agent 2;childgroup;
+
+INSERT_UPDATE Usergroup;uid[unique=true];members(uid);locname[lang=en];
+;CustomerList1;parentgroup;"Parent Customer List";
+;CustomerList2;childgroup;"Child Customer List";

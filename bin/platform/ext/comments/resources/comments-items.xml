@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+	
+	
+	<collectiontypes>
+		<collectiontype code="CommentTypes" elementtype="CommentType" autocreate="true" generate="true" type="collection" />
+	</collectiontypes>
+
+	<relations>			
+		<relation code="ReplyParentRelation" autocreate="true" generate="true" localized="false">			
+			<sourceElement qualifier="replies" type="Reply" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers initial="false" read="true" write="true" optional="true" partof="true" />
+			</sourceElement>
+			<targetElement qualifier="parent" type="Reply" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="CommentReplyRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="comment" type="Comment" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="replies" type="Reply" cardinality="many" collectiontype="list" ordered="true">		
+				<modifiers initial="false" read="true" write="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="AbstractCommentAttachmentRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="abstractComment" type="AbstractComment" cardinality="one"><!-- use to be: navigable="false" and no qualifier -->
+				<modifiers initial="false" read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="attachments" type="CommentAttachment" cardinality="many">
+				<modifiers initial="false" read="true" write="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="CommentItemRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="CommentItemRelations" typecode="1147"/>
+			<sourceElement qualifier="comments" type="Comment" cardinality="many" collectiontype="list">
+				<modifiers initial="false" read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement type="Item" cardinality="many" navigable="false">
+			</targetElement>
+		</relation>
+		
+		<relation code="AbstractCommentAuthorRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="createdComments" type="AbstractComment" cardinality="many" collectiontype="list">
+				<modifiers initial="false" read="true" write="true" optional="true" partof="true"/>
+			</sourceElement>
+			<targetElement qualifier="author" type="User" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false"/>
+			</targetElement>
+		</relation>	
+		
+		<relation code="CommentUserSettingAbstractCommentRelation" autocreate="true" generate="true" localized="false">			
+			<sourceElement qualifier="commentUserSettings" type="CommentUserSetting" cardinality="many">
+				<modifiers initial="false" read="true" write="true" optional="true" private="true" partof="true"/>
+			</sourceElement>
+			<targetElement qualifier="comment" type="AbstractComment" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false" />
+			</targetElement>
+		</relation>
+		
+		<relation code="CommentUserSettingUserRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="commentUserSettings" type="CommentUserSetting" cardinality="many" >
+				<modifiers initial="false" read="true" write="true" optional="true" private="true"/>
+			</sourceElement>
+			<targetElement qualifier="user" type="User" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false"/>
+			</targetElement>			
+		</relation>
+		
+		<relation code="CommentAssigneeRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="CommentAssignRelations" typecode="1148"/>
+			<sourceElement qualifier="assignedComments" type="Comment" cardinality="many" collectiontype="list">
+				<modifiers initial="false" read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="assignedTo" type="User" cardinality="many">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="CommentWatcherRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="CommentWatchRelations" typecode="1149"/>
+			<sourceElement qualifier="watchedComments" type="Comment" cardinality="many" collectiontype="list">
+				<modifiers initial="false" read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="watchers" type="Principal" cardinality="many" >
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="DomainComponentRelation" autocreate="true" generate="true" localized="false">			
+			<sourceElement qualifier="domain" type="Domain" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false" unique="true"/>
+			</sourceElement>
+			<targetElement qualifier="components" type="Component" cardinality="many">
+				<modifiers initial="false" read="true" write="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="CommentComponentRelation" autocreate="true" generate="true" localized="false">			
+			<sourceElement qualifier="comment" type="Comment" cardinality="many">
+				<modifiers initial="false" read="true" write="true" optional="true" private="true"/>
+			</sourceElement>
+			<targetElement qualifier="component" type="Component" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false" partof="false" />
+			</targetElement>
+		</relation>
+		
+		<relation code="DomainCommentTypeRelation" autocreate="true" generate="true" localized="false">			
+			<sourceElement qualifier="domain" type="Domain" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false"/>
+			</sourceElement>
+			<targetElement qualifier="commentTypes" type="CommentType" cardinality="many">
+				<modifiers initial="false" read="true" write="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="CommentCommentTypeRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement type="Comment" qualifier="comment" cardinality="many">
+				<modifiers initial="false" read="true" write="true" optional="true" private="true"/>
+			</sourceElement>
+			<targetElement type="CommentType" qualifier="commentType" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="false"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="ComponentReadPrincipalRelation" autocreate="true" generate="true" localized="true">
+			<deployment table="CommentCompReadRels" typecode="1150"/>
+			<sourceElement type="Component" cardinality="many" navigable="false">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="Principal" qualifier="readPermitted" cardinality="many" navigable="true">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="ComponentWritePrincipalRelation" autocreate="true" generate="true" localized="true">
+			<deployment table="CommentCompWriteRels" typecode="1151"/>
+			<sourceElement type="Component" cardinality="many" navigable="false">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="Principal" qualifier="writePermitted" cardinality="many" navigable="true">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="ComponentCreatePrincipalRelation" autocreate="true" generate="true" localized="true">
+			<deployment table="CommentCompCreateRels" typecode="1152"/>
+			<sourceElement type="Component" cardinality="many" navigable="false">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="Principal" qualifier="createPermitted" cardinality="many" navigable="true">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="ComponentRemovePrincipalRelation" autocreate="true" generate="true" localized="true">
+			<deployment table="CommentCompRemoveRels" typecode="1153"/>
+			<sourceElement type="Component" cardinality="many" navigable="false">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="Principal" qualifier="removePermitted" cardinality="many" navigable="true">
+				<modifiers initial="false" read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+	</relations>
+	
+	<itemtypes>
+		<itemtype code="CommentAttachment" generate="true" 
+			jaloclass="de.hybris.platform.comments.jalo.CommentAttachment"
+		   	extends="GenericItem"
+		   	autocreate="true">
+		   	<deployment table="CommentAttachments" typecode="1146"/>
+			<attributes>
+				<attribute type="Item" qualifier="item" generate="true">
+					<persistence type="property"/>
+					<modifiers initial="true" read="true" write="true"
+						optional="false" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="comm_att_comment">
+					<key attribute="abstractComment"/>
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="AbstractComment" generate="true"
+		   jaloclass="de.hybris.platform.comments.jalo.AbstractComment"
+		   extends="GenericItem"
+		   autocreate="true"
+		   abstract="true">
+		   <deployment table="Comments" typecode="1140"/>
+			<attributes>
+				<attribute qualifier="subject" type="java.lang.String">
+					<description>Subject of a comment</description>
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="text" type="java.lang.String" >
+					<description>Content of a comment</description>
+					<modifiers initial="true" read="true" write="true"
+						optional="false" dontOptimize="true"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Comment" generate="true"
+		   jaloclass="de.hybris.platform.comments.jalo.Comment"
+		   extends="AbstractComment"
+		   autocreate="true">
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" unique="true" />
+					<persistence type="property" />
+					<description>unique identifier of the comment; will be generated if not set</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="priority" type="java.lang.Integer">
+					<description>Priority of a comment</description>
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="relatedItems" type="ItemCollection">
+					<description>Related items of this comment</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="jalo" />
+					<model>
+						<getter name="relatedItems" deprecated="true" deprecatedSince="ages" default="true"/>
+						<setter name="relatedItems" deprecated="true" deprecatedSince="ages" default="true"/>
+					</model>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="comment_code">
+					<key attribute="code"/>
+				</index>
+				<index name="comment_component">
+					<key attribute="component"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="Reply" generate="true"
+		   jaloclass="de.hybris.platform.comments.jalo.Reply"
+		   extends="AbstractComment"
+		   autocreate="true">
+			<attributes/>
+			<indexes>
+				<index name="reply_parent">
+					<key attribute="parent"/>
+				</index>
+				<index name="reply_comment">
+					<key attribute="comment"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="Domain" generate="true"
+		   jaloclass="de.hybris.platform.comments.jalo.Domain"
+		   extends="GenericItem"
+		   autocreate="true">
+		   <deployment table="CommentDomains" typecode="1141"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers initial="true" read="true" write="false"
+						optional="true" unique="true" />
+					<persistence type="property" />
+					<description>unique identifier of the domain; will be generated if not set</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>Name of the domain</description>
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="commDomain_code">
+					<key attribute="code"/>
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="Component" generate="true"
+		   jaloclass="de.hybris.platform.comments.jalo.Component"
+		   extends="GenericItem"
+		   autocreate="true">
+		   <deployment table="CommentComponents" typecode="1142"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers initial="true" read="true" write="false"
+						optional="true" unique="true" />
+					<persistence type="property" />
+					<description>unique identifier of the component</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>Name of the component</description>
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="availableCommentTypes" type="CommentTypes">
+					<persistence type="jalo"/>
+					<modifiers write="false"/>
+					<model>
+						<getter name="availableCommentTypes" deprecated="true" deprecatedSince="ages" default="true"/>
+						<setter name="availableCommentTypes" deprecated="true" deprecatedSince="ages" default="true"/>
+					</model>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="commComponent_code">
+					<key attribute="code"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="CommentUserSetting" generate="true"
+		   jaloclass="de.hybris.platform.comments.jalo.CommentUserSetting"
+		   extends="GenericItem"
+		   autocreate="true">
+		   <deployment table="CommentUserSettings" typecode="1144"/>
+			<attributes>
+				<attribute qualifier="read" type="java.lang.Boolean">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="ignored" type="java.lang.Boolean">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="priority" type="java.lang.Integer">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="cus_user_comment" unique="true" >
+					<key attribute="user"/>
+					<key attribute="comment"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="CommentType" generate="true"
+		   jaloclass="de.hybris.platform.comments.jalo.CommentType"
+		   extends="GenericItem"
+		   autocreate="true">
+		   <deployment table="CommentTypes" typecode="1145"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers initial="true" read="true" write="false"
+						optional="true"/>
+					<persistence type="property" />
+					<description>unique identifier of the comment type within domain</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="metaType" type="ComposedType">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="comment_type_code"> <!-- TODO: unique="true" (makes problems with mssql currently -->
+					<key attribute="code"/>
+					<key attribute="domain"/>
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="Principal" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="profilePicture" type="Media">
+					<modifiers initial="false" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

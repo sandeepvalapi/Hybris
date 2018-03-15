@@ -1,0 +1,22 @@
+#unenrcyptedCardsWrapper {
+	margin-bottom: 50px
+}
+
+#fileName {
+	width: 98%;
+}
+
+#spinner {
+	opacity: 0.25;
+	-moz-transform: scale(6);
+	-webkit-transform: scale(6);
+}
+
+#spinnerWrapper {
+	display: none;
+	margin-top: 100px;
+	width: 100%;
+	position: absolute;
+	z-index: 1000;
+	text-align: center;
+}

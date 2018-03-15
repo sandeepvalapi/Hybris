@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- 
+
+XXXX
+
+ -->
+<project name="project.migration">
+
+	<!--
+	  the next line is added allow eclipse resolving the 'platformhome' property.
+	  It is not needed for the normal build process, since platformhome is always set from the outside.
+	  -->
+	<property name="platformhome" location="../../.." />
+	
+	<taskdef name="migrate_cockpit_config" classname="de.hybris.ant.taskdefs.migration.MigrateCsvConfigurationTask">
+		<classpath>
+			<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+		</classpath>
+	</taskdef>
+	
+	<macrodef name="extension_migrate_cockpit_config">
+		<attribute name="extname" />
+		<attribute name="argOldPath" />
+		<attribute name="argCsvPath" />
+		<attribute name="argNewPath" />
+		<sequential>	
+			<migrate_cockpit_config argOldPath="${argOldPath}" argCsvPath="${argCsvPath}" argNewPath="${argNewPath}"/>	
+		</sequential>
+	</macrodef>
+
+</project>

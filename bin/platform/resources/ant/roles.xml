@@ -1,0 +1,481 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="roles">
+
+    <target name="createRole" description="Creates role given by -Drole.name parameter. Uses current config as a base. If -Dclean.config parameter is set to true localextensions.xml and local.properties files will not be copied.">
+        <deprecation_warning />
+        <create_role/>
+    </target>
+
+    <target name="deleteRole" description="Deletes role given by -Drole.name parameter.">
+        <deprecation_warning />
+        <delete_role/>
+    </target>
+
+    <target name="activateRole" description="Activates role given by -Drole.name parameter.">
+        <deprecation_warning />
+        <activate_role/>
+    </target>
+
+    <target name="deactivateRole" description="Deactivates role.">
+        <deprecation_warning />
+        <deactivate_instance/>
+    </target>
+
+    <target name="listRoles" description="Lists roles.">
+        <deprecation_warning />
+        <list_roles/>
+    </target>
+
+    <target name="createInstance" description="Creates role ${role.name}'s instance given by -Drole.name and -Dinstance.name parameters.">
+        <deprecation_warning />
+        <create_instance/>
+    </target>
+
+    <target name="activateInstance" description="Activates role's instance given by -Drole.name and -Dinstance.name parameters.">
+        <deprecation_warning />
+        <activate_instance/>
+    </target>
+
+    <target name="deactivateInstance" description="Deactivates instance.">
+        <deprecation_warning />
+        <deactivate_instance/>
+    </target>
+
+    <target name="deleteInstance" description="Deletes role's instance given by -Drole.name and -Dinstance.name parameters.">
+        <deprecation_warning />
+        <delete_instance/>
+    </target>
+
+    <macrodef name="deprecation_warning">
+        <sequential>
+            <echo>************************************************************************************************************ </echo>
+            <echo>    WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING  </echo>
+            <echo>                                                                                                             </echo>
+            <echo>  Roles feature has been deprecated and is scheduled to be removed in 6.7. Use Docker environment instead.   </echo>
+            <echo>                                                                                                             </echo>
+            <echo>    WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING  </echo>
+            <echo>************************************************************************************************************ </echo>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="create_role">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="role.name"/>
+                </not>
+                <then>
+                    <list_roles/>
+                </then>
+            </if>
+            <input addproperty="role.name" message="enter role name"/>
+            <check_role_present role.name="${role.name}"/>
+            <if>
+                <not>
+                    <isset property="role.present"/>
+                </not>
+                <then>
+                    <echo>creating role ${role.name}</echo>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/base/config"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/base/lib"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/base/temp"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/base/data"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/base/log"/>
+                    <if>
+                        <istrue value="${clean.config}"/>
+                        <then>
+                            <echo>clean.config parameter was set to true, skipping localextensions.xml and local.properties files</echo>
+                            <copy todir="${HYBRIS_ROLES_DIR}/${role.name}/base/config">
+                                <fileset dir="${HYBRIS_CONFIG_DIR}">
+                                    <exclude name="localextensions.xml"/>
+                                    <exclude name="local.properties"/>
+                                </fileset>
+                            </copy>
+                            <copy_catalina_properties role.name="${role.name}"/>
+                        </then>
+                        <else>
+                            <echo>clean.config parameter was set to false, copying localextensions.xml and local.properties files</echo>
+                            <copy todir="${HYBRIS_ROLES_DIR}/${role.name}/base/config">
+                                <fileset dir="${HYBRIS_CONFIG_DIR}"/>
+                            </copy>
+                        </else>
+                    </if>
+
+                </then>
+                <else>
+                    <echo>role ${role.name} is already present</echo>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="copy_catalina_properties">
+        <attribute name="role.name"/>
+        <sequential>
+            <if>
+                <not>
+                    <available file="${HYBRIS_CONFIG_DIR}/tomcat/conf/catalina.properties"/>
+                </not>
+                <then>
+                    <copy todir="${HYBRIS_ROLES_DIR}/@{role.name}/base/config/tomcat/conf">
+                        <fileset dir="${bundled.server.home}/conf">
+                            <include name="catalina.properties"/>
+                        </fileset>
+                    </copy>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="activate_instance">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="role.name"/>
+                </not>
+                <then>
+                    <list_roles/>
+                </then>
+            </if>
+            <input addproperty="role.name" message="enter role name"/>
+            <input addproperty="instance.name" message="enter instance name"/>
+            <echo>Activating role ${role.name}'s instance ${instance.name}</echo>
+            <check_instance_present role.name="${role.name}" instance.name="${instance.name}"/>
+            <if>
+                <isset property="instance.present"/>
+                <then>
+                    <propertyfile
+                            file="${platformhome}/active-role-env.properties"
+                            comment="${role.name} properties">
+                        <entry key="ACTIVE_ROLE" value="${role.name}" operation="="/>
+                        <entry key="ACTIVE_ROLE_INSTANCE" value="${instance.name}" operation="="/>
+                        <entry key="CATALINA_BASE" value="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}/tomcat" operation="="/>
+                        <entry key="HYBRIS_BOOTSTRAP_BIN_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/bootstrap" operation="="/>
+                        <entry key="HYBRIS_CONFIG_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/config" operation="="/>
+                        <entry key="HYBRIS_DATA_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/data" operation="="/>
+                        <entry key="HYBRIS_LOG_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}/log" operation="="/>
+                        <entry key="HYBRIS_TEMP_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}/temp" operation="="/>
+                        <entry key="HYBRIS_BIN_DIR" value="${HYBRIS_BIN_DIR}" operation="="/>
+                    </propertyfile>
+                </then>
+                <else>
+                    <echo>instance ${instance.name} does not exist in role ${role.name}</echo>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="activate_role">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="role.name"/>
+                </not>
+                <then>
+                    <list_roles/>
+                </then>
+            </if>
+            <input addproperty="role.name" message="enter role name"/>
+            <deactivate_instance/>
+            <echo>Activating role ${role.name}</echo>
+            <check_role_present role.name="${role.name}"/>
+            <if>
+                <isset property="role.present"/>
+                <then>
+                    <propertyfile
+                            file="${platformhome}/active-role-env.properties"
+                            comment="${role.name} properties">
+                        <entry key="ACTIVE_ROLE" value="${role.name}" operation="="/>
+                        <entry key="HYBRIS_CONFIG_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/config" operation="="/>
+                        <entry key="HYBRIS_BOOTSTRAP_BIN_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/bootstrap" operation="="/>
+                        <entry key="HYBRIS_TEMP_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/temp" operation="="/>
+                        <entry key="HYBRIS_DATA_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/data" operation="="/>
+                        <entry key="HYBRIS_LOG_DIR" value="${HYBRIS_ROLES_DIR}/${role.name}/base/log" operation="="/>
+                        <entry key="HYBRIS_BIN_DIR" value="${HYBRIS_BIN_DIR}" operation="="/>
+                    </propertyfile>
+                </then>
+                <else>
+                    <echo>role ${role.name} does not exist</echo>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="delete_role" description="Deletes role with name given by -Drole.name parameter">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="role.name"/>
+                </not>
+                <then>
+                    <list_roles/>
+                </then>
+            </if>
+            <input addproperty="role.name" message="enter role name"/>
+            <echo>Deleting role ${role.name}</echo>
+            <check_role_present role.name="${role.name}"/>
+            <if>
+                <isset property="role.present"/>
+                <then>
+                    <load_instance_properties/>
+                    <if>
+                        <equals arg1="${role.name}" arg2="${roles.ACTIVE_ROLE}"/>
+                        <then>
+                            <echo>${role.name} is active, deactivating</echo>
+                            <deactivate_instance/>
+                        </then>
+                    </if>
+                    <delete dir="${HYBRIS_ROLES_DIR}/${role.name}" />
+                </then>
+                <else>
+                    <echo>role ${role.name} does not exist</echo>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="deactivate_instance">
+        <sequential>
+            <echo>Deactivating</echo>
+            <if>
+                <available file="${platformhome}/active-role-env.properties"/>
+                <then>
+                    <delete file="${platformhome}/active-role-env.properties"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="list_roles" description="Returns list of configured server roles">
+        <sequential>
+            <echo>Listing roles</echo>
+            <load_instance_properties/>
+            <if>
+                <available file="${HYBRIS_ROLES_DIR}"/>
+                <then>
+                    <load_role_names/>
+                    <for list="${toString:roles_list}" param="role" delimiter=";">
+                        <sequential>
+                            <if>
+                                <equals arg1="@{role}" arg2="${roles.ACTIVE_ROLE}"/>
+                                <then>
+                                    <echo>@{role} *</echo>
+                                </then>
+                                <else>
+                                    <echo>@{role}</echo>
+                                </else>
+                            </if>
+                            <load_instance_names role.name="@{role}"/>
+                            <for list="${toString:instances_list}" param="instance" delimiter=";">
+                                <sequential>
+                                    <if>
+                                        <and>
+                                            <equals arg1="@{role}" arg2="${roles.ACTIVE_ROLE}"/>
+                                            <equals arg1="@{instance}" arg2="${roles.ACTIVE_ROLE_INSTANCE}"/>
+                                        </and>
+                                        <then>
+                                            <echo>+-->@{instance} *</echo>
+                                        </then>
+                                        <else>
+                                            <echo>+-->@{instance}</echo>
+                                        </else>
+                                    </if>
+                                </sequential>
+                            </for>
+                        </sequential>
+                    </for>
+                    <echo>========</echo>
+                </then>
+                <else>
+                    <echo>HYBRIS_ROLES_DIR is not set</echo>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="load_instance_properties" description="Loads active role's instance properties (if active role is present). All properties are prefixed with roles.">
+        <sequential>
+            <if>
+                <available file="${platformhome}/active-role-env.properties"/>
+                <then>
+                    <loadproperties srcfile="${platformhome}/active-role-env.properties" prefix="roles."/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="load_role_names" description="Sets value of roles_list property to list of role names separated by ;">
+        <sequential>
+            <dirset dir="${HYBRIS_ROLES_DIR}" includes="*" id="roles_list" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="check_role_present" description="Sets value of role.present parameter to true if role ${role.name} is present">
+        <attribute name="role.name"/>
+        <sequential>
+            <var name="role.present" unset="true"/>
+            <load_role_names/>
+            <for list="${toString:roles_list}" param="role" delimiter=";">
+                <sequential>
+                    <if>
+                        <equals arg1="@{role}" arg2="${role.name}"/>
+                        <then>
+                            <property name="role.present" location="true"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="load_instance_names" description="Sets value of instances_list property to list of role's instance names separated by ;">
+        <attribute name="role.name"/>
+        <sequential>
+            <dirset dir="${HYBRIS_ROLES_DIR}/@{role.name}" includes="*" id="instances_list" excludes="base"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="check_instance_present" description="Sets value of instance.present parameter to true if role ${role.name}'s instance ${instance.name} is present">
+        <attribute name="role.name"/>
+        <attribute name="instance.name"/>
+        <sequential>
+            <var name="instance.present" unset="true"/>
+            <check_role_present role.name="${role.name}"/>
+            <if>
+                <isset property="role.present"/>
+                <then>
+                    <load_instance_names role.name="${role.name}"/>
+                    <for list="${toString:instances_list}" param="instance" delimiter=";">
+                        <sequential>
+                            <if>
+                                <equals arg1="@{instance}" arg2="${instance.name}"/>
+                                <then>
+                                    <property name="instance.present" location="true"/>
+                                </then>
+                            </if>
+                        </sequential>
+                    </for>
+                </then>
+                <else>
+                    <echo>role ${role.name} does not exist</echo>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="create_instance">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="role.name"/>
+                </not>
+                <then>
+                    <list_roles/>
+                </then>
+            </if>
+            <input addproperty="role.name" message="enter role name"/>
+            <input addproperty="instance.name" message="enter instance name"/>
+            <check_role_present role.name="${role.name}"/>
+            <check_instance_present role.name="${role.name}" instance.name="${instance.name}"/>
+            <if>
+                <and>
+                    <isset property="role.present"/>
+                    <not>
+                        <isset property="instance.present"/>
+                    </not>
+                </and>
+                <then>
+                    <echo>creating instance ${instance.name} for role ${role.name}</echo>
+                    <input addproperty="http.port" message="enter http port"/>
+                    <input addproperty="ajp.port" message="enter ajp port"/>
+                    <input addproperty="ssl.port" message="enter ssl port"/>
+                    <input addproperty="jmx.port" message="enter jmx port"/>
+                    <input addproperty="jmx.server.port" message="enter jmx server port"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}/config"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}/tomcat"/>
+                    <mkdir dir="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}/tomcat/bin"/>
+                    <echo>updating file ${role.name}'s instance.properties file</echo>
+                    <propertyfile file="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}/config/instance.properties">
+                        <entry key="tomcat.http.port" value="${http.port}" operation="="/>
+                        <entry key="tomcat.ssl.port" value="${ssl.port}" operation="="/>
+                        <entry key="tomcat.ajp.port" value="${ajp.port}" operation="="/>
+                        <entry key="tomcat.jmx.port" value="${jmx.port}" operation="="/>
+                        <entry key="tomcat.jmx.server.port" value="${jmx.server.port}" operation="="/>
+                    </propertyfile>
+                </then>
+                <else>
+                    <if>
+                        <not>
+                            <isset property="role.present"/>
+                        </not>
+                        <then>
+                            <echo>role ${role.name} is not present. create role before creating instance.</echo>
+                        </then>
+                        <else>
+                            <echo>instance ${instance.name} is already present in role ${role.name}</echo>
+                        </else>
+                    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="delete_instance">
+        <sequential>
+            <if>
+                <not>
+                    <isset property="role.name"/>
+                </not>
+                <then>
+                    <list_roles/>
+                </then>
+            </if>
+            <input addproperty="role.name" message="enter role name"/>
+            <input addproperty="instance.name" message="enter instance name"/>
+            <check_instance_present role.name="${role.name}" instance.name="${instance.name}"/>
+            <if>
+                <and>
+                    <isset property="instance.present"/>
+                    <isset property="role.present"/>
+                    <not>
+                        <equals arg1="base" arg2="${instance.name}"/>
+                    </not>
+                </and>
+                <then>
+                    <if>
+                        <and>
+                            <equals arg1="${role.name}" arg2="${ACTIVE_ROLE}"/>
+                            <equals arg1="${instance.name}" arg2="${ACTIVE_ROLE_INSTANCE}"/>
+                        </and>
+                        <then>
+                            <deactivate_instance/>
+                        </then>
+                    </if>
+                    <echo>deleting instance ${instance.name}</echo>
+                    <delete dir="${HYBRIS_ROLES_DIR}/${role.name}/${instance.name}"/>
+                </then>
+                <else>
+                    <if>
+                        <isset property="role.present"/>
+                        <then>
+                            <echo>instance ${instance.name} does not exist in role ${role.name}</echo>
+                        </then>
+                    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+</project>

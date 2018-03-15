@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<editor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="editor.xsd">
+	<group qualifier="General" visible="true" initially-opened="true">
+		<label key="cockpit.config.label.General" />
+		<property qualifier="cmsitem.name"/>
+		<property qualifier="AbstractRestriction.description"/>
+		<property qualifier="CMSUserRestriction.users"/>
+		<property qualifier="cmsitem.uid"/>
+		<property qualifier="cmsitem.catalogVersion" editor="shortListEditor"/>
+	</group>
+
+	<group qualifier="admin" visible="false" initially-opened="false">
+		<label key="config.general.administration" />
+		<property qualifier="Item.pk" />
+		<property qualifier="Item.creationTime" />
+		<property qualifier="Item.modifiedtime" />
+		<property qualifier="AbstractRestriction.type"/>
+		<property qualifier="AbstractRestriction.typeCode"/>
+	</group>
+	
+	<custom-group 
+		class="de.hybris.platform.cockpit.services.config.impl.UnassignedEditorSectionConfiguration" 
+		qualifier="unassigned"
+		initially-opened="false" visible="false">
+		<label key="cockpit.config.label.Other" />
+	</custom-group>
+</editor>

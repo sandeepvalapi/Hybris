@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<audit-report-config name="merge-append">
+	<given-root-type>UserGroup</given-root-type>
+	<types>
+	<type code="UserGroup">
+            <atomic-attributes>
+                <atomic-attribute qualifier="description" displayName="description"/>                
+            </atomic-attributes>
+        </type>
+		<type code="User" mode="append">
+			<atomic-attributes>
+				 <atomic-attribute qualifier="name" displayName="name"/>
+			</atomic-attributes>			
+			<reference-attributes>                
+                <reference-attribute qualifier="defaultShipmentAddress" displayName="defaultShipmentAddress"
+                                     type="Address"/>
+            </reference-attributes>
+            <relation-attributes>
+             
+            </relation-attributes>
+		</type>	
+		 <type code="Address" displayName="Address">
+            <atomic-attributes>
+                <atomic-attribute qualifier="appartment" displayName="appartment"/>                
+            </atomic-attributes>     
+         </type>
+          
+	</types>
+</audit-report-config>

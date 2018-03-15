@@ -1,0 +1,11 @@
+#interceptors, #interceptors_filter {
+	padding-right: 10px;
+}
+.replacingInterceptors {
+	display: none;
+}
+
+#dialogContainer p {
+	padding: 0;
+	margin: 0;
+}

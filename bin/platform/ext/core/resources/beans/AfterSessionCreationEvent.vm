@@ -1,0 +1,75 @@
+/*
+ * ----------------------------------------------------------------
+ * --- WARNING: THIS FILE IS GENERATED AND WILL BE OVERWRITTEN!
+ * --- Generated at $currentDateTime
+ * ----------------------------------------------------------------
+ *
+ * [y] hybris Platform
+ * 
+ * Copyright (c) 2000-2016 SAP SE
+ * All rights reserved.
+ * 
+ * This software is the confidential and proprietary information of SAP 
+ * Hybris ("Confidential Information"). You shall not disclose such 
+ * Confidential Information and shall use it only in accordance with the 
+ * terms of the license agreement you entered into with SAP Hybris.
+ */
+package $packageName;
+
+import java.io.Serializable;
+
+#foreach($i in $imports)
+import $i;
+#end
+#if ( ! $imports.isEmpty() )
+
+#end
+#if ( $hasDescription )
+/**
+ * $description
+ */
+#end
+public class $shortClassName #if($superclassName)extends $superclassName #else implements java.io.Serializable #end
+
+{
+	#foreach($v in $memberVariables)
+$v.comment
+	private $v.type $v.name;
+	#end
+	
+	public ${constructorName}()
+	{
+		// default constructor
+	}
+
+	public ${constructorName}(final Serializable session)
+	{
+		super(session);
+	}
+	
+	#foreach($v in $memberVariables)
+#if ($v.overridden)@Override #end
+	
+	public void set${StringUtils.capitalize($v.name)}(final ${v.type} ${v.name})
+	{
+		this.${v.name} = ${v.name};
+	}
+	
+#if ($v.overridden)	@Override #end
+	#if ($v.type == 'boolean')	
+	
+	public $v.type is${StringUtils.capitalize($v.name)}() 
+	{
+		return $v.name;
+	}
+	#else
+	
+	public $v.type get${StringUtils.capitalize($v.name)}() 
+	{
+		return $v.name;
+	}
+	#end
+	
+	#end
+
+}

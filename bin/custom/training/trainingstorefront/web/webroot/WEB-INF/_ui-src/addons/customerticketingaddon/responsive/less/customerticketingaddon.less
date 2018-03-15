@@ -1,0 +1,127 @@
+//variables for highlighting the ticket status and message, colors are differ from CoreACC
+@cts-ticket-status-open-in-process-color: #0486e0;
+@cts-ticket-message-open-in-process-color: #a3e2ff;
+@cts-ticket-status-closed-color: #18bc33;
+@cts-ticket-message-closed-color: #a1eeae;
+
+.cts-msg-history {
+  margin-top: @grid-gutter-width;
+  .full-width-padding();
+
+  &-item {
+    margin-top: @grid-gutter-width;
+    display: none;
+
+    &-info {
+      font-size: @font-size-large-1;
+      margin-bottom: (@grid-gutter-width / 2);
+      padding: 0 @grid-gutter-width;
+
+      @media (max-width: @screen-xs-max) {
+        padding: 0;
+      }
+
+      .author {
+        font-weight: bold;
+      }
+    }
+
+    .well {
+      border-radius: 3px;
+      border: 1px solid @border-color-2;
+
+      &.well-tertiary {
+        border: 1px solid @table-head-bg;
+        opacity: .5;
+      }
+      &.well-closed{
+        background-color: @cts-ticket-message-closed-color;
+      }
+      &.well-reopen{
+        background-color: @cts-ticket-message-open-in-process-color;
+      }
+
+      @media (max-width: @screen-xs-max) {
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        margin-left: -@grid-gutter-width;
+        margin-right: -@grid-gutter-width;
+      }
+    }
+
+    &-msg {
+      font-size: @font-size-large-1;
+    }
+
+    &.ct-msg-visible {
+      display: block;
+    }
+
+    &-agent {
+      .well,
+      .cts-msg-history-item-info {
+        text-align: right;
+      }
+    }
+  }
+
+  #ct-toggle-all-messages {
+    display: block;
+    text-align: center;
+    margin-top: @grid-gutter-width;
+
+  }
+}
+
+.cts-msg-history-item-modified-field {
+  margin-left: 5px;
+
+  &:before{
+    content: "|";
+    position: relative;
+    left: -3px;
+    top: -2px;
+    color: @text-color-secondary;
+  }
+}
+.cts-msg-history-item-modified-field--status {
+  font-size: @font-size-base;
+  font-weight: 700;
+  text-transform: uppercase;
+
+  &-inprocess,
+  &-open,
+  &-reopen{
+    color: @cts-ticket-status-open-in-process-color;
+  }
+
+  &-completed,
+  &-closed {
+    color:@cts-ticket-status-closed-color;
+  }
+}
+
+#supportTicketForm {
+  textarea.form-control {
+    height: 240px;
+  }
+}
+
+.cts-attach-list {
+  .list-unstyled;
+  border-top: 1px solid @border-color-2;
+  margin: @grid-gutter-width -@grid-gutter-width 0;
+  padding: (@grid-gutter-width/2) @grid-gutter-width 0;
+  font-size: @font-size-large-1;
+}
+.cts-attach-file {
+  padding: 3px 0;
+
+  .glyphicon {
+    color: @link-hover-color;
+    font-size: 1.125em;
+    margin-right: 3px;
+    top: 4px;
+  }
+}

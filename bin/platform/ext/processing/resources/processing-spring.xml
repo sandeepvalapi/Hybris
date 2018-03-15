@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="Task_executionDateAttributeHandler"
+			class="de.hybris.platform.servicelayer.dynamic.TaskExecutionDateAttributeHandler"/>
+
+	<bean id="Task_expirationDateAttributeHandler"
+			class="de.hybris.platform.servicelayer.dynamic.TaskExpirationDateAttributeHandler"/>
+
+	<bean id="TaskCondition_expirationDateAttributeHandler"
+			class="de.hybris.platform.servicelayer.dynamic.TaskConditionExpirationDateAttributeHandler"/>
+
+	<bean id="TaskPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.TaskPrepareInterceptor" />
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="TaskPrepareInterceptor"/>
+		<property name="typeCode" value="Task"/>
+	</bean>
+
+	<bean id="TaskConditionPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.TaskConditionPrepareInterceptor" />
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="TaskConditionPrepareInterceptor"/>
+		<property name="typeCode" value="TaskCondition"/>
+	</bean>
+
+    <bean id="distributedProcessCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+        <property name="key" value="${keygen.distributed.process.code.name}"/>
+        <property name="digits" value="${keygen.distributed.process.code.digits}"/>
+        <property name="start" value="${keygen.distributed.process.code.start}"/>
+        <property name="type" value="${keygen.distributed.process.code.type}"/>
+        <property name="template" value="${keygen.distributed.process.code.template}"/>
+    </bean>
+
+    <bean id="abstractSimpleDistributedProcessHandler"
+          class="de.hybris.platform.processing.distributed.simple.SimpleAbstractDistributedProcessHandler"
+          abstract="true">
+        <constructor-arg ref="defaultModelService"/>
+        <constructor-arg ref="defaultFlexibleSearchService"/>
+        <constructor-arg ref="defaultDistributedProcessService"/>
+    </bean>
+
+    <bean id="simpleScriptingDistributedProcessHandler"
+          class="de.hybris.platform.processing.distributed.simple.SimpleScriptingDistributedProcessHandler"
+          parent="abstractSimpleDistributedProcessHandler">
+        <constructor-arg ref="scriptingLanguagesService"/>
+    </bean>
+
+    <!-- For testing only -->
+    <bean id="testCronJobFactory" class="de.hybris.platform.servicelayer.cronjob.TestCronJobFactory"/>
+
+    <bean id="testSimpleDistributedProcessHandler"
+          class="de.hybris.platform.processing.distributed.simple.SimpleDistributedProcessHandler"
+          parent="abstractSimpleDistributedProcessHandler">
+        <constructor-arg>
+            <bean class="de.hybris.platform.processing.distributed.simple.TestBatchProcessor">
+                <property name="modelService" ref="modelService"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="multiValueTestSimpleDistributedProcessHandler"
+          class="de.hybris.platform.processing.distributed.simple.SimpleDistributedProcessHandler"
+          parent="abstractSimpleDistributedProcessHandler">
+        <constructor-arg>
+            <bean class="de.hybris.platform.processing.distributed.simple.MultiValueTestBatchProcessor">
+                <property name="modelService" ref="modelService"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="completelyFailingTestSimpleDistributedProcessHandler"
+          class="de.hybris.platform.processing.distributed.simple.SimpleDistributedProcessHandler"
+          parent="abstractSimpleDistributedProcessHandler">
+        <constructor-arg>
+            <bean class="de.hybris.platform.processing.distributed.simple.CompletelyFailingBatchProcessor">
+                <property name="modelService" ref="modelService"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="sometimesFailingTestSimpleDistributedProcessHandler"
+          class="de.hybris.platform.processing.distributed.simple.SimpleDistributedProcessHandler"
+          parent="abstractSimpleDistributedProcessHandler">
+        <constructor-arg>
+            <bean class="de.hybris.platform.processing.distributed.simple.SometimesFailingBatchProcessor">
+                <property name="modelService" ref="modelService"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+</beans>

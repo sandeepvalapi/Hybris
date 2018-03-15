@@ -1,0 +1,15 @@
+<%@ tag body-content="empty" trimDirectiveWhitespaces="true"%>
+<%@ attribute name="store" required="false" type="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+
+<div class="storeMap">	
+	<c:if test="${store ne null and store.geoPoint.latitude ne null and store.geoPoint.longitude ne null}">
+		<div class="store_map_details" id="map_canvas"
+			data-latitude = '${store.geoPoint.latitude}'
+			data-longitude = '${store.geoPoint.longitude}'
+			data-stores= '{"id":"0","latitude":"${store.geoPoint.latitude}","longitude":"${store.geoPoint.longitude}","name":"<div class=strong>${fn:escapeXml(store.name)}</div><div>${fn:escapeXml(store.address.line1)}</div><div>${fn:escapeXml(store.address.line2)}</div><div>${fn:escapeXml(store.address.town)}</div><div>${fn:escapeXml(store.address.postalCode)}</div><div>${fn:escapeXml(store.address.country.name)}</div>"}'
+			></div>
+	</c:if>
+</div>

@@ -1,0 +1,1 @@
+﻿${ctx.messages.getMessage('emailSubject', ${ctx.quote.code}, ${ctx.quote.expirationTime})}

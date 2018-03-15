@@ -1,0 +1,2113 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+    <collectiontypes>
+        <!-- cronjob -->
+        <collectiontype code="CronJobList" elementtype="CronJob" autocreate="true" generate="true" type="list"/>
+        <collectiontype code="StepList" elementtype="Step" autocreate="true" generate="true" type="list"/>
+        <collectiontype code="TriggerList" elementtype="Trigger" autocreate="true" generate="true" type="list"/>
+        <collectiontype code="JobLogList" elementtype="JobLog" autocreate="true" generate="true" type="list"/>
+        <collectiontype code="ChangeDescriptorList" elementtype="ChangeDescriptor" autocreate="true" generate="true"
+                        type="collection"/>
+        <collectiontype code="DayOfWeekList" elementtype="DayOfWeek" autocreate="true" generate="true" type="list"/>
+        <collectiontype code="LogFileCollection" elementtype="LogFile" autocreate="true" generate="true"/>
+        <collectiontype code="CronJobResultCollection" elementtype="CronJobResult" autocreate="true" generate="true"
+                        type="collection"/>
+        <collectiontype code="CronJobStatusCollection" elementtype="CronJobStatus" autocreate="true" generate="true"
+                        type="collection"/>
+        <!-- processengine -->
+        <collectiontype elementtype="java.lang.String" code="WizardProcessStatesCollection" autocreate="true"/>
+    </collectiontypes>
+
+    <enumtypes>
+        <!-- cronjob -->
+        <enumtype code="CronJobStatus" autocreate="true" generate="true">
+            <description>The status indicates the condition which the CronJob is in</description>
+            <model package="de.hybris.platform.cronjob.enums"/>
+            <value code="RUNNINGRESTART">
+                <description>The CronJob's execution has previously been canceled, so it has been restarted and is
+                    currently still running
+                </description>
+            </value>
+            <value code="RUNNING">
+                <description>The CronJob is being executed right now</description>
+            </value>
+            <value code="PAUSED">
+                <description>The CronJob's execution has been interrupted in its execution, either automatically by a
+                    piece of business logic or manually by user intervention. You will need to resume the CronJob's
+                    execution if you want it to finish its run.
+                </description>
+            </value>
+            <value code="FINISHED">
+                <description>The CronJob has completed its run</description>
+            </value>
+            <value code="ABORTED">
+                <description>The CronJob's execution has been cancelled - either due to an error or due to user
+                    intervention. Check the CronJob's log for details
+                </description>
+            </value>
+            <value code="UNKNOWN">
+                <description>Most probably, a CronJob in this state has never been run before</description>
+            </value>
+        </enumtype>
+
+        <enumtype code="CronJobResult" autocreate="true" generate="true">
+            <description>The result reports on how the CronJob's last run was.</description>
+            <model package="de.hybris.platform.cronjob.enums"/>
+            <value code="SUCCESS">
+                <description>The CronJob was executed without running into any problems</description>
+            </value>
+            <value code="FAILURE">
+                <description>The CronJob has completed its run on schedule, but it was not successful for some reason.
+                    Unlike the 'ERROR' result, this indicates a planned completion of the CronJob. Check the CronJob's
+                    log for details.
+                </description>
+            </value>
+            <value code="ERROR">
+                <description>There was a problem during the CronJob's run (for example, the Java Virtual Machine was
+                    terminated or there was a system exception). Unlike the {literal}FAILURE{literal} status, this
+                    status indicates an uncontrolled termination of the CronJob. Check the CronJob's log for details.
+                </description>
+            </value>
+            <value code="UNKNOWN">
+                <description>No result is available. Most probably the CronJob has never been started yet.</description>
+            </value>
+        </enumtype>
+
+        <enumtype code="JobLogLevel" autocreate="true" generate="true">
+            <model package="de.hybris.platform.cronjob.enums"/>
+            <value code="DEBUG"/>
+            <value code="INFO"/>
+            <value code="WARNING"/>
+            <value code="ERROR"/>
+            <value code="FATAL"/>
+            <value code="UNKNOWN"/>
+        </enumtype>
+
+        <enumtype code="ErrorMode" autocreate="true" generate="true">
+            <model package="de.hybris.platform.cronjob.enums"/>
+            <value code="FAIL"/>
+            <value code="PAUSE"/>
+            <value code="IGNORE"/>
+        </enumtype>
+
+        <enumtype code="DayOfWeek" autocreate="true" generate="true">
+            <model package="de.hybris.platform.cronjob.enums"/>
+            <value code="SUNDAY"/>
+            <value code="MONDAY"/>
+            <value code="TUESDAY"/>
+            <value code="WEDNESDAY"/>
+            <value code="THURSDAY"/>
+            <value code="FRIDAY"/>
+            <value code="SATURDAY"/>
+        </enumtype>
+
+        <!-- task -->
+        <enumtype code="ActionType" autocreate="false" generate="true">
+            <value code="TASK"/>
+            <!-- from processengine -->
+            <value code="PROCESS"/>
+        </enumtype>
+
+        <!-- processengine -->
+        <enumtype generate="true" code="ProcessState" autocreate="true" dynamic="false">
+            <model package="de.hybris.platform.processengine.enums"/>
+            <value code="CREATED"/>
+            <value code="RUNNING"/>
+            <value code="WAITING"/>
+            <value code="SUCCEEDED"/>
+            <value code="FAILED"/>
+            <value code="ERROR"/>
+        </enumtype>
+
+        <enumtype code="BooleanOperator" generate="true" autocreate="true" dynamic="false">
+            <model package="de.hybris.platform.processengine.enums"/>
+            <value code="AND"/>
+            <value code="OR"/>
+        </enumtype>
+
+		<enumtype code="DistributedProcessState" autocreate="true" generate="true">
+			<value code="CREATED"/>
+			<value code="INITIALIZING"/>
+			<value code="SCHEDULING_EXECUTION"/>
+			<value code="WAITING_FOR_EXECUTION"/>
+			<value code="SUCCEEDED"/>
+			<value code="FAILED"/>
+			<value code="STOPPED"/>
+		</enumtype>
+
+		<enumtype code="BatchType" autocreate="true" generate="true">
+   			<value code="INITIAL"/>
+   			<value code="INPUT"/>
+   			<value code="RESULT"/>
+   		</enumtype>
+
+    </enumtypes>
+
+	<maptypes>
+		<maptype code="QueryParametersMapType"
+               argumenttype="java.lang.String"
+               returntype="java.lang.String"
+               autocreate="true"
+               generate="true"/>
+	</maptypes>
+	
+    <relations>
+        <!-- cronjob -->
+        <relation code="CronJobProcessedStepsRelation" autocreate="true" generate="true" localized="false">
+            <deployment table="ProcessedStepsRelation" typecode="506"/>
+            <sourceElement qualifier="processedCronJobs" type="CronJob" cardinality="many" ordered="false">
+                <description>processed cronjobs</description>
+                <modifiers read="true" write="false" search="true" optional="true" private="true"/>
+            </sourceElement>
+            <targetElement qualifier="processedSteps" type="Step" cardinality="many" ordered="true"
+                           collectiontype="list">
+                <description>processed steps</description>
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="CronJobPendingStepsRelation" autocreate="true" generate="true" localized="false">
+            <deployment table="PendingStepsRelation" typecode="507"/>
+            <sourceElement qualifier="pendingCronJobs" type="CronJob" cardinality="many" ordered="false">
+                <description>pending cronjobs</description>
+                <modifiers read="true" write="false" search="true" optional="true" private="true"/>
+            </sourceElement>
+            <targetElement qualifier="pendingSteps" type="Step" cardinality="many" ordered="true" collectiontype="list">
+                <description>pending steps</description>
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="JobSearchRestrictionRelation" autocreate="true" generate="true" localized="false">
+            <sourceElement qualifier="job" type="Job" cardinality="one" ordered="false">
+                <description>assigned job</description>
+                <modifiers read="true" write="true" search="true"/>
+            </sourceElement>
+            <targetElement qualifier="restrictions" type="JobSearchRestriction" cardinality="many" ordered="true"
+                           collectiontype="list">
+                <description>processed steps</description>
+                <modifiers read="true" write="true" search="true" partof="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="CompositeCronJobEntriesRelation" autocreate="true" generate="true" localized="false">
+            <sourceElement qualifier="compositeCronJob" type="CompositeCronJob" cardinality="one" ordered="false">
+                <description>assigned CronJob</description>
+                <modifiers read="true" write="true" search="true"/>
+            </sourceElement>
+            <targetElement qualifier="compositeEntries" type="CompositeEntry" cardinality="many" ordered="true"
+                           collectiontype="list">
+                <description>list of cronjobs/jobs which will be executed</description>
+                <modifiers read="true" write="true" search="true" partof="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="CronJobJobLogsRelation" generate="true" localized="false" autocreate="true">
+            <sourceElement qualifier="cronJob" type="CronJob" cardinality="one">
+                <description>assigned CronJob</description>
+                <modifiers read="true" write="false" initial="true" optional="false" search="true"/>
+            </sourceElement>
+            <targetElement qualifier="logs" type="JobLog" cardinality="many" collectiontype="list">
+                <description>list of jobLogs</description>
+                <modifiers read="true" write="false" initial="false" search="true" partof="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="JobTriggerRelation" generate="true" localized="false" autocreate="true">
+            <sourceElement qualifier="job" type="Job" cardinality="one">
+                <description>assigned job</description>
+                <modifiers read="true" write="false" initial="true" search="true"/>
+            </sourceElement>
+            <targetElement qualifier="triggers" type="Trigger" cardinality="many" collectiontype="list">
+                <description>list of triggers</description>
+                <modifiers read="true" write="true" search="true" partof="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="CronJobTriggerRelation" generate="true" localized="false" autocreate="true">
+            <sourceElement qualifier="cronJob" type="CronJob" cardinality="one">
+                <description>assigned cronjob</description>
+                <modifiers read="true" write="false" initial="true" search="true"/>
+            </sourceElement>
+            <targetElement qualifier="triggers" type="Trigger" cardinality="many" collectiontype="list">
+                <description>list of triggers</description>
+                <modifiers read="true" write="true" search="true" partof="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="JobCronJobRelation" generate="true" localized="false" autocreate="true">
+            <sourceElement qualifier="job" type="Job" cardinality="one">
+                <description>References to the Job assigned to the CronJob</description>
+                <modifiers read="true" write="false" initial="true" optional="false" search="true"/>
+            </sourceElement>
+            <targetElement qualifier="cronJobs" type="CronJob" cardinality="many">
+                <description>CronJobs the job is assigned to</description>
+                <modifiers read="true" write="false" initial="false" search="true"/>
+            </targetElement>
+        </relation>
+        
+        <relation code="CronJobHistoryRelation" autocreate="true" generate="true" localized="false">
+                <sourceElement qualifier="cronJob" type="CronJob" cardinality="one">
+                        <description>cronjob</description>
+                        <modifiers read="true" write="true" search="true"/>
+                </sourceElement>
+                <targetElement qualifier="cronJobHistoryEntries" type="CronJobHistory" cardinality="many" ordered="true" collectiontype="list">
+                        <description>history entries</description>
+                        <modifiers read="true" write="true" search="true" partof="true"/>	
+                </targetElement>
+        </relation>
+
+        <!-- task -->
+        <relation code="TaskConditionRelation" autocreate="true" generate="true" localized="false">
+            <sourceElement type="Task" qualifier="task" cardinality="one">
+                <modifiers read="true" write="true" optional="true"/>
+            </sourceElement>
+            <targetElement type="TaskCondition" qualifier="conditions" cardinality="many" collectiontype="set"
+                           ordered="false">
+                <modifiers read="true" write="true" optional="true" partof="true"/>
+            </targetElement>
+        </relation>
+
+        <!-- processengine -->
+        <relation generate="true" localized="false" code="Process2TaskRelation"
+                  autocreate="true">
+            <sourceElement type="BusinessProcess" cardinality="one"
+                           qualifier="process">
+                <modifiers initial="true" optional="false"/>
+            </sourceElement>
+            <targetElement type="ProcessTask" cardinality="many"
+                           qualifier="currentTasks"/>
+        </relation>
+
+        <relation generate="true" localized="false" code="Process2ProcessParameterRelation"
+                  autocreate="true">
+            <sourceElement type="BusinessProcess" cardinality="one" qualifier="process">
+                <modifiers initial="true" optional="false"/>
+            </sourceElement>
+            <targetElement type="BusinessProcessParameter" cardinality="many" qualifier="contextParameters">
+                <modifiers partof="true"/>
+            </targetElement>
+        </relation>
+
+        <relation generate="true" localized="false" code="Process2TaskLogRelation"
+                  autocreate="true">
+            <sourceElement type="BusinessProcess" cardinality="one"
+                           qualifier="process">
+                <modifiers initial="true" optional="false"/>
+            </sourceElement>
+            <targetElement type="ProcessTaskLog" cardinality="many"
+                           qualifier="taskLogs">
+                <modifiers initial="false" optional="true" partof="true"/>
+            </targetElement>
+        </relation>
+        
+        <relation generate="true" localized="false" code="DistributedProcess2BatchRelation" autocreate="true">
+   			<sourceElement type="DistributedProcess" cardinality="one" qualifier="process">
+   				<modifiers read="true" write="false" optional="false" initial="true" unique="true" />
+   			</sourceElement>
+   			<targetElement type="Batch" cardinality="many" qualifier="batches">
+   				<modifiers partof="true" />
+   			</targetElement>
+   		</relation>	
+        
+    </relations>
+
+    <itemtypes>
+        <!-- cronjob -->
+
+        <itemtype code="Job" jaloclass="de.hybris.platform.cronjob.jalo.Job" extends="GenericItem" autocreate="true"
+                  generate="true"
+                  abstract="true">
+            <deployment table="Jobs" typecode="500"/>
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+                <property name="legacyPersistence">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                    <custom-properties>
+                        <property name="hmcIndexField">
+                            <value>"thefield"</value>
+                        </property>
+                    </custom-properties>
+                </attribute>
+                <attribute qualifier="nodeID" type="java.lang.Integer">
+                    <description>Node ID</description>
+                    <modifiers read="true" write="false" initial="true" search="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="nodeGroup" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <!--   introduced attributes from cronjob start  -->
+                <attribute qualifier="errorMode" type="ErrorMode">
+                    <description>the error mode. @since 2.10</description>
+                    <modifiers read="true" write="true" initial="false" search="true" optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("ErrorMode", "IGNORE")</defaultvalue>
+                </attribute>
+                <attribute qualifier="logToFile" type="java.lang.Boolean">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                </attribute>
+                <attribute qualifier="logToDatabase" type="java.lang.Boolean">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                </attribute>
+                <attribute qualifier="logLevelFile" type="JobLogLevel">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("JobLogLevel", "INFO")</defaultvalue>
+                </attribute>
+
+                <attribute qualifier="logLevelDatabase" type="JobLogLevel">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("JobLogLevel", "WARNING")</defaultvalue>
+                </attribute>
+                <attribute qualifier="sessionUser" type="User">
+                    <modifiers read="true" write="true" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sessionLanguage" type="Language">
+                    <modifiers read="true" write="true" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sessionCurrency" type="Currency">
+                    <modifiers read="true" write="true" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sessionContextValues" type="java.util.Map">
+                    <description>the sessioncontext values. @since 2.20</description>
+                    <modifiers read="true" write="true" initial="true" optional="true" dontOptimize="true"
+                               private="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="active" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="retry" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="singleExecutable" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="emailAddress" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                    <custom-properties>
+                        <property name="hmcIndexField">
+                            <value>"thefield"</value>
+                        </property>
+                    </custom-properties>
+                </attribute>
+                <attribute qualifier="sendEmail" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="changeRecordingEnabled" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true" search="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="requestAbort" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="requestAbortStep" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="priority" type="java.lang.Integer">
+                    <description>the priority. @since 2.10</description>
+                    <defaultvalue>Integer.valueOf(4)</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true" search="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="removeOnExit" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="emailNotificationTemplate" type="RendererTemplate">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="alternativeDataSourceID" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+            <!--   introduced attributes from cronjob end  -->
+            <indexes>
+                <index name="IdxCode">
+                    <key attribute="code"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="BatchJob" jaloclass="de.hybris.platform.cronjob.jalo.BatchJob" extends="Job" autocreate="true"
+                  generate="true">
+            <attributes>
+                <attribute qualifier="steps" type="StepList">
+                    <modifiers read="true" write="true" initial="false" optional="true" partof="true"/>
+                    <persistence type="jalo"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="CronJobHistory"
+                  jaloclass="de.hybris.platform.cronjob.jalo.CronJobHistory"
+                  extends="GenericItem" autocreate="true" generate="true">
+            <deployment table="CronJobHistories" typecode="522"/>
+            <attributes>
+                <attribute qualifier="cronJobCode" type="java.lang.String">
+                    <modifiers initial="true" read="true" write="false"
+                               optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="jobCode" type="java.lang.String">
+                    <modifiers initial="true" read="true" write="false"
+                               optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="startTime" type="java.util.Date">
+                    <modifiers initial="true" read="true" write="false"
+                               optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="endTime" type="java.util.Date">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+                <attribute type="int" qualifier="nodeID">
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+                <attribute qualifier="scheduled" type="java.lang.Boolean">
+                    <defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="userUid" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+                <attribute qualifier="status" type="CronJobStatus">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <defaultvalue>em().getEnumerationValue("CronJobStatus", "UNKNOWN")</defaultvalue>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="result" type="CronJobResult">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <defaultvalue>em().getEnumerationValue("CronJobResult", "UNKNOWN")</defaultvalue>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="failureMessage" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+                <attribute qualifier="progress" type="java.lang.Double">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+                <attribute qualifier="statusLine" type="java.lang.String">
+                	<persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+
+        <itemtype code="CronJob" jaloclass="de.hybris.platform.cronjob.jalo.CronJob" extends="GenericItem"
+                  autocreate="true"
+                  generate="true">
+            <deployment table="CronJobs" typecode="501"/>
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+                <property name="legacyPersistence">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="true" optional="true" unique="true"/>
+                    <persistence type="property"/>
+                    <description>Identifier for the CronJob</description>
+                    <custom-properties>
+                        <property name="hmcIndexField">
+                            <value>"thefield"</value>
+                        </property>
+                    </custom-properties>
+                </attribute>
+                <attribute qualifier="errorMode" type="ErrorMode">
+                    <description>the error mode. @since 2.10</description>
+                    <modifiers read="true" write="true" initial="false" search="true" optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("ErrorMode", "IGNORE")</defaultvalue>
+                </attribute>
+                <attribute qualifier="logToFile" type="java.lang.Boolean">
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <description>Whether the CronJob's execution log is written to a log file</description>
+                </attribute>
+                <attribute qualifier="logToDatabase" type="java.lang.Boolean">
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <description>Whether the CronJob's execution log is written to a log entry in the hybris Suite's
+                        database
+                    </description>
+                </attribute>
+                <attribute qualifier="logLevelFile" type="JobLogLevel">
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("JobLogLevel", "INFO")</defaultvalue>
+                    <description>Specifies the log level for logging to the file</description>
+                </attribute>
+                <attribute qualifier="logLevelDatabase" type="JobLogLevel">
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("JobLogLevel", "WARNING")</defaultvalue>
+                    <description>Specifies the log level for logging to the database</description>
+                </attribute>
+                <attribute qualifier="logFiles" type="LogFileCollection">
+                    <modifiers read="true" write="true" optional="true" dontOptimize="true" partof="true"/>
+                    <persistence type="jalo"/>
+                    <description>A list of log files related to the current CronJob</description>
+                </attribute>
+                <attribute qualifier="sessionUser" type="User">
+                    <modifiers read="true" write="true" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                    <description>The user in whose context (access rights, restrictions, etc) the CronJob will be
+                        executed
+                    </description>
+                </attribute>
+                <attribute qualifier="sessionLanguage" type="Language">
+                    <modifiers read="true" write="true" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                    <description>The system language to execute the CronJob in</description>
+                </attribute>
+                <attribute qualifier="sessionCurrency" type="Currency">
+                    <modifiers read="true" write="true" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                    <description>The system currency with which to execute the CronJob</description>
+                </attribute>
+                <attribute qualifier="sessionContextValues" type="java.util.Map">
+                    <description>the sessioncontext values. @since 2.20</description>
+                    <modifiers read="true" write="true" initial="true" optional="true" dontOptimize="true"
+                               private="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="active" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <description>Whether the CronJob is active (is run when its trigger is due). If set to false, the
+                        CronJob will not be executed if its trigger is due
+                    </description>
+                </attribute>
+                <attribute qualifier="retry" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <description>If an assigned job can't be started because of an already running job, a trigger will
+                        be created for the the cronjob instance with current time as activation time. This one will be
+                        triggerd on next poll repeatedly till the cronjob gets executed once
+                    </description>
+                </attribute>
+                <attribute qualifier="singleExecutable" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <description>If the assigned TriggerableJob instance can not be performed yet, a new Trigger for
+                        this CronJob will be created
+                    </description>
+                </attribute>
+                <attribute qualifier="emailAddress" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                    <description>The e-mail address to which to send a notification on the CronJob's execution
+                    </description>
+                    <custom-properties>
+                        <property name="hmcIndexField">
+                            <value>"thefield"</value>
+                        </property>
+                    </custom-properties>
+                </attribute>
+                <attribute qualifier="sendEmail" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <description>Whether a status e-mail is to be sent after the CronJob's execution</description>
+                </attribute>
+                <attribute qualifier="startTime" type="java.util.Date">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="endTime" type="java.util.Date">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="status" type="CronJobStatus">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <defaultvalue>em().getEnumerationValue("CronJobStatus", "UNKNOWN")</defaultvalue>
+                    <persistence type="property"/>
+                    <description>The CronJob's execution status</description>
+                </attribute>
+                <attribute qualifier="result" type="CronJobResult">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <defaultvalue>em().getEnumerationValue("CronJobResult", "UNKNOWN")</defaultvalue>
+                    <persistence type="property"/>
+                    <description>The CronJob's execution result</description>
+                </attribute>
+                <attribute qualifier="logText" type="java.lang.String">
+                    <modifiers read="true" write="false" initial="false" optional="true"/>
+                    <persistence type="jalo"/>
+                </attribute>
+                <attribute qualifier="nodeID" type="java.lang.Integer">
+                    <modifiers read="true" write="true" initial="true" search="true" optional="true"/>
+                    <persistence type="property"/>
+                    <description>The number of the cluster node on which the CronJob is to be run. This setting is
+                        relevant for clustered hybris Suite installations only.
+                    </description>
+                </attribute>
+                <attribute qualifier="nodeGroup" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+                <attribute qualifier="runningOnClusterNode" type="java.lang.Integer">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+                <attribute qualifier="currentStep" type="Step">
+                    <modifiers read="true" write="false" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="changeRecordingEnabled" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false" search="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="changes" type="ChangeDescriptorList">
+                    <modifiers read="true" write="false" initial="false" optional="true" partof="true"/>
+                    <persistence type="jalo"/>
+                </attribute>
+                <attribute qualifier="requestAbort" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="requestAbortStep" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="timeTable" type="java.lang.String">
+                    <modifiers read="true" write="false" initial="false" optional="true"/>
+                    <persistence type="dynamic" attributeHandler="cronjobTimetable"/>
+                </attribute>
+                <attribute qualifier="priority" type="java.lang.Integer">
+                    <description>the priority. @since 2.10</description>
+                    <defaultvalue>Integer.valueOf(4)</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true" search="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="removeOnExit" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                    <description>If set to true, the CronJob is removed from the hybris Suite after execution
+                    </description>
+                </attribute>
+                <attribute qualifier="emailNotificationTemplate" type="RendererTemplate">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="alternativeDataSourceID" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="logsDaysOld" type="int">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>de.hybris.platform.util.Config.getInt("cronjob.logs.logsdaysold", 14)</defaultvalue>
+                    <description>All JobLogs (JobLogModels) older than this value in days will be removed
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="logsCount" type="int">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>de.hybris.platform.util.Config.getInt("cronjob.logs.logscount", 5)</defaultvalue>
+                    <description>All JobLogs (JobLogModels) above this value will be removed
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="logsOperator" type="BooleanOperator">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>em().getEnumerationValue("BooleanOperator", "AND")</defaultvalue>
+                    <description>Operator
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="filesDaysOld" type="int">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>de.hybris.platform.util.Config.getInt("cronjob.logs.filesdaysold", 14)</defaultvalue>
+                    <description>All LogFiles (LogFileModels) older than this value in days will be removed
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="filesCount" type="int">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>de.hybris.platform.util.Config.getInt("cronjob.logs.filescount", 5)</defaultvalue>
+                    <description>All LogFiles (LogFileModels) above this value will be removed
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="filesOperator" type="BooleanOperator">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>em().getEnumerationValue("BooleanOperator", "AND")</defaultvalue>
+                    <description>Operator
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                    <attribute qualifier="queryCount" type="int">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>1000</defaultvalue>
+                    <description>Maximum number of cron jobs processed during one run while cleaning cron jobs' logs.
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="activeCronJobHistory" type="CronJobHistory">
+                	<modifiers read="true" write="true" optional="true"/>
+                	<description>Active CronJobHistory entry</description>
+                	<persistence type="property"/>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="IdxJob">
+                    <key attribute="job"/>
+                </index>
+                <index name="IdxNode">
+                    <key attribute="nodeID"/>
+                </index>
+                <index name="IdxActive">
+                    <key attribute="active"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="CompositeCronJob" jaloclass="de.hybris.platform.cronjob.jalo.CompositeCronJob" extends="CronJob"
+                  autocreate="true" generate="true">
+            <!-- attributes>
+                <attribute qualifier="job" redeclare="true" type="CompositeJob">
+                    <modifiers read="true" write="true" optional="true" unique="true" />
+                    <persistence type="property" />
+                </attribute>
+            </attributes-->
+        </itemtype>
+
+        <itemtype code="CompositeJob" jaloclass="de.hybris.platform.cronjob.jalo.CompositeJob" extends="Job"
+                  autocreate="true"
+                  generate="true">
+        </itemtype>
+
+        <itemtype code="CompositeEntry" jaloclass="de.hybris.platform.cronjob.jalo.CompositeEntry" extends="GenericItem"
+                  autocreate="true" generate="true">
+            <deployment table="CompositeEntries" typecode="510"/>
+            <custom-properties>
+                <property name="legacyPersistence">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String">
+                    <modifiers read="true" write="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="executableCronJob" type="CronJob">
+                    <modifiers read="true" write="true" optional="true" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="triggerableJob" type="job">
+                    <modifiers read="true" write="true" optional="true" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <!--
+                <attribute qualifier="synchronous" type="java.lang.Boolean">
+                    <modifiers read="true" write="true" initial="true" optional="false" unique="true" />
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="essential" type="java.lang.Boolean">
+                    <modifiers read="true" write="true" initial="true" optional="false" unique="true" />
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <persistence type="property" />
+                </attribute>
+                -->
+            </attributes>
+        </itemtype>
+
+        <itemtype code="Trigger" jaloclass="de.hybris.platform.cronjob.jalo.Trigger" extends="GenericItem"
+                  autocreate="true"
+                  generate="true">
+            <deployment table="TriggersCJ" typecode="502"/>
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+                <property name="legacyPersistence">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="active" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="second" type="java.lang.Integer">
+                    <description>time value second</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="minute" type="java.lang.Integer">
+                    <description>time value minute</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="hour" type="java.lang.Integer">
+                    <description>time value hour</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="day" type="java.lang.Integer">
+                    <description>time value day</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="month" type="java.lang.Integer">
+                    <description>time value month</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="year" type="java.lang.Integer">
+                    <description>time value year</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="relative" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <description>time values are considered as relative values</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="daysOfWeek" type="DayOfWeekList">
+                    <description>days of week the trigger is active</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="weekInterval" type="java.lang.Integer">
+                    <description>week interval for days of week</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="dateRange" type="de.hybris.platform.util.StandardDateRange">
+                    <description>date range the trigger is active</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="activationTime" type="java.util.Date">
+                    <description>next activation time</description>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="timeTable" type="java.lang.String">
+                    <modifiers read="true" write="false" initial="false" optional="true"/>
+                    <persistence type="dynamic" attributeHandler="triggerTimetable"/>
+                </attribute>
+                <attribute qualifier="cronExpression" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="maxAcceptableDelay" type="java.lang.Integer">
+                    <description>the maximum acceptable delay (s) in which the job can be triggered, after which it is
+                        ignored.
+                    </description>
+                    <defaultvalue>Integer.valueOf(-1)</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="IdxCronJob">
+                    <key attribute="cronJob"/>
+                </index>
+                <index name="IdxActive">
+                    <key attribute="active"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="ChangeDescriptor" jaloclass="de.hybris.platform.cronjob.jalo.ChangeDescriptor"
+                  extends="GenericItem"
+                  autocreate="true" generate="true">
+            <deployment table="ChangeDescriptors" typecode="505"/>
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="cronJob" type="CronJob">
+                    <modifiers read="true" write="false" initial="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="step" type="Step">
+                    <modifiers read="true" write="false" initial="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="changedItem" type="Item">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sequenceNumber" type="java.lang.Integer">
+                    <modifiers read="true" write="false" initial="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="saveTimestamp" type="java.util.Date">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="previousItemState" type="java.util.Map">
+                    <modifiers read="true" write="true" initial="false" optional="true" dontOptimize="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="changeType" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="description" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="true" dontOptimize="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="cronjobIDX">
+                    <key attribute="cronJob"/>
+                </index>
+                <index name="stepIDX">
+                    <key attribute="step"/>
+                </index>
+                <index name="changedItemIDX">
+                    <key attribute="changedItem"/>
+                </index>
+                <!-- also add inxed to sequence number because of numerous MAX queries -->
+                <index name="seqNrIDX">
+                    <key attribute="sequenceNumber"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="MediaProcessCronJob" jaloclass="de.hybris.platform.cronjob.jalo.MediaProcessCronJob"
+                  extends="CronJob"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="jobMedia" type="JobMedia">
+                    <modifiers read="true" write="true" initial="false" search="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="currentLine" type="java.lang.Integer">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="lastSuccessfulLine" type="java.lang.Integer">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="URLCronJob" jaloclass="de.hybris.platform.cronjob.jalo.URLCronJob" extends="MediaProcessCronJob"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="URL" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" search="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="FlexibleSearchCronJob" jaloclass="de.hybris.platform.cronjob.jalo.FlexibleSearchCronJob"
+                  extends="MediaProcessCronJob"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="query" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" search="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="failOnUnknown" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="dontNeedTotal" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="rangeStart" type="java.lang.Integer">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="count" type="java.lang.Integer">
+                    <modifiers read="true" write="true" initial="false" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="searchResult" type="StringCollection">
+                    <modifiers read="true" write="false" initial="false" optional="true"/>
+                    <persistence type="jalo"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="Step" jaloclass="de.hybris.platform.cronjob.jalo.Step" extends="GenericItem" autocreate="true"
+                  generate="true" abstract="true">
+            <deployment table="Steps" typecode="503"/>
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="batchJob" type="BatchJob">
+                    <modifiers read="true" write="false" initial="true" search="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="code" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" search="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sequenceNumber" type="java.lang.Integer">
+                    <modifiers read="true" write="true" initial="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="synchronous" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.TRUE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" search="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="errorMode" type="ErrorMode">
+                    <modifiers read="true" write="true" initial="false" search="true" optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("ErrorMode", "FAIL")</defaultvalue>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="IdxBatchJob">
+                    <key attribute="batchJob"/>
+                </index>
+                <!-- also add inxed to sequence number because of numerous MAX queries -->
+                <index name="seqNrIDX">
+                    <key attribute="sequenceNumber"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="MediaProcessorStep" jaloclass="de.hybris.platform.cronjob.jalo.MediaProcessorStep"
+                  extends="Step"
+                  autocreate="true" generate="true" abstract="true">
+        </itemtype>
+
+        <itemtype code="GenericCSVImportStep" jaloclass="de.hybris.platform.cronjob.jalo.GenericCSVImportStep"
+                  extends="MediaProcessorStep"
+                  autocreate="true" generate="true" abstract="false">
+        </itemtype>
+
+        <itemtype code="CSVExportStep" jaloclass="de.hybris.platform.cronjob.jalo.CSVExportStep"
+                  extends="MediaProcessorStep"
+                  autocreate="true" generate="true" abstract="false">
+        </itemtype>
+
+        <itemtype code="GetURLStep" jaloclass="de.hybris.platform.cronjob.jalo.GetURLStep" extends="MediaProcessorStep"
+                  autocreate="true" generate="true" abstract="false">
+        </itemtype>
+
+        <itemtype code="JobLog" jaloclass="de.hybris.platform.cronjob.jalo.JobLog" extends="GenericItem"
+                  autocreate="true"
+                  generate="true">
+            <deployment table="JobLogs" typecode="504"/>
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="step" type="Step">
+                    <modifiers read="true" write="false" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="message" type="java.lang.String">
+                    <modifiers read="true" write="false" initial="true" optional="true" dontOptimize="true"/>
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+                <attribute qualifier="shortMessage" type="java.lang.String">
+                    <modifiers read="true" write="false" initial="false" optional="true"/>
+                    <persistence type="jalo"/>
+                </attribute>
+                <attribute qualifier="level" type="JobLogLevel">
+                    <modifiers read="true" write="false" initial="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="cronjobIDX">
+                    <key attribute="cronJob"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="JobMedia" jaloclass="de.hybris.platform.cronjob.jalo.JobMedia" extends="Media" autocreate="true"
+                  generate="true">
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="locked" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" initial="false" optional="false" private="false"/>
+                    <persistence type="jalo"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="LogFile" extends="Media" jaloclass="de.hybris.platform.cronjob.jalo.LogFile" autocreate="true"
+                  generate="true">
+            <custom-properties>
+                <property name="systemType">
+                    <value>java.lang.Boolean.TRUE</value>
+                </property>
+            </custom-properties>
+            <attributes>
+                <attribute redeclare="true" qualifier="owner" type="CronJob">
+                    <modifiers read="true" write="false" initial="true" optional="false" private="false"/>
+                    <persistence type="cmp" qualifier="ownerPkString"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+
+        <itemtype code="TypeSystemExportJob" jaloclass="de.hybris.platform.cronjob.jalo.TypeSystemExportJob"
+                  extends="Job"
+                  autocreate="true" generate="true">
+        </itemtype>
+
+
+        <itemtype code="RemoveItemsJob" jaloclass="de.hybris.platform.cronjob.jalo.RemoveItemsJob" extends="Job"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+                <attribute qualifier="code" redeclare="true" type="java.lang.String">
+                    <defaultvalue>"RemoveItemsJob"</defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="RemoveItemsCronJob" jaloclass="de.hybris.platform.cronjob.jalo.RemoveItemsCronJob"
+                  extends="CronJob"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="itemPKs" type="Media">
+                    <modifiers read="true" write="true" initial="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="itemsFound" type="java.lang.Integer">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="itemsDeleted" type="java.lang.Integer">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="itemsRefused" type="java.lang.Integer">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="createSavedValues" type="java.lang.Boolean">
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="MoveMediaCronJob" autocreate="true" generate="true" extends="CronJob"
+                  jaloclass="de.hybris.platform.cronjob.jalo.MoveMediaCronJob">
+
+            <attributes>
+                <attribute type="MediaCollection" qualifier="medias">
+                    <persistence type="property"/>
+                    <modifiers/>
+                    <description>Selected medias which will be moved</description>
+                </attribute>
+                <attribute type="MediaFolder" qualifier="targetFolder">
+                    <persistence type="property"/>
+                    <modifiers/>
+                    <description>Folder where selected medias will be moved to</description>
+                </attribute>
+                <attribute type="java.lang.Integer" qualifier="movedMediasCount">
+                    <persistence type="property"/>
+                    <modifiers/>
+                    <description>Successfully moved medias since start of cronjob</description>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="MoveMediaJob" autocreate="true" generate="true" extends="Job"
+                  jaloclass="de.hybris.platform.cronjob.jalo.MoveMediaJob"/>
+
+        <itemtype code="MediaFolderStructureMigrationCronJob" autocreate="true" generate="true" extends="CronJob"
+                  jaloclass="de.hybris.platform.cronjob.jalo.MediaFolderStructureMigrationCronJob">
+            <attributes>
+                <attribute type="MediaFolder" qualifier="mediaFolder">
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                    <description>Folder for which migration job has to be performed</description>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="CleanupDynamicProcessDefinitionsCronJob" autocreate="true" generate="true" extends="CronJob"
+                  jaloclass="de.hybris.platform.cronjob.jalo.CleanupDynamicProcessDefinitionsCronJob">
+            <attributes>
+                <attribute qualifier="timeThreshold" type="java.lang.Integer">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" optional="true"/>
+                </attribute>
+                <attribute qualifier="versionThreshold" type="java.lang.Integer">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" optional="true"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <!-- deprecated as of HOR-1411 -->
+        <itemtype code="CleanUpCronJob" extends="CronJob" jaloclass="de.hybris.platform.cronjob.jalo.CleanUpCronJob"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="xDaysOld" type="int">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>Integer.valueOf(14)</defaultvalue>
+                    <description>All CronJobs (CronJobModels) older than this value in days will be removed
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="excludeCronJobs" type="CronJobList">
+                    <persistence type="property"/>
+                    <description>A List of CronJobs which should never be deleted by this clean up job</description>
+                </attribute>
+                <attribute qualifier="resultcoll" type="CronJobResultCollection">
+                    <persistence type="property"/>
+                    <description>Filter: only cronjobs with this Result will be deleted</description>
+                </attribute>
+                <attribute qualifier="statuscoll" type="CronJobStatusCollection">
+                    <persistence type="property"/>
+                    <description>Filter: only cronjobs with this status will be deleted</description>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="JobSearchRestriction" extends="GenericItem"
+                  jaloclass="de.hybris.platform.cronjob.jalo.JobSearchRestriction"
+                  autocreate="true" generate="true">
+            <deployment table="JobSearchRestriction" typecode="508"/>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <description>ID</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="type" type="ComposedType">
+                    <modifiers read="true" write="true"/>
+                    <description>Code of the Type for which the restriction is defined</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="query" type="java.lang.String">
+                    <modifiers read="true" write="true" initial="false" optional="true" dontOptimize="true"/>
+                    <description>Search Restriction query</description>
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="ServicelayerJob"
+                  extends="Job"
+                  jaloclass="de.hybris.platform.servicelayer.internal.jalo.ServicelayerJob"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+                <attribute qualifier="springId" type="java.lang.String" autocreate="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                </attribute>
+                <attribute qualifier="springIdCronJobFactory" type="java.lang.String" autocreate="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="true"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="ScriptingJob"
+                  extends="ServicelayerJob"
+                  jaloclass="de.hybris.platform.servicelayer.internal.jalo.ScriptingJob"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+                <attribute qualifier="springId" type="java.lang.String" redeclare="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                    <defaultvalue>"scriptingJobPerformable"</defaultvalue>
+                </attribute>
+                <attribute qualifier="scriptURI" type="java.lang.String">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+       <itemtype code="ProcessTaskLogMaintenanceJob" autocreate="true"
+			generate="true" extends="ServicelayerJob"
+			jaloclass="de.hybris.platform.cronjob.jalo.ProcessTaskLogMaintenanceJob">
+			<attributes>
+				<attribute qualifier="age" type="int">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+				<attribute qualifier="numberOfLogs" type="int">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+				<attribute qualifier="springId" type="java.lang.String" redeclare="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                    <defaultvalue>"cleanUpProcessTaskLogPerformable"</defaultvalue>
+                </attribute>
+                <attribute qualifier="queryCount" type="int">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <defaultvalue>1000</defaultvalue>
+                    <description>Maximum number of items that can be retrieved form DB and thus removed
+                    </description>
+                    <persistence type="property"/>
+                </attribute>
+			</attributes>
+		</itemtype>
+ 
+        <itemtype code="MaintenanceCleanupJob"
+                  extends="ServicelayerJob"
+                  jaloclass="de.hybris.platform.servicelayer.internal.jalo.MaintenanceCleanupJob"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+                <attribute qualifier="threshold" type="java.lang.Integer">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" optional="true"/>
+                    <description>Depending on the implemented Maintenance strategy this threeshold value can be uses as
+                        'days old' or as max/min value ...
+                    </description>
+                </attribute>
+                <attribute qualifier="searchType" type="ComposedType">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" optional="true"/>
+                    <description>can be used in the search part to search for this given type only</description>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="DynamicMaintenanceCleanupJob"
+                  extends="MaintenanceCleanupJob"
+                  jaloclass="de.hybris.platform.servicelayer.internal.jalo.DynamicMaintenanceCleanupJob"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+                <attribute qualifier="springId" type="java.lang.String" redeclare="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                    <defaultvalue>"cleanupDynamicallyPerformable"</defaultvalue>
+                </attribute>
+                <attribute qualifier="searchScript" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" optional="true"/>
+                </attribute>
+                <attribute qualifier="processScript" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" optional="true"/>
+                </attribute>
+            </attributes>
+            <!-- TODO enum for dynamic language? -->
+        </itemtype>
+
+        <!-- task -->
+        <itemtype generate="true" code="Task"
+                  jaloclass="de.hybris.platform.task.Task" extends="GenericItem"
+                  autocreate="true">
+            <deployment table="Tasks" typecode="950"/>
+            <attributes>
+                <attribute qualifier="runnerBean" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                </attribute>
+
+                <attribute qualifier="executionDate" type="java.util.Date">
+                    <description>Date after this task is to be executed</description>
+                    <persistence type="dynamic"/>
+                    <modifiers optional="true"/>
+                </attribute>
+
+                <attribute qualifier="executionTimeMillis" type="java.lang.Long">
+                    <description>Internal representation to overcome database limitations!</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true"/>
+                </attribute>
+
+                <attribute qualifier="executionHourMillis" type="java.lang.Long">
+                    <description>Internal representation to overcome database limitations!</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="false" />
+                </attribute>
+
+                <attribute qualifier="failed" type="java.lang.Boolean">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" optional="true"/>
+                </attribute>
+
+                <attribute qualifier="expirationDate" type="java.util.Date">
+                    <persistence type="dynamic"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="expirationTimeMillis" type="java.lang.Long">
+                    <description>Date when this task is to be executed</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="context" type="java.lang.Object">
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>BLOB</value>
+                        </columntype>
+                    </persistence>
+                    <modifiers optional="true"/>
+                </attribute>
+
+                <attribute qualifier="contextItem" type="Item">
+                    <persistence type="property"/>
+                    <modifiers optional="true"/>
+                </attribute>
+
+                <attribute qualifier="nodeId" type="java.lang.Integer">
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="nodeGroup" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="retry" type="java.lang.Integer">
+                    <defaultvalue>new Integer(0)</defaultvalue>
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true"/>
+                </attribute>
+
+                <attribute qualifier="runningOnClusterNode" type="java.lang.Integer">
+                    <defaultvalue>Integer.valueOf(-1)</defaultvalue>
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="Task_dr_idx">
+                    <key attribute="runningOnClusterNode"/>
+                    <key attribute="expirationTimeMillis"/>
+                    <key attribute="nodeId"/>
+                </index>
+                <index name="Task_dr2_idx">
+                    <key attribute="failed"/>
+                    <key attribute="runningOnClusterNode"/>
+                    <key attribute="executionHourMillis"/>
+                    <key attribute="itemtype" />
+                    <key attribute="nodeId"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="TaskCondition"
+                  jaloclass="de.hybris.platform.task.TaskCondition" extends="GenericItem"
+                  autocreate="true" generate="true">
+            <deployment table="TaskConditions" typecode="951"/>
+            <attributes>
+
+                <attribute qualifier="uniqueID" type="java.lang.String">
+                    <description>The unique id of this condition - may be created by number series !?</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="expirationDate" type="java.util.Date">
+                    <description>The maximum allowed time to wait for completion</description>
+                    <persistence type="dynamic"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="expirationTimeMillis" type="java.lang.Long">
+                    <description>The maximum allowed time to wait for completion</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="processedDate" type="java.util.Date">
+                    <description>The date when this condition has been processed.
+                        Then state is switched to FULFILLED or REJECTED.
+                    </description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true"/>
+                </attribute>
+
+                <attribute qualifier="fulfilled" type="java.lang.Boolean">
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true"/>
+                </attribute>
+
+                <attribute qualifier="consumed" type="java.lang.Boolean">
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true"/>
+                </attribute>
+
+				<attribute qualifier="choice" type="java.lang.String">
+                    <description>Additional value which can be provided by the user when triggering an event</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="false"/>
+                </attribute>
+
+				<attribute qualifier="counter" type="java.lang.Integer">
+                    <description>Counter which if set to value greater than 0 prevent fulfilling the condition. Counter is decremented every time when an event is triggered.</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" read="true" write="true" initial="false"/>
+                </attribute>
+
+            </attributes>
+            <indexes>
+                <index name="Cond_idx" unique="true">
+                    <key attribute="uniqueID"/>
+                    <key attribute="consumed"/>
+                </index>
+                <index name="Cond_match_idx">
+                    <key attribute="task"/>
+                    <key attribute="fulfilled"/>
+                    <key attribute="itemtype"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="AbstractAction"
+                  jaloclass="de.hybris.platform.servicelayer.jalo.action.AbstractAction"
+                  autocreate="true"
+                  generate="true"
+                  abstract="true">
+            <deployment table="SLActions" typecode="1000"/>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String" autocreate="true" generate="true">
+                    <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="type" type="ActionType" autocreate="true" generate="true">
+                    <modifiers read="true" write="false" optional="false" initial="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="target" type="java.lang.String" autocreate="true" generate="true">
+                    <modifiers read="true" write="false" optional="false" initial="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="SimpleAction"
+                  jaloclass="de.hybris.platform.servicelayer.jalo.action.SimpleAction"
+                  extends="AbstractAction"
+                  autocreate="true"
+                  generate="true">
+        </itemtype>
+
+        <!-- processengine -->
+        <itemtype code="BusinessProcessParameter"
+                  jaloclass="de.hybris.platform.processengine.jalo.BusinessProcessParameter" extends="GenericItem"
+                  autocreate="true" generate="true">
+            <!--  TODO assign decent typecode -->
+            <deployment table="ProcessParameters" typecode="32764"/>
+            <attributes>
+                <attribute qualifier="name" type="java.lang.String">
+                    <description>Unique identifier of this process context parameter</description>
+                    <modifiers initial="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="value" type="java.lang.Object">
+                    <description>Value of this context parameter.</description>
+                    <modifiers initial="true" optional="false"/>
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>BLOB</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+            </attributes>
+
+            <indexes>
+                <index name="BusinessProcessParameter_idx" unique="true">
+                    <key attribute="process"/>
+                    <key attribute="name"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype generate="true" code="BusinessProcess"
+                  jaloclass="de.hybris.platform.processengine.jalo.BusinessProcess" extends="GenericItem"
+                  autocreate="true">
+            <!--  TODO assign decent typecode -->
+            <deployment table="Processes" typecode="32766"/>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String">
+                    <description>Unique identifier of this process</description>
+                    <modifiers initial="true" optional="false" unique="true" write="false"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="processDefinitionName" type="java.lang.String">
+                    <description>Name of the process definition to use.</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="false" write="false"/>
+                </attribute>
+
+                <attribute qualifier="processDefinitionVersion" type="java.lang.String">
+                    <description>Version of the process definition used by this process.</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true"/>
+                </attribute>
+
+                <attribute qualifier="state" type="ProcessState">
+                    <description>Current (persisted) state of this process.</description>
+                    <defaultvalue>
+                        em().getEnumerationValue(de.hybris.platform.processengine.constants.ProcessengineConstants.TC.PROCESSSTATE,
+                        de.hybris.platform.processengine.constants.ProcessengineConstants.Enumerations.ProcessState.CREATED)
+                    </defaultvalue>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+
+                <attribute qualifier="processState" type="ProcessState">
+                    <description>Current (accessible) state of this process.</description>
+                    <persistence type="dynamic" attributeHandler="businessProcessProcessStateDynamicHandler"/>
+                    <modifiers write="false"/>
+                </attribute>
+
+                <attribute type="java.lang.String" qualifier="endMessage">
+                    <description>Message given in the end state of the process.</description>
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+
+                <attribute qualifier="user" type="User">
+                    <modifiers read="true" write="true" initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+            <indexes>
+                <index name="ProcessengineProcess_name_idx" unique="true">
+                    <key attribute="code"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="ProcessTask" extends="Task" jaloclass="de.hybris.platform.processengine.jalo.ProcessTask"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="action" type="java.lang.String">
+                    <description>Name of the action to perform.</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="false" write="false"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype generate="true" code="ProcessTaskLog"
+                  jaloclass="de.hybris.platform.processengine.jalo.ProcessTaskLog" extends="GenericItem"
+                  autocreate="true">
+
+            <deployment table="TaskLogs" typecode="32767"/>
+
+            <attributes>
+
+                <attribute qualifier="returnCode" type="java.lang.String">
+                    <description>Return code of the task.</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="true"/>
+                </attribute>
+
+                <attribute qualifier="startDate" type="java.util.Date">
+                    <description>Date when task was started</description>
+                    <modifiers initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="endDate" type="java.util.Date">
+                    <description>Date when task was ended</description>
+                    <modifiers initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="actionId" type="java.lang.String">
+                    <description>ID of the action performed</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="false"/>
+                </attribute>
+
+                <attribute qualifier="clusterId" type="java.lang.Integer">
+                    <description>ID of the cluster where action performed</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="false"/>
+                </attribute>
+
+                <attribute type="java.lang.String" qualifier="logMessages">
+                    <description>Messages given during the process.</description>
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="ScriptingTask" extends="Task" jaloclass="de.hybris.platform.task.jalo.ScriptingTask"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="scriptURI" type="java.lang.String">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="runnerBean" type="java.lang.String" redeclare="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                    <defaultvalue>"scriptingTaskRunner"</defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+        <itemtype code="DynamicProcessDefinition" extends="AbstractDynamicContent" abstract="false"
+                  jaloclass="de.hybris.platform.processengine.jalo.DynamicProcessDefinition">
+        </itemtype>
+
+        <itemtype code="TriggerTask" extends="Task" jaloclass="de.hybris.platform.task.jalo.TriggerTask"
+                  autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="trigger" type="Trigger">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="runnerBean" type="java.lang.String" redeclare="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                    <defaultvalue>"triggerTaskRunner"</defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="AbstractRetentionRule" extends="GenericItem" abstract="true">
+            <deployment table="RetentionRule" typecode="983" />
+            <attributes>
+            	<attribute qualifier="code" type="java.lang.String">
+                    <persistence type="property" />
+                    <modifiers optional="false" unique="true"/>
+                </attribute>
+                <attribute qualifier="actionReference" type="java.lang.String">
+                    <persistence type="property" />
+                    <modifiers optional="false"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<itemtype code="AfterRetentionCleanupRule" extends="AbstractRetentionRule">
+            <attributes>
+             	<attribute qualifier="retirementItemType" type="ComposedType">
+                    <persistence type="property" />
+                    <modifiers optional="false" />
+                </attribute>
+            	<attribute qualifier="retirementDateAttribute" type="AttributeDescriptor">
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="retentionTimeSeconds" type="java.lang.Long">
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="itemFilterExpression" type="java.lang.String">
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="retirementDateExpression" type="java.lang.String">
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="FlexibleSearchRetentionRule" extends="AbstractRetentionRule">
+            <attributes>
+                <attribute qualifier="searchQuery" type="java.lang.String">
+                    <persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+                    <modifiers optional="false" />
+                </attribute>
+                <attribute qualifier="queryParameters" type="QueryParametersMapType">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="retentionTimeSeconds" type="java.lang.Long">
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="RetentionJob"
+                  extends="ServicelayerJob"
+                  jaloclass="de.hybris.platform.servicelayer.internal.jalo.RetentionJob"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+                <attribute qualifier="springId" type="java.lang.String" redeclare="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" initial="true" optional="false"/>
+                    <defaultvalue>"afterRetentionCleanupJobPerformable"</defaultvalue>
+                </attribute>
+               <attribute generate="true" autocreate="true" qualifier="retentionRule" type="AbstractRetentionRule">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="batchSize" type="java.lang.Integer">
+                    <persistence type="property" />
+                    <modifiers optional="false"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<typegroup name="Distributed processing related types">
+		
+			<itemtype code="DistributedProcess">
+				<deployment table="distributedprocesses" typecode="111"/>
+				<attributes>
+					<attribute qualifier="code" type="java.lang.String">
+    					<modifiers read="true" write="false" optional="false" initial="true" unique="true" />
+    					<persistence type="property" />
+    				</attribute>
+    				<attribute qualifier="handlerBeanId" type="java.lang.String">
+    					<modifiers read="true" write="false" optional="true" initial="true" />
+    					<persistence type="property" />
+    				</attribute>
+    				<attribute qualifier="currentExecutionId" type="java.lang.String">
+    					<modifiers read="true" write="true" optional="false" initial="true" />
+    					<persistence type="property" />
+    				</attribute>
+    				<attribute qualifier="state" type="DistributedProcessState">
+    					<modifiers read="true" write="true" optional="false" initial="true" />
+    					<persistence type="property" />
+    				</attribute>
+    				<attribute qualifier="stopRequested" type="boolean">
+    					<modifiers read="true" write="true" optional="false" initial="true" />
+    					<persistence type="property" />
+    					<defaultvalue>false</defaultvalue>
+    				</attribute>
+                    <attribute qualifier="nodeGroup" type="java.lang.String">
+                        <persistence type="property"/>
+                        <modifiers optional="true" read="true" write="false" initial="true"/>
+                    </attribute>
+                    <attribute qualifier="status" type="java.lang.String">
+                        <persistence type="property"/>
+                        <modifiers optional="true" read="true" write="true" initial="false"/>
+                    </attribute>
+                    <attribute qualifier="extendedStatus" type="java.lang.String">
+                        <persistence type="property"/>
+                        <modifiers optional="true" read="true" write="true" initial="false"/>
+                    </attribute>
+                    <attribute qualifier="progress" type="java.lang.Double">
+                        <persistence type="property"/>
+                        <modifiers optional="true" read="true" write="true" initial="false"/>
+                    </attribute>
+				</attributes>
+			</itemtype>
+
+            <itemtype code="Batch">
+                <deployment table="distributedbatches" typecode="112"/>
+                <attributes>
+                    <attribute qualifier="id" type="java.lang.String">
+                        <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                    <attribute qualifier="executionId" type="java.lang.String">
+                        <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                    <attribute qualifier="type" type="BatchType">
+                        <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                    <attribute qualifier="remainingWorkLoad" type="long">
+                        <modifiers read="true" write="false" optional="false" initial="true"/>
+                        <persistence type="property"/>
+                        <defaultvalue>0</defaultvalue>
+                    </attribute>
+                </attributes>
+                <indexes>
+                    <index name="BatchUnqIdx" unique="true">
+                        <key attribute="executionId"/>
+                        <key attribute="process"/>
+                        <key attribute="id"/>
+                        <key attribute="type"/>
+                    </index>
+                </indexes>
+            </itemtype>
+
+            <itemtype code="SimpleDistributedProcess" extends="DistributedProcess">
+                <attributes>
+                    <attribute qualifier="batchSize" type="int">
+                        <persistence type="property" />
+                        <modifiers read="true" write="false" initial="true" />
+                    </attribute>
+                </attributes>
+            </itemtype>
+
+            <itemtype code="SimpleBatch" extends="Batch">
+                <attributes>
+                    <attribute qualifier="resultBatchId" type="java.lang.String">
+                        <persistence type="property" />
+                        <modifiers read="true" write="true" optional="true" />
+                    </attribute>
+                    <attribute qualifier="retries" type="int">
+                        <persistence type="property" />
+                        <modifiers read="true" write="true" optional="false" />
+                    </attribute>
+                    <attribute qualifier="scriptCode" type="java.lang.String">
+                        <persistence type="property" />
+                        <modifiers read="true" write="true" optional="true" />
+                    </attribute>
+                    <attribute qualifier="context" type="java.lang.Object">
+                        <persistence type="property">
+                            <columntype database="oracle">
+                                <value>BLOB</value>
+                            </columntype>
+                        </persistence>
+                        <modifiers optional="true"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+			
+			<itemtype code="DistributedProcessTransitionTask" extends="Task">
+				<attributes>
+					<attribute qualifier="contextItem" type="DistributedProcess" redeclare="true">
+	                    <persistence type="property"/>
+	                    <modifiers initial="true" optional="false"/>
+	                </attribute>
+	                <attribute qualifier="state" type="DistributedProcessState">
+    					<modifiers read="true" write="false" optional="false" initial="true" />
+    					<persistence type="property" />
+    				</attribute>
+                </attributes>
+			</itemtype>
+			
+			<itemtype code="DistributedProcessWorkerTask" extends="Task">
+				<attributes>
+					<attribute qualifier="contextItem" type="Batch" redeclare="true">
+	                    <persistence type="property"/>
+	                    <modifiers initial="true" optional="false"/>
+	                </attribute>
+	                <attribute qualifier="conditionId" type="java.lang.String">
+    					<modifiers read="true" write="false" optional="false" initial="true" />
+    					<persistence type="property" />
+    				</attribute>
+                </attributes>
+			</itemtype>
+			
+		</typegroup>
+
+    </itemtypes>
+</items>

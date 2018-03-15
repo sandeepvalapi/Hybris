@@ -1,0 +1,368 @@
+#
+# Shortcuts for complex catalog-dependent attributes
+#
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$catalogversion=catalogversion(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online']
+$supercategories=supercategories(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$picture=picture(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$thumbnail=thumbnail(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$normal=normal(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$detail=detail(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$logo=logo(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$icon=icon(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$list_thumbnails=thumbnails(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$baseProduct=baseProduct(code, catalogVersion(catalog(id[default='hwcatalog']),version[default='Online']))
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];supplier(uid);defaultCatalog;previewURLTemplate;
+;hwcatalog;Hardware-Katalog;Computer hardware;hybris;false;/storefoundation/index.jsf;
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);inclAssurance;inclDuty;inclFreight;inclPacking;active
+;hwcatalog;Online;de,en;true;true;true;false;true
+;hwcatalog;Online;de,en;true;true;true;false;false
+
+#media handling info: if you want to create a 'real' media with data instead of an url use for example the following statement in the media column:;
+#jar:/sampledata/media/pic-graka1-1.jpg;
+
+
+INSERT_UPDATE category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories;;description[lang=de];description[lang=en];order
+;HW1000;;Peripherie;Peripheral equipment;;HW1000-24;Produkte rund um den Computer;products around the computer;0
+
+;HW1100;;Monitore;Monitors;HW1000;HW1100-23;Monitore der Firma EIZO;Monitors of the brand EIZO;0
+;HW1200;;Fotografie;Photography;HW1000;HW1200-22;verschiedene Digitalkameras;miscellaneous digital cameras;1
+
+;HW2000;;Systemkomponenten;System components;;HW2000-25;Komponenten für den Computer, wie Grafikkarten, Prozessoren;components for the computer like graphic cards or processors;1
+
+;HW2100;;Prozessoren;Processors;HW2000;HW2100-19;Das Herz eines Computers;The heart of a computer;0
+;HW2200;;Motherboards;Motherboards;HW2000;HW2200-20;Hauptkomponente eines Rechners;main part of a computer;1
+;HW2300;;Grafikkarten;Graphic cards;HW2000;HW2300-21;Für das beste visuelle Vergnügen;For the best visual experience;2
+
+;HW2110;;Intel;Intel;HW2100;HW2110-18;Produkte der Firma Intel;products from Intel;0
+;HW2120;;AMD;AMD;HW2100;HW2120-17;Produkte der Firma AMD;products from AMD;1
+
+;HW1210;;Canon;Canon;HW1200;HW1210-13;Produkte der Firma Canon;products by Canon;0
+;HW1220;;Pentax;Pentax;HW1200;HW1220-12;Produkte der Firma Pentax;products by Pentax;1
+;HW1230;;Sony;Sony;HW1200;HW1230-14;Produkte der Firma Sony;products by Sony;2
+;HW1240;;HP;HP;HW1200;HW1240-15;Produkte der Firma HP;products by HP;3
+
+;topseller;;Topseller;Topseller;;;Ausgewählte Sonderangebote für Sie!;Choosen special offers only for you!;2
+;specialoffers;;Sonderangebote;Special offers;;;;;5
+
+;HW2310;;nVidia;nVidia;HW2300;HW2310-01;Grafikkarten mit einem nVidia Chip;graphic cards with nVidia chip;0
+;HW2320;;ATI;ATI;HW2300;HW2320-01;Grafikkarten mit einem ATI Chip;graphic cards with ATI  chip;1
+
+INSERT_UPDATE category;code[unique=true];$catalogversion;allowedPrincipals(uid);
+;HW1000;;customergroup;
+;HW2000;;customergroup;
+;topseller;;customergroup;
+;specialoffers;;customergroup;
+
+#% impex.setLocale( Locale.GERMANY );
+
+############## graphic cards ###########
+
+INSERT_UPDATE product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$supercategories;description[lang=de];description[lang=en];$prices;approvalStatus(code);onlineDate;offlineDate;;;ean;manufacturerName;;;;deliveryTime;$normal
+
+;HW2300-2356;;PNY Verto GF 6 6600GT 128DDR PCI Express;PNY Verto GF 6 6600GT 128DDR PCI Express ;pieces;HW2300,specialoffers;;;157,95 EUR;approved;;;HW2300-2356-01;HW2300-2356-00;HW2300-2356;PNY Technologies;;PNY_logo;;1;
+
+;HW2300-3843;;PNY Verto GF 7800GT 256MB PCI Express ;PNY Verto GF 7800GT 256MB PCI Express ;pieces;HW2300;;;282,50 EUR;approved;;;HW2300-3843-01;HW2300-3843-00;HW2300-3843;PNY Technologies;;PNY_logo;;1;
+
+;HW2300-4121;;PNY Verto GF 7800GTX 256MB PCI Express ;PNY Verto GF 7800GTX 256MB PCI Express ;pieces;HW2300,topseller;;;422 EUR;approved;;;HW2300-4121-01;HW2300-4121-00;HW2300-4121;PNY Technologies;;PNY_logo;;1;
+
+;HW2310-1001;;eVGA GeForce MX 4000;eVGA GeForce MX 4000;pieces;HW2310;Die eVGA GeForce MX 4000 ist mit der GeForce MX4000 GPU und 64 MB Speicher ausgestattet. Die Einsteigerkarte ist eine hervorragende Grafiklösung für Arbeits- oder Officecomputer, da sie durch die passive Kühlung komplett geräuschlos in einem Gehäuse arbeitet.;"<b>NVIDIA Provides a New Level of Graphics </b></br>
+The new GeForce MX 4000 delivers the best in class features, performance, and reliability. Including a powerful 128MB frame buffer; NVIDIA's nView multi-display technology for the ultimate display flexibility and user control; NVIDIA's Lightspeed Memory Architecture (LMA) II - to boost the effective memory bandwidth for fast, fluid frame rates; and NVIDIA's Accuview Antialiasing for delivering incredible visual quality.";29,90 EUR;approved;;;HW2310-1001-01;HW2310-1001-00;HW2310-1001-00;eVGA;HW2310-1001-02,HW2310-1001-03,HW2310-1001-04,HW2310-1001-05,HW2310-1001-06,HW2310-1001-07,HW2310-1001-08,HW2310-1001-09;eVGA_logo;HW2310-1001-02t,HW2310-1001-03t,HW2310-1001-04t,HW2310-1001-05t,HW2310-1001-06t,HW2310-1001-07t,HW2310-1001-08t,HW2310-1001-09t;3;
+
+;HW2310-1002;;PNY Quadro FX 1100;PNY Quadro FX 1100;pieces;HW2310;"<b>Die PNY Quadro FX 1100</b> ist die ideale Lösung für professionelle 3D-Anwender, die auf Highend-Features verzichten können, aber dennoch hohe Performance und Qualität in gängigen Anwendungen verlangen. <p>
+Ideal für den kostenbewussten Anwender ist die PNY Quadro FX 1100: Mehr Leistung zu diesem Preis gibt es in der gesamten Branche nirgends! Alles in allem: Workstation-Grafiklösungen mit einem besseren Preis-Leistungsverhältnis als die PNY Quadro FX 1100 gibt es einfach nicht!";"<b>PNY Quadro FX1100</b></br>
+NVIDIA® Quadro® FX 1100 is the highest performing mid-range workstation product in the Quadro FX family, targeted towards applications in the CAD, DCC and Scientific Visualization markets. Quadro FX 1100 is the industry’s best price/performance graphics solution for Professional 3D applications. With the addition of Quadro FX 1100, the NVIDIA Quadro FX family delivers top-to-bottom leadership in application performance and quality. 
+<p>
+<b>NVIDIA Quadro FX 1100 </b></br>
+The Quadro® FX delivers the fastest application performance and the highest quality workstation graphics. But raw performance are only the beginning—Quadro FX takes the leading computer-aided design and digital content creation applications to a new level of interactivity by enabling unprecedented capabilities in programmability and precision.";780,61 EUR;approved;;;HW2310-1002-01;HW2310-1002-00;HW2310-1002-00;PNY;HW2310-1002-02,HW2310-1002-03,HW2310-1002-04,HW2310-1002-05,HW2310-1002-06,HW2310-1002-07,HW2310-1002-08,HW2310-1002-09,HW2310-1002-10;PNY_logo;HW2310-1002-02t,HW2310-1002-03t,HW2310-1002-04t,HW2310-1002-05t,HW2310-1002-06t,HW2310-1002-07t,HW2310-1002-08t,HW2310-1002-09t,HW2310-1002-10t;3;
+
+;HW2310-1003;;Chaintech GeForce 6600 GT;Chaintech GeForce 6600 GT;pieces;HW2310;Die Chaintech GeForce 6600 GT bietet ein hervoragendes Preis-/Leistungsverhältnis. Dank schnellen GDDR3-Speichers hat man genug Leistung für aktuelle 3D-Spiele zu einem für diese Klasse sensationellen Preis.;"<b>Great Price!</br>
+Chaintech GeForce 6600 Video Card</b></br>
+Supercharge your gaming with the power of an NVIDIA GeForce 6600 GPU. The NVIDIA® GeForce™ 6600 GPUs deliver best-in-class performance and advanced visual effects for next-generation games. The only GPU in its class with support for Microsoft® DirectX® 9.0 Shader Model 3.0 and with support for PCI Express, the GeForce 6600 delivers ultra-realistic effects, unmatched features, and rock-solid stability so you can play your game the way it’s meant to be played. <p>
+<b>Before you buy</b> - make sure your motherboard is compatible with this video card. For example, PCI Express video cards won’t work with motherboards designed only for AGP or PCI video cards, and vice versa. Please read the specifications carefully or call us for expert advice.";145, 99 EUR;approved;;;HW2310-1003-01;HW2310-1003-00;HW2310-1003-00;CHAINTECH;HW2310-1003-02,HW2310-1003-03,HW2310-1003-04,HW2310-1003-05,HW2310-1003-06,HW2310-1003-07,HW2310-1003-08,HW2310-1003-09,HW2310-1003-10,HW2310-1003-11,HW2310-1003-12;CHAINTECH_logo;HW2310-1003-02t,HW2310-1003-03t,HW2310-1003-04t,HW2310-1003-05t,HW2310-1003-06t,HW2310-1003-07t,HW2310-1003-08t,HW2310-1003-09t,HW2310-1003-10t,HW2310-1003-11t,HW2310-1003-12t;3
+
+;HW2310-1004;;XFX GeForce 6600 GT ;XFX GeForce 6600 GT ;pieces;HW2310,specialoffers;"Mit diesem Artikel erhalten Sie 2 Grafikkarten.<p>
+Unter dem Vollkupferkühler der XFX GeForce 6600 GT verbirgt sich die GeForce 6600 GT GPU mit 128 MB Videospeicher. Die leistungsfähige PCI-Express-Grafikkarte verfügt über eine 128-Bit Speicheranbindung, acht Pixel-Pipelines und 1-GHz-DDR-Speicher. Damit werden selbst anspruchsvolle DirectX 9 Games beschleunigt und optional kann die Grafikkarte über den SLI-Port mit einer identischen Karte gekoppelt werden, um die Grafikpower fast zu verdoppeln.";"<b>Great Price!</br>
+XFX GeForce 6600 GT Video Card</b>
+Supercharge your gaming with the power of an NVIDIA GeForce 6600 GPU. The NVIDIA® GeForce™ 6600 GPUs deliver best-in-class performance and advanced visual effects for next-generation games. The only GPU in its class with support for Microsoft® DirectX® 9.0 Shader Model 3.0 and with support for PCI Express, the GeForce 6600 delivers ultra-realistic effects, unmatched features, and rock-solid stability so you can play your game the way it’s meant to be played. <p>
+<b>Before you buy</b> - make sure your motherboard is compatible with this video card. For example, PCI Express video cards won’t work with motherboards designed only for AGP or PCI video cards, and vice versa. Please read the specifications carefully or call us for expert advice.";250 EUR;approved;;;HW2310-1004-01;HW2310-1004-00;HW2310-1004-00;XFX;HW2310-1004-02,HW2310-1004-03,HW2310-1004-04,HW2310-1004-05,HW2310-1004-06,HW2310-1004-07,HW2310-1004-08,HW2310-1004-09;XFX_logo;HW2310-1004-02t,HW2310-1004-03t,HW2310-1004-04t,HW2310-1004-05t,HW2310-1004-06t,HW2310-1004-07t,HW2310-1004-08t,HW2310-1004-09t;3
+
+;HW2310-1005;;XFX GeForce MX 4000 ;XFX GeForce MX 4000 ;pieces;HW2310;Die XFX GeForce MX 4000 ist mit dem NVIDIA GeForce MX4000 Chip ausgestattet und tritt damit die Nachfolge des erfolgreichen GeForce4 MX-440 Chips an. Die Grafikkarte verfügt bereits über die AGP 8x Technologie und ist komplett passiv gekühlt. Daher eignet sie sich bestens als Grafiklösung in Office- oder Arbeitscomputer, da kein Lüftergeräusch die Arbeit stört. Trotzdem ist die Grafikkarte ein vollwertiger 3D-Beschleuniger, da DirectX und OpenGL unterstützt werden, so daß einem gelegentlichen Spiel nichts im Wege steht. Ausgestattet ist die Grafikkarte mit einem VGA-, DVI- und S-Video Ausgang.;"<b>The Video ""Deal of the Year!""</br>
+XFX's High-Performance GeForce MX 4000 </b></br>
+</br>
+A steal on one of the hottest video systems available. The GeForce MX4000 graphics processing unit (GPU) brings a new level of graphics performance and flexibility to the mainstream desktop PC. By incorporating NVIDIA's innovative nView display technology, highly efficient Lightspeed Memory Architecture (LMA) II, and advanced Accuview antialiasing techniques, the GeForce MX4000 GPU is the most feature-rich, cost-effective, and highly integrated GPU we've seen. We're particularly impressed with NVIDIA's hot nView display technology, enabling you to select any combination of multiple displays, LCDs, CRTs and TVs. It's a great new feature----and true 8X AGP pumps out crisp, high-res video. The VPE (Video Processing Engine) delivers best-possible video quality for DVDs and other video formats. An integrated MPEG2 decoder reduces CPU power-drain for DVD playback. Also includes TV out. Great price. Great video. <p>
+<b>NVIDIA GeForce MX 4000</b></br>
+With the GeForce MX graphics processing units, NVIDIA provides a new level of cost-effective, high-performance graphics to the mainstream PC user. With its incomparable nView multi-display architecture, Lightspeed Memory Architecture II, and Accuview Antialiasing engine, the GeForce MX series delivers feature-rich, leading-edge graphics technology, performance and flexibility.<p>
+<b>nView Multi-Display Technology</b></br>
+The nView hardware and software technology combination delivers maximum flexibility for multi-display options, and provides unprecedented end-user control of the desktop experience. <p>	
+<b>Accuview Antialiasing (AA)</b></br>
+The Accuview Antialiasing subsystem with advanced multisampling hardware delivers full-scene antialiased quality at performance levels never before seen.<p>
+<b>Lightspeed Memory Architecture II</b></br>
+LMA II boosts effective memory bandwidth by up to 300%. Radical new technologies including Z-occlusion culling, fast Z-clear, and auto pre-charge effectively multiply the memory bandwidth to ensure fluid frame rates for the latest 3D and 2D games and applications.
+<p>
+Provides double the bandwidth of AGP 4X—2.1GB/sec. vs. 1.1BG/sec. AGP 8X enables more complex models and detailed textures, creating richer and more lifelike environments. Uninterrupted data flow allows for smoother video streaming and faster, more seamless gameplay.<p>";29,90 EUR;approved;;;HW2310-1005-01;HW2310-1005-00;HW2310-1005-00;XFX;HW2310-1005-02,HW2310-1005-03,HW2310-1005-04,HW2310-1005-05,HW2310-1005-06,HW2310-1005-07,HW2310-1005-08,HW2310-1005-09,HW2310-1005-10;XFX_logo;HW2310-1005-02t,HW2310-1005-03t,HW2310-1005-04t,HW2310-1005-05t,HW2310-1005-06t,HW2310-1005-07t,HW2310-1005-08t,HW2310-1005-09t,HW2310-1005-10t;3
+
+;HW2310-1006;;Leadtek GeForce 6600;Leadtek GeForce 6600;pieces;HW2310;Die Leadtek GeForce 6600 ist mit der NVIDIA GeForce 6600 GPU und 256 MB Speicher ausgestattet. Die Grafikkarte bietet für den Preis überdurchschnittliche 3D-Performance, so dass auch Spieler mit kleinem Budget zu hochauflösender DirectX 9 Grafik kommen.;"<b>256MB DDR Powerhouse!</br>
+Leadtek GeForce 6600 PCI Express Video Card</b></br>
+Supercharge your gaming with the power of an NVIDIA GeForce 6600 GPU. The NVIDIA® GeForce™ 6600 GPUs deliver best-in-class performance and advanced visual effects for next-generation games. The only GPU in its class with support for Microsoft® DirectX® 9.0 Shader Model 3.0 and with support for PCI Express, the GeForce 6600 delivers ultra-realistic effects, unmatched features, and rock-solid stability so you can play your game the way it’s meant to be played. <p>
+<b>Before you buy</b> - make sure your motherboard is compatible with this video card. For example, PCI Express video cards won't work with motherboards designed only for AGP or PCI video cards, and vice versa. Please read the specifications carefully or call us for expert advice.
+<p>
+Note: SLI is accomplished through software included with the Video Card
+<p>	
+Supercharge your gaming with the power of an NVIDIA GeForce 6600 GPU. The NVIDIA GeForce 6600 GPUs deliver best-in-class performance and advanced visual effects for next-generation games. The only GPU in its class with support for Microsoft DirectX 9.0 Shader Model 3.0 and with support for PCI Express.<p>
+<b>Superscalar 16-pipe GPU Architecture</b></br>
+Delivers 8× the shading power of previous generation products for screaming gaming performance.<p>
+<b>CineFX 3.0 Engine</b></br>
+Powers the next generation of cinematic realism. Full support for Microsoft® DirectX® 9.0 Shader Model 3.0 enables stunning and complex special effects. Next-generation shader architecture delivers faster and smoother gameplay.<p>
+<b>UltraShadow II Technology</b></br>
+Enhances the performance of bleeding-edge games, like id Software's Doom III, that feature complex scenes with multiple light sources and objects. Second-generation technology delivers more than 4× the shadow processing power over the previous generation.<p>
+<b>64-Bit Texture Filtering and Blending </b></br>
+Based on the OpenEXR technology from Industrial Light &amp; Magic, NVIDIA's 64-bit texture implementation sets new standards for image clarity and quality through floating point capabilities in shading, filtering, texturing, and blending.<p>
+<b>Intellisample 3.0 Technology</b></br>
+The industry’s fastest and highest quality antialiasing delivers ultra-realistic visuals, with no jagged edges, at lightning-fast speeds. Extends performance and quality gains to higher resolutions and antialiasing levels. 
+<p>
+<b>Unified Driver Architecture (UDA)</b></br>
+Part of the NVIDIA Forceware unified software environment (USE). The NVIDIA UDA guarantees forward and backward compatibility with software drivers. Simplifies upgrading to a new NVIDIA product because all NVIDIA products work with the same driver software.
+	<p>
+<b>nView Multi-Display Technology</b></br>
+The nView hardware and software technology combination delivers maximum flexibility for multi-display options, and provides unprecedented end-user control of the desktop experience. <p>
+<b>PCI Express Support</b></br>
+PCI Express is a new Intel bus architecture that doubles the bandwidth of the AGP 8X bus, delivering over 4 GB per second in both upstream and downstream data transfers.";124,90 EUR;approved;;;HW2310-1006-01;HW2310-1006-00;HW2310-1006-00;Leadtek;HW2310-1006-02,HW2310-1006-03,HW2310-1006-04,HW2310-1006-05,HW2310-1006-06,HW2310-1006-07,HW2310-1006-08,HW2310-1006-09,HW2310-1006-10,HW2310-1006-11;Leadtek_logo;HW2310-1006-02t,HW2310-1006-03t,HW2310-1006-04t,HW2310-1006-05t,HW2310-1006-06t,HW2310-1006-07t,HW2310-1006-08t,HW2310-1006-09t,HW2310-1006-10t,HW2310-1006-11t;3
+
+;HW2310-1007;;Asus GeForce 6600 GT;Asus GeForce 6600 GT;pieces;HW2310;Die NVIDIA GeForce 6600 GT GPU auf der Asus GeForce 6600 GT Grafikkarte unterstützt nicht nur aktuelle DirectX 9 Spiele, sondern ermöglicht ein flüssiges Spielen fast aller modernen 3D-Spiele. Durch eine 128-Bit Speicheranbindung, 8 Pixel Pipelines und einem 900 MHz Speichertakt wird so die Pixelpracht ruckelfrei auf den Bildschirm gebracht.;"<b>Experience the Explosive Superspeed </br>
+of PCI-Express with ASUS Powered EN6600GT</b></br>
+ASUS Extreme N6600GT Top Overclock Performance Series equip with newest ASUS-specific award-winning features and NVIDIA®’s GeForce 6600GT Graphics Processing Unit(GPU). ASUS Extreme N6600GT Top Series is positioned on the performance products and the most complete solution for the 3D and video application market.<p>
+<b>Before you buy</p> - make sure your motherboard is compatible with this video card. For example, PCI Express video cards won’t work with motherboards designed only for AGP or PCI video cards, and vice versa. Please read the specifications carefully or call us for expert advice.";185,99 EUR;approved;;;HW2310-1007-01;HW2310-1007-00;HW2310-1007-00;ASUS;HW2310-1007-02,HW2310-1007-03,HW2310-1007-04,HW2310-1007-05,HW2310-1007-06,HW2310-1007-07,HW2310-1007-08,HW2310-1007-09,HW2310-1007-10,HW2310-1007-11,HW2310-1007-12,HW2310-1007-13,HW2310-1007-14,HW2310-1007-15,HW2310-1007-16,HW2310-1007-17;ASUS_logo;HW2310-1007-02t,HW2310-1007-03t,HW2310-1007-04t,HW2310-1007-05t,HW2310-1007-06t,HW2310-1007-07t,HW2310-1007-08t,HW2310-1007-09t,HW2310-1007-10t,HW2310-1007-11t,HW2310-1007-12t,HW2310-1007-13t,HW2310-1007-14t,HW2310-1007-15t,HW2310-1007-16t,HW2310-1007-17t;3
+
+;HW2320-1008;;ATI All-In-Wonder Radeon X800XT;ATI All-In-Wonder Radeon X800XT;pieces;HW2320,specialoffers;Die ATI All in Wonder X800XT verfügt über die leistungsstarke Radeon X800 XT GPU und 256 MB GDDR3 Speicher. Durch 16 Pixel Pipelines, eine 256-Bit Speicheranbindung und hohe Taktraten besitzt die AGP-Grafikkarte genügend Leistung für moderne Spiele und 3D-Anwendungen. Jedoch bietet die Karte wesentlich mehr, als reine 3D-Performance, denn die ATI All in Wonder X800XT Grafikkarte ist ein echtes Multitalent. Zum einen ist ein TV/FM-Tuner auf der Karte integriert, so dass am PC Fernsehen gesehen und Radio gehört werden kann. Des weiteren erfüllt sie auch die Anforderungen, die an eine Videoschnittkarte gestellt werden. Denn die AGP-Grafikkarte begnügt sich nicht nur mit einem normalen Video-Eingang, sondern verfügt auch über StereoCinch Ein- und Ausgänge. Damit ist sie die perfekte Grafiklösung für Multimedia-Enthusiasten.;"<b>Multimedia Entertainment Is Redefined</b></br>
+Built upon the award-winning powerful RADEON® X800 Visual Processing Unit (VPU), this new multimedia add-in video card brings innovative solutions for home theater, video editing and gaming enthusiasts. Turn your computer into a personal video recorder (PVR), DVD player, 3D game machine, radio jukebox and more. You can enjoy new levels of entertainment on your PC monitor, TV, or HDTV display, with the included output connections. 
+<p>
+<b>Home Entertainment To The eXTreme</b></br>
+This silicon digital TV tuner provides instant viewing of up to 125 channels of cable or antenna broadcasts. TV-ON-DEMAND™ is yours to enjoy for pausing and recording TV programs on your PC. Similarly, FM-ON-DEMAND™ allows for pausing and recording of FM radio to MP3. Easily watch TV on your computer while working with other Windows® programs with THRUVIEW™ or even watch two TV Programs at the same time with MulTView™ (Optional TV Wonder/Pro required) 
+<p>
+View upcoming programs with the Interactive Program Guide, Gemstar's GUIDE Plus+™ . This intelligent free integrated program guide allows users to view and search TV listings by category, actor/performer, or date. Schedule and record programs at the click of a mouse – all the benefits of a PVR without the monthly fees. Enjoy all this entertainment while relaxing from up to 60 feet away with the REMOTE WONDER™ II. This second-generation radio-frequency remote control device allows for complete computer control with the benefits of wireless connectivity";299,99 EUR;approved;;;HW2320-1008-01;HW2320-1008-00;HW2320-1008-00;ATI;HW2320-1008-02,HW2320-1008-03,HW2320-1008-04,HW2320-1008-05,HW2320-1008-06,HW2320-1008-07;ATI_logo;HW2320-1008-02t,HW2320-1008-03t,HW2320-1008-04t,HW2320-1008-05t,HW2320-1008-06t,HW2320-1008-07t;3
+
+;HW2320-1009;;DiabloTek Radeon 9600XT ;DiabloTek Radeon 9600XT ;pieces;HW2320;Die DiabloTek Radeon 9600XT ist mit dem ATI Radeon 9600XT Chip ausgestattet und stellt ambitionierten Spielern eine preisgünstige Grafikkarte zur Verfügung, die DirectX 9 Spiele unterstützt. Ausgestattet ist die Grafikkarte mit einem VGA-, DVI- und S-Video Ausgängen, die den Anschluß von normalen VGA Monitoren, digitalen TFT-Bildschirmen und Fernsehern ermöglicht.;"<b>High-End Performance At A Bargain Price!<b></br>
+Explore stunning new worlds of cinematic gameplay with the unprecedented combination of power, performance, and Microsoft® DirectX® 9 optimized support featured in RADEON™ 9600XT visual processors. Maximize your long-term entertainment value with its Quad-pipe architecture and high precision cinematic shaders that will upgrade expectations for devoted gamers and casual fans alike - and push the most compelling next-generation games to their limit.";99,80 EUR;approved;;;HW2320-1009-01;HW2320-1009-00;HW2320-1009-00;diablotek;HW2320-1009-02,HW2320-1009-03,HW2320-1009-04,HW2320-1009-05,HW2320-1009-06,HW2320-1009-07,HW2320-1009-08,HW2320-1009-09,HW2320-1009-10;diablotek_logo;HW2320-1009-02t,HW2320-1009-03t,HW2320-1009-04t,HW2320-1009-05t,HW2320-1009-06t,HW2320-1009-07t,HW2320-1009-08t,HW2320-1009-09t,HW2320-1009-10t;3
+
+;HW2320-1010;;Diamond Viper Radeon 9600XT;Diamond Viper Radeon 9600XT;pieces;HW2320;Die Diamond Viper Radeon 9600XT ist mit der ATI Radeon 9600XT GPU und 256 MB Videospeicher ausgestattet. Die DirectX 9 Karte verfügt über ein hervorragendes Preis-/Leistungsverhältnis, da selbst komplexe 3D-Spiele problemlos mit der 9600XT funktionieren. Dies wird über eine 128-Bit Speicheranbindung, vier Pixel Pipelines und 3,6ns Speicher realisiert.;"<b>Diamond Viper Radeon 9600XT</b></br>
+Explore stunning new worlds of cinematic gameplay with the Viper® 9600XT graphics accelerator card, featuring ATI Radeon 9600XT graphics technology! The Viper® 9600XT delivers an unprecedented combination of power, performance, and Microsoft® DirectX® 9 optimized support for the serious gamer. The Viper® 9600XT’s Quad-pipe architecture and high precision shaders will maximize your long-term entertainment value, pushing the most compelling next-generation games to their limit!<p>
+Specially designed with the hardcore gamer in mind, Diamond Viper® graphics cards feature the hottest visual processing technology and the mosdt advanced features. For a limited time this Diamond video card includes full versions of these games: Hitman 2: Silent Assassin, Tomb Raider: Angel of Darkness and Deus Ex: Invisible War get yours today while supplies last.";155,99 EUR;approved;;;HW2320-1010-01;HW2320-1010-00;HW2320-1010-00;diamond;HW2320-1010-02,HW2320-1010-03,HW2320-1010-04,HW2320-1010-05,HW2320-1010-06,HW2320-1010-07,HW2320-1010-08,HW2320-1010-09,HW2320-1010-10,HW2320-1010-11;diamond_logo;HW2320-1010-02t,HW2320-1010-03t,HW2320-1010-04t,HW2320-1010-05t,HW2320-1010-06t,HW2320-1010-07t,HW2320-1010-08t,HW2320-1010-09t,HW2320-1010-10t,HW2320-1010-11t;4
+
+;HW2320-1011;;ATI Radeon X1800 XT;ATI Radeon X1800 XT;pieces;HW2320,specialoffers;Die ATI Radeon X1800 XT aus dem Hause ATI basiert auf der leistungsstarken Radeon X1800 XT GPU und 512 MB Videospeicher. Für eine herausragende High-Definition Gaming Erfahrung mit bester Dynamik sorgen überragende Frame Raten sowie die volle Direct X9.0 und OpenGL 2.0 Unterstützung. ;"<b>Radeon X1800 Series</b></br>
+3D Architecture for Maximum Visual Velocity
+The ATI Radeon® X1800 Series hands you the visual and performance possibilities you only dreamed of from a PC graphics processor. It has been designed with a radically new ultra-threaded 3D architecture and Shader Model 3.0, unleashing the most mind-blowing gaming effects. What’s more, the Radeon® X1800 introduces ATI’s revolutionary Avivo™, our new reference for video and display perfection.
+<p>
+<b>Before you buy</b> - make sure your motherboard is compatible with this video card. For example, PCI Express video cards won’t work with motherboards designed only for AGP or PCI video cards, and vice versa. Please read the specifications carefully or call us for expert advice.
+<p>
+<b>The Most Advanced 3D Performance Arsenal</b></br>
+Get the ultimate gaming performance AND image quality with an advanced ultra-threaded 3D architecture, a ruthlessly efficient memory controller and Shader Model 3.0, all enabled by the most advanced 90 nanometer GPU process. Radeon® X1800 series’ 90-nanometer process technology and ultra-threaded architecture combine power and efficiency as well as support for Shader Model 3.0 to deliver new High Dynamic Range visual effects, enhanced realism with Adaptive Anti Aliasing and lightening fast performance in OpenGL® and DirectX® 9 games.
+<p>
+<b>CrossFire: Multiply and Conquer with Multi-GPU Performance</b></br>
+Designed from the ground up with GPU sharing in mind, the Radeon® X1800 series allows you to get incredible gaming performance by adding a Radeon® X1800 Crossfire™ Edition graphics card for ultra fast performance that works with all games, all the time.
+CrossFire’s™ “supertiling” GPU sharing speeds rendering by evenly dividing the graphics processing, intelligently alternating the rendering workload to each Radeon® GPU for efficient load balancing, and optimized performance.";599,99 EUR;approved;;;HW2320-1011-01;HW2320-1011-00;HW2320-1011-00;ati;HW2320-1011-02,HW2320-1011-03,HW2320-1011-04,HW2320-1011-05,HW2320-1011-06,HW2320-1011-07,HW2320-1011-08;ATI_logo;HW2320-1011-02t,HW2320-1011-03t,HW2320-1011-04t,HW2320-1011-05t,HW2320-1011-06t,HW2320-1011-07t,HW2320-1011-08t;2
+;
+
+########## mainboards ############
+
+;HW2200-0561;;ASUS P4P800-E DELUXE 865PE Sockel478 ;ASUS P4P800-E DELUX S478 865PE;pieces;HW2200;"<i>""PRESCOTT ready""</i>,<br/>Hyper-Threading-Technology Support,<br/>";"<i>""PRESCOTT ready""</i>,<br/>Hyper-Threading technology support<br/>";86,8 EUR;approved;;;HW2200-0561-01;HW2200-0561-00;HW2200-0561;ASUS;;ASUS_logo;;2
+
+;HW2200-0623;;Intel Desktop Board D945GTPLKR ATX LGA775 ;Intel Desktop Board D945GTPLKR ATX LGA775 ;pieces;HW2200,topseller;;;142,56 EUR;approved;;;HW2200-0623-01;HW2200-0623-00;HW2200-0623;Intel;;HW2110-18;;3
+
+;HW2200-0812;;Intel Desktop Board D945PVSLKR f. LGA775 ;Intel Desktop Board D945PVSLKR f. LGA775 ;pieces;HW2200;;;180,96 EUR;approved;;;HW2200-0812-01;HW2200-0812-00;HW2200-0812;Intel;;HW2110-18;;1
+
+;HW2200-0521;;Intel Desktop Board D945PSNLK f LGA775 ;Intel Desktop Board D945PSNLK f LGA775 ;pieces;HW2200;;;134,1 EUR;approved;;;HW2200-0521-01;HW2200-0521-00;HW2200-0521;Intel;;HW2110-18;;3
+
+;HW2200-0878;;Intel Desktop Board D945GNTLKR f LGA775 ;Intel Desktop Board D945GNTLKR f LGA775;pieces;HW2200;;;143,72 EUR;approved;;;HW2200-0878-01;HW2200-0878-00;HW2200-0878;Intel;;HW2110-18;;1
+
+############# cpu's/processors #####################
+
+;
+;HW2110-0012;;Intel CeleronD Prozessor 325 2,5 533 S478 ;Intel CeleronD Processor 325 2.5 533 S478 ;pieces;HW2110;"<b>Hinweis:</b> erfordert ""PRESCOTT ready"" Motherboard";"<b>Please Note:</b> Requires ""PRESCOTT Ready"" Motherboard";81,08 EUR;approved;;;HW2110-0012-01;HW2110-0012-00;HW2110-0012;Intel;;HW2110-18;;1
+;HW2110-0019;;Intel PentiumD Prozessor 830 3,0 LGA775;Intel PentiumD Processor 830 3,0 LGA775;pieces;HW2110;"2x 1.024KB Cache, <br/>Sockel LGA775 Format <br/>";"2x 1024 KB cache 800 MHz front side bus, <br/>0.09‘ core Execute disable bit and Intel EM64T support Socket LGA775 format .<br/><b>Please note:</b> for motherboards compatible with the BTX standard! <br/>";381,64 EUR;approved;;;HW2110-0019-01;HW2110-0019-00;HW2110-0019;Intel;;HW2110-18;;14
+;HW2110-0027;;Intel Pentium4 Prozessor 670 3,8 LGA775 ;Intel Pentium4 Processor 670 3.8 LGA775;pieces;HW2110;"Unterstützt Hyper-Threading Technologie,<br/>Execute Disable Bit und Intel EM64T Support,<br/>Sockel LGA775 Format<br/>";"Supports Hyper-Threading technology<br/>Execute Disable Bit and Intel EM64T support<br/>Socket LGA775 format<br/>";671,64 EUR;approved;;;HW2110-0027-01;HW2110-0027-00;HW2110-0027;Intel;;HW2110-18;;1
+;HW2110-0029;;Intel Pentium4 Prozessor 551 3,4 LGA775 ;Intel Pentium4 Processor 551 3.4 LGA775 ;pieces;HW2110;"Unterstützt Hyper-Threading Technologie,<br/>Execute Disable Bit und Intel EM64T Support,<br/>Sockel LGA775 Format<br/><br/>";"Supports Hyper-Threading technology<br/>Execute Disable Bit and Intel EM64T support<br/>Socket LGA775 format<br/>";316,68 EUR;approved;;;HW2110-0029-01;HW2110-0029-00;HW2110-0029;Intel;;HW2110-18;;4
+;HW2120-0341;;"AMD Athlon 64 3200+ (Boxed, OPGA, ""Venice"")";"AMD Athlon 64 3200+ (Boxed, OPGA, ""Venice"")";pieces;HW2120,topseller,specialoffers;"Der neue AMD Athlon64 Prozessor für Sockel 939 mit ""Venice""-Kern bietet dank Dual-Channel Speicherinterface und seiner leistungsfähigen Architektur hohe Performance in High-End PC-Systemen bei gleizeitig reduzierter Verlustleistung gegenüber älteren Modellen. Der Prozessor basiert auf der AMD64 Technologie, einer bahnbrechenden Architektur, die 64-Bit-Technologie auf der x86-Plattform ermöglicht. Der Athlon64 bringt damit modernste 64-Bit-Technologie in den Desktop- bzw. Workstation-PC. Der Venice-Kern besitzt gegenüber Winchester einen optimierten Speicherkontroller, SSE3-Unterstützung und höheres Taktpotential.<br/><br/>
+<b>Level 1 Cache:</b>    128 KB <br/>
+<b>Level 2 Cache:</b>    512 KB <br/>
+<b>Befehlssätze:</b>    MMX, SSE, SSE2, SSE3, AMD64, Cool'n'Quiet, NX-Bit <br/>
+<b>Core-Spannung:</b>    1,4 Volt <br/>
+<b>Bauform:</b>    OPGA <br/>
+<b>Zubehör:</b>    Prozessorlüfter <br/>
+<b>Weitere Infos:</b>    Verwendet werden können Speichermodule bis DDR400 (PC3200). Der Sockel 939 ist AMD's neue Plattforum für High-End PCs und Workstations, geeignet für neuere Athlon 64 und Athlon 64 FX Prozessoren. Ein Netzteil mit mindestens 350 Watt wird benötigt. 
+ ";"The new AMD Athlon 64 processor (Venice core) for Socket 939 chipsets offers high performance in high-end PC systems and reduced power consumption (compared to older versions) due to its dual-channel memory interface and its efficient architecture. It is based on the AMD64 technology, a groundbreaking architecture that allows 64-bit technology on the x86 platform. Thus, the Athlon64 equips desktop PCs and workstation with the latest 64-bit technology. Compared to the Winchester core, the Venice core boasts an improved memory controller, SSE3 support and higher clock limits.<br/><br/>
+<b>level 1 cache:</b>    128 KB <br/>
+<b>level 2 cache:</b>    512 KB <br/>
+<b>instruction sets:</b>    MMX, SSE, SSE2, SSE3, AMD64, Cool'n'Quiet, NX-Bit <br/>
+<b>core voltage:</b>    1.4 Volt <br/>
+<b>type:</b>    OPGA <br/>";179 EUR , 3 pieces = 150 EUR , 5 pieces = 130 EUR [17.10.2005,28.04.2009];approved;;;HW2120-0341-01;HW2120-0341-00;HW2120-0341;AMD;;HW2120-17;;5
+;
+
+############# monitors/displays #######################
+
+;HW1100-0023;;"EIZO L578-K 17"" LCD-Monitor (silber)";"EIZO L578-K 17"" LCD Monitor (silver)";pieces;HW1100;"<b>Farbe:</b> Silber<br/>
+<b>Größe:</b> 17""<br/>
+<b>Signaleingang:</b> analog/digital<br/>
+<b>Physikalische Auflösung:</b> 1280 x 1024<br/>
+<b>Kontrast:</b> 1000:1<br/>
+<b>Helligkeit:</b> 250 cd/m²<br/>
+<b>Einblickwinkel horiz./vertik.:</b> 178°/178°<br/>
+<b>Reaktionszeit:</b> 16 ms<br/>
+<b>Prüfzeichen:</b> TCO03<br/>
+<b>Höhenverstellbarkeit:</b> ja<br/>
+<b>Wandanbringung möglich:</b> optional<br/>
+<b>Lautsprecher:</b> ja<br/>
+Herstellergarantie 5 Jahre Vor-Ort-Austausch-Service (Details siehe Hersteller-Web-Site) <br/> <a href=""http://www.eizo.de/"">EIZO.de</a>";"<b>Color:</b> silver<br/>
+<b>Size:</b> 17""<br/>
+<b>Signal input:</b> analogue/digital<br/>
+<b>Physical resolution:</b> 1280x1024<br/>
+<b>Contrast:</b> 1000:1<br/>
+<b>Brightness:</b> 250 cd/m²<br/>
+<b>Viewing angle horiz./vertical:</b> 178°/178°<br/>
+<b>Reaction Time:</b> 16 ms<br/>
+<b>Compliance:</b> TCO'03<br/>
+<b>Height Adjustability:</b> yes<br/>
+<b>Wall mounting possible:</b> optional<br/>
+<b>Multimedia:</b> yes<br/>
+Version English Manufacturer's warranty 5 Years Bring-In (see manufacturer's website for details) <br/> <a href=""http://www.eizo.co.uk/"">EIZO.co.uk</a>";523,99 EUR;approved;;;HW1100-0023-01;HW1100-0023-00;HW1100-0023;EIZO;;;;5
+
+;HW1100-0024;;"EIZO L578-K 17"" LCD-Monitor (schwarz)";"EIZO L578-K 17"" LCD Monitor (black)";pieces;HW1100;"<b>Farbe:</b> Schwarz<br/>
+<b>Größe:</b> 17""<br/>
+<b>Signaleingang:</b> analog/digital<br/>
+<b>Physikalische Auflösung:</b> 1280 x 1024<br/>
+<b>Kontrast:</b> 1000:1<br/>
+<b>Helligkeit:</b> 250 cd/m²<br/>
+<b>Einblickwinkel horiz./vertik.:</b> 178°/178°<br/>
+<b>Reaktionszeit:</b> 16 ms<br/>
+<b>Prüfzeichen:</b> TCO03<br/>
+<b>Höhenverstellbarkeit:</b> ja<br/>
+<b>Wandanbringung möglich:</b> optional<br/>
+<b>Lautsprecher:</b> ja<br/>
+Herstellergarantie 5 Jahre Vor-Ort-Austausch-Service (Details siehe Hersteller-Web-Site) <br/> <a href=""http://www.eizo.de/"">EIZO.de</a>";"<b>Color:</b> black<br/>
+<b>Size:</b> 17""<br/>
+<b>Signal input:</b> analogue/digital<br/>
+<b>Physical resolution:</b> 1280x1024<br/>
+<b>Contrast:</b> 1000:1<br/>
+<b>Brightness:</b> 250 cd/m²<br/>
+<b>Viewing angle horiz./vertical:</b> 178°/178°<br/>
+<b>Reaction Time:</b> 16 ms<br/>
+<b>Compliance:</b> TCO'03<br/>
+<b>Height Adjustability:</b> yes<br/>
+<b>Wall mounting possible:</b> optional<br/>
+<b>Multimedia:</b> yes<br/>
+Version English Manufacturer's warranty 5 Years Bring-In (see manufacturer's website for details) <br/> <a href=""http://www.eizo.co.uk/"">EIZO.co.uk</a>";523,99 EUR;approved;;;HW1100-0024-01;HW1100-0024-00;HW1100-0024;EIZO;;;;6
+
+;HW1100-0025;;"EIZO L578-K 17"" LCD-Monitor (grau)";"EIZO L578-K 17"" LCD Monitor (grey)";pieces;HW1100,topseller;"<b>Farbe:</b> Grau<br/>
+<b>Größe:</b> 17""<br/>
+<b>Signaleingang:</b> analog/digital<br/>
+<b>Physikalische Auflösung:</b> 1280 x 1024<br/>
+<b>Kontrast:</b> 1000:1<br/>
+<b>Helligkeit:</b> 250 cd/m²<br/>
+<b>Einblickwinkel horiz./vertik.:</b> 178°/178°<br/>
+<b>Reaktionszeit:</b> 16 ms<br/>
+<b>Prüfzeichen:</b> TCO03<br/>
+<b>Höhenverstellbarkeit:</b> ja<br/>
+<b>Wandanbringung möglich:</b> optional<br/>
+<b>Lautsprecher:</b> ja<br/>
+Herstellergarantie 5 Jahre Vor-Ort-Austausch-Service (Details siehe Hersteller-Web-Site) <br/> <a href=""http://www.eizo.de/"">EIZO.de</a>";"<b>Color:</b> grey<br/>
+<b>Size:</b> 17""<br/>
+<b>Signal input:</b> analogue/digital<br/>
+<b>Physical resolution:</b> 1280x1024<br/>
+<b>Contrast:</b> 1000:1<br/>
+<b>Brightness:</b> 250 cd/m²<br/>
+<b>Viewing angle horiz./vertical:</b> 178°/178°<br/>
+<b>Reaction Time:</b> 16 ms<br/>
+<b>Compliance:</b> TCO'03<br/>
+<b>Height Adjustability:</b> yes<br/>
+<b>Wall mounting possible:</b> optional<br/>
+<b>Multimedia:</b> yes<br/>
+Version English Manufacturer's warranty 5 Years Bring-In (see manufacturer's website for details) <br/> <a href=""http://www.eizo.co.uk/"">EIZO.co.uk</a>";599,99 EUR;approved;;;HW1100-0025-01;HW1100-0025-00;HW1100-0025;EIZO;;;;3
+
+
+################## digital cameras #########################
+
+;
+;HW1240-1732;;HP Photosmart R717 Digitalkamera;HP Photosmart R717 Digital Camera Bundle;pieces;HW1240;"<b>Speicher:</b> intern 32 MB<br/>";"<b>Memory:</b> Internal 32 MB<br/>";201,00 EUR;approved;;;HW1240-1732-01;HW1240-1732-00;HW1240-1732;Hewlett-Packard;;HW1240-15;;2
+;HW1240-1733;;HP Photosmart R817 Digitalkamera;HP Photosmart R817 Digital Camera;pieces;HW1240;"<b>Speicher:</b> intern 32 MB";"<b>Memory:</b> Internal 32 MB";227,00 EUR;approved;;;HW1240-1733-01;HW1240-1733-00;HW1240-1733;Hewlett-Packard;;HW1240-15;;4
+;HW1210-3411;;Canon Digital Ixus 50 Digitalkamera ;Canon Digital Ixus 55 Camera;pieces;HW1210,specialoffers;"<b>Speicher:</b> 16 MB";"<b>Memory:</b> Internal 16 MB<br/>";253,00 EUR;approved;;;HW1210-3411-01;HW1210-3411-00;HW1210-3411;Canon;;HW1210-13;;2
+;HW1210-3412;;Canon Digital Ixus 750 Digitalkam.silber ;Canon Digital Ixus 750 Camera Silver;pieces;HW1210;"<b>Speicher:</b> 32 MB";"<b>Memory:</b> 32 MB<br/>";364,00 EUR;approved;;;HW1210-3412-01;HW1210-3412-00;HW1210-3412;Canon;;HW1210-13;;1
+;HW1210-3422;;Canon Digital Ixus i5 silber ;Canon Digital Ixus i5 Silver;pieces;HW1210;"<b>Speicher:</b> 32 MB";"<b>Memory:</b> 32 MB";245,00 EUR;approved;;;HW1210-3422-01;HW1210-3422-00;HW1210-3422;Canon;;HW1210-13;;1
+;HW1220-0011;;Pentax Optio WP Digitalkamera;Pentax Optio WP Digital Camera;pieces;HW1220;"<b>Speicher:</b> intern 10 MB<br/><b>Wasserdicht bis zu 1m  </b>";"<b>Memory:</b> Internal 10 MB";204 EUR;approved;;;HW1220-0011-01;HW1220-0011-00;HW1220-0011;Pentax;;HW1220-12;;2
+;HW1230-0200;;Sony DSC-P200 CYBER-SHOT silber;Sony DSC-P200 CYBER-SHOT Silver ;pieces;HW1230,topseller;"<b>Speicher:</b> 32 MB<br/><b>Wichtiger Hinweis: <br/>Keine Rücknahme möglich! </b>";"<b>Memory:</b> 32 MB<br/><b>Please note: <br/>For returns please see our T&amp;C's </b>";269 EUR;approved;;;HW1230-0200-01;HW1230-0200-00;HW1230-0200;Sony;;HW1230-14;;3
+;HW1210-0400;;Canon EOS 400D;Canon EOS 400D;pieces;HW1210,topseller;"<b>Wichtiger Hinweis: <br/>Keine Rücknahme möglich! </b>";"<b>Please note: <br/>For returns please see our T&amp;C's </b>";669 EUR;approved;;;HW1210-0400-01;HW1210-0400-00;HW1210-0400;Canon;;HW1210-13;;3
+;HW1230-0001;;Sony DSLR-A700;Sony DSLR-A700;pieces;HW1230,topseller;"<b>Wichtiger Hinweis: <br/>Keine Rücknahme möglich! </b>";"<b>Please note: <br/>For returns please see our T&amp;C's </b>";769 EUR;approved;;;HW1230-0001-01;HW1230-0001-00;HW1230-0001;Sony;;HW1230-14;;3
+
+
+#INSERT_UPDATE Keyword;catalog(id[default='hwcatalog']);$catalogversion;categories(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']));language(isocode)[unique=true];keyword[unique=true];products;
+#;;;HW1200,HW1210,HW1220,HW1230,HW1240,HW1250;de;kameras;
+#;;;HW1200,HW1210,HW1220,HW1230,HW1240,HW1250;de;cameras;
+#;;;HW1200,HW1210,HW1220,HW1230,HW1240,HW1250;de;fotoapparat;
+#;;;HW1200,HW1210,HW1220,HW1230,HW1240,HW1250;de;fotoapperat;
+#;;;HW1200,HW1210,HW1220,HW1230,HW1240,HW1250;de;fotoaperat;
+#;;;HW1200,HW1210,HW1220,HW1230,HW1240,HW1250;de;fotoaparat;
+#;;;HW1100;de;bildschirm;
+#;;;HW1100;de;bildschirme;
+
+INSERT_UPDATE ProductReference;source(code, $catalogversion)[unique=true];target(code, $catalogversion)[unique=true];referenceType(code)[unique=true];active;preselected;description[lang=de];description[lang=en];quantity;$icon
+#nachfolgemodelle;
+;HW2300-2356;HW2300-3843;FOLLOWUP;true;false;;;1;
+;HW2300-2356;HW2300-4121;FOLLOWUP;true;false;;;1;
+#ähnliche produkte;
+;HW2300-3843;HW2300-4121;SIMILAR;true;false;;;1;
+;HW2300-4121;HW2300-3843;SIMILAR;true;false;;;1;
+;HW2300-2356;HW2310-1003;SIMILAR;true;false;;;1;
+;HW2300-2356;HW2310-1004;SIMILAR;true;false;;;1;
+;HW2300-2356;HW2310-1006;SIMILAR;true;false;;;1;
+;HW2300-2356;HW2310-1007;SIMILAR;true;false;;;1;
+;HW2310-1003;HW2300-2356;SIMILAR;true;false;;;1;
+;HW2310-1003;HW2310-1004;SIMILAR;true;false;;;1;
+;HW2310-1003;HW2310-1006;SIMILAR;true;false;;;1;
+;HW2310-1003;HW2310-1007;SIMILAR;true;false;;;1
+;HW2310-1004;HW2310-1003;SIMILAR;true;false;;;1
+;HW2310-1004;HW2300-2356;SIMILAR;true;false;;;1
+;HW2310-1004;HW2310-1006;SIMILAR;true;false;;;1
+;HW2310-1004;HW2310-1007;SIMILAR;true;false;;;1
+;HW2310-1006;HW2310-1003;SIMILAR;true;false;;;1
+;HW2310-1006;HW2310-1004;SIMILAR;true;false;;;1
+;HW2310-1006;HW2300-2356;SIMILAR;true;false;;;1
+;HW2310-1006;HW2310-1007;SIMILAR;true;false;;;1
+;HW2310-1007;HW2300-2356;SIMILAR;true;false;;;1
+;HW2310-1007;HW2310-1003;SIMILAR;true;false;;;1
+;HW2310-1007;HW2310-1004;SIMILAR;true;false;;;1
+;HW2310-1007;HW2310-1006;SIMILAR;true;false;;;1
+
+# bundles;
+;HW2300-2356;HW2200-0878;CROSSELLING;true;true;;;1
+;HW2300-2356;HW2110-0029;CROSSELLING;true;true;;;1
+;HW2300-2356;HW1100-0024;CROSSELLING;true;true;;;1
+;HW2200-0878;HW2300-2356;CROSSELLING;true;true;;;1
+;HW2200-0878;HW2110-0029;CROSSELLING;true;true;;;1
+;HW2200-0878;HW1100-0024;CROSSELLING;true;true;;;1
+;HW2110-0029;HW2300-2356;CROSSELLING;true;true;;;1
+;HW2110-0029;HW2200-0878;CROSSELLING;true;true;;;1
+;HW2110-0029;HW1100-0024;CROSSELLING;true;true;;;1
+;HW1100-0024;HW2300-2356;CROSSELLING;true;true;;;1
+;HW1100-0024;HW2200-0878;CROSSELLING;true;true;;;1
+;HW1100-0024;HW2110-0029;CROSSELLING;true;true;;;1
+
+
+#promoted selling;
+;HW2200-0561;HW2320-1010;UPSELLING;true;false;Wir empfehlen dazu;We recommend;1
+;HW2200-0561;HW1100-0023;UPSELLING;true;false;Wir empfehlen dazu;We recommend;1
+;HW2320-1010;HW2200-0561;UPSELLING;true;false;;;1
+;HW2320-1010;HW1100-0023;UPSELLING;true;false;;;1
+;HW1100-0023;HW2200-0561;UPSELLING;true;false;;;1
+;HW1100-0023;HW2320-1010;UPSELLING;true;false;;;1
+;HW1210-3422;HW2200-0561;UPSELLING;true;false;;;1
+;HW1210-3422;HW2320-1010;UPSELLING;true;false;;;1
+;HW1210-3422;HW1100-0023;UPSELLING;true;false;;;1
+
+
+;HW1210-3422;HW1100-0023;ACCESSORIES;true;false;Zubehör;Accessories;1
+;HW1210-3422;HW1100-0024;ACCESSORIES;true;false;Zubehör;Accessories;1
+;HW1210-3422;HW1100-0025;ACCESSORIES;true;false;Zubehör;Accessories;1
+;HW1210-3422;HW2200-0878;ACCESSORIES;true;false;Brauchen Sie noch?;Do you also need?;
+;HW1210-3422;HW2110-0029;ACCESSORIES;true;false;Brauchen Sie noch?;Do you also need?;
+;HW1210-3422;HW1100-0024;ACCESSORIES;true;false;Brauchen Sie noch?;Do you also need?;

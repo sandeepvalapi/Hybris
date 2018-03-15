@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2017 SAP SE
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ Hybris ("Confidential Information"). You shall not disclose such
+  ~ Confidential Information and shall use it only in accordance with the
+  ~ terms of the license agreement you entered into with SAP Hybris.
+  ~
+  -->
+
+<audit-report-config name="UserWithDisplayNameConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="../audit/audit.xsd">
+    <given-root-type>User</given-root-type>
+    <types>
+        <type code="User" displayName="User">
+            <atomic-attributes>
+                <atomic-attribute qualifier="uid" displayName="uid"/>
+                <atomic-attribute qualifier="name" displayName="nAmE"/>
+                <atomic-attribute qualifier="description" displayName="userDescription"/>
+            </atomic-attributes>
+            <reference-attributes>
+                <reference-attribute qualifier="defaultPaymentAddress" displayName="defaultPaymentAddress"
+                                     type="Address"/>
+            </reference-attributes>
+            <virtual-attributes>
+                <virtual-attribute expression="owner" type="Address" many="true" displayName="owned Addresses"/>
+            </virtual-attributes>
+            <relation-attributes>
+                <relation-attribute relation="principalGroupRelation" displayName="User_Groups" many="true"
+                                    type="UserGroup"/>
+            </relation-attributes>
+        </type>
+        <type code="Address">
+            <atomic-attributes>
+                <atomic-attribute qualifier="streetname" displayName="streeT"/>
+                <atomic-attribute qualifier="appartment" displayName="aPpartment"/>
+            </atomic-attributes>
+        </type>
+        <type code="UserGroup">
+            <atomic-attributes>
+                <atomic-attribute qualifier="locName" displayName="lOcName"/>
+            </atomic-attributes>
+        </type>
+    </types>
+</audit-report-config>

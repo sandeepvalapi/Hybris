@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<advanced-search xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="advanced-search.xsd">
+	
+	<group name="root" type="unit">
+		<label key="config.general.searchfor" />
+		<property qualifier="media.code"/>
+		<property qualifier="media.mime"/>
+		<property qualifier="media.folder"/>
+		<group name="admin" visible="false">
+			<label key="config.general.administration" />
+			<property qualifier="item.pk" visible="false" sort-enabled="false"/>
+			<property qualifier="item.modifiedtime" visible="false" sort-enabled="false"/>
+		</group>
+	</group>
+	
+</advanced-search>

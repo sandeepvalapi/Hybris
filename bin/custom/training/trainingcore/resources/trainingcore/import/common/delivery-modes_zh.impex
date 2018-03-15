@@ -1,0 +1,23 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import Delivery Modes / Zones
+#
+
+# Language
+$lang=zh
+
+# Zone Delivery Modes
+UPDATE ZoneDeliveryMode;code[unique=true];name[lang=$lang];description[lang=$lang]
+ ;premium-gross;"高级送货";"1-2 工作日"
+ ;premium-net;"高级送货";"1-2 工作日"
+ ;standard-gross;"标准送货";"3-5 工作日"
+ ;standard-net;"标准送货";"3-5 工作日"

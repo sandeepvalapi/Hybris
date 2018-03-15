@@ -1,0 +1,10 @@
+{  
+   "name":"testweb",
+   "version":"6.6.0.0",
+   "dependencies":{  
+      "javascript-debug":"0.4.0",
+      "jquery":"3.2.1",
+      "jquery-ui":"1.12.1",
+      "datatables":"1.7.6"
+   }
+}

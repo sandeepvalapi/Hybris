@@ -1,0 +1,5 @@
+INSERT_UPDATE Usergroup;uid[unique=true];
+;itemLockingGroup;
+
+UPDATE User;uid[unique=true];groups(uid)[mode=append]
+;admin;itemLockingGroup;

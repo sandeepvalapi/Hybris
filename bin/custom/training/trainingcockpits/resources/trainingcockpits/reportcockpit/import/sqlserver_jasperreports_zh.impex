@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Localise hsqldb jasper reports
+#
+
+# Language
+$lang=zh
+
+$defaultCatalog=Default
+$defaultCatalogVersion=Staged
+$catalogVersion=catalogVersion(catalog(id[default='$defaultCatalog']),version[default='$defaultCatalogVersion'])[unique=true,default='$defaultCatalog:$defaultCatalogVersion']
+
+
+# Create Countries
+UPDATE JasperMedia;code[unique=true];$catalogVersion;title[lang=$lang];reportDescription[lang=$lang]
+ ;averageOrderValueBySite;;"站点的平均订单值";"该小组件显示时间范围内的平均订单值"
+ ;orderVolumeBySite;;"站点的订单量";"显示给定时间段提交的订单量"
+ ;salesByCountryAndSite;;"站点的国家销量";"该小组件按国家显示收入"
+ ;salesByHourAndSite;;"站点的小时销量";"显示 24 小时内每个小时的整体销量"
+ ;salesPerCategoryBySite;;"站点的类别销量";"该小组件显示给定时间段每个类别的销量"
+ ;salesPerRegionBySite;;"站点的地区销量";"该小组件显示国家中每个地区的销量"
+ ;topSellingProductsBySite;;"站点的最畅销产品";"显示整个系统中前 5 个最畅销产品的列表"
+ ;totalSalesBySite;;"站点的总销量";"显示给定时间段内站点的总销量"

@@ -1,0 +1,900 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+	<collectiontypes>
+		<collectiontype code="WorkflowActionTemplateList"
+			elementtype="WorkflowActionTemplate" autocreate="true" generate="false"
+			type="list" />
+			
+		<collectiontype code="WorkflowLinkTemplateList"
+			elementtype="WorkflowActionTemplateLinkTemplateRelation" autocreate="true"
+			generate="true" type="list" />
+			
+		<collectiontype code="WorkflowActionList" elementtype="WorkflowAction"
+			autocreate="true" generate="false" type="list" />
+			
+		<collectiontype code="WorkflowLinkList" elementtype="WorkflowActionLinkRelation"
+			autocreate="true" generate="true" type="list" />
+			
+		<collectiontype code="WorkflowItemAttachmentList"
+			elementtype="WorkflowItemAttachment" autocreate="true" generate="false"
+			type="list" />
+			
+		<collectiontype code="WorkflowItemAttachmentItemList"
+			elementtype="Item" autocreate="true" generate="false"
+			type="list" />
+	</collectiontypes>
+	
+	
+	<enumtypes>
+		<enumtype code="WorkflowActionStatus" autocreate="true"
+			generate="true">
+			<value code="pending" />
+			<value code="in_progress" />
+			<value code="paused" />
+			<value code="completed" />
+			<value code="disabled" />
+			<value code="ended_through_end_of_workflow" />
+			<value code="terminated" />
+		</enumtype>
+		
+		<enumtype generate="true" code="WorkflowActionType"
+			autocreate="true">
+			<value code="start" />
+			<value code="end" />
+			<value code="normal" />
+		</enumtype>
+	</enumtypes>
+	
+	
+	<relations>			
+		<relation code="WorkflowTemplateActionTemplateRelation"
+			autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="workflow" type="WorkflowTemplate"
+				cardinality="one">
+				<description>workflow template to which the action template belongs</description>
+				<modifiers initial="true" read="true" write="false"
+					optional="false" />
+			</sourceElement>
+			<targetElement qualifier="actions" type="WorkflowActionTemplate"
+				cardinality="many" collectiontype="list" ordered="true">
+				<description>n-part of the WorkflowTemplateActionTemplateRelation; set of action templates from which a action will be created and set to the workflow created by the workflow template each</description>
+				<modifiers initial="false" read="true" write="true"
+					optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowTemplate2PrincipalRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="WorkflowTemplPrincRel" typecode="1117" />
+			<sourceElement type="WorkflowTemplate" qualifier="visibleTemplates" cardinality="many"/>
+			<targetElement type="Principal" qualifier="visibleForPrincipals" cardinality="many"/>
+		</relation>
+		
+		<relation code="WorkflowActionTemplateDecisionsTemplateRelation"
+			generate="true" localized="false" autocreate="true">
+			<sourceElement type="WorkflowActionTemplate" qualifier="actionTemplate"
+				cardinality="one">
+				<description>reference to the action template this decision belongs to</description>
+				<modifiers initial="true" read="true" write="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="WorkflowDecisionTemplate"
+				qualifier="decisionTemplates" cardinality="many">
+				<description>list of all decision templates of the action template</description>
+				<modifiers initial="true" read="true" write="true"
+					optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowActionTemplateLinkTemplateRelation"
+			generate="true" localized="false" autocreate="true">
+			<deployment table="WorkflowTemplateLinkRel" typecode="1125" />
+			<sourceElement type="WorkflowDecisionTemplate"
+				qualifier="incomingTemplateDecisions" cardinality="many">
+				<modifiers initial="true" read="true" write="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="WorkflowActionTemplate" qualifier="toTemplateActions"
+				cardinality="many">
+				<description>list of actions that will be activated then the decision gets chosen</description>
+				<modifiers initial="true" read="true" write="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowActionRelation" autocreate="true"
+			generate="true" localized="false">
+			<sourceElement qualifier="workflow" type="Workflow"
+				cardinality="one">
+				<description>workflow to which the action belongs</description>
+				<modifiers initial="true" read="true" write="false"
+					optional="false" />
+			</sourceElement>
+			<targetElement qualifier="actions" type="WorkflowAction"
+				cardinality="many" collectiontype="list" ordered="true">
+				<modifiers initial="false" read="true" write="true"
+					optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowActionDecisionsRelation" generate="true"
+			localized="false" autocreate="true">
+			<sourceElement type="WorkflowAction" qualifier="action"
+				cardinality="one">
+				<modifiers initial="true" read="true" write="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="WorkflowDecision" qualifier="decisions"
+				cardinality="many">
+				<description>set of all possible decisions of this action </description>
+				<modifiers initial="true" read="true" write="true"
+					optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowActionLinkRelation" generate="true"
+			localized="false" autocreate="true">
+			<deployment table="WorkflowActionLinkRel" typecode="1124" />
+			<sourceElement type="WorkflowDecision" qualifier="incomingDecisions"
+				cardinality="many">
+				<modifiers initial="true" read="true" write="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="WorkflowAction" qualifier="toActions"
+				cardinality="many">
+				<modifiers initial="true" read="true" write="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="WorkflowActionOrderingRelation" autocreate="true"
+			generate="true" localized="false">
+			<deployment table="WorkflowActionsRel" typecode="1115" />
+			<sourceElement qualifier="predecessors" type="AbstractWorkflowAction"
+				cardinality="many" collectiontype="list" ordered="true">
+				<modifiers initial="false" read="true" write="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement qualifier="successors" type="AbstractWorkflowAction"
+				cardinality="many" collectiontype="list" ordered="true">
+				<modifiers initial="false" read="true" write="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowItemAttachmentRelation" autocreate="true"
+			generate="true" localized="false">
+			<sourceElement qualifier="workflow" type="Workflow"
+				cardinality="one">
+				<description>1-part of WorkflowItemAttachmentRelation; references the related workflow this attachment belongs to</description>
+				<modifiers initial="true" read="true" write="false"
+					optional="false" />
+			</sourceElement>
+			<targetElement qualifier="attachments" type="WorkflowItemAttachment"
+				cardinality="many" collectiontype="list" ordered="true">
+				<description>n-part of the WorkflowItemAttachmentRelation; holds a set of attachments (item references) belonging to the topic of workflow</description>
+				<modifiers initial="false" read="true" write="true"
+					optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowActionItemAttachmentRelation"
+			autocreate="true" generate="true" localized="false">
+			<deployment table="WorkflowActionItemsRel" typecode="1116" />
+			<sourceElement qualifier="actions" type="WorkflowAction"
+				cardinality="many">
+				<description>part of WorkflowActionItemAttachmentRelation; references specific actions of referenced workflow for which attachment is relevant for processing</description>
+				<modifiers initial="false" read="true" write="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement qualifier="attachments" type="WorkflowItemAttachment"
+				cardinality="many" collectiontype="list" ordered="true">
+				<description>part of the WorkflowActionItemAttachmentRelation; associates a set of attachments set to the related workflow of this action </description>
+				<modifiers initial="false" read="true" write="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WorkflowActionCommentRelation" generate="true"
+			localized="false" autocreate="true">
+			<sourceElement type="AbstractWorkflowAction" qualifier="workflowAction"
+				cardinality="one">
+				<modifiers initial="true" read="true" write="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="WorkflowActionComment" qualifier="workflowActionComments"
+				cardinality="many">
+				<modifiers initial="true" read="true" write="true"
+					optional="true" partof="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+
+	<itemtypes>
+		<itemtype code="WorkflowTemplate"
+			jaloclass="de.hybris.platform.workflow.jalo.WorkflowTemplate"
+			extends="Job" autocreate="true" generate="true">
+			<custom-properties>
+				<property name="systemType">
+					<value>java.lang.Boolean.FALSE</value>
+				</property>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String"
+					redeclare="true">
+					<modifiers initial="true" read="true" write="false"
+						optional="true" unique="true" />
+					<persistence type="property" />
+					<description>unique identifier of the template; will be generated if not set</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>name of the workflows created by the template; will be copied to a created workflow initially</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+					<description>description of the workflows created by the template; will be copied to a created workflow initially</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="owner" type="User"
+					metatype="ExpressionAttributeDescriptor" redeclare="true">
+					<modifiers initial="true" read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<description>responsible user for this template</description>
+					<custom-properties>
+						<property name="defaultValueExpression">
+							<value>"de.hybris.platform.jalo.JaloSession.getCurrentSession().getUser()"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="activationScript">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+					<description>Java code used to automatically trigger a Workflow</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AbstractWorkflowAction" abstract="true"
+			jaloclass="de.hybris.platform.workflow.jalo.AbstractWorkflowAction"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="WorkflowActions" typecode="1113" />
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute type="WorkflowActionType" qualifier="actionType" metatype="ExpressionAttributeDescriptor">
+					<modifiers initial="true" read="true" write="true" optional="false" />
+					<custom-properties>
+						<property name="defaultValueExpression">
+							<value>"return de.hybris.platform.jalo.enumeration.EnumerationManager.getInstance().getEnumerationValue(\"WorkflowActionType\",\"normal\");"</value>
+						</property>
+					</custom-properties>
+					<persistence type="property" />
+					<description>marker for the type of an action (start, end, normal)</description>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers initial="true" read="true" write="false" optional="true" unique="true" />
+					<persistence type="property" />
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+					<description>unique identifier of the action</description>
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property" />
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+					<description>name of the action</description>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+						</persistence>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+					<description>description of the action; should contain the steps the assigned principal has to perform</description>
+				</attribute>
+				<attribute qualifier="principalAssigned" type="Principal" metatype="ExpressionAttributeDescriptor">
+					<modifiers initial="true" read="true" write="true" optional="false" />
+					<persistence type="property" />
+					<description>assigned principal who has to assure the completion (can also be a principal group where any member of the group can process the action)</description>
+					<custom-properties>
+						<property name="defaultValueExpression">
+							<value>"de.hybris.platform.jalo.JaloSession.getCurrentSession().getUser()"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="sendEmail" type="java.lang.Boolean">
+					<modifiers initial="true" read="true" write="true" optional="false" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<description>if activated a notification e-mail will be sent when action gets active</description>
+				</attribute>
+				<attribute qualifier="emailAddress" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property" />
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+					<description>e-mail address where notification e-mail will be sent to</description>
+				</attribute>
+				<attribute qualifier="predecessorsStr" type="java.lang.String">
+					<modifiers initial="false" read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="owner" type="User"
+					metatype="ExpressionAttributeDescriptor" redeclare="true">
+					<modifiers initial="true" read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<custom-properties>
+						<property name="defaultValueExpression">
+							<value>"de.hybris.platform.jalo.JaloSession.getCurrentSession().getUser()"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute type="RendererTemplate" qualifier="rendererTemplate">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIDX" unique="false">
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="WorkflowActionTemplate"
+			jaloclass="de.hybris.platform.workflow.jalo.WorkflowActionTemplate"
+			extends="AbstractWorkflowAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="incomingLinkTemplates" type="WorkflowLinkTemplateList">
+					<modifiers read="true" write="false" optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="incomingLinkTemplatesStr" type="java.lang.String">
+					<modifiers initial="false" read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="creationType" type="ComposedType">
+					<modifiers initial="false" read="true" write="true"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="predecessors" type="WorkflowActionTemplateList"
+					redeclare="true">
+					<modifiers initial="false" read="true" write="true"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="successors" type="WorkflowActionTemplateList"
+					redeclare="true">
+					<modifiers initial="false" read="true" write="true"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AutomatedWorkflowActionTemplate"
+			jaloclass="de.hybris.platform.workflow.jalo.AutomatedWorkflowActionTemplate"
+			extends="WorkflowActionTemplate" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="jobClass" autocreate="true" type="java.lang.Class">
+					<model>
+						<getter name="jobClass" default="true" deprecated="true" deprecatedSince="ages"/>
+						<setter name="jobClass" default="true" deprecated="true" deprecatedSince="ages"/>
+					</model>							
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+					<description>class of the automated action which must implement AutomatedWorkflowTemplateJob</description>
+				</attribute>
+				<attribute qualifier="jobHandler" autocreate="true" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"/>
+					<persistence type="property" />
+					<description>Spring bean ID of automated action</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AbstractWorkflowDecision" autocreate="true"
+			generate="true" abstract="true"
+			jaloclass="de.hybris.platform.workflow.jalo.AbstractWorkflowDecision">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<modifiers initial="true" read="true" write="false"
+						 optional="true" unique="true" />
+					<persistence type="property" />
+					<description>unique identifier of the decision</description>
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="name">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>name of the decision</description>
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="description">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>description of the decision</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="WorkflowDecisionTemplate" autocreate="true"
+			generate="true" extends="AbstractWorkflowDecision"
+			jaloclass="de.hybris.platform.workflow.jalo.WorkflowDecisionTemplate">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="parentWorkflowTemplate" type="WorkflowTemplate">
+					<modifiers read="true" write="false" />
+					<persistence type="jalo"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="WorkflowActionTemplateLinkTemplateRelation"
+			autocreate="false" generate="true"
+			jaloclass="de.hybris.platform.workflow.jalo.WorkflowActionTemplateLinkTemplateRelation">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute type="java.lang.Boolean" qualifier="andConnectionTemplate">
+					<modifiers read="true" write="true" optional="false"
+						initial="true" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="ownerName">
+					<persistence type="jalo"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="Workflow" jaloclass="de.hybris.platform.workflow.jalo.Workflow"
+			extends="CronJob" autocreate="true" generate="true">
+			<custom-properties>
+				<property name="systemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String"
+					redeclare="true">
+					<modifiers initial="true" read="true" write="false"
+						optional="true" unique="true" />
+					<persistence type="property" />
+					<description>unique identifier of a workflow; generated if not set</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>name of the workflow</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+					<description>global description of the workflow while each action has its own description</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="owner" type="User"
+					metatype="ExpressionAttributeDescriptor" redeclare="true">
+					<modifiers initial="true" read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<description>user responsible for this workflow</description>
+					<custom-properties>
+						<property name="defaultValueExpression">
+							<value>"de.hybris.platform.jalo.JaloSession.getCurrentSession().getUser()"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="job" type="WorkflowTemplate"
+					redeclare="true">
+					<modifiers initial="true" read="true" write="false"
+						optional="false" />
+					<persistence type="property" />
+					<description>related workflow template this workflow is created from (never changable)</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="WorkflowAction"
+			jaloclass="de.hybris.platform.workflow.jalo.WorkflowAction" extends="AbstractWorkflowAction"
+			autocreate="true" generate="true">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="incomingLinks" type="WorkflowLinkList">
+					<modifiers read="true" write="false" optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="incomingLinksStr" type="java.lang.String">
+					<modifiers initial="false" read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="selectedDecision" type="WorkflowDecision"
+					isSelectionOf="decisions">
+					<persistence type="property"></persistence>
+					<description>the decision chosen when the action is processed</description>
+				</attribute>
+				<attribute qualifier="firstActivated" type="java.util.Date">
+					<modifiers />
+					<persistence type="property" />
+					<description>date of first activation of the action (in case of a rejected action an action can be activated twice for example)</description>
+				</attribute>
+				<attribute qualifier="activated" type="java.util.Date">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>date of last activation</description>
+				</attribute>
+				<attribute qualifier="comment" type="java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>comment of the assigned principal on the status of the action</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="status" type="WorkflowActionStatus">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>the status of the action (pending, active, completed)</description>
+				</attribute>
+				<attribute qualifier="predecessors" type="WorkflowActionList"
+					redeclare="true">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="successors" type="WorkflowActionList"
+					redeclare="true">
+					<modifiers initial="true" read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="template" type="WorkflowActionTemplate">
+					<modifiers initial="true" read="true" write="false"
+						optional="false" />
+					<persistence type="property" />
+					<description>the action template this action was created by; template defines the perform method</description>
+				</attribute>
+				<attribute qualifier="attachmentItems" type="WorkflowItemAttachmentItemList">
+					<modifiers read="true" write="false" optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="WorkflowDecision" autocreate="true" generate="true"
+			extends="AbstractWorkflowDecision" jaloclass="de.hybris.platform.workflow.jalo.WorkflowDecision">
+		</itemtype>
+		
+		<itemtype code="WorkflowActionLinkRelation" autocreate="false"
+			generate="true"
+			jaloclass="de.hybris.platform.workflow.jalo.WorkflowActionLinkRelation">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute type="java.lang.Boolean" qualifier="active">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="andConnection">
+					<modifiers initial="true" read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="template"
+					type="WorkflowActionTemplateLinkTemplateRelation">
+					<modifiers initial="true" read="true" write="false"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="WorkflowActionComment" autocreate="true"
+			generate="true" jaloclass="de.hybris.platform.workflow.jalo.WorkflowActionComment">
+			<deployment table="WorkflowActionComments" typecode="1118" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="comment">
+					<modifiers initial="true" optional="false" read="true"
+						write="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="User" qualifier="user"
+					metatype="ExpressionAttributeDescriptor">
+					<modifiers initial="true" optional="true" read="true"
+						write="true" />
+					<persistence type="property" />
+					<custom-properties>
+						<property name="defaultValueExpression">
+							<value>"de.hybris.platform.jalo.JaloSession.getCurrentSession().getUser()"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="WorkflowItemAttachment"
+			jaloclass="de.hybris.platform.workflow.jalo.WorkflowItemAttachment"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="WorkflowItemAtts" typecode="1114" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers initial="true" read="true" write="false" optional="true" />
+					<persistence type="property" />
+					<description>identifier of this attachment; will be generated if not set</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>name of the attachment</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="comment" type="java.lang.String">
+					<modifiers initial="true" read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>a comment containing some notes either by creator or processor</description>
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="item" type="Item">
+					<modifiers initial="true" read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<description>the item this attachment references</description>
+				</attribute>
+				<attribute qualifier="typeOfItem" type="ComposedType">
+					<modifiers initial="false" read="true" write="false"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="actionStr" type="java.lang.String">
+					<modifiers initial="false" read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIDX" unique="false">
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="InboxView" extends="Item" autocreate="true"
+			generate="false" metatype="ViewType" jaloonly="true"
+			jaloclass="de.hybris.platform.util.ViewResultItem">
+			<custom-properties>
+				<property name="legacyPersistence">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="query">
+					<value>
+						"SELECT {actions:PK} action, {actions:activated} activated, {actions:comment} actioncomment, {workflows:PK} workflow FROM {WORKFLOWACTION as actions}, {Workflow as workflows} WHERE {actions:workflow}={workflows:pk} AND {actions:status}=?status AND ({actions:principalAssigned}=?session.user OR {actions:principalAssigned} IN (?session.user.allgroups)) order by workflow, action"
+					</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute autocreate="true" qualifier="action" type="WorkflowAction"
+					metatype="ViewAttributeDescriptor">
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" search="false"
+						initial="false" optional="false" />
+					<custom-properties>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+						<property name="position">
+							<value>Integer.valueOf(0)</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="activated" type="java.lang.String"
+					metatype="ViewAttributeDescriptor">
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" search="false"
+						initial="false" optional="false" />
+					<custom-properties>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+						<property name="position">
+							<value>Integer.valueOf(1)</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="actioncomment"
+					type="java.lang.String" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" search="false"
+						initial="false" optional="false" />
+					<custom-properties>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+						<property name="position">
+							<value>Integer.valueOf(2)</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="workflow" type="Workflow"
+					metatype="ViewAttributeDescriptor">
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" search="false"
+						initial="false" optional="false" />
+					<custom-properties>
+						<property name="param">
+							<value>Boolean.FALSE</value>
+						</property>
+						<property name="position">
+							<value>Integer.valueOf(3)</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="status"
+					type="WorkflowActionStatus" metatype="ViewAttributeDescriptor">
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" search="false"
+						initial="false" optional="false" />
+					<custom-properties>
+						<property name="param">
+							<value>Boolean.TRUE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

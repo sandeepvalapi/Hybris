@@ -1,0 +1,25 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$defaultCatalog=Default
+$defaultCatalogVersion=Staged
+$catalogVersion=catalogVersion(catalog(id[default='$defaultCatalog']),version[default='$defaultCatalogVersion'])[unique=true,default='$defaultCatalog:$defaultCatalogVersion']
+$jasperreports_folder=jasperreports
+$reportPath=jar:com.hybris.training.cockpits.setup.CockpitSystemSetup&/trainingcockpits/reportcockpit/reports/hsqldb
+
+INSERT_UPDATE JasperMedia;code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default=$jasperreports_folder];icon(code)[default=icon_jasperreport_wizard];$catalogVersion;mime[default='text/xml']
+;averageOrderValueBySite;averageOrderValueBySite.jrxml;$reportPath/averageOrderValueBySite.jrxml
+;salesByCountryAndSite;salesByCountryAndSite.jrxml;$reportPath/salesByCountryAndSite.jrxml
+;salesPerRegionBySite;salesPerRegionBySite.jrxml;$reportPath/salesPerRegionBySite.jrxml
+;salesPerCategoryBySite;salesPerCategoriesBySite.jrxml;$reportPath/salesPerCategoriesBySite.jrxml
+;topSellingProductsBySite;topSellingProductsBySite.jrxml;$reportPath/topSellingProductsBySite.jrxml
+;orderVolumeBySite;orderVolumeBySite.jrxml;$reportPath/orderVolumeBySite.jrxml
+;salesByHourAndSite;salesByHourAndSite.jrxml;$reportPath/salesByHourAndSite.jrxml
+;totalSalesBySite;totalSalesBySite.jrxml;$reportPath/totalSalesBySite.jrxml

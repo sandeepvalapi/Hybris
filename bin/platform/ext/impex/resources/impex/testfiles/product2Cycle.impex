@@ -1,0 +1,35 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$catalogVersion=catalogVersion(catalog(id),version)
+
+INSERT_UPDATE Product;code[unique=true]; name[lang=en]; name[lang=de];Unit(code); $catalogVersion[unique=true, allowNull=true]; description[lang=de]; description[lang=en]; approvalStatus(code);ean;manufacturerName
+; testProduct;testnameEN;testnameDE; testUnit; ; """testdescriptionDE"""; "Power Manager BOOS RC5
+
+ 
+
+5 Steckdosen schaltbar
+
+ 
+
+Mit dem neuen Power Manager BOOS RC5 erwerben Sie ein �u�erst sinnvolles und individuell einsetzbares Ger�t. Umst�ndliches Ein- und Ausschalten von einzelnen Ger�ten ist vorbei. Sie k�nnen bis zu 5 Verbraucher �ber das �bersichtliche Front-Bedienfeld mit einem Haupt- und 5 beleuchteten Einzelschaltern bequem ""managen"". Nutzen Sie das Ger�t doch zus�tzlich als Stellfl�che f�r Ihren TFT-Monitor. So macht Arbeiten Spa�.
+
+Ausstattung: 
+
+Technische Daten: Abmessungen: (B x H x T) 300 x 65 x 190 mm � Anschlussleistung gesamt: 1470 VA � Farbe: Grau/Schwarz � Kabell�nge: 1.5 m � Steckdosen-Anzahl: 5.
+
+Lieferumfang: . 1 St�ck
+
+Systemvoraussetzungen: 
+";  approved; testEAN;testManufactor
+
+"INSERT_UPDATE Unit";"unitType[unique=true]";"code[unique=true]";"name[lang=de]";"name[lang=en]";"conversion";;;;;;;;;;;;
+;"bla";"testUnit";"bla2";"bl3";1;

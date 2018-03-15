@@ -1,0 +1,11 @@
+INSERT_UPDATE Tax;code[unique=true];name[lang=de];name[lang=en];value;currency(isocode)
+;VAT_FULL;MwSt voll;VAT full;19;
+;VAT_HALF;MwSt halb;VAT half;7;
+
+INSERT_UPDATE ProductTaxGroup;code[unique=true];name[lang=de];name[lang=en];
+;Tax_Full;voller Steuersatz;full tax rate;
+;Tax_Half;halber Steuersatz;half tax rate;
+
+INSERT_UPDATE TaxRow;pg(code)[unique=true];tax(code)[unique=true];value;currency(isocode);
+;Tax_Full;VAT_FULL;19;
+;Tax_Half;VAT_HALF;7;

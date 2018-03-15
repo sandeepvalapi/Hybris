@@ -1,0 +1,357 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="distfiltersets">
+
+	<patternset id="extension.filter">
+		<exclude name="**/.svn/**" />
+		<exclude name="**/*-testclasses.xml" />
+		<exclude name="**/gensrc/**" />
+		<exclude name="*.log" />
+		<exclude name="build.xml" />
+		<exclude name="doc/*-sources.jar" />
+		<exclude name="doc/*-src.zip" />
+		<exclude name="eclipsebin/**" />
+		<exclude name="extensioninfo.xsd" />
+		<exclude name="hmc/resources/hmc.xsd" />
+		<exclude name="platformhome.properties" />
+		<exclude name="resources-lang/**" />
+		<exclude name="resources/beans.xsd" />
+		<exclude name="resources/confidential" />
+		<exclude name="resources/cybs.properties" />
+		<exclude name="resources/items.xsd" />
+		<exclude name="resources/security/thertz.p12" />
+		<exclude name="temp/**" />
+		<exclude name="tutorials/**" />
+		<exclude name="workspace/**" />
+		<exclude name="**/rebel.xml" />
+	</patternset>
+
+	<patternset id="base.extension.binary.filter">
+		<patternset refid="extension.filter" />
+
+		<!-- root files -->
+		<exclude name=".externalToolBuilders/HybrisCodeGeneration.launch" />
+		<exclude name=".project" />
+		<exclude name=".classpath_binary" />
+
+		<!-- excluded doc files -->
+		<exclude name="doc/install.xml" />
+		<exclude name="doc/resources/*.mdl" />
+
+		<!-- exclude src folders -->
+		<exclude name="web/src/**" />
+		<exclude name="src/**" />
+		<exclude name="hmc/src/**" />
+
+		<!-- exclude backoffice folders -->
+		<exclude name="backoffice/classes/**" />
+		<exclude name="backoffice/resources/**" />
+		<exclude name="backoffice/src/**" />
+		<exclude name="backoffice/testsrc/**" />
+
+		<!-- exculde root classes folder -->
+		<exclude name="classes/**" />
+
+	</patternset>
+
+	<patternset id="extension.binary.filter">
+		<patternset refid="base.extension.binary.filter" />
+		<exclude name=".settings/org.sonarlint.eclipse.core.prefs" />
+
+		<!-- specials for web folder -->
+		<exclude name="web/webroot/WEB-INF/lib/**/*hmc.jar" />
+		<exclude name="web/webroot/ext/**" />
+	</patternset>
+
+	<patternset id="extension.source.filter">
+		<patternset refid="extension.filter" />
+		<exclude name="bin/**" />
+		<exclude name=".settings/org.sonarlint.eclipse.core.prefs" />
+
+		<!-- exclude all classes folders -->
+		<exclude name="**/classes/**" />
+
+		<!-- exclude backoffice folders -->
+		<exclude name="backoffice/classes/**" />
+		<exclude name="resources/backoffice/*bof.jar" />
+		<exclude name="resources/hac/*hac.jar" />
+		<exclude name="hmc/bin/**" />
+	</patternset>
+
+	<patternset id="platform.without.general.excludes.filter">
+		<!-- hybris code generator and eclipse settings -->
+		<include name=".externalToolBuilders/HybrisCodeGeneration.launch" />
+		<include name=".externalToolBuilders/org.eclipse*" />
+		<include name=".settings/org.eclipse*" />
+		<include name=".settings/org.springframework*" />
+
+		<!-- ant -->
+		<include name="apache-ant-*/**" />
+		<include name="apache-maven-*/**" />
+
+		<!-- bootstrap -->
+		<include name="bootstrap/bin/*.jar" />
+		<include name="bootstrap/resources/y*.properties" />
+		<include name="bootstrap/resources/velocity.properties" />
+		<include name="bootstrap/resources/implicit.tld" />
+        <include name="bootstrap/resources/spring.tld" />
+        <include name="bootstrap/resources/security.tld" />
+        <include name="bootstrap/resources/spring-form.tld" />
+		<include name="bootstrap/resources/manifest.tmpl" />
+		<include name="bootstrap/resources/pojo/**" />
+		<include name="bootstrap/resources/containerization/**" />
+		
+		<include name="ext/core/lib/.lastupdate"/>
+		
+		<!-- yempty, could we move it out? or treat it as an extension? -->
+		<include name="extgen/**" />
+
+		<!-- platform libraries -->
+		<include name="lib/**/*.jar" />
+		<include name="lib/dbdriver/external-dependencies.xml" />
+		<include name="lib/dbdriver/.lastupdate" />
+
+		<!-- resources -->
+		<include name="resources/**/*" />
+
+		<!-- embedded tomcat -->
+		<include name="tomcat/**" />
+		<exclude name="tomcat/bin/velocity.log" />
+		<exclude name="tomcat/bin/wrapper.log" />
+		<exclude name="tomcat/conf/server*.xml" />
+		<exclude name="tomcat/conf/wrapper-debug.conf" />
+		<exclude name="tomcat/conf/wrapper-jprofiler.conf" />
+		<exclude name="tomcat/conf/wrapper-yourkitprofiler.conf" />
+		<exclude name="tomcat/conf/wrapper.conf" />
+		<exclude name="tomcat/logs/**" />
+		<exclude name="tomcat/lib/y*" />
+		<exclude name="tomcat/temp/**" />
+		<exclude name="tomcat/webapps/**" />
+		<exclude name="tomcat/work/**" />
+
+		<!-- embedded tcserver -->
+		<include name="tcServer*/**" />
+
+		<!-- root files -->
+		<!-- will be generated during dist process
+		<include name=".classpath" />
+		<include name="build.number" />
+		<include name="extensions.xml" />
+		 -->
+		<include name=".fbprefs" />
+		<include name=".pmd" />
+		<include name=".project" />
+		<include name="ruleset.xml" />
+		<include name="build.xml" />
+		<include name="env.properties" />
+		<include name="global.properties" />
+		<include name="adminserver.*" />
+		<include name="hybrisserver.*" />
+		<include name="tcserver.*" />
+		<include name="project.properties" />
+		<include name="roles.*" />
+		<include name="setantenv.*" />
+		<include name="setmavenenv.*" />
+		<include name="setenv.*" />
+		<include name="license.*" />
+		<include name="tenant_*.properties" />
+	</patternset>	
+
+	<patternset id="build.number.exclude.filter">
+		<exclude name="**/build.number" />
+	</patternset>
+
+	<patternset id="build.number.include.filter">
+		<include name="build.number" />
+	</patternset>
+	
+	<patternset id="excludes.filter">
+		<exclude name="**/REDEPLOY" />
+		<exclude name="**/docgen/**" />
+		<exclude name="**/extgen/temp/**" />
+		<exclude name="**/internal-dependencies.xml" />
+		<exclude name="**/dist.properties" />
+		<exclude name="**/rebel.xml" />
+	</patternset>
+	
+	<patternset id="general.excludes.filter">
+	<!-- general excludes -->
+		<patternset refid="excludes.filter" />
+		<patternset refid="build.number.exclude.filter" />
+	</patternset>
+
+	<patternset id="appservers.excludes.filter">
+		<exclude name="tomcat/**"/>
+		<exclude name="tcServer/**"/>
+	</patternset>
+
+	<patternset id="platform.dist.filter">
+		<patternset refid="platform.without.general.excludes.filter" />
+		<patternset refid="general.excludes.filter" />
+		<exclude name="lib/dbdriver/mysql*.jar" />
+		<exclude name="lib/dbdriver/ojdbc*.jar" />
+		<!-- the above filters are including models.jar as required by 'ant production' - for 'ant dist' we need to remove it! -->
+		<exclude name="bootstrap/bin/models.jar" />
+	</patternset>
+
+	<!-- production patterns, here we need even less than in a binary build -->
+
+	<patternset id="platform.with.extensions.xml.filter">
+		<patternset refid="platform.without.general.excludes.filter" />
+		<patternset refid="excludes.filter" />
+		<include name="extensions.xml" />
+	</patternset>
+	
+	<patternset id="platform.production.filter">
+		<patternset refid="platform.with.extensions.xml.filter" />
+
+		<exclude name="**/.externalToolBuilders/**" />
+		<exclude name="**/.settings/**" />
+		<exclude name="**/eclipsebin/**" />
+		<exclude name="**/doc/**" />
+		<exclude name="**/extgen/**" />
+		<exclude name="**/tomcat/work/**" />
+		<exclude name="**/tomcat/webapps/**" />
+		<exclude name="**/tomcat/config/wrapper-*.conf" />
+		<exclude name="bootstrap/antsrc/**" />
+		<exclude name="bootstrap/src/**" />
+		<exclude name="bootstrap/tomcatsrc/**" />
+		<exclude name="bootstrap/classes/**" />
+		<exclude name="bootstrap/antclasses/**" />
+		<exclude name="bootstrap/tomcatclasses/**" />
+		<exclude name="bootstrap/resources/manifest.tmpl" />
+		<exclude name="bootstrap/resources/xsl/**" />
+		<exclude name="bootstrap/*.xml" />
+
+		<exclude name="**/.classpath" />
+		<exclude name="**/.fbprefs" />
+		<exclude name="**/.pmd" />
+		<exclude name="**/.project" />
+		<exclude name="**/.springBeans" />
+	</patternset>
+
+	<patternset id="platform.production.filter.without.appservers">
+		<patternset refid="platform.production.filter" />
+		<patternset refid="appservers.excludes.filter" />
+	</patternset>
+
+	<patternset id="extension.production.filter">
+		<patternset refid="base.extension.binary.filter" />
+
+		<exclude name="doc/**" />
+		<exclude name="macrotests/**" />
+		<exclude name="src/**" />
+		<exclude name="gensrc/**" />
+		<exclude name="testsrc/**" />
+		<exclude name="web/testsrc/**" />
+		<exclude name="hmc/testsrc/**" />
+		<exclude name="hac/testsrc/**" />
+		<exclude name="testclasses/**" />
+		<exclude name="classes/**" />
+		<exclude name="hmc/classes/**" />
+		<exclude name="build.xml" />
+		<exclude name="platformhome.properties" />
+		<exclude name=".settings/**" />
+
+	</patternset>
+
+
+	<!-- default patternset for exten/modulgen -->
+	<patternset id="extgen.defaultpattern">
+		<include name="**/*" />
+		<exclude name="extgen.properties" />
+		<exclude name="**/classes/**" />
+		<exclude name="temp/**" />
+		<exclude name="bin/**" />
+		<exclude name="web/classes/**" />
+		<exclude name="testclasses/**" />
+		<exclude name="platformhome.properties" />
+		<exclude name="extensioninfo.xsd" />
+		<exclude name="resources/items.xsd" />
+		<exclude name="resources/beans.xsd" />
+		<exclude name="resources/hmc.xsd" />
+		<exclude name="resources/*-testclasses.xml" />
+		<exclude name="build.xml" />
+	</patternset>
+
+	<patternset id="localization.defaultpattern">
+		<!-- core and hmc  -->
+		<include name="**/*locales*_en.properties" />
+		<exclude name="**/hmc/web/webroot/WEB-INF/classes/**/*" />
+		<exclude name="**/unittest/**/*" />
+
+		<!-- cockpit (ng) -->
+		<include name="**/i3-label_en.properties"/>
+		<include name="**/labels_en.properties" />	
+		<include name="**/i3-label.properties" />
+		<include name="**/labels.properties" />
+
+		<!-- messages -->
+		<include name="**/*messages_en.properties" />
+		<include name="**/*messages.properties" />
+
+		<!-- frontend properties files in WEB-INF/messages folder -->
+		<include name="**/WEB-INF/messages/*_en.properties" />
+
+		<include name="**/lang-en.properties" />
+
+		<!-- email localizations from yacceleratorcore -->
+		<include name="resources/**/messages/*_en.properties" />
+
+		<!-- include validation messages -->
+		<include name="resources/**/ValidationMessages.properties" />
+
+	</patternset>
+
+	<patternset id="dependencies.defaultpattern">
+		<include name="**/external-dependencies.xml"/>
+	</patternset>
+
+	<patternset id="dependencies.platformpattern">
+		<include name="lib/**/external-dependencies.xml"/>
+	</patternset>
+
+	<patternset id="platform.production.config.filter">
+		<exclude name="**/.settings/**" />
+		<exclude name="**/.svn/**" />
+		<exclude name="**/.classpath" />
+		<exclude name="**/.project" />
+		<exclude name="**/licence/**" />
+		<exclude name="**/readme.txt" />
+	</patternset>
+
+	<patternset id="platform.production.licence.filter">
+		<include name="**/licence/**" />
+	</patternset>
+
+	<patternset id="platform.production.tomcat.context.filter">
+		<include name="conf/Catalina/**" />
+	</patternset>
+
+	<patternset id="platform.production.tomcat.lib.filter">
+		<include name="lib/ytomcat.jar" />
+	</patternset>
+
+	<patternset id="platform.production.tomcat.config.with.wrapper.filter">
+	   <include name="conf/server*.xml" />
+	   <include name="conf/wrapper*.conf" />
+   </patternset>
+
+	<patternset id="platform.production.tomcat.context.with.wrapper.filter">
+		<patternset refid="platform.production.tomcat.config.with.wrapper.filter"/>
+		<include name="conf/Catalina/**" />
+	</patternset>
+
+	<patternset id="platform.production.tomcat.config.filter">
+		<include name="conf/server*.xml" />
+	</patternset>
+
+</project>

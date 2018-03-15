@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="platform_all" default="all" basedir=".">
+	<tstamp/>
+	<property name="platformhome" location="${basedir}/../.." />
+
+	<import file="${platformhome}/resources/ant/antmacros.xml" />
+
+	<target name="prepare">
+		<prepare />
+	</target>
+
+	<target name="build" description="Builds platform"> <!-- TODO: remove! this target is in platform/build.xml -->
+		<build />
+	</target>
+
+	<target name="deploy" description="Deploys platform"> <!-- TODO: remove! this target is in platform/build.xml -->
+		<deploy />
+	</target>
+
+	<target name="all" depends="build,deploy" description="Builds and deploys"> <!-- TODO: remove! this target is in platform/build.xml -->
+		<tstamp prefix="finish"><format property="time" pattern="d-MMMM-yyyy HH:mm:ss" locale="en,UK"/>
+		  </tstamp>
+		<echo message="Build finished on ${finish.time}."></echo>
+	</target>
+
+	<target name="clean" description="Cleans platform and all extensions"> <!-- TODO: remove! this target is in platform/build.xml -->
+		<clean />
+	</target>
+	
+	<target name="cleancomplete" description="Cleans 'normally' and in addition clean database, eclipsebin and mediaweb">
+		<cleancomplete/>
+	</target>
+
+	<target name="cleandeploy" description="Cleans deployment">
+		<deploy_clean />
+	</target>
+
+	<target name="gensource" description="Generates missing sources (e.g. Generated*.java) for all extensions. after calling that you can refresh your development environment.">
+		<gensource />
+	</target>
+		
+	<target name="jspcompile" description="Compiles all jsps even if it is disabled for normal build">
+		<extensions_jspcompile />
+	</target>
+
+	<target name="log4j" description="Updates the log4j properties (copy to appserver)">
+		<log4j />
+	</target>
+
+	<target name="extgen" description="Runs extgen with settings from extgen/project.properties">
+		<extgen_generate/>
+	</target>
+
+	<!-- TODO: remove! this target is in platform/build.xml -->
+	<target name="yunit"  description="Runs non-hybris JUnit tests; that is, all JUnit tests located at 'testsrc' folder of an extensions having not package 'de.hybris.platform'">
+		<yunit_partner/>
+	</target>
+	
+		<!-- TODO: remove! this target is in platform/build.xml -->
+	<target name="yunitall"  description="Runs all JUnit tests; that is, all JUnit tests located at 'testsrc' folder of an extensions">
+		<yunit_all/>
+	</target>
+	
+	<!-- TODO: remove! this target is in platform/build.xml -->
+	<target name="yunitweb"  description="Runs non-hybris JUnit web tests; that is, all JUnit tests located at 'web/testsrc' folder of an extensions having not package 'de.hybris.platform'">
+		<yunit_web partner="true"/>
+	</target>
+	
+		<!-- TODO: remove! this target is in platform/build.xml -->
+	<target name="yunitweball"  description="Runs all JUnit web tests; that is, all JUnit tests located at 'web/testsrc' folder of an extensions">
+		<yunit_web partner="false"/>
+	</target>
+	
+		<!-- TODO: remove! this target is in platform/build.xml -->
+	<target name="yunitinit" description="Initializes JUnit tenant">
+		<yunitinit/>
+	</target>
+
+	<target name="customize" description="Copies the file content from '/config/customize' folder to '/bin' folder recursivley">
+		<customize />
+	</target>
+
+<!-- special targets for the core -->
+	<target name="core"> <!-- TODO: really needed? -->
+		<extension_build extname="core" />
+	</target>
+		
+	<target name="cleancore">
+		<extension_clean extname="core" />
+	</target>
+	
+	<target name="jhat" depends="jmap" description="Connects to running tomcat, creates a heap dump file (ant jmap) and start jhat webserver on port 7000 to analyze dump">
+		<parallel>
+			<sequential>
+				<exec dir="${HYBRIS_TEMP_DIR}" executable="jhat" >
+					<arg line="-J-mx800m jhat-heap.hprof" />
+				</exec>
+			</sequential>
+			<sequential>
+				<waitfor>
+	            <http url="http://localhost:7000"/>
+				</waitfor>
+				<echo message="Starting browser..."/>				
+				<echo message="Try the following starting points:"/>
+				<echo message="http://localhost:7000/histo/"/>
+				<echo message="http://localhost:7000/oql/"/>
+				<echo message="http://localhost:7000/showInstanceCounts/includePlatform/"/>
+				<exec executable="explorer">
+					<arg line="http://localhost:7000/histo/"/>
+				</exec>
+			</sequential>
+		</parallel>	
+		
+	</target>
+	
+	<target name="jmap" description="Connects to running tomcat, and creates a heap dump file">
+
+		<!--NOTE: will only run when java 6 is installed and the pid file was written by the java service wrapper 
+		  -->
+
+		<loadfile property="pid" srcFile="${bundled.tomcat.home}/logs/hybristomcat.java.pid">
+		   <filterchain>
+        		<striplinebreaks/>
+	      </filterchain>
+	   </loadfile>
+	
+		<echo message="generating dump from VM pid ${pid} to ${HYBRIS_TEMP_DIR}/jhat-heap.hprof"/>
+		<echo message="\n*** WARNING, THIS WILL OVERRIDE THE OLD FILE **\n"/>
+		<echo message="Export will start in 10sec. Press CTRL-C to abort"/>
+		<sleep seconds="10"/>
+		<echo message="\nCreating heap, please wait..."/>
+		
+		
+		<delete file="${HYBRIS_TEMP_DIR}/jhat-heap.hprof"/>
+		<exec dir="${HYBRIS_TEMP_DIR}" executable="jmap" >
+		  <arg value="-dump:file=jhat-heap.hprof"/>
+		  <arg value="${pid}"/>
+		</exec>
+			
+	</target>
+	
+	<target name="perf" description="Runs a SciMark2 performance test. This is a Java numerical benchmark measuring performance of computational kernels for FFTs, Monte Carlo simulation, sparse matrix computations, Jacobi SOR, and dense LU matrix factorizations.">
+	  <java classname="jnt.scimark2.commandline" fork="yes" >
+  		<jvmarg line="-server -Xmx1G -Xms1G"/>
+		  <classpath>
+					<pathelement path="${ext.core.path}/classes"/>	
+			</classpath>
+		</java>
+	</target>
+	
+	<target name="udpsniff" description="Sniffs for UDP messages in the current cluster">
+		<yrun>
+			new de.hybris.platform.cluster.udp.UDPSniffer( ).main(null);
+		</yrun>
+	</target>
+	
+	<target  name="initialize" description="Runs an initialization of the specified tenant in stand-alone mode, using hybris Administration Console default settings. Syntax: ant initialize [-Dtenant].">
+		<initialize/>
+	</target>
+	
+	<target name="runcronjob" description="Performs a cronjob in stand-alone mode. Syntax: ant runcronjob [-Dcronjob] [-Dtenant]. Use -Dcronjob to pass a CronJob code, such as -Dcronjob=MyCronJob. Use quotation marks for CronJob codes with spaces, such as -Dcronjob=&quot;My Cron Job&quot;.">
+		<runcronjob/>
+	</target>
+	
+	<target name="clearclusternodes" description="clears all stored tcp cluster nodes in the meta information table including the current node.">
+		<clearClusterNodes/>
+	</target>
+	
+	<target name="updatesystem" description="Performs an update system on master tenant">
+		<updatesystem/>
+	</target>
+</project>

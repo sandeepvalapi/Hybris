@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+ ">
+
+	<!--                          -->
+	<!--  Profiling Configuration -->
+	<!--                          -->
+	
+	<!--  Profiler Aspect -->
+	<!--
+		Sample 'pointcut' expressions: 
+		execution(* set*(*))	
+								This pointcut matches a method-execution join point, if the method name starts with
+								"set" and there is exactly one argument of any type	
+		within(com.company.*)	
+								This pointcut matches any join point in any type in the com.company package. 
+								The * is one form of the wildcards that	can be used to match many things with one signature.
+		execution(*	set*(*) ) && this(Point) && within(com.company.*) 
+								This pointcut matches a method-execution join point, if the method name starts with
+								"set" and this is an instance of type Point in the com.company package. 
+								It can be referred to using the name "set()".
+
+		Property:		limit
+		Description:	If the execution time is lesser than the specified value, the method will be ignored.
+	 	
+	 	Property: 		aspectNodeName
+	 	Description: 	JMX node name (default: ascpect class name)
+	 	
+	 	Property: 		domain
+	 	Description: 	JMX domain name (default: JmxUtils.DEFAULT_JMX_DOMAIN)
+	 	
+	 	Property: 		accuracy
+	 	Description: 	time measure  accuracy (use 'ns' for nano seconds or 'ms' for milliseconds [default])
+	 	
+	 	Note:	 	
+	 	Template class should implement interface to be able to create StandardMBean upon it (refer to javax.management.StandardMBean) .
+	 	
+	 	
+	 	The sample configuration has disabled "proxy-target-class" to enforce Spring to use JDK Dynamic Proxies.
+	 	With that you have to assure that your profiled objects are fulfilling well defined interfaces (as done in all servicelayer services).
+	 	When enabling proxying using cglib be aware of the drawbacks especially in relation to final methods. The final method will be executed
+	 	at the proxy object which does not get injected any dependencies. With that some servicelayer services (like DefaultSessionService)
+	 	are not able to be profiled using cglib.
+	 -->
+	 
+	<!--
+	<bean id="serviceLayerProfiler" class="de.hybris.platform.aop.ProfilingAspect">
+		<property name="template" value="de.hybris.platform.jmx.mbeans.impl.ProfilerReportPOJO" />		
+		<property name="assembler" ref="assembler" />			
+		<property name="limit" value="0" />
+		<property name="aspectNodeName" value="" />
+		<property name="domain" value="" />
+		<property name="accuracy" value="" />
+		<property name="tenant" ref="tenantFactory"/>
+	</bean>
+		
+	<aop:config proxy-target-class="false">
+		<aop:aspect id="serviceLayerProfilerAspect" ref="serviceLayerProfiler">
+			<aop:pointcut id="serviceLayerMethods"
+				expression="execution(* de.hybris.platform.servicelayer..*Service*.*(..))" />
+			<aop:around pointcut-ref="serviceLayerMethods" method="logExecutionTime" />
+		</aop:aspect>
+	</aop:config>
+	-->
+</beans>

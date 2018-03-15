@@ -1,0 +1,87 @@
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;ppetersonson;K2006-C0001;Peter Petersonson;a good customer from denmark;en;USD;customergroup;1234
+;demo;K2006-C0000;Klaus Demokunde;The StoreFoundation Demo Customer;en;USD;customergroup;1234
+;hweaving;K2006-C0002;Hugo Weaving;actor;en;USD;customergroup;1234
+;sbrueck;K2006-C0003;Sabine Brück;;en;USD;customergroup;1234
+;hpneumann;K2006-C0004;Hans-Peter Neumann;;en;USD;customergroup;1234
+;ahertz;K2006-C0005;Anja Hertz;;en;USD;customergroup;1234
+;abrode;K2006-C0006;Arin Brode;;en;USD;customergroup;1234
+;hschweiger;K2006-C0007;Hubert Schweiger;;en;USD;customergroup;1234
+;dkaufmann;K2006-C0008;Denny Kaufmann;;en;USD;customergroup;1234
+;kvitali;K2006-C0009;Klaas Vitali;;en;USD;customergroup;1234
+;bpoweronoff;K2006-C0010;Boris Poweronoff;the inventor of the famous power button;en;USD;customergroup;1234
+;tbullet;K2006-C0011;Toni Bullet;;en;USD;customergroup;1234
+;hjaehnig;K2006-C0012;Hendrik Jähnig;;en;USD;customergroup;1234
+;mdigit;K2006-C0013;Marc Digit;;en;USD;customergroup;1234
+;ovh;K2006-C0014;Oliver von Höchdesgarden;;en;USD;customergroup;1234
+;nvp;K2006-C0015;Nadine von Paletzkie;;en;USD;customergroup;1234
+;ariel;K2006-C0016;Ariel F. Lüdi;;en;USD;customergroup;1234
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;ppetersonson;Drittnönggettn;13a;103 25;false;Stockholm;AT;true;true;true;false;Peter;Petersonson;peter.petersonson@gmx.dk;MALE;
+;hweaving;August-Bebel-Straße ;26-53;14482;false;Potsdam;DE;false;false;true;true;Hugo ;Weaving;a.smith@matrix.com;MALE;;;;http://www.studiobabelsberg.com;Studio Babelsberg AG;
+;hweaving;Birnington Street;34;90058;false;Los Angeles;US;true;true;false;false;Hugo ;Weaving;a.smith@matrix.com;MALE;
+;demo;Alfred-Müller-Strasse;45;81379;false;München;DE;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;dr;;hybris GmbH;
+;sbrueck;Kiefernweg;1;49456;false;Bakum;DE;true;true;false;true;Sabine;Brück;2653265637.2345732354634@t-online.de;FEMALE;
+;hpneumann;Grubenweg;2;13253;false;Brenitz;DE;true;false;false;false;Hans-Peter;Neumann;quack@der-bruchpilot.de;MALE;
+;ahertz;Zennerstrasse;45;28277;false;Bremen;DE;false;false;false;true;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;ahertz;Schiller Allee;8;28277;false;Bremen;DE;true;true;true;false;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;ahertz;Stietzbaumplatz;2;81371;false;München;DE;false;false;false;false;Anja;Hertz;;FEMALE;;;;;hybris GmbH
+;abrode;Feldweg;7;18551;false;Sagard;DE;true;false;true;true;Arin;Brode;arin@wow-europe.com;MALE;;;;;hybris GmbH
+;hschweiger;Kletterstrasse;7g;86150;false;Augsburg;DE;true;true;true;true;Hubert;Schweiger;develop@hybris.de;MALE;;;;;hybris GmbH
+;dkaufmann;Leipsche Strasse;9;11993;false;Senftenberg;DE;true;true;true;false;Denny;Kaufmann;ich@denny-kaufmann.org;MALE;
+;kvitali;Buckyheide;4;25779;false;Kleve;DE;false;true;true;true;Klass;Vitali;;MALE;
+;bpoweronoff;Tom-Monitor-Straße;42;73572;false;Heuchlingen;DE;true;true;false;true;Boris;Poweronoff;reset@computer.com;MALE;;;prof;
+;tbullet;Großmann-Allee;2;45739;false;Oer-Erkenschwick;DE;false;true;false;true;Toni;Bullet;;MALE;
+;hjaehnig;Magnum-Weg;74;35614;false;Aßlar;DE;true;true;false;true;Hendrik;Jähnig;;MALE;
+;mdigit;Junghann-Müller-Strasse;21;41539;false;Dormagen;DE;true;false;true;true;Marc;Digit;;MALE;
+;ovh;Weg der Visionen;16;38543;false;Hillerse;DE;false;true;false;true;Oliver;Höchdesgarden;;MALE;von;
+;nvp;Allee der Freundschaft;18;61479;false;Glashütten;DE;true;true;true;false;Nadine;Paletzki;n.v.p.@gmx.net;FEMALE;von;
+;ariel;Haldenstrasse;1;CH-6340;false;Baar;CH;true;true;true;true;Ariel;Lüdi;develop@hybris.de;MALE;F.;;;;hybris GmbH
+
+INSERT_UPDATE Customer;uid[unique=true];defaultPaymentaddress(owner(Customer.uid), streetname, streetnumber, postalcode,duplicate);defaultShipmentAddress(owner(Customer.uid), streetname, streetnumber, postalcode, duplicate)
+;ppetersonson;ppetersonson:Drittnönggettn:13a:103 25:false;ppetersonson:Drittnönggettn:13a:103 25:false
+;demo;demo:Alfred-Müller-Strasse:45:81379:false;demo:Alfred-Müller-Strasse:45:81379:false
+;hweaving;hweaving:August-Bebel-Straße:26-53:14482:false;hweaving:Birnington Street:34:90058:false
+;sbrueck;sbrueck:Kiefernweg:1:49456:false;sbrueck:Kiefernweg:1:49456:false
+;hpneumann;hpneumann:Grubenweg:2:13253:false;hpneumann:Grubenweg:2:13253:false
+;ahertz;ahertz:Schiller Allee:8:28277:false;ahertz:Stietzbaumplatz:2:81371:false
+;abrode;abrode:Feldweg:7:18551:false;abrode:Feldweg:7:18551:false
+;hschweiger;hschweiger:Kletterstrasse:7g:86150:false;hschweiger:Kletterstrasse:7g:86150:false
+;dkaufmann;dkaufmann:Leipsche Strasse:9:11993:false;
+;kvitali;;kvitali:Buckyheide:4:25779:false
+;bpoweronoff;bpoweronoff:Tom-Monitor-Straße:42:73572:false;bpoweronoff:Tom-Monitor-Straße:42:73572:false
+;tbullet;tbullet:Großmann-Allee:2:45739:false;tbullet:Großmann-Allee:2:45739:false
+;hjaehnig;hjaehnig:Magnum-Weg:74:35614:false;hjaehnig:Magnum-Weg:74:35614:false
+;mdigit;mdigit:Junghann-Müller-Strasse:21:41539:false
+;ovh;ovh:Weg der Visionen:16:38543:false;ovh:Weg der Visionen:16:38543:false
+;nvp;nvp:Allee der Freundschaft:18:61479:false;nvp:Allee der Freundschaft:18:61479:false
+;ariel;ariel:Haldenstrasse:1:CH-6340:false;ariel:Haldenstrasse:1:CH-6340:false
+
+#bankeinzug;
+INSERT_UPDATE DebitPaymentInfo;code[unique=true];user(uid)[unique=true];baOwner;bankIDNumber;accountNumber;bank;
+;debit1;hpneumann;Hans-Peter Neumann;20010020;K1945728194;Postbank Hamburg;
+;debit;sbrueck;Sabine Brück;28022822;K777453844;Oldenburgische Landesbank AG;
+;debit1;ahertz;Anja Hertz;25090500;K32173756;Sparda-Bank Hannover;
+;debit;dkaufmann;Siegmund Kaufmann;18055000;K24621;Sparkasse Niederlausitz;
+;debit;tbullet;Toni Bullet;42661717;K727878432234;Volksbank Oer-Erkenschwick Zndl d VB Waltrop;
+;debit2;ahertz;Anja Hertz;70130800;K25473525;Merkur Bank;
+;debit2;hpneumann;Sybille Neumann;37020090;K2004820952;Bayer Hypo- und Vereinsbank;
+;debit;nvp;Ronny von Paletzkie;51050015;K35654722;Nassauische Sparkasse;
+#Kreditkarte;
+INSERT_UPDATE CreditCardPaymentInfo;code[unique=true];user(uid)[unique=true];ccOwner;number;type(code);validFromMonth;validFromYear;validToMonth;validToYear
+;amex;ariel;Ariel F. Lüdi;378282246310005;amex;1;2005;12;2007
+;visa;ariel;Ariel F. Lüdi;4012888888881881;visa;3;2005;5;2007
+;diners;ariel;Cardmember;30569309025904;diners;0;0;0;0
+;master;ariel;Robert Schumann;5105105105105100;master;0;2000;0;2009
+;amex;ppetersonson;Peter Petersonson;371449635398431;amex;1;2001;5;2007
+;diners;hweaving;Hugo Weaving;30569309025904;diners;12;2002;7;2007
+;master;sbrueck;Sabine Brück;5105105105105100;master;11;2003;9;0
+;visa;ahertz;Anja Hertz;4111 1111 1111 1111;visa;5;2005;2;2009
+;diners;abrode;Arin Brode;38520000023237;diners;7;2004;5;2007
+;amex;dkaufmann;Denny Kaufmann;378734493671000;amex;9;2001;7;2007
+;visa;kvitali;Klaas Vitali;4111 1111 1111 1111;visa;2;2002;9;0
+;diners;bpoweronoff;Boris Poweronoff;38520000023237;diners;4;2003;2;2009
+;amex;hjaehnig;Hendrik Jähnig;378282246310005;amex;7;2001;5;2007
+;visa;mdigit;Marc Digit;4012888888881881;visa;12;2000;7;2007
+;master;nvp;Nadine von Paletzkie;5555555555554444;master;11;2004;9;2007

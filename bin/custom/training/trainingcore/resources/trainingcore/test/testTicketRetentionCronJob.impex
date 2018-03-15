@@ -1,0 +1,78 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.
+# All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+###################################################################################################
+##
+## Base data required by the comment system
+##
+#Base Store
+INSERT_UPDATE BaseStore;uid[unique=true];name;
+;csTicketTestStore;Test Store for CS Ticketing;
+
+INSERT_UPDATE UserGroup;uid[unique=true]
+;testTicketGroup
+
+INSERT_UPDATE Domain;code[unique=true];name;
+;ticketSystemDomain;Ticket System Domain;
+
+INSERT_UPDATE Component;code[unique=true];name;domain[unique=true](code);readPermitted(uid);writePermitted(uid);createPermitted(uid);removePermitted(uid);
+;ticketSystem;Ticket System;ticketSystemDomain;testTicketGroup;testTicketGroup;testTicketGroup;testTicketGroup;
+
+INSERT_UPDATE CommentType;code[unique=true];name;domain[unique=true](code);metaType(code)
+;agentNote;Agent Note;ticketSystemDomain;CsCustomerEvent
+;customerNote;Customer Note;ticketSystemDomain;CsCustomerEvent
+;customerEmail;Customer Email;ticketSystemDomain;CsCustomerEvent
+;ticketCreationEvent;Ticket Created Event;ticketSystemDomain;CsCustomerEvent
+;ticketAssignedEvent;Ticket Assigned Event;ticketSystemDomain;CsTicketEvent;
+;ticketResolutionEvent;Ticket Resolved Event;ticketSystemDomain;CsTicketResolutionEvent
+;ticketUnResolutionEvent;Ticket UnResolved Event;ticketSystemDomain;CsCustomerEvent
+;ticketChangeEvent;Ticket Changed Event;ticketSystemDomain;CsTicketEvent;
+
+###################################################################################################
+##
+## Sample ticket data
+##
+INSERT_UPDATE CsAgentGroup;uid[unique=true];ticketstores(uid);defaultAssignee(uid)
+;testTicketGroup1;csTicketTestStore;
+
+INSERT_UPDATE Employee;uid[unique=true];name;description;sessionLanguage(isocode);groups(uid);password;ticketstores(uid)
+;agent1;Ticket Agent 1;Ticket Agent 1;en;testTicketGroup1;1234;csTicketTestStore
+;agent2;Ticket Agent 2;Ticket Agent 2;en;testTicketGroup1;1234;csTicketTestStore
+;agent4;Ticket Agent 4;Ticket Agent 4;en;testTicketGroup1;1234;csTicketTestStore
+
+INSERT_UPDATE Employee;uid[unique=true];name;groups(uid)
+;csagent;Agent for Unit Test;testTicketGroup1
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;
+;user1;user1;name;
+
+INSERT_UPDATE CsCustomerEvent;code[unique=true];author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);subject;text
+;test-ticket-1-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;test-ticket-2-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;test-ticket-3-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;test-ticket-4-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created problem';
+;test-ticket-5-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created problem';
+;test-ticket-6-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created incident';
+;test-ticket-7-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+
+INSERT_UPDATE CsCustomerEvent;code[unique=true];author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);text;interventionType(code);reason(code)
+;test-ticket-7-customer;admin;ticketSystem;customerNote;'customer call events';Email;Complaint
+
+INSERT_UPDATE CsTicketResolutionEvent;code[unique=true];resolutionType[unique=true](code);author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);text
+;test-ticket-7-closed;Closed;admin;ticketSystem;ticketResolutionEvent;'Ticket Closed';
+
+INSERT_UPDATE CsTicket;state[default='New'](code);ticketID[unique=true];retentionDate[dateformat=dd.MM.yyyy HH:mm];customer(uid);category(code);priority(code);assignedAgent(uid);assignedGroup(uid);headline;comments(code);resolution(code);
+;;test-ticket-1;;user1;Note;Low;csagent;testTicketGroup1;'Test Headline 1';test-ticket-1-create;;
+;;test-ticket-4;;user1;Problem;High;csagent;testTicketGroup1;'Test Problem for customer';test-ticket-4-create;;
+;;test-ticket-5;;user1;Problem;High;csagent;testTicketGroup1;'Test Problem';test-ticket-5-create;;
+;Open;test-ticket-6;;user1;Incident;High;csagent;testTicketGroup1;'Test Incident for order';test-ticket-6-create;;
+;Closed;test-ticket-7;26.05.2016 10:58;user1;Note;Low;csagent;testTicketGroup1;'Test Note for order';test-ticket-7-create,test-ticket-7-customer,test-ticket-7-closed;test-ticket-7-closed

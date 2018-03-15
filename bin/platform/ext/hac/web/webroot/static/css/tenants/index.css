@@ -1,0 +1,7 @@
+button {
+	float: left !important;
+}
+
+#tenantsOverview {
+	overflow: auto;
+}

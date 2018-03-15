@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="start" name="process1">
+
+	<contextParameter name="order" use="required" type="" />
+	
+	<action id="start" bean="noAction">
+		<transition name="OK" to="rnd"/>
+	</action>
+	
+	<action id="rnd" bean="noAction">
+		<transition name="OK" to="sayA"/>
+	</action>
+	
+	<action id="sayA" bean="noAction">
+		<transition name="OK" to="finally"/>
+	</action>
+	
+	<wait id="waitForever" then="finally">
+		<event>SomethingToHappen</event>
+	</wait>
+	
+	<action id="finally" bean="noAction">
+		<transition name="OK" to="success"/>
+	</action>
+	
+	<end id="error" state="ERROR">All went wrong.</end>
+	<end id="success" state="SUCCEEDED">Everything was fine</end>
+</process>

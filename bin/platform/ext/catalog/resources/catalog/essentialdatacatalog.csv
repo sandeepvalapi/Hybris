@@ -1,0 +1,7 @@
+
+	INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]; defaultCatalog
+	;Default;Default-Katalog;default catalog;true
+
+	INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);active
+	;Default;Online;de,en;false
+	;Default;Staged;de,en;true

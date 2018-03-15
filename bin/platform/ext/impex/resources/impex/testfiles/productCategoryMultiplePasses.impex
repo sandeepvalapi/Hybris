@@ -1,0 +1,8 @@
+# Import requires multiple passes so that the category required by the product can be resolved
+# Product
+INSERT_UPDATE Product;code[unique=true];catalogVersion(catalog(id),version)[unique=true, allowNull=true];supercategories(code)
+;ECP648Product; ;ECP648Category
+
+# Category - required by product
+INSERT_UPDATE Category;code[unique=true];catalogVersion(catalog(id),version)[unique=true, allowNull=true]
+;ECP648Category; ;

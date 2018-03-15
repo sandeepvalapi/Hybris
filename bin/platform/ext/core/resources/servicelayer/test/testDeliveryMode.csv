@@ -1,0 +1,50 @@
+INSERT_UPDATE Zone;code[unique=true];countries(isocode);
+;de;DE;
+;europe;AT,GB,CH;
+;world;US;
+;duplicate_zone;DE,AT,GB,CH;
+
+INSERT_UPDATE StandardPaymentMode;code[unique=true];name[lang=de];name[lang=en];description[lang=de];description[lang=en];active;paymentinfotype(code)
+;creditcard;Kreditkarte;creditcard;Bezahlung per Keditkarte;payment with creditcard;true;CreditCardPaymentInfo
+;debitentry;Bankeinzug;Bank Collection;Bezahlung per Bankeinzug;payment with bank collection;true;DebitPaymentInfo
+;invoice;Rechnung;Invoice;per Rechnung bezahlen;payment with invoice;true;InvoicePaymentInfo
+;advance;Vorkasse;Advance;per Vorkasse bezahlen;payment in advance;true;AdvancePaymentInfo
+
+INSERT_UPDATE DeliveryMode;code[unique=true];active;net;supportedpaymentmodes(code);
+;courier;true;false;creditcard;Kreditkarte;creditcard,debitentry,invoice,advance;
+;postService;true;false;creditcard,debitentry,invoice,advance;
+;collect;true;false;invoice,advance;
+
+INSERT_UPDATE ZoneDeliveryMode;code[unique=true];name[lang=de];name[lang=en];active;description[lang=en];supportedpaymentmodes(code);net;propertyname
+;dhl;DHL;DHL;true;"For more than 35 years, DHL has built the world's premier global delivery network by trailblazing express shipping in one country after another. Over 220 countries and territories later, DHL is the global market leader of the international express and logistics industry. DHL specializes in providing customers with innovative and customized transportation solutions from a single source. www.dhl.com";advance;false;delivery.zone.price;
+;post;Deutsche Post;Deutsche Post;true;"Deutsche Post is a modern and effective partner within Deutsche Post World Net. The knowledge of our employees, our flexible infrastructure and our nationwide network of retail outlets provide the guarantee that this will remain the case.www.deutschepost.com";creditcard, debitentry, invoice;false;delivery.zone.price;
+;fedex;FedEx;FedEx;true;"FedEx provides access to a growing global marketplace through a network of supply chain, transportation, business and related information services.www.fedex.com";creditcard, advance;false;delivery.zone.price;
+;ups;UPS;UPS;true;"With more than 2,000 daily flights to over 200 countries and territories, time-definite delivery options, up-to-the-minute tracking, and expertise in customs clearance regulations, UPS makes international shipping easier than ever.http://www.ups.com/content/gb/en/index.jsx";creditcard, debitentry, invoice, advance;false;delivery.zone.price;
+
+INSERT_UPDATE ZoneDeliveryModeValue;deliverymode(code)[unique=true];zone(code)[unique=true];currency(isocode)[unique=true];minimum[unique=true];value;
+;dhl;de;EUR;0;6;
+;dhl;de;EUR;20;4
+;dhl;de;EUR;50;0
+;dhl;europe;EUR;0;10
+;dhl;europe;EUR;100;8
+;dhl;europe;USD;0;15
+;dhl;world;EUR;0;15
+;dhl;world;EUR;100;5
+;dhl;world;GBP;0;10
+;dhl;world;USD;0;25
+;post;de;EUR;0;1,2
+;post;de;EUR;5;0,8
+;post;de;EUR;10;0,5
+;fedex;de;EUR;0;5
+;fedex;europe;EUR;0;6
+#;fedex;world;EUR;0;10
+;ups;de;EUR;0;10
+;ups;de;EUR;3;7,32
+;ups;de;EUR;6;5,56
+;ups;de;EUR;50;3
+;ups;europe;EUR;0;6
+;ups;europe;EUR;20;5,5
+;ups;europe;EUR;60;5
+;ups;europe;EUR;100;4,4
+;ups;world;EUR;0;7
+;ups;world;USD;50;5

@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+	<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+	
+
+	<collectiontypes>
+		<collectiontype code="FlagsCollection" elementtype="RegexpFlag" autocreate="true" generate="true" type="set"  />
+        <collectiontype code="LanguagesCollection" elementtype="Language" autocreate="true" generate="true" type="set" />
+    </collectiontypes>
+
+	<enumtypes>
+		<enumtype generate="true" code="Severity" autocreate="true">
+			<description>Severities for a constraints</description>
+			<value code="ERROR" />
+			<value code="WARN" />
+			<value code="INFO" />
+		</enumtype>
+		
+		<enumtype generate="true" code="ValidatorLanguage" autocreate="true">
+			<description>Language of dynamic validation</description>
+			<value code="BEANSHELL"  />
+			<!-- 
+			value code="VELOCITY" />
+			<value code="GROOVY" /
+			-->
+		</enumtype>
+
+		<enumtype generate="true" code="RegexpFlag" autocreate="true">
+			<value code="UNIX_LINES" />
+			<value code="CASE_INSENSITIVE" />
+			<value code="COMMENTS" />
+			<value code="MULTILINE" />
+			<value code="DOTALL" />
+			<value code="UNICODE_CASE" />
+			<value code="CANON_EQ" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		
+		<relation code="ConstraintCompositeTypeRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="constraints" type="AbstractConstraint" collectiontype="set" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="type" type="ComposedType" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="AttributeConstraintAttributeDescRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="constraints" type="AttributeConstraint" collectiontype="set" cardinality="many"
+				ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="descriptor" type="AttributeDescriptor" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="ConstraintGroup2AbstractConstraintRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="CstrGr2AbsCstrRel" typecode="979"/>
+			<sourceElement qualifier="constraints" type="AbstractConstraint" collectiontype="set" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" /> 
+			</sourceElement>
+			<targetElement qualifier="constraintGroups" type="ConstraintGroup" collectiontype="set" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="ComposedType2CoverageConstraintGroupRelation" generate="true" autocreate="true" localized="false">
+			<deployment typecode="978" table="CmpType2CovGrpRels"/>
+			<sourceElement qualifier="dedicatedTypes" type="ComposedType" cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement type="CoverageConstraintGroup" cardinality="many" navigable="false">
+				<modifiers read="true" write="true"/>
+			</targetElement>	
+		</relation>
+		
+		
+		
+	</relations>
+
+	<itemtypes>
+
+		<!-- Groups -->
+		<itemtype code="ConstraintGroup" autocreate="true" generate="true" jaloclass="de.hybris.platform.validation.jalo.constraints.ConstraintGroup"
+			extends="GenericItem">
+			<description>Constraint group definition</description>
+			<deployment table="ConstraintGroup" typecode="982" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="id">
+					<description>Constraint group identifier</description>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property" />					
+				</attribute>
+				<attribute type="java.lang.String" qualifier="interfaceName">
+					<modifiers unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="CronstraintGroup_idx">
+					<key attribute="id"/>
+				</index>
+			</indexes>
+		</itemtype>
+		
+		
+		<itemtype code="CoverageConstraintGroup" autocreate="true" generate="true" jaloclass="de.hybris.platform.cockpit.jalo.CoverageConstraintGroup"
+			extends="ConstraintGroup">
+			<attributes>
+				<attribute qualifier="coverageDomainID" type="java.lang.String">
+					<modifiers optional="false" write="true" read="true" />
+					<defaultvalue>"defaultDomain"</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+
+		<!-- Constraints -->
+
+		<itemtype 	code="AbstractConstraint" 
+						abstract="true" 
+						autocreate="true" generate="true"
+						jaloclass="de.hybris.platform.validation.jalo.constraints.AbstractConstraint"
+						extends="GenericItem">
+			<description>Abstract constraint base definition for all constraint types</description>
+			<deployment table="ValidationConstraints" typecode="980" />
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<description>Constraint identifier</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" initial="true" />
+					<persistence type="property" />					
+				</attribute>
+				<attribute qualifier="active" type="boolean">
+					<description>Enabled flag for a constraint</description>
+					<modifiers optional="false" initial="true" />
+					<persistence type="property" />		
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>			
+				</attribute>
+				<attribute qualifier="needReload" type="boolean">
+					<description>true if the constraint (+values) was never loaded (in the current state) into the framework.</description>
+					<modifiers optional="false" write="false" />
+					<persistence type="dynamic" attributeHandler="abstractConstraintNeedReloadAttributeHandler"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute type="java.lang.Class" qualifier="annotation">
+					<description>Full class name literal for a corresponding annotation</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="severity" type="Severity">
+					<description>Severity level</description>
+					<modifiers read="true" write="true" search="true" initial="true" />
+					<persistence type="property" /> 
+					<defaultvalue>em().getEnumerationValue("Severity","ERROR")</defaultvalue>
+				</attribute>
+				
+				<attribute qualifier="defaultMessage" type="localized:java.lang.String">
+					<description>Localized resource bundle evaluated error message</description>
+					<modifiers read="true"  write="false" search="true" initial="false" optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="message" type="localized:java.lang.String">
+					<description>Localized error message</description>
+					<modifiers read="true" write="true" search="true" initial="true" />					
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>clob</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+				</attribute>
+				<attribute qualifier="target" type="java.lang.Class">
+					<description>Target class for covered with  validation logic</description>
+					<modifiers read="true" write="true" search="true"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="AbstractConstraint_idx" unique="true">
+					<key attribute="id"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype 	code="TypeConstraint" 
+						autocreate="true" generate="true" 
+						extends="AbstractConstraint"
+						jaloclass="de.hybris.platform.validation.jalo.constraints.TypeConstraint">
+			<description>Type constraint definition</description>						
+		</itemtype>
+
+		<itemtype 	code="AttributeConstraint" 
+						autocreate="true" generate="true" 
+						extends="AbstractConstraint"
+						jaloclass="de.hybris.platform.validation.jalo.constraints.AttributeConstraint">
+			<description>Attribute constraint definition</description>
+			<attributes>
+				<attribute qualifier="qualifier" type="java.lang.String">
+					<description>Qualifier name for attribute descriptor</description>
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+                <attribute qualifier="languages" type="LanguagesCollection">
+                    <description>Languages for which constraint will be enforced</description>
+                    <modifiers read="true" write="true" search="false" optional="true" initial="false" />
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+		</itemtype>
+
+		<itemtype 	code="DynamicConstraint" 
+						autocreate="true" generate="true" 
+						extends="TypeConstraint"
+						jaloclass="de.hybris.platform.validation.jalo.constraints.DynamicConstraint">
+			<description>Dynamic constraint definition</description>
+			<attributes>
+				<attribute qualifier="language" type="ValidatorLanguage">
+					<description>Type of the dynamic script language</description>
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+					<persistence type="property" />
+				</attribute>	
+				<!-- it has size limitation , for final release we should use media  -->			
+				<attribute type="java.lang.String" qualifier="expression">
+					<description>Expression to evaluate in assigned language type</description>
+					<modifiers read="true" write="true" search="true"  initial="true" optional="false" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>         
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true"/>
+					<defaultvalue>de.hybris.platform.validation.annotations.Dynamic.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<!--  JSR 303 compatibility constraints  -->
+		<itemtype code="PatternConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.PatternConstraint">
+			<description>Pattern JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="regexp">
+					<description>Regular expression for constraint</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="FlagsCollection" qualifier="flags">
+					<description>Regular expression for constraint</description>
+					<modifiers read="true" write="true" search="false" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.Pattern.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="PastConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.PastConstraint">
+			<description>Past JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.Past.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="FutureConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.FutureConstraint">
+			<description>Future JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true"/>
+					<defaultvalue>javax.validation.constraints.Future.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DigitsConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.DigitsConstraint">
+			<description>Digits JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="integer">
+					<description>Integer part of the number </description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="fraction">
+					<description>Fraction part of the number </description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true"/>
+					<defaultvalue>javax.validation.constraints.Digits.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MinConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.MinConstraint">
+			<description>Minimal JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.lang.Long" qualifier="value">
+					<description>Minimal value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.Min.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+	
+		<itemtype code="MaxConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.MaxConstraint">
+			<description>Maximal JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.lang.Long" qualifier="value">
+					<description>Maximal value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true"/>
+					<defaultvalue>javax.validation.constraints.Max.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+	
+
+		<itemtype code="DecimalMaxConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.DecimalMaxConstraint">
+			<description>Decimal maximal JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.math.BigDecimal" qualifier="value">
+					<description>Maximal value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.DecimalMax.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="HybrisDecimalMaxConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.HybrisDecimalMaxConstraint">
+			<description>Hybris counterpart for decimalmaximal JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.math.BigDecimal" qualifier="value">
+					<description>Maximal value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>de.hybris.platform.validation.annotations.HybrisDecimalMax.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DecimalMinConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.DecimalMinConstraint">
+			<description>Decimal minimal JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.math.BigDecimal" qualifier="value">
+					<description>Maximal value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.DecimalMin.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="HybrisDecimalMinConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.HybrisDecimalMinConstraint">
+			<description>Hybris counterpart for decimal min JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.math.BigDecimal" qualifier="value">
+					<description>Minimal value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>de.hybris.platform.validation.annotations.HybrisDecimalMin.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="NullConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.NullConstraint">
+			<description>Null JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.Null.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="NotNullConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.NotNullConstraint">
+			<description>Not null JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.NotNull.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="AssertTrueConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.AssertTrueConstraint">
+			<description>Assert True JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.AssertTrue.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AssertFalseConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.AssertFalseConstraint">
+			<description>Assert False JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.AssertFalse.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SizeConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.jsr303.SizeConstraint">
+			<description>Size range JSR 303 compatible constraint class</description>
+			<attributes>
+				<attribute type="java.lang.Long" qualifier="min">
+					<description>Underflow value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />					
+				</attribute>
+				<attribute type="java.lang.Long" qualifier="max">
+					<description>Overflow value</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />					
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>javax.validation.constraints.Size.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!--  JSR 303 compatibility constraints  -->
+	
+		<!-- custom constraint types -->
+		<itemtype code="XorNullReferenceConstraint" autocreate="true" generate="true" extends="TypeConstraint"
+			jaloclass="de.hybris.platform.validation.jalo.constraints.XorNullReferenceConstraint">
+			<description>Custom constraint for presenting type scoped constraint</description>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="firstFieldName">
+					<description>First field name for XOR null reference logic</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />					
+				</attribute>
+				<attribute type="java.lang.String" qualifier="secondFieldName">
+					<description>Second field name for XOR null reference logic</description>
+					<modifiers read="true" write="true" search="true" optional="false" initial="true" />
+					<persistence type="property" />					
+				</attribute>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>de.hybris.platform.validation.annotations.XorNotNull.class</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="NotEmptyConstraint" autocreate="true" generate="true" extends="AttributeConstraint" 
+		jaloclass="de.hybris.platform.validation.jalo.constraints.NotEmptyConstraint">
+			<description>Custom constraint which checks for empty strings (Apache commons implementation)</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>de.hybris.platform.validation.annotations.NotEmpty.class</defaultvalue>
+				</attribute>				
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="NotBlankConstraint" autocreate="true" generate="true" extends="AttributeConstraint" 
+		jaloclass="de.hybris.platform.validation.jalo.constraints.NotBlankConstraint">
+			<description>Custom constraint which checks for blank strings (Apache commons implementation)</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>de.hybris.platform.validation.annotations.NotBlank.class</defaultvalue>
+				</attribute>				
+			</attributes>
+		</itemtype>
+		
+	</itemtypes>
+</items>

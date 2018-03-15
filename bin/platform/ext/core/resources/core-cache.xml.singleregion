@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2011 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           " default-lazy-init="true">
+
+   <alias alias="cacheController" name="defaultCacheController" />
+   <alias alias="CacheController" name="defaultCacheController" />
+   
+   <alias alias="cacheConfiguration" name="defaultCacheConfiguration"/>
+   
+   <alias alias="entityCacheRegion" name="defaultEntityCacheRegion" />
+   <alias alias="typesystemCacheRegion" name="defaultTypesystemCacheRegion"/>
+   <alias alias="queryCacheRegion" name="defaultQueryCacheRegion"/>
+      
+   <alias alias="cacheRegionsList" name="defaultScenarioCacheRegionList" />
+   <alias alias="cacheRegionResolverList" name="defaultScenarioCacheRegionResolverList" />
+   <alias alias="cacheInvalidationFilterList" name="defaultFilterList" />
+
+   <alias alias="cacheRegionProvider" name="defaultCacheRegionProvider" />
+   <alias alias="CacheRegionProvider" name="defaultCacheRegionProvider" />
+
+   <alias alias="regionRegistryAllocationStrategy" name="defaultRegionRegistryAllocationStrategy" />
+	
+   <!-- Assumption: is there is only one controller. -->
+   <bean name="defaultCacheController" class="de.hybris.platform.regioncache.DefaultCacheController" lazy-init="true" >
+   		<constructor-arg name="configuration" ref="cacheConfiguration" />
+   </bean>
+   
+   <bean name="defaultCacheConfiguration" class="de.hybris.platform.regioncache.DefaultCacheConfiguration" lazy-init="true">
+		<constructor-arg name="regions">
+			<ref bean="cacheRegionsList"/>
+		</constructor-arg>
+		
+		<constructor-arg name="resolvers">
+			<ref bean="cacheRegionResolverList"/>	
+		</constructor-arg>		
+
+		<constructor-arg name="invalidationFilters">
+			<ref bean="cacheInvalidationFilterList" />
+		</constructor-arg>		
+   </bean>
+      
+   <bean id="defaultScenarioCacheRegionResolverList" class="java.util.ArrayList">
+	    <constructor-arg>
+	        <list>
+	            <ref bean="defaultCacheRegionResolver" />
+	        </list>
+	    </constructor-arg>
+   </bean>
+   
+   <bean id="defaultFilterList" class="java.util.ArrayList" >
+   	    <constructor-arg>
+   	    	<list>
+   	    	</list>
+   	    </constructor-arg>
+   </bean>
+   
+   <bean name="defaultCacheRegionResolver" class="de.hybris.platform.regioncache.region.SingleCacheRegionResolver" lazy-init="true">
+   	<constructor-arg name="cacheRegionProvider" ref="cacheRegionProvider"/>
+   </bean>
+
+   <bean id="defaultScenarioCacheRegionList" class="java.util.ArrayList">
+	    <constructor-arg>
+	        <list>
+	            <ref bean="singleCacheRegion"/>
+	        </list>
+	    </constructor-arg>
+   </bean>
+   
+   <bean name="defaultCacheRegionProvider" class="de.hybris.platform.regioncache.region.impl.DefaultCacheRegionProvider" lazy-init="true">
+   		<constructor-arg name="cacheRegions" ref="cacheRegionsList" />
+   </bean>
+   
+   <bean name="defaultRegionRegistryAllocationStrategy" class="de.hybris.platform.regioncache.RegionRegistryAllocationStrategy" />
+   
+   <bean name="singleCacheRegion" class="de.hybris.platform.regioncache.region.impl.DefaultCacheRegion" lazy-init="true">
+   		<constructor-arg name="name" value="singleCacheRegion" />
+   		<constructor-arg name="maxEntries" value="${singleregion.size}" />
+   		<constructor-arg name="evictionPolicy" value="${singleregion.eviction.policy}" />
+   		<constructor-arg name="statsEnabled" value="${singleregion.stats.enabled}" />
+   		<constructor-arg name="exclusiveComputation" value="${singleregion.exclusivecomputation}" />
+		<property name="handledTypes">
+			<array>
+				<value>__ALL_TYPES__</value>
+			</array>
+		</property>   
+   </bean>
+   
+</beans>           

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <!-- Return Process Actions -->
+
+    <bean id="initialReturnAction" class="com.hybris.training.fulfilmentprocess.actions.returns.InitialReturnAction" parent="abstractAction"/>
+
+    <bean id="captureRefundAction" class="com.hybris.training.fulfilmentprocess.actions.returns.CaptureRefundAction" parent="abstractAction"/>
+
+    <bean id="successCaptureAction" class="com.hybris.training.fulfilmentprocess.actions.returns.SuccessCaptureAction" parent="abstractAction"/>
+
+    <bean id="approveReturnAction" class="com.hybris.training.fulfilmentprocess.actions.returns.ApproveReturnAction" parent="abstractAction"/>
+
+    <bean id="cancelReturnAction" class="com.hybris.training.fulfilmentprocess.actions.returns.CancelReturnAction" parent="abstractAction"/>
+
+    <bean id="printReturnLabelAction" class="com.hybris.training.fulfilmentprocess.actions.returns.PrintReturnLabelAction" parent="abstractAction"/>
+
+    <bean id="printPackingLabelAction" class="com.hybris.training.fulfilmentprocess.actions.returns.PrintPackingLabelAction" parent="abstractAction"/>
+
+    <bean id="acceptGoodsAction" class="com.hybris.training.fulfilmentprocess.actions.returns.AcceptGoodsAction" parent="abstractAction"/>
+
+    <bean id="taxReverseAction" class="com.hybris.training.fulfilmentprocess.actions.returns.TaxReverseAction" parent="abstractAction"/>
+
+    <bean id="successTaxReverseAction" class="com.hybris.training.fulfilmentprocess.actions.returns.SuccessTaxReverseAction" parent="abstractAction"/>
+
+    <bean id="inventoryUpdateAction" class="com.hybris.training.fulfilmentprocess.actions.returns.InventoryUpdateAction" parent="abstractAction"/>
+
+</beans>

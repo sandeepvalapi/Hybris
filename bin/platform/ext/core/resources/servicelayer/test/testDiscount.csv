@@ -1,0 +1,5 @@
+INSERT_UPDATE Discount;code[unique=true];value;priority;global;currency(isocode);name[lang=de];name[lang=en]
+;totally_free;100;0;false;;alles gratis;all free
+;eighty_percent;80;0;false;;kostet 20%;20% of the price
+;fifty_percent;50;0;false;;kostet nur die H䀞lfte;half the price
+;tenAndALittleOff;10,5;10;true;EUR;10,50 Euro weniger;10,50 Euro less

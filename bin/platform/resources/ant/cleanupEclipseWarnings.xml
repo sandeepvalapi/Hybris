@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="cleanupEclipseWarnings">
+  
+ <!-- Contains Macro to clean up eclipse errors and warnings for Binary Dist and Source Dist--> 
+ 
+ <!-- Macro for Binary Dist --> 
+ <macrodef name="modify_eclipse_settings_binary">
+   <attribute name="destdir" />
+   <attribute name="extname" />
+   
+   <sequential>
+    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${platformhome}/resources/ant/lib/xmltask-1.16.jar" />
+    <if>
+        <matches pattern="(.*ext-template.*)" string="@{destdir}" /> <!-- do no touch templates -->
+        <then>
+        </then>
+        <else>
+          <echo message="Cleaning up errors and warnings for @{extname}" />
+          
+          <if>
+            <available file="@{destdir}/.project"/>
+            <then>
+              <private_manipulate_project_file destdir="@{destdir}" />
+            </then>
+          </if>
+          
+          <if>
+            <available file="@{destdir}/.pmd" />
+            <then>
+              <private_manipulate_pmd_file destdir="@{destdir}" />  
+            </then>
+          </if>
+          
+          <if>
+            <available file="@{destdir}/.settings/org.eclipse.jdt.core.prefs" type="file" />
+            <then>
+              <replaceregexp file="@{destdir}/.settings/org.eclipse.jdt.core.prefs" 
+                match = "(=warning|=error)"
+                replace = "=ignore"
+                byline="true"
+              />
+            </then>
+          </if>
+        </else>
+      </if>
+    </sequential>
+ </macrodef>
+
+ 
+ <macrodef name="private_manipulate_project_file">
+   <attribute name="destdir" />
+   <sequential>
+     <xmltask source="@{destdir}/.project" dest="@{destdir}/.project">
+        <replace path="projectDescription/buildSpec/buildCommand[name/text()='net.sourceforge.pmd.eclipse.plugin.pmdBuilder']" WithText=""/>
+        <replace path="projectDescription/natures/nature[text()='net.sourceforge.pmd.eclipse.plugin.pmdNature']" WithText=""/>
+      </xmltask>
+   </sequential>
+ </macrodef>
+ 
+ 
+  <macrodef name="private_manipulate_pmd_file">
+   <attribute name="destdir" />
+   <sequential>
+    <xmltask source="@{destdir}/.pmd" dest="@{destdir}/.pmd">
+      <replace path="pmd/violationsAsErrors/text()" WithText="false"/>
+    </xmltask>
+   </sequential>
+ </macrodef>
+ 
+
+ 
+ <!-- Macro for Source Dist --> 
+ <macrodef name="modify_eclipse_settings_source">
+   <attribute name="destdir" />
+   <attribute name="extname" />
+   
+   <sequential>
+     <if>
+       <matches pattern="(.*ext-template.*)" string="${destdir}" /> <!-- do no touch templates -->
+      <then>
+      </then>
+      <else>
+        <echo message="Deleting .settings from @{extname}"/>
+        <if>
+          <available file="@{destdir}/.settings" type="dir" />
+          <then>
+            <delete dir="${path}/.settings"/>
+          </then>
+        </if>
+      </else>
+     </if>
+    </sequential>
+ </macrodef>
+  
+</project>  

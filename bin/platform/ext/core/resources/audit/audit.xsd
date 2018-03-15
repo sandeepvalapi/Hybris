@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="audit-report-config">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="given-root-type" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="types"/>
+            </xs:sequence>
+            <xs:attribute type="name" name="name" use="required"/>
+            <xs:attribute type="xs:string" name="auditRecordsProvider"/>
+            <xs:attribute type="xs:string" name="mode"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="types">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="type" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="type">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="atomic-attributes" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="reference-attributes" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="virtual-attributes" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="relation-attributes" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute type="name" name="code" use="required"/>
+            <xs:attribute type="xs:string" name="displayName" use="optional"/>
+            <xs:attribute type="xs:string" name="displayKey" use="optional"/>
+            <xs:attribute type="xs:string" name="mode" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="atomic-attributes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="atomic-attribute" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="reference-attributes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="reference-attribute" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="virtual-attributes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="virtual-attribute" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="relation-attributes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="relation-attribute" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="resolves-by">
+        <xs:complexType>
+            <xs:attribute type="xs:string" name="resolverBeanId" use="optional"/>
+            <xs:attribute type="xs:string" name="expression" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="atomic-attribute">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="resolves-by" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute type="name" name="qualifier" use="required"/>
+            <xs:attribute type="xs:string" name="displayName" use="optional"/>
+            <xs:attribute type="xs:string" name="displayKey" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="reference-attribute">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="resolves-by" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute type="name" name="qualifier" use="required"/>
+            <xs:attribute type="xs:string" name="displayName" use="optional"/>
+            <xs:attribute type="xs:string" name="displayKey" use="optional"/>
+            <xs:attribute type="xs:boolean" name="many" use="optional"/>
+            <xs:attribute type="xs:string" name="type" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="virtual-attribute">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="resolves-by" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute type="name" name="expression" use="optional"/>
+            <xs:attribute type="xs:string" name="displayName" use="optional"/>
+            <xs:attribute type="xs:string" name="displayKey" use="optional"/>
+            <xs:attribute type="xs:boolean" name="many" use="optional"/>
+            <xs:attribute type="xs:string" name="type" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="relation-attribute">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="resolves-by" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="relation" use="required"/>
+            <xs:attribute type="xs:string" name="displayName" use="optional"/>
+            <xs:attribute type="xs:string" name="displayKey" use="optional"/>
+            <xs:attribute type="xs:boolean" name="many" use="optional"/>
+            <xs:attribute type="xs:string" name="type" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="given-root-type" type="xs:string"/>
+    <xs:simpleType name="name">
+        <xs:annotation>
+            <xs:documentation>A non-empty string.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

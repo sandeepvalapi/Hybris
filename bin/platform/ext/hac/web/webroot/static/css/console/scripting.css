@@ -1,0 +1,64 @@
+.border {
+    background-color: #FAFAFF;
+    border: 1px solid darkgray;
+}
+
+#textarea-container {
+    position: relative;
+    border: 1px dashed #666 !important;
+}
+
+#spinner {
+    opacity: 0.25;
+    -moz-transform: scale(6);
+    -webkit-transform: scale(6);
+}
+
+#spinnerWrapper {
+    display: none;
+    margin-top: 100px;
+    width: 100%;
+    position: absolute;
+    z-index: 1000;
+    text-align: center;
+    /*border: 1px solid red;*/
+}
+
+#output {
+    margin: 0;
+}
+
+.ui-tabs .ui-tabs-panel {
+    padding: 5px;
+}
+
+.scrollable {
+    overflow: auto;
+}
+
+#executeButton {
+    float: right;
+}
+
+div#rMenu {
+    position: absolute;
+    visibility: hidden;
+    top: 0;
+    text-align: left;
+    padding: 0px;
+}
+
+div#rMenu ul {
+    margin: 0px;
+    padding: 1px;
+    background: #4B5367
+}
+
+div#rMenu ul li {
+    margin: 2px;
+    padding: 2px;
+    cursor: pointer;
+    list-style: none outside none;
+    background-color: #2055CC;
+    color: white;
+}

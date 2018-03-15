@@ -1,0 +1,36 @@
+# Classification
+INSERT_UPDATE ClassificationSystem;id[unique=true];name[lang=en]
+;classification;Classification
+
+INSERT_UPDATE ClassificationSystemVersion;catalog(id)[unique=true];version[unique=true];active
+;classification;Online;true
+
+INSERT_UPDATE ClassificationClass;code[unique=true];name[lang=en];supercategories(code);catalogVersion(catalog(id),version)
+;common_class;Common classification;;classification:Online
+;special_class;Special classification;common_class;classification:Online
+
+INSERT_UPDATE ClassificationAttribute;code[unique=true];name[lang=en];systemVersion(catalog(id),version)
+;common_attribute;Common;classification:Online
+;special_attribute;Special;classification:Online
+
+INSERT_UPDATE ClassAttributeAssignment;classificationClass(code)[unique=true];classificationAttribute(code)[unique=true];attributeType(code);systemVersion(catalog(id),version)
+;common_class;common_attribute;string;classification:Online
+;special_class;special_attribute;string;classification:Online
+
+# Catalog
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en]
+;navigation;Navigation
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active
+;navigation;Online;true
+
+INSERT_UPDATE Category;code[unique=true];supercategories(code);name[lang=en];catalogVersion(catalog(id),version)
+;cat1;common_class;Cat1;navigation:Online
+;cat2;cat1,special_class;Cat2;navigation:Online
+;cat3;cat2;Cat3;navigation:Online
+;cat4;cat3;Cat4;navigation:Online
+;cat5;cat1;Cat5;navigation:Online
+
+INSERT_UPDATE Product;code[unique=true];supercategories(code);name[lang=en];catalogVersion(catalog(id),version)
+;prodInOneCtg;cat4;Product in one ctg;navigation:Online
+;prodInTwoCtgs;cat4,cat5;Product in two ctgs;navigation:Online

@@ -1,0 +1,7 @@
+INSERT_UPDATE Customer; uid[unique=true]; defaultPaymentAddress( &payAddress );
+; jan ; payAddress0
+; piotr; payAddress1
+
+INSERT Address; &payAddress; owner( Customer.uid ) ; department
+; payAddress0 ; jan  ; a1
+; payAddress1 ; piotr  ; a2

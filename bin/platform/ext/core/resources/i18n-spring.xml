@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- services -->
+
+	<alias alias="i18nService" name="defaultI18NService"/>
+	<alias alias="i18NService" name="defaultI18NService"/>
+	<bean id="defaultI18NService" parent="abstractBusinessService"
+		class="de.hybris.platform.servicelayer.i18n.impl.DefaultI18NService">
+		<property name="localeService" ref="localizationService"/>
+		<property name="i18nDao" ref="i18nDao"/>
+		<property name="currencyDao" ref="currencyDao"/>
+		<lookup-method name="lookupTypeService" bean="typeService"/>
+	</bean>
+
+	<alias alias="conversionStrategy" name="defaultConversionStrategy"/>
+	<bean id="defaultConversionStrategy" class="de.hybris.platform.servicelayer.i18n.impl.DefaultConversionStrategy" />
+
+	<alias alias="commonI18NService" name="defaultCommonI18NService"/>
+	<bean id="defaultCommonI18NService" class="de.hybris.platform.servicelayer.i18n.impl.DefaultCommonI18NService"  parent="abstractBusinessService">
+		<property name="languageDao" ref="languageDao"/>
+		<property name="currencyDao" ref="currencyDao"/>
+		<property name="countryDao" ref="countryDao"/>
+		<property name="regionDao" ref="regionDao"/>
+		<property name="conversionStrategy" ref="conversionStrategy"/>
+	</bean>
+
+	<alias alias="l10nService" name="defaultL10NService"/>
+	<bean id="defaultL10NService" class="de.hybris.platform.servicelayer.i18n.impl.DefaultL10NService">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!--  Localization Service (data and session language/locale)-->
+	<alias alias="localizationService" name="defaultLocalizationService"/>
+	<bean id="defaultLocalizationService" class="de.hybris.platform.servicelayer.internal.i18n.impl.DefaultLocalizationService" parent="abstractService"/>
+
+    <!-- daos -->
+	<bean id="baseI18NDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao" abstract="true">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="languageDao" class="de.hybris.platform.servicelayer.i18n.daos.impl.DefaultLanguageDao"   parent="baseI18NDao" />
+
+	<bean id="currencyDao" class="de.hybris.platform.servicelayer.i18n.daos.impl.DefaultCurrencyDao" parent="baseI18NDao" />
+
+	<bean id="countryDao" class="de.hybris.platform.servicelayer.i18n.daos.impl.DefaultCountryDao" parent="baseI18NDao" />
+
+	<bean id="regionDao" class="de.hybris.platform.servicelayer.i18n.daos.impl.DefaultRegionDao" parent="baseI18NDao" />
+
+	<alias alias="i18nDao" name="defaultI18NDao"/>
+	<bean id="defaultI18NDao" class="de.hybris.platform.servicelayer.i18n.impl.DefaultI18NDao" parent="abstractItemDao" />
+
+	<!-- interceptors -->
+	<bean id="lastLanguageRemoveInterceptor" class="de.hybris.platform.servicelayer.i18n.interceptors.RemoveLastLanguageInterceptor">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id="currentSessionLanguageRemoveInterceptor" class="de.hybris.platform.servicelayer.i18n.interceptors.RemoveSessionLanguageInterceptor">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id="removeLastLanguageInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="lastLanguageRemoveInterceptor"/>
+		<property name="typeCode" value="Language"/>
+	</bean>
+
+	<bean id="removeSessionLanguageInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="currentSessionLanguageRemoveInterceptor"/>
+		<property name="typeCode" value="Language"/>
+	</bean>
+
+	<!-- remove currency interceptors -->
+	<bean id="baseCurrencyRemoveInterceptor" class="de.hybris.platform.servicelayer.i18n.interceptors.RemoveBaseCurrencyInterceptor">
+	</bean>
+
+	<bean id="removeCurrencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="baseCurrencyRemoveInterceptor"/>
+		<property name="typeCode" value="Currency"/>
+		<property name="order" value="1"/>
+	</bean>
+
+	<!-- remove currency interceptors -->
+
+	<bean id="prepareDefaultSymbolInterceptor" class="de.hybris.platform.servicelayer.i18n.interceptors.PrepareDefaultSymbolInterceptor">
+		<property name="i18NService" ref="defaultI18NService"/>
+	</bean>
+
+	<bean id="prepareCurrencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="prepareDefaultSymbolInterceptor"/>
+		<property name="typeCode" value="Currency"/>
+	</bean>
+
+	<bean id="validateCurrencyDataInterceptor" class="de.hybris.platform.servicelayer.i18n.interceptors.ValidateCurrencyDataInterceptor" />
+
+	<bean id="validateCurrencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="validateCurrencyDataInterceptor"/>
+		<property name="typeCode" value="Currency"/>
+	</bean>
+
+	<!-- bean name="i18nSystemSetup" class="de.hybris.platform.servicelayer.i18n.system.I18NSystemSetup">
+			<property name="modelService" ref="modelService" />
+			<property name="commonI18NService" ref="commonI18NService" />
+	</bean-->
+
+	<!--  format factory  -->
+	<alias alias="formatFactory" name="defaultFormatFactory"/>
+	<bean name="defaultFormatFactory" class="de.hybris.platform.servicelayer.i18n.impl.DefaultFormatFactory">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<!-- flexible search query preprocessors -->
+	<bean id="localeQueryPreprocessor" class="de.hybris.platform.servicelayer.i18n.query.preprocessor.LocaleQueryPreprocessor">
+		<property name="i18nService" ref="i18nService" />
+		<property name="commonI18nService" ref="commonI18NService" />
+	</bean>
+
+</beans>

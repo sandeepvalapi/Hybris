@@ -1,0 +1,18 @@
+.resultBox {
+	display: none;
+	clear: both;
+	padding-top: 20px;
+}
+
+button {
+	float: none;
+}
+
+#sql {
+	width: 98%;
+	height: 60px;
+}
+
+#overallTestNames {
+	word-wrap: break-word;
+}

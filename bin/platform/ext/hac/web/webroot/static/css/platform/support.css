@@ -1,0 +1,18 @@
+#buttonCreateZIP {
+	float: left;
+}
+
+
+#buttonDownloadZIP,#buttonSendZIP {
+	display: none;
+	float: left;
+}
+
+.spinner {
+	opacity: 0.5;
+}
+
+#supportFiles {
+	height: 400px;
+	overflow: auto;
+}

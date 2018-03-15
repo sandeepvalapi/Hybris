@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype elementtype="java.lang.String" code="StringSet" autocreate="true" generate="false" type="set" />
+	</collectiontypes>
+
+	<relations>
+		<relation code="User2TokenRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="User" qualifier="user" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="OAuthAccessToken" qualifier="tokens" cardinality="many" collectiontype="collection"
+						   ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="OAuthClientDetails" generate="true" autocreate="true"
+				  jaloclass="de.hybris.platform.webservicescommons.jalo.OAuthClientDetails">
+			<deployment table="OAuthClientDetails" typecode="6500" />
+
+			<attributes>
+				<attribute qualifier="clientId" type="java.lang.String">
+					<description>Client Id</description>
+					<modifiers unique="true" optional="false" initial="true" write="false" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="resourceIds" type="StringSet">
+					<description>Set of Resource Id's</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="clientSecret" type="java.lang.String">
+					<description>Client Secret</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="scope" type="StringSet">
+					<description>Set of client scopes</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="authorizedGrantTypes" type="StringSet">
+					<description>Set of grant types for client</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="registeredRedirectUri" type="StringSet">
+					<description>Set of redirect Uri for client</description>
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>BLOB</value>
+						</columntype>
+						<columntype>
+							<value>java.io.Serializable</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="authorities" type="StringSet">
+					<description>Set of authorities granted to client</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="accessTokenValiditySeconds" type="java.lang.Integer">
+					<description>Set of authorities granted to client</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="refreshTokenValiditySeconds" type="java.lang.Integer">
+					<description>Set of authorities granted to client</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="autoApprove" type="StringSet">
+					<description>Set of auto approve scopes of client</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="disabled" type="java.lang.Boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<description>Client disabled</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+
+			<indexes>
+				<index name="clientIdIdx" unique="true">
+					<key attribute="clientId" />
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="OpenIDClientDetails" extends="OAuthClientDetails" generate="true" autocreate="true"
+				jaloclass="de.hybris.platform.webservicescommons.jalo.OpenIDClientDetails">
+			
+			<attributes>
+				<attribute qualifier="externalScopeClaimName" type="java.lang.String">
+					<description>External Scope Claim Name (if not null will be used in the JWT)</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="issuer" type="java.lang.String">
+					<description>Issuer Name</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="OpenIDExternalScopes" generate="true" autocreate="true"
+			jaloclass="de.hybris.platform.webservicescommons.jalo.OpenIDExternalScopes">
+			<deployment table="OpenIDExternalScopes" typecode="6520" />
+
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+                </attribute>
+				<attribute qualifier="clientDetailsId" type="OpenIDClientDetails">
+					<description>Client Details Id</description>
+					<modifiers optional="false" write="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="PrincipalCollection" qualifier="permittedPrincipals">
+					<description>Collection of Principals that are assigned to this set od scopes</description>
+                    <persistence type="property"/>
+                </attribute>
+				<attribute qualifier="scope" type="StringSet">
+					<description>Set of scopes assigned to given Principals</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+
+			<indexes>
+				<index name="exScopesClIdIdx">
+					<key attribute="clientDetailsId" />
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype generate="true" code="OAuthAccessToken"
+				  jaloclass="de.hybris.platform.webservicescommons.jalo.OAuthAccessToken"
+				  autocreate="true">
+			<deployment table="OAuthAccessToken" typecode="6228" />
+
+			<attributes>
+				<attribute qualifier="tokenId" type="java.lang.String">
+					<description>Token key</description>
+					<modifiers unique="true" optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="token" type="java.lang.Object">
+					<description>serialized token object</description>
+					<modifiers read="true" write="false" search="false" initial="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>BLOB</value>
+						</columntype>
+						<columntype>
+							<value>java.io.Serializable</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="authenticationId" type="java.lang.String">
+					<description>Authentication identifier</description>
+					<modifiers read="true" write="false" search="false" initial="true" optional="false"/>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="client" type="OAuthClientDetails">
+					<modifiers read="true" write="false" search="true" initial="true" optional="false" />
+					<description>Client identifier</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="authentication" type="java.lang.Object">
+					<description>Serialized authentication object</description>
+					<modifiers read="true" write="true" search="false" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>BLOB</value>
+						</columntype>
+						<columntype>
+							<value>java.io.Serializable</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="refreshToken" type="OAuthRefreshToken">
+					<modifiers read="true" write="false" initial="true" search="true"
+							   optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="tokenIdIdx" unique="true">
+					<key attribute="tokenId" />
+				</index>
+				<index name="authenticationIdIdx" unique="true">
+					<key attribute="authenticationId" />
+				</index>
+				<index name="refreshTokenIdx">
+					<key attribute="refreshToken" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype generate="true" code="OAuthRefreshToken"
+				  jaloclass="de.hybris.platform.webservicescommons.jalo.OAuthRefreshToken"
+				  autocreate="true">
+			<deployment table="OAuthRefreshToken" typecode="6229" />
+
+			<attributes>
+				<attribute qualifier="tokenId" type="java.lang.String">
+					<description>Token key</description>
+					<modifiers optional="false" initial="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="token" type="java.lang.Object">
+					<description>Serialized token object</description>
+					<modifiers read="true" write="true" search="false" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>BLOB</value>
+						</columntype>
+						<columntype>
+							<value>java.io.Serializable</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="authentication" type="java.lang.Object">
+					<description>Serialized authentication object</description>
+					<modifiers read="true" write="true" search="false" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>BLOB</value>
+						</columntype>
+						<columntype>
+							<value>java.io.Serializable</value>
+						</columntype>
+					</persistence>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="tokenIdIdx" unique="true">
+					<key attribute="tokenId" />
+				</index>
+			</indexes>
+		</itemtype>
+		<itemtype generate="true" code="OAuthAuthorizationCode"
+				  jaloclass="de.hybris.platform.oauth2.jalo.OAuthAuthorizationCode"
+				  autocreate="true">
+			<deployment table="OAuthAuthorizationCode" typecode="6231" />
+
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Token key</description>
+					<modifiers optional="false" initial="true" unique="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="authentication" type="java.lang.Object">
+					<description>Serialized authentication object</description>
+					<modifiers read="true" write="true" search="false" encrypted="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>BLOB</value>
+						</columntype>
+						<columntype>
+							<value>java.io.Serializable</value>
+						</columntype>
+					</persistence>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIdx" unique="true">
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+		<itemtype code="BruteForceOAuthDisabledAudit"
+				  extends="AbstractUserAudit"
+				  jaloclass="de.hybris.platform.jalo.user.BruteForceOAuthDisabledAudit"
+				  autocreate="true"
+				  generate="true">
+			<attributes>
+				<attribute autocreate="true" qualifier="failedOAuthAuthorizations" type="java.lang.Integer" generate="true">
+					<modifiers read="true" write="false" search="true" initial="true" optional="false" unique="false" />
+					<description>Number of failed logins</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

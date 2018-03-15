@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- 
+	  - Events: Session 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterSessionCreationEvent" type="event"/>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.BeforeSessionCloseEvent" type="event"/>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterSessionAttributeChangeEvent" type="event">
+		<property name="attributeName" type="String"/>
+		<property name="value" type="Object"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterSessionUserChangeEvent" type="event">
+		<property name="previousUserUID" type="String"/>
+	</bean>
+	
+	<!-- 
+	  - Events: Tenant 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterTenantRestartEvent" type="event">
+		<property name="tenantId" type="String"/>
+	</bean>
+	
+	<!--  
+	  - Events: Item Life Cycle 
+	  -->
+	  
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterItemCreationEvent" 
+		extends="de.hybris.platform.servicelayer.event.events.AbstractPersistenceEvent"
+		type="event">
+		<property name="typeCode" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterItemRemovalEvent"
+		extends="de.hybris.platform.servicelayer.event.events.AbstractPersistenceEvent"
+		type="event">
+	</bean>
+	
+	<!-- 
+	  - Events: Initialization 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterInitializationStartEvent" type="event">
+		<property name="params" type="java.util.Map&lt;String, String&gt;"/>
+		<property name="ctx" type="de.hybris.platform.util.JspContext"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterInitializationEndEvent" type="event">
+		<property name="params" type="java.util.Map&lt;String, String&gt;"/>
+		<property name="ctx" type="de.hybris.platform.util.JspContext"/>
+	</bean>
+
+	<!-- 
+	  - Events: Internals 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.InvalidateModelConverterRegistryEvent" type="event">
+		<property name="composedTypeCode" type="String"/>
+		<property name="composedClass" type="Class"/>
+		<property name="refresh" type="boolean"/>
+	</bean>
+
+
+	<!-- 
+	  - Test: Demo bean
+	  -->
+	<bean class="de.hybris.platform.test.beans.TestBean" superEquals="false">
+		
+		<property name="stringProperty" type="String"/>
+		<property name="integerProperty" type="Integer" />
+		<property name="booleanProperty" type="boolean"/>
+		<property name="nativeProperty" type="int" />
+		
+		<property name="equalsA" type="String" equals="true"/>
+		<property name="equalsB" type="Integer" equals="true"/>
+		<property name="equalsC" type="Boolean" equals="true"/>
+		
+	</bean>
+
+
+	<!-- Entry group -->
+	<bean class="de.hybris.platform.core.order.EntryGroup">
+		<property name="groupNumber" type="java.lang.Integer"/>
+		<property name="priority" type="java.lang.Integer"/>
+		<property name="label" type="java.lang.String"/>
+		<property name="groupType" type="de.hybris.platform.core.enums.GroupType"/>
+		<property name="children" type="java.util.List&lt;de.hybris.platform.core.order.EntryGroup&gt;"/>
+		<property name="externalReferenceId" type="java.lang.String"/>
+		<property name="erroneous" type="java.lang.Boolean"/>
+	</bean>
+
+	<!-- Search pagination/sorting -->
+	<bean class="de.hybris.platform.core.servicelayer.data.SearchPageData&lt;RESULT>">
+		<description>POJO that includes all necessary data for making a paginated and sorted search and returning response from that request.</description>
+		<property name="results" type="java.util.List&lt;RESULT>"/>
+		<property name="sorts" type="java.util.List&lt;de.hybris.platform.core.servicelayer.data.SortData>"/>
+		<property name="pagination" type="de.hybris.platform.core.servicelayer.data.PaginationData"/>
+	</bean>
+	
+	
+	<bean class="de.hybris.platform.core.servicelayer.data.SortData">
+		<description>POJO representing a sort option.</description>
+		<property name="code" type="String" />
+		<property name="asc" type="boolean">
+			<description>Direction of sorting. true=ascending, false=descending</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.core.servicelayer.data.PaginationData">
+		<description>POJO representation of search pagination.</description>
+		<property name="pageSize" type="int">
+			<description>The number of results per page. A page may have less results if there are less than a full page of results, only on the last page in the results.</description>
+		</property>
+		<property name="currentPage" type="int">
+			<description>The current page number. The first page is number zero (0), the second page is number one (1), and so on.</description>
+		</property>		
+		<property name="numberOfPages" type="int">
+			<description>The total number of pages. This is the number of pages, each of pageSize, required to display the totalNumberOfResults. Output only, may not be set if needsTotal=false.</description>
+		</property>
+		<property name="totalNumberOfResults" type="long">
+			<description>The total number of matched results across all pages. Output only, may not be set if needsTotal=false.</description>
+		</property>
+		<property name="needsTotal" type="boolean">
+			<description>Flag for indicating if totalNumberOfResults is needed or not. Input only.</description>
+		</property>
+	</bean>
+
+</beans>

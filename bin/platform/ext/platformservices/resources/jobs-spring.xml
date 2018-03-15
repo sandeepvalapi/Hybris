@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- mainenance strategy bean definitions  -->
+
+    <bean id="cleanupCronJobsPerformable" parent="abstractGenericMaintenanceJobPerformable">
+        <property name="maintenanceCleanupStrategy">
+            <bean class="de.hybris.platform.jobs.maintenance.impl.CleanupCronJobStrategy">
+                <property name="modelService" ref="modelService"/>
+                <property name="typeService" ref="typeService"/>
+                <property name="status">
+                    <set>
+                        <value type="de.hybris.platform.cronjob.enums.CronJobStatus">FINISHED</value>
+                    </set>
+                </property>
+                <property name="result">
+                    <set>
+                        <value type="de.hybris.platform.cronjob.enums.CronJobResult">SUCCESS</value>
+                    </set>
+                </property>
+                <property name="excludedCronJobCodes">
+                    <set/>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="cleanupSavedValuesPerformable" parent="abstractGenericMaintenanceJobPerformable">
+        <property name="maintenanceCleanupStrategy">
+            <bean class="de.hybris.platform.jobs.maintenance.impl.CleanupSavedValuesStrategy">
+                <property name="flexibleSearchService" ref="flexibleSearchService"/>
+                <property name="modelService" ref="modelService"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- here a bean with dynamic beanshell content -->
+    <bean id="dynamicallyMaintenancePerformable" class="de.hybris.platform.jobs.DynamicMaintenanceJobPerformable"
+          parent="abstractGenericMaintenanceJobPerformable">
+        <property name="abortOnError" value="true"/>
+    </bean>
+
+    <!-- MediaFolder structure migration maintenance job -->
+    <bean id="mediaFolderStructureMigration" parent="abstractGenericMaintenanceJobPerformable">
+        <property name="maintenanceCleanupStrategy">
+            <bean class="de.hybris.platform.jobs.maintenance.impl.MediaMigrationStrategy">
+                <property name="mediaService" ref="mediaService"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!-- Removes unused dynamic process definitions -->
+    <bean id="cleanupDynamicProcessDefinitions" parent="abstractGenericMaintenanceJobPerformable">
+        <property name="maintenanceCleanupStrategy">
+            <bean class="de.hybris.platform.jobs.maintenance.impl.CleanupDynamicProcessDefinitionsStrategy">
+                <property name="modelService" ref="modelService"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- the generic maintenance job as abstract bean definitions bean -->
+    <bean id="abstractGenericMaintenanceJobPerformable"
+          class="de.hybris.platform.jobs.GenericMaintenanceJobPerformable" abstract="true"
+          parent="abstractJobPerformable">
+        <property name="modelResolver" ref="modelResolver"/>
+        <property name="pageSize" value="100"/>
+        <property name="abortOnError" value="false"/>
+    </bean>
+
+    <!-- deprecated as of HOR-1411 -->
+    <bean id="cleanUpJobPerformable" class="de.hybris.platform.jobs.CleanUpJobPerformable"
+          parent="abstractJobPerformable">
+        <property name="i18nService" ref="i18nService"/>
+    </bean>
+
+    <bean id="cleanUpLogsJobPerformable" parent="abstractGenericMaintenanceJobPerformable">
+        <property name="maintenanceCleanupStrategy">
+            <bean class="de.hybris.platform.jobs.maintenance.impl.CleanUpLogsStrategy">
+                <property name="modelService" ref="modelService"/>
+                <property name="flexibleSearchService" ref="flexibleSearchService"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="cleanUpProcessTaskLogPerformable" class="de.hybris.platform.jobs.CleanUpProcessTaskLogPerformable"
+    parent="abstractJobPerformable"/>
+
+    <bean id="moveMediaJob" class="de.hybris.platform.jobs.MoveMediaJobPerformable" parent="abstractJobPerformable">
+        <property name="mediaService" ref="mediaService"/>
+    </bean>
+
+    <bean id="removeItemsJob" class="de.hybris.platform.jobs.RemoveItemsJobPerformable" parent="abstractJobPerformable">
+        <property name="permissionCheckingService" ref="permissionCheckingService"/>
+        <property name="mediaService" ref="mediaService"/>
+    </bean>
+
+    <bean id="newCategoryFinder" class="de.hybris.platform.catalog.job.diff.impl.NewCategoryCatalogVersionDiffFinder">
+        <property name="enumerationService" ref="enumerationService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="removedCategoryFinder"
+          class="de.hybris.platform.catalog.job.diff.impl.RemovedCategoryCatalogVersionDiffFinder">
+        <property name="enumerationService" ref="enumerationService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="newProductFinder" class="de.hybris.platform.catalog.job.diff.impl.NewProductCatalogVersionDiffFinder">
+        <property name="enumerationService" ref="enumerationService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <bean id="approvalStatusFinder" class="de.hybris.platform.catalog.job.diff.impl.ProductApprovalStatusDiffFinder">
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <bean id="removedProductFinder"
+          class="de.hybris.platform.catalog.job.diff.impl.RemovedProductCatalogVersionDiffFinder">
+        <property name="enumerationService" ref="enumerationService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <bean id="productPriceFinder" class="de.hybris.platform.catalog.job.diff.impl.ProductPriceDiffFinder">
+        <property name="enumerationService" ref="enumerationService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="priceService" ref="priceService"/>
+    </bean>
+
+    <bean id="compareCatalogVersionsJobPerformable"
+          class="de.hybris.platform.catalog.job.CompareCatalogVersionsJobPerformable" parent="abstractJobPerformable">
+        <property name="compareSteps">
+            <list>
+                <ref bean="newCategoryFinder"/>
+                <ref bean="removedCategoryFinder"/>
+                <ref bean="newProductFinder"/>
+                <ref bean="removedProductFinder"/>
+                <ref bean="approvalStatusFinder"/>
+                <ref bean="productPriceFinder"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="typesSorter" class="de.hybris.platform.catalog.job.sort.impl.ComposedTypeSorter">
+        <property name="typeService" ref="typeService"/>
+    </bean>
+
+    <bean id="catalogVersionJobDao" class="de.hybris.platform.catalog.job.util.impl.DefaultCatalogVersionJobDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="composedTypeSorter" ref="typesSorter"></property>
+    </bean>
+
+    <bean id="removeScriptGenerator"
+          class="de.hybris.platform.catalog.job.util.impl.CatalogVersionRemoveImpexScriptGenerator">
+        <property name="catalogVersionJobDao" ref="catalogVersionJobDao"></property>
+    </bean>
+
+    <bean id="abstractRemoveStrategy" class="de.hybris.platform.catalog.job.strategy.impl.AbstractRemoveStrategy"
+          abstract="true">
+        <property name="importService" ref="importService"/>
+        <property name="catalogVersionJobDao" ref="catalogVersionJobDao"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="removeScriptGenerator" ref="removeScriptGenerator"/>
+        <property name="removeCallback" ref="removeJobCallback"/>
+    </bean>
+
+    <bean id="removeCatalogVersionStrategy"
+          class="de.hybris.platform.catalog.job.strategy.impl.RemoveCatalogVersionStrategy"
+          parent="abstractRemoveStrategy"/>
+
+    <bean id="removeCatalogStrategy" class="de.hybris.platform.catalog.job.strategy.impl.RemoveCatalogStrategy"
+          parent="abstractRemoveStrategy"/>
+
+    <bean id="removeJobCallback" class="de.hybris.platform.catalog.job.callback.impl.RemoveCatalogVersionsCallback">
+        <property name="catalogVersionJobDao" ref="catalogVersionJobDao"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="removeCatalogVersionJobPerformable"
+          class="de.hybris.platform.catalog.job.RemoveCatalogVersionJobPerformable" parent="abstractJobPerformable">
+        <property name="removeCatalogStrategy" ref="removeCatalogStrategy"/>
+        <property name="removeCatalogVersionStrategy" ref="removeCatalogVersionStrategy"/>
+    </bean>
+
+    <bean id="compositeJobPerformable" class="de.hybris.platform.catalog.job.CompositeJobPerformable"
+          parent="abstractJobPerformable">
+        <property name="cronJobService" ref="cronJobService"/>
+    </bean>
+
+    <bean id="cleanUpCronJobInterceptor" class="de.hybris.platform.jobs.CleanUpCronJobInterceptor"/>
+
+    <bean id="cleanUpCronJobInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cleanUpCronJobInterceptor"/>
+        <property name="typeCode" value="CleanUpCronJob"/>
+    </bean>
+
+    <bean id="scriptingJobPerformable" class="de.hybris.platform.jobs.ScriptingJobPerformable"
+          parent="abstractJobPerformable">
+        <property name="scriptingLanguagesService" ref="scriptingLanguagesService"/>
+    </bean>
+    
+	<bean id="afterRetentionCleanupJobPerformable" class="de.hybris.platform.retention.job.AfterRetentionCleanupJobPerformable" parent="abstractJobPerformable" >
+	    <property name="retentionItemsProviderFactory" ref="retentionItemsProviderFactory"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,7 @@
+#set( $openStyle = $utility.initializeCharStyle($node) )
+#if( $openStyle  &&  $openStyle.startsWith( "<ParaStyle:" ) )
+#if( (!$utility.parentIsMain($node)  ||  $node != $node.getParentNode().getChildNodes().get(0))  &&  $node.getParentNode().getNodeName() != "cellNode" )
+${PARAGRAPH_BREAK}
+#end
+#end
+${openStyle}${translator.renderContent($node)}

@@ -1,0 +1,1175 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="distmacros">
+
+	<property name="platformhome" value="../../../" />
+	<import file="${platformhome}/resources/ant/dist/filtersets.xml" />
+	<import file="${platformhome}/resources/ant/dist/classpathgen.xml" />
+
+	<typedef resource="com/googlecode/svntask/svntask.xml">
+		<classpath>
+			<fileset dir="${platformhome}/resources/ant/lib">
+				<include name="*.jar" />
+			</fileset>
+		</classpath>
+	</typedef>
+
+	<macrodef name="dist">
+		<attribute name="development.dist" default="false" />
+		<attribute name="dependencies.dist" default="false" />
+		<attribute name="extensions.source" default="" />
+		<attribute name="extensions.binary" default="" />
+		<attribute name="extensions.activated" default="" />
+		<attribute name="extensions.deactivated" default="" />
+		<attribute name="include.platform" default="false" />
+		<attribute name="create.en.langpack" default="true" />
+		<attribute name="recipes.dir" default="" />
+		<attribute name="finalzipname" default="${HYBRIS_TEMP_DIR}/dists/hybris-distribution-${build.version}-${DSTAMP}-${TSTAMP}.zip" />
+		<attribute name="finaldevzipname" default="${HYBRIS_TEMP_DIR}/dists/hybris-distribution-${build.version}-${DSTAMP}-${TSTAMP}-dev.zip" />
+		<sequential>
+			<!-- load properties if given -->
+			<if>
+				<isset property="dist.properties.file" />
+				<then>
+					<property file="${dist.properties.file}" prefix="dist." />
+					<property name="dist.finalzipname" value="${HYBRIS_TEMP_DIR}/dists/${dist.zip.name}.zip" />
+					<property name="dist.finaldevzipname" value="${HYBRIS_TEMP_DIR}/dists/${dist.zip.name}-dev.zip" />
+					<property name="dist.extensions.activated" value="${dist.extensions.source},${dist.extensions.binary}" />
+				</then>
+			</if>
+
+			<!-- load packaging if given -->
+			<if>
+				<isset property="dist.packaging.file" />
+				<then>
+					<property file="${dist.packaging.file}" />
+				</then>
+			</if>
+
+			<!-- loading packaging files in order -->
+			<property file="${HYBRIS_CONFIG_DIR}/packaging.properties" />
+			<property file="${platformhome}/resources/ant/dist/packaging.properties" />
+
+			<!-- setting defaults -->
+			<property name="dist.extensions.source" value="@{extensions.source}" />
+			<property name="dist.extensions.binary" value="@{extensions.binary}" />
+			<property name="dist.extensions.activated" value="@{extensions.activated}" />
+			<property name="dist.extensions.deactivated" value="@{extensions.deactivated}" />
+			<property name="dist.include.platform" value="@{include.platform}" />
+			<property name="dist.create.en.langpack" value="@{create.en.langpack}" />
+			<property name="dist.finalzipname" value="@{finalzipname}" />
+			<property name="dist.finaldevzipname" value="@{finaldevzipname}" />
+			<property name="dist.development.dist" value="@{development.dist}" />
+			<property name="dist.dependencies.dist" value="@{dependencies.dist}" />
+			<property name="dist.recipes.dir" value="@{recipes.dir}" />
+
+			<!-- clean up -->
+			<propertyregex property="dist.extensions.binary.clean" input="${dist.extensions.binary}" regexp=";" replace="," global="true" defaultValue="${dist.extensions.binary}" />
+			<propertyregex property="dist.extensions.source.clean" input="${dist.extensions.source}" regexp=";" replace="," global="true" defaultValue="${dist.extensions.source}" />
+			<propertyregex property="dist.extensions.activated.clean" input="${dist.extensions.activated}" regexp=";" replace="," global="true" defaultValue="${dist.extensions.activated}" />
+			<propertyregex property="dist.extensions.deactivated.clean" input="${dist.extensions.deactivated}" regexp=";" replace="," global="true" defaultValue="${dist.extensions.deactivated}" />
+
+
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- Creating Distribution" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- dist.extensions.source        : ${dist.extensions.source.clean}" />
+			<echo level="info" message="- dist.extensions.binary        : ${dist.extensions.binary.clean}" />
+			<echo level="info" message="- dist.extensions.activated     : ${dist.extensions.activated.clean}" />
+			<echo level="info" message="- dist.extensions.deactivated   : ${dist.extensions.deactivated.clean}" />
+			<echo level="info" message="- dist.include.platform         : ${dist.include.platform}" />
+			<echo level="info" message="- dist.create.en.langpack       : ${dist.create.en.langpack}" />
+			<echo level="info" message="- dist.finalzipname             : ${dist.finalzipname}" />
+			<echo level="info" message="- dist.recipes.dir              : ${dist.recipes.dir}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<!-- prepare the environment -->
+			<prepare />
+			<delete dir="${HYBRIS_TEMP_DIR}/dist" failonerror="true" />
+			<property name="destination.folder" value="${HYBRIS_TEMP_DIR}/dist/hybris" />
+			<mkdir dir="${destination.folder}" />
+
+			<property name="destination.develop.folder" value="${HYBRIS_TEMP_DIR}/dev_dist/hybris" />
+			<mkdir dir="${destination.develop.folder}" />
+
+			<property name="loc.destination.folder" value="${HYBRIS_TEMP_DIR}/loc_dist/hybris" />
+			<mkdir dir="${loc.destination.folder}" />
+
+			<property name="dep.destination.folder" value="${HYBRIS_TEMP_DIR}/dep_dist/hybris" />
+			<mkdir dir="${dep.destination.folder}" />
+
+			<property name="destination.recipes.folder" value="${HYBRIS_TEMP_DIR}/dist/installer/recipes" />
+
+			<!-- copy source extensions -->
+			<if>
+				<isset property="dist.extensions.source.clean" />
+				<then>
+					<for list="${dist.extensions.source.clean}" param="extname" delimiter=",">
+						<sequential>
+							<extension_package_check extname="@{extname}" />
+							<extension_dist extname="@{extname}" disttype="source" destdir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}" />
+							<if>
+								<istrue value="${dist.development.dist}"/>
+								<then>
+									<extension_dist extname="@{extname}" disttype="devzip" destdir="${destination.develop.folder}/bin/${ext.@{extname}.package}/@{extname}" />
+								</then>
+							</if>
+
+							<if>
+								<istrue value="${dist.create.en.langpack}" />
+								<then>
+									<if>
+										<isreference refid="@{extname}.localization.pattern"/>
+										<then>
+											<copy todir="${loc.destination.folder}/bin/${ext.@{extname}.package}/@{extname}" preservelastmodified="true">
+												<fileset dir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}">
+													<patternset refid="@{extname}.localization.pattern"/>
+												</fileset>
+											</copy>
+										</then>
+										<else>
+											<copy todir="${loc.destination.folder}/bin/${ext.@{extname}.package}/@{extname}" preservelastmodified="true">
+												<fileset dir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}">
+													<patternset refid="localization.defaultpattern"/>
+												</fileset>
+											</copy>
+										</else>
+									</if>
+
+								</then>
+							</if>
+
+							<copy_external_dependencies srcdir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}" targetdir="${dep.destination.folder}/bin/${ext.@{extname}.package}/@{extname}" patternset="dependencies.defaultpattern"/>
+
+						</sequential>
+					</for>
+				</then>
+			</if>
+
+			<!-- copy binary extensions -->
+			<if>
+				<isset property="dist.extensions.binary.clean" />
+				<then>
+					<for list="${dist.extensions.binary.clean}" param="extname" delimiter=",">
+						<sequential>
+							<extension_package_check extname="@{extname}" />
+							<extension_dist extname="@{extname}" disttype="binary" destdir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}" />
+							<if>
+								<istrue value="${dist.development.dist}"/>
+								<then>
+									<extension_dist extname="@{extname}" disttype="devzip" destdir="${destination.develop.folder}/bin/${ext.@{extname}.package}/@{extname}" />
+								</then>
+							</if>
+
+							<if>
+								<istrue value="${dist.create.en.langpack}" />
+								<then>
+									<if>
+										<isreference refid="@{extname}.localization.pattern"/>
+										<then>
+											<copy todir="${loc.destination.folder}/bin/${ext.@{extname}.package}/@{extname}" preservelastmodified="true">
+												<fileset dir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}">
+													<patternset refid="@{extname}.localization.pattern"/>
+												</fileset>
+											</copy>
+										</then>
+										<else>
+											<copy todir="${loc.destination.folder}/bin/${ext.@{extname}.package}/@{extname}" preservelastmodified="true">
+												<fileset dir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}">
+													<patternset refid="localization.defaultpattern"/>
+												</fileset>
+											</copy>
+										</else>
+									</if>
+
+								</then>
+							</if>
+
+							<copy_external_dependencies srcdir="${destination.folder}/bin/${ext.@{extname}.package}/@{extname}" targetdir="${dep.destination.folder}/bin/${ext.@{extname}.package}/@{extname}" patternset="dependencies.defaultpattern"/>
+
+						</sequential>
+					</for>
+				</then>
+			</if>
+
+			<!-- platform -->
+			<if>
+				<equals arg1="${dist.include.platform}" arg2="true" />
+				<then>
+					<prepare_packaging extensionnames="${dist.extensions.binary.clean},${dist.extensions.source.clean}" />
+
+					<!-- copy platform -->
+					<platform_dist_copy srcdir="${platformhome}" destdir="${destination.folder}/bin/platform" />
+
+					<!-- create default extensions.xml file -->
+					<generate_extensionsxml extensiontargetfile="${destination.folder}/bin/platform/extensions.xml" activatedextensions="${dist.extensions.activated.clean}" deactivatedextensions="${dist.extensions.deactivated.clean}" />
+
+					<!-- generate packaging.properties file -->
+					<generate_packaging_properties targetfile="${destination.folder}/bin/platform/resources/ant/dist/packaging.properties" extensionnames="${dist.extensions.binary.clean},${dist.extensions.source.clean}" />
+
+					<if>
+						<istrue value="${dist.development.dist}"/>
+						<then>
+							<!-- copy platform -->
+							<platform_dist_copy srcdir="${platformhome}" destdir="${destination.develop.folder}/bin/platform" />
+
+							<!-- create default extensions.xml file -->
+							<generate_extensionsxml extensiontargetfile="${destination.develop.folder}/bin/platform/extensions.xml" activatedextensions="${dist.extensions.activated.clean}" deactivatedextensions="${dist.extensions.deactivated.clean}" />
+
+							<!-- generate packaging.properties file -->
+							<generate_packaging_properties targetfile="${destination.develop.folder}/bin/platform/resources/ant/dist/packaging.properties" extensionnames="${dist.extensions.binary.clean},${dist.extensions.source.clean}" />
+
+							<copy_bootstrap_sources destinationFolder="${destination.develop.folder}/bin/platform/bootstrap" devzip="true"/>
+						</then>
+
+					</if>
+
+					<copy_external_dependencies srcdir="${platformhome}" targetdir="${dep.destination.folder}/bin/platform" patternset="dependencies.platformpattern"/>
+
+				</then>
+			</if>
+
+			<!-- copy files if given -->
+			<if>
+				<and>
+					<isset property="dist.additional.files" />
+					<available file="${dist.additional.files}" type="dir" />
+				</and>
+				<then>
+					<echo message="Copying additional files from ${dist.additional.files} to ${HYBRIS_TEMP_DIR}/dist ..." />
+					<copy todir="${HYBRIS_TEMP_DIR}/dist" overwrite="true" failonerror="true" preservelastmodified="true">
+						<fileset dir="${dist.additional.files}">
+							<include name="**/*" />
+						</fileset>
+					</copy>
+					<if>
+						<istrue value="@{development.dist}"/>
+						<then>
+							<copy todir="${HYBRIS_TEMP_DIR}/dev_dist" overwrite="true" failonerror="true" preservelastmodified="true">
+								<fileset dir="${dist.additional.files}">
+									<include name="**/*" />
+								</fileset>
+							</copy>
+						</then>
+					</if>
+
+				</then>
+			</if>
+
+			<xmltask todir="${HYBRIS_TEMP_DIR}/dist">
+			      <fileset dir="${HYBRIS_TEMP_DIR}/dist">
+			        <include name="**/extensioninfo.xml" />
+			      </fileset>
+			      <replace path="/extensioninfo/extension/@usemaven" withText="false"/>
+		    </xmltask>
+
+			<if>
+				<equals arg1="${dist.include.platform}" arg2="true" />
+				<then>
+					<echo message="Touching ${HYBRIS_TEMP_DIR}/dist/hybris/bin/platform/lib/dbdriver/.lastupdate .."/>
+					<touch file="${HYBRIS_TEMP_DIR}/dist/hybris/bin/platform/lib/dbdriver/.lastupdate" />
+					<if>
+						<istrue value="${dist.development.dist}"/>
+						<then>
+							<echo message="Touching ${HYBRIS_TEMP_DIR}/dev_dist/hybris/bin/platform/lib/dbdriver/.lastupdate .."/>
+							<touch file="${HYBRIS_TEMP_DIR}/dev_dist/hybris/bin/platform/lib/dbdriver/.lastupdate"/>
+						</then>
+						<else>
+							<echo message="No need to touch ${HYBRIS_TEMP_DIR}/dev_dist/hybris/bin/platform/lib/dbdriver/.lastupdate"/>
+						</else>
+					</if>
+				</then>
+				<else>
+					<echo message="No need to touch ${HYBRIS_TEMP_DIR}/dist/hybris/bin/platform/lib/dbdriver/.lastupdate"/>
+				</else>
+			</if>
+
+			<if>
+				<not>
+					<equals arg1="" arg2="${dist.recipes.dir}"/>
+				</not>
+				<then>
+					<if>
+						<not>
+							<available file="${destination.recipes.folder}"/>
+						</not>
+						<then>
+							<mkdir dir="${destination.recipes.folder}" />
+						</then>
+					</if>
+					<for list="${dist.recipes.dir}" delimiter="," param = "dir">
+						<sequential>
+							<if>
+								<available file="@{dir}"/>
+								<then>
+									<copy todir="${destination.recipes.folder}">
+										<fileset dir="@{dir}"/>
+									</copy>
+								</then>
+							</if>
+						</sequential>
+					</for>
+
+				</then>
+			</if>
+
+			<zip destfile="${dist.finalzipname}">
+				<zipfileset dir="${HYBRIS_TEMP_DIR}/dist" filemode="755">
+					<include name="**/*.sh"/>
+				</zipfileset>
+				<zipfileset dir="${HYBRIS_TEMP_DIR}/dist">
+					<exclude name="**/*.sh"/>
+				</zipfileset>
+			</zip>
+
+			<if>
+				<istrue value="${dist.development.dist}"/>
+				<then>
+					<zip destfile="${dist.finaldevzipname}">
+						<zipfileset dir="${HYBRIS_TEMP_DIR}/dev_dist" filemode="755">
+							<include name="**/*.sh"/>
+						</zipfileset>
+						<zipfileset dir="${HYBRIS_TEMP_DIR}/dev_dist">
+							<exclude name="**/*.sh"/>
+						</zipfileset>
+					</zip>
+
+				</then>
+			</if>
+
+			<zip destfile="${HYBRIS_TEMP_DIR}/dists/langpack.zip" basedir="${HYBRIS_TEMP_DIR}/loc_dist"/>
+
+			<zip destfile="${HYBRIS_TEMP_DIR}/dists/dependencies.zip" basedir="${HYBRIS_TEMP_DIR}/dep_dist"/>
+
+			<!-- deploy properties -->
+			<create_deployment_info />
+
+			<!-- extract localization files for 'en' language -->
+			<!--if>
+				<istrue value="${dist.create.en.langpack}" />
+				<then>	
+					<ant antfile="${platformhome}/resources/ant/localization.xml" target="create_en_langpack" />
+				</then>
+			</if-->
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="create_deployment_info">
+		<sequential>
+			<delete file="${HYBRIS_TEMP_DIR}/dist/deployinfo.properties" />
+
+			<!-- echo svn properties -->
+			<trycatch property="svn.info.platform.errors">
+				<try>
+					<svn>
+						<info path="${platformhome}" revisionproperty="svn.info.platform.rev" urlproperty="svn.info.platform.url" />
+					</svn>
+					<propertyfile file="${HYBRIS_TEMP_DIR}/dist/deployinfo.properties">
+						<entry key="revision" value="${svn.info.platform.rev}" />
+						<entry key="svnurl" value="${svn.info.platform.url}" />
+					</propertyfile>
+				</try>
+				<catch>
+					<echo level="debug" message="Could not get svn status for @{platformhome} : ${svn.info.@{extname}.errors}" />
+				</catch>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="sourcezip" description="creates a zip file containing all java source and resource files, e.g. for eclipse">
+		<attribute name="zipfile" default="${HYBRIS_TEMP_DIR}/dists/hybris-sourcezip-${build.version}-${DSTAMP}-${TSTAMP}.zip" />
+		<attribute name="extensions" />
+		<attribute name="includebootstrap" />
+		<attribute name="create.zip" default="true"/>
+		<attribute name="source.folders" default="src,gensrc,web/src,backoffice/src,hmc/src,testsrc,doclet,celumInstall/anttasks/src,celumInstall/celumPlugin/src,acceleratoraddon/web/src" />
+		<sequential>
+
+			<!-- load properties if given -->
+			<if>
+				<isset property="sourcezip.properties.file" />
+				<then>
+					<property file="${sourcezip.properties.file}" prefix="sourcezip." />
+				</then>
+			</if>
+			<propertyregex property="sourcezip.extensions.clean" input="@{extensions}" regexp=";" replace="," global="true" defaultValue="@{extensions}" />
+			<property name="sourcezip.create.zip" value="@{create.zip}"/>
+			<property name="sourcezip.includebootstrap" value="@{includebootstrap}" />
+      		<property name="sourcezip.source.folders" value="@{source.folders}" />
+
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- Creating Source Zip" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- extensions  : @{extensions}" />
+			<echo level="info" message="- zipfile     : @{zipfile}" />
+			<echo level="info" message="- create.zip  : ${sourcezip.create.zip}" />
+			<echo level="info" message="- bootstrap   : ${sourcezip.includebootstrap}" />
+			<echo level="info" message="- src folders : ${sourcezip.source.folders}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<prepare />
+
+			<property name="sourcezip.temp.dir" value="${HYBRIS_TEMP_DIR}/dist/hybris/sourcezip" />
+			<delete dir="${sourcezip.temp.dir}" />
+			<mkdir dir="${sourcezip.temp.dir}" />
+
+			<copy_sources extensions="${sourcezip.extensions.clean}" destinationFolder="${sourcezip.temp.dir}" />
+
+			<if>
+				<istrue value="${sourcezip.includebootstrap}" />
+				<then>
+					<copy_bootstrap_sources destinationFolder="${sourcezip.temp.dir}"/>
+				</then>
+			</if>
+
+			<if>
+				<istrue value="${sourcezip.create.zip}" />
+				<then>
+					<zip destfile="@{zipfile}" basedir="${sourcezip.temp.dir}" />
+				</then>
+			</if>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="copy_sources">
+		<attribute name="extensions" />
+		<attribute name="destinationFolder" />
+		<sequential>
+			<mkdir dir="@{destinationFolder}" />
+			<for param="extname" list="@{extensions}">
+				<sequential>
+					<echo message="Copying sources for extension @{extname} ..."/>
+					<if>
+						<isset property="@{extname}.source.folders" />
+						<then>
+							<echo message="Using specific source folders for extension @{extname} => ${@{extname}.source.folders} "/>
+							<for param="srcpath" list="${@{extname}.source.folders}">
+								<sequential>
+									<if>
+										<available file="${ext.@{extname}.path}/@{srcpath}" />
+										<then>
+											<echo message="copying ${ext.@{extname}.path}/@{srcpath}..." />
+											<copy todir="@{destinationFolder}" preservelastmodified="true">
+												<fileset dir="${ext.@{extname}.path}/@{srcpath}">
+													<include name="**/*.java" />
+													<exclude name="**/GeneratedTypeInitializer.java" />
+													<exclude name="**/package-info.java" />
+												</fileset>
+											</copy>
+											<echo />
+										</then>
+									</if>
+								</sequential>
+							</for>
+						</then>
+						<else>
+							<echo message="Using standard source folders for extension @{extname} => ${sourcezip.source.folders} "/>
+							<for param="srcpath" list="${sourcezip.source.folders}">
+								<sequential>
+									<if>
+										<available file="${ext.@{extname}.path}/@{srcpath}" />
+										<then>
+											<echo message="copying ${ext.@{extname}.path}/@{srcpath}..." />
+											<copy todir="@{destinationFolder}" preservelastmodified="true">
+												<fileset dir="${ext.@{extname}.path}/@{srcpath}">
+													<include name="**/*.java" />
+													<exclude name="**/GeneratedTypeInitializer.java" />
+													<exclude name="**/package-info.java" />
+												</fileset>
+											</copy>
+											<echo />
+										</then>
+									</if>
+								</sequential>
+							</for>
+						</else>
+					</if>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="copy_bootstrap_sources">
+		<attribute name="destinationFolder" />
+		<attribute name="devzip" default="false"/>
+		<sequential>
+			<mkdir dir="@{destinationFolder}" />
+			<if>
+				<equals arg1="true" arg2="@{devzip}"/>
+				<then>
+					<copy todir="@{destinationFolder}" preservelastmodified="true">
+						<fileset dir="${platformhome}/bootstrap">
+							<include name="build.xml" />
+							<include name="bootstraputil.xml" />
+						</fileset>
+					</copy>
+					<delete dir="@{destinationFolder}/bin" failonerror="false" />
+				</then>
+			</if>
+			<for param="srcpath" list="antsrc,src,testsrc,tomcatsrc">
+				<sequential>
+					<if>
+						<available file="${platformhome}/bootstrap/@{srcpath}" />
+						<then>
+							<echo message="copying ${platformhome}/bootstrap/@{srcpath}..." />
+							<var name="bootstrap_src_dest_dir" unset="true"/>
+							<if>
+								<equals arg1="true" arg2="@{devzip}"/>
+								<then>
+									<property name="bootstrap_src_dest_dir" value="@{destinationFolder}/@{srcpath}"/>
+								</then>
+								<else>
+									<property name="bootstrap_src_dest_dir" value="@{destinationFolder}"/>
+								</else>
+							</if>
+							<mkdir dir="${bootstrap_src_dest_dir}"/>
+							<copy todir="${bootstrap_src_dest_dir}" preservelastmodified="true">
+								<fileset dir="${platformhome}/bootstrap/@{srcpath}">
+									<include name="**/*.java" />
+									<exclude name="**/package-info.java" />
+								</fileset>
+							</copy>
+							<echo />
+						</then>
+					</if>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="copy_external_dependencies">
+		<attribute name="srcdir"/>
+		<attribute name="targetdir"/>
+		<attribute name="patternset"/>
+		<sequential>
+			<echo/>
+			<echo>*************************************************</echo>
+			<echo>- copy_external_dependencies</echo>
+			<echo>-------------------------------------------------</echo>
+			<echo>- srcdir:     @{srcdir}</echo>
+			<echo>- targetdir:  @{targetdir}</echo>
+			<echo>- patternset: @{patternset}</echo>
+			<echo>*************************************************</echo>
+			<echo/>
+			<if>
+				<istrue value="${dist.dependencies.dist}"/>
+				<then>
+					<copy todir="@{targetdir}" preservelastmodified="true">
+						<fileset dir="@{srcdir}">
+							<patternset refid="@{patternset}"/>
+						</fileset>
+					</copy>
+					<update_external_dependencies dir="@{targetdir}" patternset="@{patternset}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="update_external_dependencies">
+		<attribute name="dir"/>
+		<attribute name="patternset"/>
+		<sequential>
+			<if>
+				<isset property="dist.external.dependencies.version"/>
+				<then>
+					<echo>replacing version number in @{dir} with ${dist.external.dependencies.version}</echo>
+					<replaceregexp preserveLastModified="true" match="&lt;version&gt;(.*)&lt;/version&gt;"
+							replace="&lt;version&gt;${dist.external.dependencies.version}&lt;/version&gt;">
+						<fileset dir="@{dir}" erroronmissingdir="false">
+							<patternset refid="@{patternset}"/>
+						</fileset>
+					</replaceregexp>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="generate_extensionsxml">
+		<attribute name="activatedExtensions" />
+		<attribute name="deactivatedExtensions" />
+		<attribute name="extensionTargetFile" />
+		<sequential>
+                       <var name="activatedExtensionsFiltered" unset="true"/>
+			<ysubtractlist minuend="@{activatedExtensions}" subtrahend="@{deactivatedExtensions}" delimiter="," difference="activatedExtensionsFiltered"/>
+			<delete file="@{extensionTargetFile}" />
+			<concat destfile="@{extensionTargetFile}" append="true">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;hybrisconfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="resources/schemas/extensions.xsd"&gt;
+	&lt;extensions&gt;
+		&lt;!--
+				All extensions located in $${HYBRIS_BIN_DIR}/platform/ext are automatically loaded.
+				More information about how to configure available extensions can be found here : https://wiki.hybris.com/x/nZVzC
+		--&gt;
+
+		&lt;path dir="$${HYBRIS_BIN_DIR}" /&gt;
+
+</concat>
+
+			<var name="lastPackage" unset="true" />
+			<for list="${packaging.values}" delimiter="," param="package.value">
+				<sequential>
+					<if>
+						<not>
+							<equals arg1="@{package.value}" arg2="platform/ext" trim="true" />
+						</not>
+						<then>
+							<if>
+								<not>
+									<equals arg1="@{package.value}" arg2="${lastPackage}" trim="true" />
+								</not>
+								<then>
+									<concat append="true" destfile="@{extensionTargetFile}">
+										<![CDATA[
+		<!-- @{package.value} -->
+]]></concat>
+									<var name="lastPackage" value="@{package.value}" />
+								</then>
+							</if>
+
+
+							<!-- adding all active extensions -->
+							<for list="${activatedExtensionsFiltered}" delimiter="," param="extname">
+								<sequential>
+									<if>
+										<equals arg1="${ext.@{extname}.package}" arg2="${lastPackage}" />
+										<then>
+											<concat destfile="@{extensionTargetFile}" append="true">		&lt;extension name="@{extname}" /&gt;
+</concat>
+										</then>
+									</if>
+								</sequential>
+							</for>
+
+							<!-- adding all inactive extensions -->
+							<for list="@{deactivatedExtensions}" delimiter="," param="extname">
+								<sequential>
+									<if>
+										<equals arg1="${ext.@{extname}.package}" arg2="${lastPackage}" />
+										<then>
+											<concat destfile="@{extensionTargetFile}" append="true">
+												<![CDATA[
+		<!-- <extension name="@{extname}" />-->
+]]></concat>
+										</then>
+									</if>
+								</sequential>
+							</for>
+						</then>
+					</if>
+				</sequential>
+			</for>
+
+			<concat destfile="@{extensionTargetFile}" append="true">
+
+	&lt;/extensions&gt;
+&lt;/hybrisconfig&gt;</concat>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare_packaging">
+		<attribute name="extensionNames" />
+		<sequential>
+			<var name="packaging.values" value="" />
+			<for list="@{extensionNames}" delimiter="," param="extname">
+				<sequential>
+					<if>
+						<not>
+							<contains string="${packaging.values}" substring="${ext.@{extname}.package}" />
+						</not>
+						<then>
+							<var name="packaging.values" value=",${packaging.values},${ext.@{extname}.package}," />
+						</then>
+					</if>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="generate_packaging_properties">
+		<attribute name="targetFile" />
+		<attribute name="extensionNames" />
+		<sequential>
+			<delete file="@{targetFile}" />
+			<touch file="@{targetFile}" />
+
+			<var name="lastPackage" unset="true" />
+			<for list="${packaging.values}" delimiter="," param="package.value">
+				<sequential>
+					<if>
+						<not>
+							<equals arg1="@{package.value}" arg2="${lastPackage}" trim="true" />
+						</not>
+						<then>
+							<concat append="true" destfile="@{targetFile}">
+##########################################################################
+## @{package.value}
+##########################################################################
+</concat>
+							<var name="lastPackage" value="@{package.value}" />
+						</then>
+					</if>
+
+					<for list="@{extensionNames}" delimiter="," param="extname">
+						<sequential>
+							<if>
+								<equals arg1="${ext.@{extname}.package}" arg2="${lastPackage}" />
+								<then>
+									<concat append="true" destfile="@{targetFile}">ext.@{extname}.package=@{package.value}
+</concat>
+								</then>
+							</if>
+						</sequential>
+					</for>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_package_check">
+		<attribute name="extname" />
+		<sequential>
+			<!-- set unset package names -->
+			<if>
+				<not>
+					<isset property="ext.@{extname}.package" />
+				</not>
+				<then>
+					<echo message="setting ext.@{extname}.package=custom" level="warning" />
+					<property name="ext.@{extname}.package" value="custom" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="copy_extension_for_source_dist">
+		<attribute name="srcdir" />
+		<attribute name="destdir" />
+		<attribute name="extname" />
+		<sequential>
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- copy_extension_for_source_dist" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- srcdir:   @{srcdir}" />
+			<echo level="info" message="- destdir:  @{destdir}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<if>
+				<isreference refid="extension.@{extname}.source.filter" />
+				<then>
+					<copy todir="@{destdir}" preservelastmodified="true">
+						<fileset dir="@{srcdir}">
+							<patternset refid="extension.@{extname}.source.filter" />
+						</fileset>
+					</copy>
+				</then>
+				<else>
+					<copy todir="@{destdir}" preservelastmodified="true">
+						<fileset dir="@{srcdir}">
+							<patternset refid="extension.source.filter" />
+						</fileset>
+					</copy>
+				</else>
+			</if>
+
+			<mkdir dir="@{destdir}/gensrc" />
+
+			<if>
+				<equals arg1="platformwebservices" arg2="@{extname}" />
+				<then>
+					<mkdir dir="@{destdir}/web/gensrc" />
+				</then>
+			</if>
+			<!-- automatically generate and patch .classpath if:
+			    a) ext.@{extname}.extension.meta.classpathgen = true
+			    b) ext.@{extname}.extension.meta.classpathgen is not set at all
+			    -->
+			<if>
+				<or>
+					<equals arg1="${ext.@{extname}.extension.meta.classpathgen}" arg2="true"/>
+					<not>
+						<isset property="ext.@{extname}.extension.meta.classpathgen"/>
+					</not>
+				</or>
+				<then>
+					<create_extension_classpath_file extname="@{extname}" destdir="@{destdir}" />
+					<modify_eclipse_settings_source destdir="@{destdir}" extname="@{extname}" />
+				</then>
+				<else>
+					<echo message="Skipping classpathgen for extension @{extname}!"/>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+   <!-- GROOT-100 -->
+   <macrodef name="copy_extension_for_devzip_dist">
+      <attribute name="srcdir" />
+      <attribute name="destdir" />
+      <attribute name="extname" />
+
+      <sequential>
+      <if>
+				<isreference refid="extension.@{extname}.devzip.filter" />
+				<then>
+          <echo level="info" message=" ############### building devzip for @{extname} #################" />
+					<copy todir="@{destdir}" preservelastmodified="true">
+						<fileset dir="@{srcdir}">
+							<patternset refid="extension.@{extname}.devzip.filter" />
+						</fileset>
+					</copy>
+				</then>
+				<else>
+          <copy_extension_for_source_dist srcdir="@{srcdir}" destdir="@{destdir}" extname="@{extname}" />
+				</else>
+			</if>
+			</sequential>
+
+  </macrodef>
+
+	<macrodef name="copy_external_extension_for_dist">
+		<attribute name="srcdir" />
+		<attribute name="destdir" />
+		<attribute name="extname" />
+		<sequential>
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- copy_external_extension_for_dist" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- srcdir:   @{srcdir}" />
+			<echo level="info" message="- destdir:  @{destdir}" />
+			<echo level="info" message="- extname:  @{extname}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<if>
+				<available file="@{srcdir}" type="dir"/>
+				<then>
+					<copy todir="@{destdir}" preservelastmodified="true">
+						<fileset dir="@{srcdir}"/>
+					</copy>
+				</then>
+			</if>
+			<if>
+				<available file="@{srcdir}" type="file"/>
+				<then>
+					<copy todir="@{destdir}" preservelastmodified="true" file="@{srcdir}"/>
+				</then>
+			</if>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="copy_extension_for_binary_dist">
+		<attribute name="srcdir" />
+		<attribute name="destdir" />
+		<attribute name="extname" />
+		<sequential>
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- copy_extension_for_binary_dist" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- srcdir:   @{srcdir}" />
+			<echo level="info" message="- destdir:  @{destdir}" />
+			<echo level="info" message="- extname:  @{extname}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<extension_compile extname="@{extname}" />
+
+			<if>
+				<isreference refid="extension.@{extname}.binary.filter" />
+				<then>
+					<copy todir="@{destdir}" preservelastmodified="true">
+						<fileset dir="@{srcdir}">
+							<patternset refid="extension.@{extname}.binary.filter" />
+						</fileset>
+					</copy>
+				</then>
+				<else>
+					<copy todir="@{destdir}" preservelastmodified="true">
+						<fileset dir="@{srcdir}">
+							<patternset refid="extension.binary.filter" />
+						</fileset>
+					</copy>
+				</else>
+			</if>
+
+			<if>
+				<available file="@{srcdir}/.project" />
+				<then>
+					<copy file="@{srcdir}/.project" tofile="@{destdir}/.project" failonerror="false" overwrite="true" preservelastmodified="true">
+						<filterchain>
+							<replaceregex pattern="auto,full," replace="," byline="true" />
+						</filterchain>
+					</copy>
+				</then>
+			</if>
+
+			<extension_build_jar extname="@{extname}" destdir="@{destdir}" />
+
+			<!-- automatically generate and patch .classpath if:
+			    a) ext.@{extname}.extension.meta.classpathgen = true
+			    b) ext.@{extname}.extension.meta.classpathgen is not set at all
+			    -->
+			<if>
+				<or>
+					<equals arg1="${ext.@{extname}.extension.meta.classpathgen}" arg2="true"/>
+					<not>
+						<isset property="ext.@{extname}.extension.meta.classpathgen"/>
+					</not>
+				</or>
+				<then>
+					<create_extension_classpath_file extname="@{extname}" destdir="@{destdir}" />
+					<modify_eclipse_settings_binary destdir="@{destdir}" extname="@{extname}" />
+				</then>
+				<else>
+					<if>
+						<!--allowing to specify a differene .classpath file for 'binary' release
+						    by looking for .classpath_binary and copying that to the release folder as .classpath -->
+						<available file="${ext.@{extname}.path}/.classpath_binary" />
+						<then>
+							<copy file="${ext.@{extname}.path}/.classpath_binary" tofile="@{destdir}/.classpath" overwrite="true"/>
+						</then>
+						<else>
+							<echo message="Skipping classpathgen for extension @{extname}!"/>
+						</else>
+					</if>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="extension_dist">
+		<attribute name="extname" />
+		<attribute name="disttype" />
+		<attribute name="destdir" />
+		<sequential>
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- extension_dist" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- extname:   @{extname}" />
+			<echo level="info" message="- disttype:  @{disttype}" />
+			<echo level="info" message="- destdir:   @{destdir}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<echo message="creating @{disttype} distribution for extension '@{extname}'..." />
+
+			<!-- this variable can be used in the buildcallbacks to do stuff with the destination folder -->
+			<var name="destdir" unset="true" />
+			<var name="destdir" value="@{destdir}" />
+
+			<callback extname="@{extname}" target="before_dist" />
+
+			<extension_dist_copy extname="@{extname}" disttype="@{disttype}" destdir="@{destdir}" srcdir="${ext.@{extname}.path}" />
+
+			<callback extname="@{extname}" target="after_dist" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_dist_copy">
+		<attribute name="extname" />
+		<attribute name="disttype" />
+		<attribute name="destdir" />
+		<attribute name="srcdir" />
+		<sequential>
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- extension_dist_copy" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- extname:   @{extname}" />
+			<echo level="info" message="- disttype:  @{disttype}" />
+			<echo level="info" message="- srcdir:    @{srcdir}" />
+			<echo level="info" message="- destdir:   @{destdir}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<mkdir dir="@{destdir}" />
+			<callback extname="@{extname}" target="before_dist_copy" />
+
+			<if>
+				<matches string="@{srcdir}" pattern="\$" />
+				<then>
+					<fail>.
+Missing extension folder for @{extname}!!!
+Usually that would mean that the folder has been removed or was not properly built in an earlier stage.
+					</fail>
+				</then>
+			</if>
+
+			<echo message="Copying @{extname} @{srcdir} => @{destdir}" />
+			<if>
+				<equals arg1="binary" arg2="@{disttype}" />
+				<then>
+					<if>
+						<istrue value="${ext.@{extname}.warextension}"/>
+						<then>
+							<copy_external_extension_for_dist srcdir="@{srcdir}" destdir="@{destdir}" extname="@{extname}" />
+						</then>
+						<else>
+							<copy_extension_for_binary_dist srcdir="@{srcdir}" destdir="@{destdir}" extname="@{extname}" />
+						</else>
+					</if>
+				</then>
+				<else>
+          <if>
+              <equals arg1="source" arg2="@{disttype}" />
+              <then>
+					<if>
+						<or>
+							<not>
+								<isset property="ext.@{extname}.warextension"/>
+							</not>
+							<isfalse value="${ext.@{extname}.warextension}"/>
+						</or>
+						<then>
+							<copy_extension_for_source_dist srcdir="@{srcdir}" destdir="@{destdir}" extname="@{extname}" />
+						</then>
+                	</if>
+              </then>
+              <else>
+				  <if>
+					  <istrue value="${ext.@{extname}.warextension}"/>
+					  <then>
+						  <copy_external_extension_for_dist srcdir="@{srcdir}" destdir="@{destdir}" extname="@{extname}" />
+					  </then>
+					  <else>
+                  		<copy_extension_for_devzip_dist srcdir="@{srcdir}" destdir="@{destdir}" extname="@{extname}" />
+					  </else>
+				  </if>
+              </else>
+          </if>
+				</else>
+			</if>
+			<if>
+				<or>
+					<isfalse value="${ext.@{extname}.warextension}"/>
+					<not>
+						<isset property="ext.@{extname}.warextension"/>
+					</not>
+				</or>
+				<then>
+					<update_external_dependencies dir="@{destdir}" patternset="dependencies.defaultpattern"/>
+					<extension_build_number extname="@{extname}" destdir="@{destdir}" />
+				</then>
+			</if>
+			<callback extname="@{extname}" target="after_dist_copy" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extension_build_number">
+		<attribute name="extname" />
+		<attribute name="destdir" />
+		<sequential>
+			<var name="hybris.build.description" value="@{extname}" />
+			<var name="hybris.build.name" value="@{extname}" />
+			<var name="hybris.build.extensions" unset="true" />
+
+			<!-- create resources dir if not existing -->
+			<mkdir dir="@{destdir}/resources" />
+			<echoproperties destfile="@{destdir}/resources/@{extname}.build.number">
+				<propertyset>
+					<propertyref prefix="hybris.build" />
+					<filtermapper>
+						<replacestring from="hybris.build." to="" />
+					</filtermapper>
+				</propertyset>
+			</echoproperties>
+
+			<!-- echo svn properties -->
+			<trycatch property="svn.info.@{extname}.errors">
+				<try>
+					<svn>
+						<info path="${ext.@{extname}.path}" revisionproperty="svn.info.@{extname}.rev" urlproperty="svn.info.@{extname}.url" />
+					</svn>
+					<propertyfile file="@{destdir}/resources/@{extname}.build.number">
+						<entry key="revision" value="${svn.info.@{extname}.rev}" />
+						<entry key="svnurl" value="${svn.info.@{extname}.url}" />
+					</propertyfile>
+				</try>
+				<catch>
+					<echo level="debug" message="Could not get svn status for ${ext.@{extname}.path} : ${svn.info.@{extname}.errors}" />
+				</catch>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="platform_dist_copy">
+		<attribute name="srcdir" />
+		<attribute name="destdir" />
+		<sequential>
+			<echo level="info" message=" " />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message="- copying platform" />
+			<echo level="info" message="-------------------------------------------------" />
+			<echo level="info" message="- srcdir:   @{srcdir}" />
+			<echo level="info" message="- destdir:  @{destdir}" />
+			<echo level="info" message="*************************************************" />
+			<echo level="info" message=" " />
+
+			<mkdir dir="@{destdir}" />
+			<copy todir="@{destdir}" preservelastmodified="true">
+				<fileset dir="@{srcdir}">
+					<patternset refid="platform.dist.filter" />
+				</fileset>
+			</copy>
+			<update_external_dependencies dir="@{destdir}" patternset="dependencies.defaultpattern"/>
+			<modify_eclipse_settings_binary destdir="@{destdir}" extname="" />
+			<create_platform_build_number_file platformhome="@{destdir}" />
+			<create_platform_classpath_file destinationplatformhome="@{destdir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="create_platform_build_number_file">
+		<attribute name="platformhome" />
+		<sequential>
+			<var name="hybris.build.releasedate" value="${DSTAMP} ${TSTAMP}" />
+			<var name="hybris.build.name" unset="true" />
+			<var name="hybris.build.description" unset="true" />
+			<echo message="Placing build.number file to @{platformhome}/build.number" />
+			<echoproperties destfile="@{platformhome}/build.number">
+				<propertyset>
+					<propertyref prefix="hybris.build" />
+					<filtermapper>
+						<replacestring from="hybris.build." to="" />
+					</filtermapper>
+				</propertyset>
+			</echoproperties>
+
+			<!-- echo svn properties -->
+			<trycatch property="svn.info.platform.errors">
+				<try>
+					<svn>
+						<info path="${platformhome}" revisionproperty="svn.info.platform.rev" urlproperty="svn.info.platform.url" />
+					</svn>
+					<propertyfile file="@{platformhome}/build.number">
+						<entry key="revision" value="${svn.info.platform.rev}" />
+						<entry key="svnurl" value="${svn.info.platform.url}" />
+					</propertyfile>
+				</try>
+				<catch>
+					<echo level="debug" message="Could not get svn status for @{platformhome} : ${svn.info.@{extname}.errors}" />
+				</catch>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- add to end of list -->
+	<bean depends-on="stringList" parent="listMergeDirective">
+		<property name="add" value="eee" />
+	</bean>
+
+	<!-- add after value -->
+	<bean depends-on="stringList" parent="listMergeDirective">
+		<property name="add" value="bbb" />
+		<property name="afterValues">
+			<list value-type="java.lang.String">
+				<value>aaa</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- add before value -->
+	<bean depends-on="stringList" parent="listMergeDirective">
+		<property name="add" value="ccc" />
+		<property name="beforeValues">
+			<list value-type="java.lang.String">
+				<value>ddd</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--  add between -->
+	<bean depends-on="stringList" parent="listMergeDirective">
+		<property name="add" value="zzz" />
+		<property name="beforeValues">
+			<list value-type="java.lang.String">
+				<value>ccc</value>
+			</list>
+		</property>
+		<property name="afterValues">
+			<list value-type="java.lang.String">
+				<value>bbb</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- object list -->
+	<!-- add to end of list -->
+	<bean depends-on="objectList" parent="listMergeDirective">
+		<property name="add">
+			<value type="java.math.BigDecimal">1.0</value>
+		</property>
+	</bean>
+
+	<!-- add after class -->
+	<bean depends-on="objectList" parent="listMergeDirective">
+		<property name="add">
+			<value type="java.math.BigInteger">2</value>
+		</property>
+		<property name="afterClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.String</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- add before class -->
+	<bean depends-on="objectList" parent="listMergeDirective">
+		<property name="add">
+			<value type="java.lang.Character">d</value>
+		</property>
+		<property name="beforeClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--  add between -->
+	<bean depends-on="objectList" parent="listMergeDirective">
+		<property name="add">
+			<value type="java.lang.Long">2</value>
+		</property>
+		<property name="beforeClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+		<property name="afterClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.String</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- decimal list -->
+	<!-- add to end of list -->
+	<bean depends-on="decimalList" parent="listMergeDirective">
+		<property name="add" ref="decimal4" />
+	</bean>
+
+	<!-- add after bean -->
+	<bean depends-on="decimalList" parent="listMergeDirective">
+		<property name="add" ref="decimal1" />
+		<property name="afterBeanNames">
+			<list>
+				<value>decimal0</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- add before bean -->
+	<bean depends-on="decimalList" parent="listMergeDirective">
+		<property name="add" ref="decimal2" />
+		<property name="beforeBeanNames">
+			<list>
+				<value>decimal3</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--  add between -->
+	<bean depends-on="decimalList" parent="listMergeDirective">
+		<property name="add" ref="decimal5" />
+		<property name="beforeBeanNames">
+			<list>
+				<value>decimal3</value>
+			</list>
+		</property>
+		<property name="afterBeanNames">
+			<list>
+				<value>decimal0</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- list in property merge directives -->
+	<!-- add to end of list -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="stringList" />
+		<property name="add" value="eee" />
+	</bean>
+
+	<!-- add after value -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="stringList" />
+		<property name="add" value="bbb" />
+		<property name="afterValues">
+			<list value-type="java.lang.String">
+				<value>aaa</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- add before value -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="stringList" />
+		<property name="add" value="ccc" />
+		<property name="beforeValues">
+			<list value-type="java.lang.String">
+				<value>ddd</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--  add between -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="stringList" />
+		<property name="add" value="zzz" />
+		<property name="beforeValues">
+			<list value-type="java.lang.String">
+				<value>ccc</value>
+			</list>
+		</property>
+		<property name="afterValues">
+			<list value-type="java.lang.String">
+				<value>bbb</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- object list -->
+	<!-- add to end of list -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="objectList" />
+		<property name="add">
+			<value type="java.math.BigDecimal">1.0</value>
+		</property>
+	</bean>
+
+	<!-- add after class -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="objectList" />
+		<property name="add">
+			<value type="java.math.BigInteger">2</value>
+		</property>
+		<property name="afterClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.String</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- add before class -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="objectList" />
+		<property name="add">
+			<value type="java.lang.Character">d</value>
+		</property>
+		<property name="beforeClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- add between classes -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="objectList" />
+		<property name="add">
+			<value type="java.lang.Long">2</value>
+		</property>
+		<property name="beforeClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.Integer</value>
+			</list>
+		</property>
+		<property name="afterClasses">
+			<list value-type="java.lang.Class">
+				<value>java.lang.String</value>
+			</list>
+		</property>
+	</bean>
+	
+
+	<!-- decimal list -->
+	<!-- add to end of list -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="decimalList" />
+		<property name="add" ref="decimal4" />
+	</bean>
+
+	<!-- add after bean -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="decimalList" />
+		<property name="add" ref="decimal1" />
+		<property name="afterBeanNames">
+			<list>
+				<value>decimal0</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- add before bean -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="decimalList" />
+		<property name="add" ref="decimal2" />
+		<property name="beforeBeanNames">
+			<list>
+				<value>decimal3</value>
+			</list>
+		</property>
+	</bean>
+
+	<!--  add between -->
+	<bean depends-on="mergeFieldTestBean" parent="listMergeDirective">
+		<property name="listPropertyDescriptor" value="decimalList" />
+		<property name="add" ref="decimal5" />
+		<property name="beforeBeanNames">
+			<list>
+				<value>decimal3</value>
+			</list>
+		</property>
+		<property name="afterBeanNames">
+			<list>
+				<value>decimal0</value>
+			</list>
+		</property>
+	</bean>
+</beans>

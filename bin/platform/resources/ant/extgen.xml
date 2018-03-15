@@ -1,0 +1,323 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="extgenmacros">
+
+	<macrodef name="extgen_init">
+		<attribute name="input.name" />
+		<attribute name="input.package" />
+		<attribute name="input.template" />
+		<sequential>
+
+			<!-- Overwrite properties changed by input dialog -->
+			<var name="extgen.extension.name" value="@{input.name}" />
+			<var name="extgen.extension.package" value="@{input.package}" />
+			<var name="extgen.directory.source" value="${ext.@{input.template}.path}" />
+
+			<echo message="Using extension template source: ${extgen.directory.source}" />
+
+			<!-- check input parameters -->
+			<condition property="legal-extensionname">
+				<matches pattern="^[A-Za-z]+[A-Za-z0-9]*$" string="${extgen.extension.name}" />
+			</condition>
+			<fail message="There are not allowed characters in the extension name '${extgen.extension.name}'." unless="legal-extensionname" />
+
+			<!-- check if new name contains template name -->
+			<condition property="template-name-in-extension-name">
+				<contains casesensitive="no" string="@{input.name}" substring="@{input.template}" />
+			</condition>
+			<fail message="The extension name '@{input.name}' contains the template name '@{input.template}' which would result in recursive replacements." if="template-name-in-extension-name" />
+
+
+			<condition property="legal-extensionsource">
+				<available file="${extgen.directory.source}" />
+			</condition>
+			<fail message="Source directory '${extgen.directory.source}' for template '@{input.name}' does not exist." unless="legal-extensionsource" />
+
+			<!-- default extension target -->
+			<property name="extension.directory.target" value="${extgen.extension.path}/${extgen.extension.name}" />
+
+			<!-- default extension classprefix -->
+			<property name="extension.abstractclassprefix" value="Generated" />
+
+			<!-- default package (if not set in properties file) -->
+			<property name="extgen.extension.package" value="de.hybris.platform.${extgen.extension.name}" />
+			<property name="extgen.package" value="${extgen.extension.package}" />
+			<propertyregex property="extgen.package.directory" input="${extgen.package}" regexp="\." replace="/" global="true" defaultValue="${extgen.package}" />
+
+			<!-- default source directory (if not set in properties file) -->
+			<property name="extgen.directory.source" value="templates/yempty" />
+
+			<!-- default classprefix (if not set in properties file) -->
+			<property name="extension.classprefix" value="${extgen.extension.name}" />
+			<yfirstletteruppercase property="extension.classprefix" />
+
+			<!-- default manager name (if not set in properties file) -->
+			<property name="extension.managername" value="${extension.classprefix}Manager" />
+			<yfirstletteruppercase property="extension.managername" />
+
+			<!-- default manager superclass (if not set in properties file) -->
+			<property name="extension.managersuperclass" value="de.hybris.platform.jalo.extension.Extension" />
+
+			<propertyregex property="extension.managersuperclassname" input="${extension.managersuperclass}" regexp="^.*\.([^\.]*)$$" replace="\1" global="false" override="true" />
+
+			<!-- manager superclass impl/ejbimpl/ejb/home/remote -->
+			<property name="extension.managersuperclassimpl" value="${extension.managersuperclass}.${extension.managersuperclassname}Impl" />
+			<propertyregex property="extension.managersuperclassejbimpl" input="${extension.managersuperclass}" regexp="^(.*\.)jalo(\..*)$$" replace="\1jaloimpl\2EJBImpl" global="false" override="true" />
+			<propertyregex property="extension.managersuperclassejb" input="${extension.managersuperclass}" regexp="^(.*\.)jalo(\..*)$$" replace="\1session\2EJB" global="false" override="true" />
+			<propertyregex property="extension.managersuperclasshome" input="${extension.managersuperclass}" regexp="^(.*\.)jalo(\..*)$$" replace="\1session\2Home" global="false" override="true" />
+			<propertyregex property="extension.managersuperclassremote" input="${extension.managersuperclass}" regexp="^(.*\.)jalo(\..*)$$" replace="\1session\2Remote" global="false" override="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="clean_extgen_temp" description="clean up all temporarily used folders and files">
+		<sequential>
+			<delete dir="${extgen.directory.tmp}_final" quiet="true" />
+			<delete dir="${extgen.directory.tmp}" quiet="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare_extgen_temp">
+		<sequential>
+			<mkdir dir="${extgen.directory.tmp}" />
+			<echo message="Copying template files from ${extgen.directory.source} to ${extgen.directory.tmp}" />
+			<copy todir="${extgen.directory.tmp}">
+				<fileset dir="${extgen.directory.source}">
+					<include name="**/*" />
+				</fileset>
+			</copy>
+
+			<!-- in generated extension, disable jspcompile as default value -->
+			<replaceregexp file="${extgen.directory.tmp}/extensioninfo.xml" match='jspcompile="true"' replace='jspcompile="false"' byline="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="filter_extgen_files">
+		<attribute name="include.empty.dirs"/>
+		<sequential>
+			<if>
+				<not>
+					<available file="${extgen.directory.source}/extgen.properties" />
+				</not>
+				<then>
+					<fail message="extgen.properties in source extension not found! this is not a template!" />
+				</then>
+			</if>
+			<property file="${extgen.directory.source}/extgen.properties" />
+
+			<property name="YEXTNAME_TOKEN" value="YEXTNAME" />
+			<property name="YPACKAGE_TOKEN" value="YPACKAGE" />
+			<property name="YCLASSPREFIX_TOKEN" value="YCLASSPREFIX" />
+			<property name="YMANAGER_TOKEN" value="YMANAGER" />
+			<property name="YGENERATED_TOKEN" value="YGENERATED" />
+
+			<propertyregex property="platformhome_slash" input="${platformhome}" regexp="\\" replace="/" global="true" defaultValue="${platformhome}" />
+
+			<echo message="Replacing tokens in template files: ${extgen.directory.tmp}" level="debug" />
+			<replace dir="${extgen.directory.tmp}" excludes="**/*.class,**/*.jar">
+				<replacefilter token="@EXTGEN_VERSION@" value="${extgen.version}" />
+				<replacefilter token="@PLATFORM_HOME@" value="${platformhome_slash}" />
+
+				<replacefilter token="${YPACKAGE_TOKEN}DIR" value="${extgen.package.directory}" />
+				<replacefilter token="${YPACKAGE_TOKEN}" value="${extgen.package}" />
+				<replacefilter token="${YGENERATED_TOKEN}" value="${extension.abstractclassprefix}" />
+				<replacefilter token="${YCLASSPREFIX_TOKEN}" value="${extension.classprefix}" />
+
+				<replacefilter token="YMANAGEREJBIMPLSUPERCLASS" value="${extension.managersuperclassejbimpl}" />
+				<replacefilter token="YMANAGERIMPLSUPERCLASS" value="${extension.managersuperclassimpl}" />
+				<replacefilter token="YMANAGEREJBSUPERCLASS" value="${extension.managersuperclassejb}" />
+				<replacefilter token="YMANAGERHOMESUPERCLASS" value="${extension.managersuperclasshome}" />
+				<replacefilter token="YMANAGEREREMOTEUPERCLASS" value="${extension.managersuperclassremote}" />
+				<replacefilter token="YMANAGERSUPERCLASS" value="${extension.managersuperclass}" />
+
+				<replacefilter token="${YMANAGER_TOKEN}" value="${extension.managername}" />
+				<replacefilter token="${YEXTNAME_TOKEN}" value="${extgen.extension.name}" />
+			</replace>
+
+			<!-- 
+				replace the extension manager superclass additionally in extensioninfo.xml 
+			-->
+			<replaceregexp file="${extgen.directory.tmp}/extensioninfo.xml" match="(webroot=)&quot;.*&quot;" replace="\1&quot;/${extgen.extension.name}&quot;" />
+
+			<echo message="Moving and renaming template files to: ${extgen.directory.tmp}_final" level="debug" />
+			<copy todir="${extgen.directory.tmp}_final" includeemptydirs="@{include.empty.dirs}">
+				<fileset dir="${extgen.directory.tmp}">
+					<include name="**/*" />
+				</fileset>
+				<chainedmapper>
+					<filtermapper>
+						<replaceregex pattern="${YPACKAGE_TOKEN}DIR" replace="${extgen.package.directory}" flags="g" />
+					</filtermapper>
+					<filtermapper>
+						<replaceregex pattern="${YPACKAGE_TOKEN}" replace="${extgen.package.directory}" flags="g" />
+					</filtermapper>
+					<filtermapper>
+						<replaceregex pattern="${YGENERATED_TOKEN}" replace="${extension.abstractclassprefix}" flags="g" />
+					</filtermapper>
+					<filtermapper>
+						<replaceregex pattern="${YCLASSPREFIX_TOKEN}" replace="${extension.classprefix}" flags="g" />
+					</filtermapper>
+					<filtermapper>
+						<replaceregex pattern="${YMANAGER_TOKEN}" replace="${extension.managername}" flags="g" />
+					</filtermapper>
+					<filtermapper>
+						<replaceregex pattern="${YEXTNAME_TOKEN}" replace="${extgen.extension.name}" flags="g" />
+					</filtermapper>
+				</chainedmapper>
+			</copy>
+			<copy todir="${extgen.directory.tmp}_final">
+				<fileset dir="${extgen.directory.tmp}">
+					<include name="web/src" />
+				</fileset>
+			</copy>
+
+			<!-- Copy accelerator addon webroot folder -->
+			<copy todir="${extgen.directory.tmp}_final">
+				<fileset dir="${extgen.directory.tmp}">
+					<include name="acceleratoraddon/webroot/**" />
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extgen_copy_extension">
+		<sequential>
+			<if>
+				<available file="${extension.directory.target}" />
+				<then>
+					<fail message="Directory ${extension.directory.target} already exists." />
+				</then>
+				<else>
+					<mkdir dir="${extension.directory.target}/lib" />
+					<if>
+						<isreference refid="extgen.${input.template}.pattern" />
+						<then>
+							<echo message="Using ${input.template} pattern to copy template..." />
+							<copy todir="${extension.directory.target}/">
+								<fileset dir="${extgen.directory.tmp}_final">
+									<patternset refid="extgen.${input.template}.pattern" />
+								</fileset>
+							</copy>
+						</then>
+						<else>
+							<copy todir="${extension.directory.target}/">
+								<fileset dir="${extgen.directory.tmp}_final">
+									<patternset refid="extgen.defaultpattern" />
+								</fileset>
+							</copy>
+						</else>
+					</if>
+				</else>
+			</if>
+
+			<!-- delete extgen macros in buildcallbacks.xml -->
+			<if>
+				<available file="${extension.directory.target}/buildcallbacks.xml" />
+				<then>
+					<xmltask source="${extension.directory.target}/buildcallbacks.xml" dest="${extension.directory.target}/buildcallbacks.xml">
+						<remove path="//*[@name='${extgen.extension.name}_before_extgen']" />
+						<remove path="//*[@name='${extgen.extension.name}_after_extgen']" />
+					</xmltask>
+				</then>
+			</if>
+
+			<!-- delete template marker in extensioninfo.xml -->
+			<xmltask source="${extension.directory.target}/extensioninfo.xml" dest="${extension.directory.target}/extensioninfo.xml">
+				<remove path="//*[@key='extgen-template-extension']" />
+			</xmltask>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="extgen_generate" description="generates the new extension">
+		<sequential>
+			<!-- remove all trailing white spaces in the specified files -->
+			<replaceregexp match="[ \t]+$" replace="" flags="g" byline="true">
+				<fileset dir=".">
+					<include name="${platformhome}/extgen/project.properties" />
+					<include name="${platformhome}/extgen/local.properties" />
+				</fileset>
+			</replaceregexp>
+
+			<property file="${platformhome}/extgen/local.properties" />
+			<property file="${platformhome}/extgen/project.properties" />
+
+			<!-- *************************
+				Add here new templates
+			************************** -->
+			<getextensionsformeta metakey="extgen-template-extension" metavalue="true" resultproperty="default.templates" />
+
+			<property name="extgen.version" value="${build.version}" />
+			<property name="extgen.directory.tmp" value="${temp.dir}/extgen" />
+			
+			<if>
+				<isset property="ext.${extgen.template.default}.path"/>
+				<then>
+					<property name="template" value="${extgen.template.default}"/>
+				</then>
+				<else>
+				  	<propertyregex property="template"
+									input="${default.templates}"
+									regexp="(.*?),"
+									select="\1"
+									casesensitive="false"
+				  					override="true"
+									defaultValue="${default.templates}"/>				
+				</else>
+			</if>
+									
+			<input validargs="${default.templates}" defaultvalue="${template}" addproperty="input.template">
+Please choose a template for generation.
+Press [Enter] to use the default value</input>
+
+			<input defaultvalue="${extgen.extension.name}" addproperty="input.name">
+Please choose the name of your extension. It has to start with a letter followed by letters and/or numbers.
+Press [Enter] to use the default value</input>
+
+			<input defaultvalue="${extgen.extension.package}" addproperty="input.package">
+Please choose the package name of your extension. It has to fulfill java package name convention.
+Press [Enter] to use the default value</input>
+
+
+			<callback target="before_extgen" extname="${input.template}" />
+
+			<condition property="include.empty.dirs">
+				<equals arg1="ycoreplus" arg2="${input.template}" />
+			</condition>
+
+			<extgen_init input.name="${input.name}" input.package="${input.package}" input.template="${input.template}" />
+			<clean_extgen_temp />
+			<prepare_extgen_temp />
+			<filter_extgen_files include.empty.dirs="${include.empty.dirs}"/>
+			<extgen_copy_extension />
+
+			<callback target="after_extgen" extname="${input.template}" />
+
+			<echo>
+	
+	Next steps:
+	
+1) Add your extension to your ${HYBRIS_CONFIG_DIR}/localextensions.xml
+	
+     &lt;extension dir="${extgen.extension.path}/${extgen.extension.name}"/&gt;
+				
+2) Please remove all template extensions (again) before you proceed.
+	
+3) Make sure the applicationserver is stopped before you build the extension the first time.
+	
+4) Perform 'ant' in your hybris/platform directory.
+
+5) Restart the applicationserver
+		
+			</echo>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<wizard-config showPrefilledValues="true" selectMode="true" createMode="true" displaySubtypes="true">
+	<displayed-properties>
+		<property qualifier="CMSLinkComponent.linkName" />
+		<property qualifier="CMSLinkComponent.contentPage">
+			<parameter name="predefinedValuesStrategy" value="cmsItemPredefinedValuesStrategy"/>
+			<parameter name="allowCreate" value="false" />
+		</property>
+		<property qualifier="CMSLinkComponent.product">
+			<parameter name="allowCreate" value="false" />
+		</property>
+		<property qualifier="CMSLinkComponent.category">
+			<parameter name="allowCreate" value="false" />
+		</property>
+		<property qualifier="CMSLinkComponent.external" visible="false">
+			<parameter name="defaultValue" value="false"/>
+		</property>
+	</displayed-properties>
+</wizard-config>

@@ -1,0 +1,2 @@
+All logs are written to the configured hybris log directory.
+See platform/env.properties for the used log file settings.

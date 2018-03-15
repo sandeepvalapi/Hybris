@@ -1,0 +1,49 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+
+######### Item Cleanup CronJobs START #########
+INSERT_UPDATE FlexibleSearchRetentionRule;code[unique=true];searchQuery;actionReference;retentionTimeSeconds
+# Find all deactivated not processed customers owning orders and past retention date (2 days) without retention state. Remove related objects of the found customers and set the their retention state to 'PROCESSED'.
+;customersWithOrdersFSRetentionRule;SELECT DISTINCT {c.pk}, {c.itemtype} FROM {Customer AS c JOIN Order AS o on {c.pk} = {o.user}} WHERE {c.deactivationDate} < ?CALC_RETIREMENT_TIME and {c.retentionState} IS NULL;customerCleanupRelatedObjectsAction;172800
+# Find and remove all deactivated customers not owning any order currently and the current date has past deactivation date+retention date (2 days).
+;customersWithoutOrdersFSRetentionRule;SELECT DISTINCT {c:PK}, {c.itemtype} FROM {Customer AS c} WHERE {c:PK} NOT IN ({{SELECT {c1.pk} FROM {Customer AS c1 JOIN Order AS o on {c1.pk} = {o.user}} WHERE {c1.deactivationDate} < ?CALC_RETIREMENT_TIME }}) AND {c.deactivationDate} < ?CALC_RETIREMENT_TIME;customerNotOwningOrdersRemoveCleanupAction;172800
+# Find and remove all expired orders (10 years)
+;ordersFSRetentionRule;SELECT DISTINCT {pk}, {itemtype} FROM {Order} WHERE {expirationTime} < ?CALC_RETIREMENT_TIME;orderRemoveCleanupAction;315576000
+# Find and remove all expired tickets (1 year from retentionDate) which customers have been processed.
+;ticketsFSRetentionRule;SELECT DISTINCT {t.pk}, {t.itemtype} FROM {CsTicket as t} WHERE {t.retentionDate} < ?CALC_RETIREMENT_TIME;csTicketRemoveCleanupAction;31557600
+# Find and close all non-closed tickets which weren't updated for some period (90 days)
+;ticketsFSStagnationRule;SELECT DISTINCT {t.pk}, {t.itemtype},{t.state} FROM {CsTicket as t} where {t.modifiedtime} < ?CALC_RETIREMENT_TIME AND {t.state} IN ({{SELECT {s.pk} FROM {CsTicketState as s} WHERE {s.code} IN ('New', 'Open')}});csTicketStagnationAction;7776000
+
+# FS JOB
+INSERT_UPDATE RetentionJob;code[unique=true];retentionRule(code);batchSize[default=100]
+;customersWithOrdersRetentionJob;customersWithOrdersFSRetentionRule;
+;customersWithoutOrdersRetentionJob;customersWithoutOrdersFSRetentionRule;
+;ordersRetentionJob;ordersFSRetentionRule;
+;ticketsRetentionJob;ticketsFSRetentionRule;
+;ticketsFSStagnationJob;ticketsFSStagnationRule;
+
+# FS CRON JOB
+INSERT_UPDATE CronJob;code[unique=true];job(code);sessionLanguage(isoCode)[default=en]
+;customersWithOrdersRetentionCronJob;customersWithOrdersRetentionJob;
+;customersWithoutOrdersRetentionCronJob;customersWithoutOrdersRetentionJob;
+;ordersRetentionCronJob;ordersRetentionJob;
+;ticketsRetentionCronJob;ticketsRetentionJob;
+;ticketsStagnationJob;ticketsFSStagnationJob;
+
+# Run CronJobs at 3:05 AM every day
+INSERT_UPDATE Trigger;cronJob(code)[unique=true];second[default=0];minute[default=5];hour[default=3];day[default=-1];month[default=-1];year[default=-1];relative[default=false];active[default=false];maxAcceptableDelay[default=-1]
+;customersWithOrdersRetentionCronJob;
+;customersWithoutOrdersRetentionCronJob;
+;ordersRetentionCronJob;
+;ticketsRetentionCronJob;
+# Run the CloseStagnantServiceTicketsJob at 12:05 AM every day
+;ticketsStagnationJob;;;12;0;;;;true;

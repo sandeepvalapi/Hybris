@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<ruleset name="rsneu" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+			<description>PMD Plugin preferences rule set</description>
+
+			<exclude-pattern>.*/Generated/.*</exclude-pattern>
+			<exclude-pattern>.*/gensrc/.*</exclude-pattern>
+			<exclude-pattern>.*/jsp/.*</exclude-pattern>
+			<exclude-pattern>.*_jsp.java</exclude-pattern>
+			<exclude-pattern>.*/de/hybris/platform/cockpit/services/config/jaxb/.*</exclude-pattern>
+			<exclude-pattern>.*/virtualjdbc/.*</exclude-pattern>
+			<exclude-pattern>.*/jax-doclets/.*</exclude-pattern>
+
+			<!-- ============================================================================================================ -->
+			<!-- ===================== hybris ruleset ======================================================================== -->
+			<!-- ============================================================================================================ -->
+	<rule name="AnnotationIgnoreMustNotBeEmptyRule" message="add to the @ignore a jira issue" class="de.hybris.bootstrap.pmd.rules.AnnotationIgnoreMustNotBeEmptyRule">
+		<description>
+An @ignore annotation is only valid if it links to a jira issue where the reason for the ignore is described.			
+		</description>
+		<priority>2</priority>
+	</rule>
+
+
+
+</ruleset>

@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testclasses><commons><testclass>de.hybris.platform.commons.test.jalo.CommonsTest</testclass><testclass>de.hybris.platform.commons.test.jalo.TransformTest</testclass><testclass>de.hybris.platform.commons.jalo.FOPFormatterTest</testclass><testclass>de.hybris.platform.commons.jalo.VelocityFormatterTest</testclass></commons></testclasses>

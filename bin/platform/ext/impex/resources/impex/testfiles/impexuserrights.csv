@@ -1,0 +1,7 @@
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;impexgroup;customergroup;;;;;;;
+;;;;Product;+;+;+;+;-
+Customer;impex-demo;impexgroup;1234;;;;;;
+
+$END_USERRIGHTS;;;;;;;;;

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<atomictypes/>
+	<collectiontypes>	
+		<collectiontype code="StandardPaymentModeValueCollection" elementtype="StandardPaymentModeValue" autocreate="true" generate="false"/>
+	</collectiontypes>	
+	
+	<enumtypes/>	
+	
+	<maptypes/>
+
+	<relations>
+		<relation code="StdModeValuesRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement type="StandardPaymentMode" qualifier="paymentMode" cardinality="one">
+				<modifiers read="true" write="false" search="true" optional="false" removable="false" initial="true"/>
+			</sourceElement>
+			<targetElement type="StandardPaymentModeValue" qualifier="paymentModeValues" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" initial="false" partof="true"/>
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+	
+		<itemtype code="StandardPaymentModeValue"
+					extends="GenericItem"
+					jaloclass="de.hybris.platform.paymentstandard.jalo.StandardPaymentModeValue"
+					autocreate="true"
+					generate="true">
+            <deployment table="StdPaymModeVals" typecode="1022"/>
+			<attributes>
+				<attribute qualifier="currency" type="Currency" autocreate="true" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true"/>
+				</attribute>
+				<attribute qualifier="value" type="java.lang.Double" autocreate="true" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+
+		<itemtype code="StandardPaymentMode"
+					extends="PaymentMode"
+					jaloclass="de.hybris.platform.paymentstandard.jalo.StandardPaymentMode"
+					autocreate="true"
+					generate="true">
+			<attributes>
+				<attribute qualifier="net" type="java.lang.Boolean" autocreate="true" >
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false" removable="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+
+</items>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+
+	<alias name="defaultMimeService" alias="mimeService" />
+	<bean id="defaultMimeService" class="de.hybris.platform.media.services.impl.DefaultMimeService" />
+
+	<alias name="defaultMediaLocationHashService" alias="mediaLocationHashService" />
+	<bean id="defaultMediaLocationHashService" class="de.hybris.platform.media.services.impl.DefaultMediaLocationHashService">
+		<property name="salt" value="123456789" />
+	</bean>
+
+	<alias name="defaultMediaStorageConfig" alias="mediaStorageConfig" />
+	<bean id="defaultMediaStorageConfig" class="de.hybris.platform.media.storage.impl.TestMediaStorageConfig" />
+
+	<bean id="localFileMediaStorageStrategy" class="de.hybris.platform.media.storage.impl.LocalFileMediaStorageStrategy">
+		<property name="locationHashService" ref="mediaLocationHashService" />
+		<property name="storageConfig" ref="mediaStorageConfig" />
+		<property name="mimeService" ref="mimeService" />
+		<property name="mainDataDir" value="#{systemProperties['java.io.tmpdir']}/hybrisMediaStorageTest" />
+		<property name="replicationDirs">
+			<list>
+				<value>#{systemProperties['java.io.tmpdir']}/hybrisMediaStorageTest</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="localFileMediaStorageCleaner" class="de.hybris.platform.media.storage.impl.LocalFileMediaStorageCleaner">
+		<property name="replicationDirs">
+			<list>
+				<value>#{systemProperties['java.io.tmpdir']}/hybrisMediaStorageTest</value>
+			</list>
+		</property>
+    </bean>
+
+</beans>               

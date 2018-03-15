@@ -1,0 +1,103 @@
+	.configEntry {
+	width: 330px;
+}
+
+/*--- former config.jsp styles ---*/
+.configKey,.configValue {
+	padding: 3px;
+	width: 280px;
+	border-radius: 5px;
+	float: left;
+}
+
+.spaceTop {
+	margin-top: 100px;
+}
+
+.addInput {
+	padding: 3px;
+	width: 280px;
+	border-radius: 5px;
+}
+
+#addButton {
+	float: right;
+}
+
+#props {
+	width: 100% !important;
+}
+
+#props > td {
+	width: 50%;
+}
+
+#props td {
+	font-size: 11px;
+	padding: 4px 10px 4px 5px;
+}
+
+#props th {
+	padding: 4px 10px 4px 5px;
+}
+
+.truncate {
+	width: 300px;
+}
+
+.addConfigIcon {
+	-webkit-transition: opacity 0.75s ease-out;
+	-moz-transition: opacity 0.75s ease-out;
+	width: 20px;
+	height: 20px;
+	float: right;
+	opacity: 0.25;
+	float: right;
+	margin-top: 8px;
+}
+
+.addConfigIcon:hover {
+	cursor: pointer;
+	opacity: 1;
+}
+
+.clearAllProperties {
+	background: #FFF;
+	border: none;
+	color: #000;
+	display: block;
+	font: normal;
+	height: auto;
+	letter-spacing: normal;
+	line-height: normal;
+	margin: 0;
+	padding: 0;
+	text-transform: normal;
+	visibility: visible;
+	width: auto;
+	word-spacing: normal;
+	z-index: auto;
+}
+
+#addKeyTD {
+	background-image: -webkit-linear-gradient(#, #9FBFD2 100%); 
+	background-image: -moz-linear-gradient(white 0%, #9FBFD2 100%); 
+	background-image: -o-linear-gradient(white 0%, #9FBFD2 100%); 
+	background-image: linear-gradient(white 0%, #9FBFD2 100%);
+}
+
+.applyIconHighOpac {
+	-webkit-transition: opacity 0.75s ease-out;
+	-moz-transition: opacity 0.75s ease-out;
+	width: 20px;
+	height: 20px;
+	float: right;
+	opacity: 1;
+	float: right;
+	margin-top: 8px;
+}
+
+.applyIconHighOpac:hover {
+	cursor: pointer;
+	opacity: 1;
+}

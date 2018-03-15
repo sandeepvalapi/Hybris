@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+
+	<collectiontypes>
+		<collectiontype code="AbstractAdvancedSavedQuerySearchParameterCollection" elementtype="AbstractAdvancedSavedQuerySearchParameter" autocreate="true" generate="true" />
+		<collectiontype code="WherePartCollection" elementtype="WherePart" autocreate="true" generate="true" />
+	</collectiontypes>
+	
+	<enumtypes>
+		<enumtype code="EmptyParamEnum" autocreate="true" generate="true">
+			<value code="ignore"/>
+			<value code="trimAndIgnore"/>
+			<!-- 
+			<value code="trimAndNull"/>	
+			<value code="trimAndNotNull" />		
+			 -->
+			<value code="asitis" />		
+		</enumtype>
+		<enumtype code="AdvancedQueryComparatorEnum" autocreate="true" generate="true">
+			<value code="equals"/>
+			<value code="contains"/>
+			<value code="gt"/>
+			<value code="gtandequals"/>	
+			<value code="lt" />
+			<value code="ltandequals"/>
+			<value code="startwidth" />
+		</enumtype>
+	</enumtypes>
+	
+	<relations>
+		<relation code="Query2WherePartRelation" generate="true" localized="false" autocreate="true">
+			<sourceElement type="AdvancedSavedQuery" qualifier="savedQuery" cardinality="one">
+				<modifiers read="true" write="true"	optional="false" />
+			</sourceElement>
+			<targetElement type="WherePart" qualifier="whereparts" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="WherePart2SearchParameterRelation" generate="true" localized="false" autocreate="true">
+			<sourceElement type="WherePart" qualifier="wherePart" cardinality="one">
+				<modifiers read="true" write="true"	optional="false" />
+			</sourceElement>
+			<targetElement type="AbstractAdvancedSavedQuerySearchParameter" qualifier="dynamicParams" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+	</relations>
+	
+	<itemtypes>
+		<itemtype code="AdvancedSavedQuery" extends="SavedQuery"
+			jaloclass="de.hybris.platform.advancedsavedquery.jalo.AdvancedSavedQuery"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute autocreate="true" qualifier="params"
+					type="ParamTypeMap" redeclare="true">
+					<modifiers read="true" write="false" search="false"
+						removable="false" optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<!-- Replaced by Query2WherePartRelation
+				<attribute autocreate="true" qualifier="whereparts" type="WherePartCollection">
+					<modifiers read="true" write="true" search="false" optional="true" partof="true" />
+					<persistence type="jalo" />
+				</attribute>
+				-->
+				<attribute type="java.lang.String"
+					qualifier="generatedFlexibleSearch">
+					<modifiers read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="WherePart" autocreate="true" generate="true"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.advancedsavedquery.jalo.WherePart">
+			<deployment table="WhereParts" typecode="1300"/>
+			<attributes>
+				<!-- Replaced by Query2WherePartRelation 
+				<attribute type="AdvancedSavedQuery"
+					qualifier="savedQuery">
+					<modifiers read="true" write="true"	optional="false" />
+					<persistence type="property" />
+				</attribute>
+				-->
+				<attribute type="java.lang.Boolean" qualifier="and">
+					<modifiers read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute type="java.lang.String"
+					qualifier="replacePattern">
+					<modifiers read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<!-- Replaced by WherePart2SearchParameterRelation
+				<attribute autocreate="true" qualifier="dynamicParams" type="AbstractAdvancedSavedQuerySearchParameterCollection">
+					<modifiers read="true" write="true" search="false" optional="true" partof="true" />
+					<persistence type="jalo" />
+				</attribute>
+				-->
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractAdvancedSavedQuerySearchParameter"
+			autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.advancedsavedquery.jalo.AbstractAdvancedSavedQuerySearchParameter"
+			extends="GenericItem" abstract="true">
+			<attributes>
+				<!-- Replaced by WherePart2SearchParameterRelation
+				<attribute type="WherePart" qualifier="wherePart">
+					<modifiers read="true" write="true"	optional="false" />
+					<persistence type="property" />
+				</attribute>
+				-->
+				<attribute type="AdvancedQueryComparatorEnum"
+					qualifier="comparator">
+					<modifiers read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<defaultvalue>
+						em().getEnumerationValue("AdvancedQueryComparatorEnum","equals")
+					</defaultvalue>
+				</attribute>
+				<attribute type="EmptyParamEnum"
+					qualifier="emptyHandling">
+					<modifiers read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<defaultvalue>
+						em().getEnumerationValue("EmptyParamEnum","asitis")
+					</defaultvalue>
+				</attribute>
+				<attribute type="Type" qualifier="valueType">
+					<modifiers read="true" write="true" />
+					<persistence type="property" />
+
+				</attribute>
+				<attribute type="java.lang.String"
+					qualifier="searchParameterName">
+					<modifiers read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String"
+					qualifier="joinAlias">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="localized:java.lang.String"
+					qualifier="name">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Boolean"	qualifier="lower">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="TypedAdvancedSavedQuerySearchParameter"
+			autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.advancedsavedquery.jalo.TypedAdvancedSavedQuerySearchParameter"
+			extends="AbstractAdvancedSavedQuerySearchParameter">
+			<attributes>
+				<attribute type="java.lang.String"
+					qualifier="searchParameterName" redeclare="true">
+					<modifiers read="true" write="false"
+						optional="true" />
+				</attribute>
+				<attribute type="AttributeDescriptor"
+					qualifier="typedSearchParameter" isSelectionOf="typeAttributes">
+					<modifiers read="true" write="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="attributeSet"
+					qualifier="typeAttributes">
+					<modifiers read="true" write="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute type="Type" qualifier="valueType"
+					redeclare="true">
+					<modifiers read="true" write="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute type="ComposedType"
+					qualifier="enclosingType">
+					<modifiers read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SimpleAdvancedSavedQuerySearchParameter"
+			autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.advancedsavedquery.jalo.SimpleAdvancedSavedQuerySearchParameter"
+			extends="AbstractAdvancedSavedQuerySearchParameter" />
+
+		<itemtype code="ComposedTypeAdvancedSavedQuerySearchParameter"
+			autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.advancedsavedquery.jalo.ComposedTypeAdvancedSavedQuerySearchParameter"
+			extends="TypedAdvancedSavedQuerySearchParameter">
+			<attributes>
+
+				<attribute type="ComposedType" qualifier="enclosingType"
+					redeclare="true">
+					<modifiers read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>
