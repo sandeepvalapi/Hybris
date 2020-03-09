@@ -9,7 +9,7 @@
   "dependencies": {
     "enquire" : "2.1.2",
     "Imager" : "",
-    "jquery" : "3.2.1",
+    "jquery" : "3.4.1",
     "jquery-ui" : "1.12.1",
     "jquery.blockUI" : "2.66",
     "jquery.colorbox" : "1.5.14",
