@@ -5,6 +5,7 @@
 <%@ taglib prefix="cms" uri="http://hybris.com/tld/cmstags"%>
 <%@ taglib prefix="cart" tagdir="/WEB-INF/tags/responsive/cart" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
@@ -15,13 +16,16 @@
 
 	<div class="cart-top-bar">
         <div class="text-right">
-            <a href="" class="help js-cart-help" data-help="<spring:theme code="text.help" />"><spring:theme code="text.help" />
+            <spring:theme var="textHelpHtml" code="text.help" />
+            <a href="" class="help js-cart-help" data-help="${fn:escapeXml(textHelpHtml)}">${textHelpHtml}
                 <span class="glyphicon glyphicon-info-sign"></span>
             </a>
             <div class="help-popup-content-holder js-help-popup-content">
                 <div class="help-popup-content">
                     <strong>${fn:escapeXml(cartData.code)}</strong>
-                    <spring:theme code="basket.page.cartHelpContent" htmlEscape="false" />
+                    <spring:theme var="cartHelpContentVar" code="basket.page.cartHelpContent" htmlEscape="false" />
+                    <c:set var="cartHelpContentVarSanitized" value="${ycommerce:sanitizeHTML(cartHelpContentVar)}" />
+                    <div>${cartHelpContentVarSanitized}</div>
                 </div>
             </div>
 		</div>

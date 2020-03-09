@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages;
 
@@ -30,11 +23,13 @@ import de.hybris.platform.acceleratorstorefrontcommons.forms.validation.Password
 import de.hybris.platform.acceleratorstorefrontcommons.forms.validation.ProfileValidator;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.verification.AddressVerificationResultHandler;
 import de.hybris.platform.acceleratorstorefrontcommons.util.AddressDataUtil;
+import de.hybris.platform.cms2.data.PagePreviewCriteriaData;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
 import de.hybris.platform.cms2.model.pages.AbstractPageModel;
 import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.cms2.model.pages.PageTemplateModel;
 import de.hybris.platform.cms2.servicelayer.services.CMSPageService;
+import de.hybris.platform.cms2.servicelayer.services.CMSPreviewService;
 import de.hybris.platform.commercefacades.address.AddressVerificationFacade;
 import de.hybris.platform.commercefacades.address.data.AddressVerificationResult;
 import de.hybris.platform.commercefacades.customer.CustomerFacade;
@@ -53,6 +48,7 @@ import de.hybris.platform.commercefacades.user.data.TitleData;
 import de.hybris.platform.commercefacades.user.exceptions.PasswordMismatchException;
 import de.hybris.platform.commerceservices.address.AddressVerificationDecision;
 import de.hybris.platform.commerceservices.customer.DuplicateUidException;
+import de.hybris.platform.commerceservices.enums.CountryType;
 import de.hybris.platform.commerceservices.search.pagedata.PageableData;
 import de.hybris.platform.commerceservices.search.pagedata.PaginationData;
 import de.hybris.platform.commerceservices.search.pagedata.SearchPageData;
@@ -172,19 +168,23 @@ public class AccountPageControllerTest
 	@Mock
 	private AddressVerificationResultHandler addressVerificationResultHandler;
 	@Mock
-	private PasswordValidator passwordValidator; //NOPMD
+	private PasswordValidator passwordValidator;
 	@Mock
-	private EmailValidator emailValidator; //NOPMD
+	private EmailValidator emailValidator;
 	@Mock
-	private AddressValidator addressValidator; //NOPMD
+	private AddressValidator addressValidator;
 	@Mock
-	private ProfileValidator profileValidator; //NOPMD
+	private ProfileValidator profileValidator;
 	@Mock
-	private SiteConfigService siteConfigService; //NOPMD
+	private SiteConfigService siteConfigService;
+	@Mock
+	private CMSPreviewService cmsPreviewService;
 
 	private List breadcrumbsList;
 
 	private SearchPageData<OrderHistoryData> searchList;
+
+	private final PagePreviewCriteriaData pagePreviewCriteriaData = new PagePreviewCriteriaData();
 
 	@InjectMocks
 	private final AddressDataUtil addressConverter = Mockito.spy(new AddressDataUtil());
@@ -197,16 +197,17 @@ public class AccountPageControllerTest
 		final List breadcrumbsList = new ArrayList();
 		breadcrumbsList.add(breadcrumb);
 
-
+		BDDMockito.given(cmsPreviewService.getPagePreviewCriteria()).willReturn(pagePreviewCriteriaData);
 		BDDMockito.given(accountBreadcrumbBuilder.getBreadcrumbs(Mockito.anyString())).willReturn(breadcrumbsList);
-		BDDMockito.given(cmsPageService.getPageForLabelOrId(Mockito.anyString())).willReturn(contentPageModel);
+		BDDMockito.given(cmsPageService.getPageForLabelOrId(Mockito.anyString(), Mockito.anyObject()))
+				.willReturn(contentPageModel);
 		BDDMockito.given(pageTitleResolver.resolveContentPageTitle(Mockito.anyString())).willReturn(TITLE_FOR_PAGE);
 		BDDMockito.given(Boolean.valueOf(page.containsAttribute(CMS_PAGE_MODEL))).willReturn(Boolean.TRUE);
 		BDDMockito.given(page.asMap().get(CMS_PAGE_MODEL)).willReturn(abstractPageModel);
 		BDDMockito.given(abstractPageModel.getMasterTemplate()).willReturn(pageTemplateModel);
 		BDDMockito.given(cmsPageService.getFrontendTemplateName(pageTemplateModel)).willReturn(VIEW_FOR_PAGE);
 
-		BDDMockito.given(checkoutFacade.getDeliveryCountries()).willReturn(Collections.singletonList(countryData));
+		BDDMockito.given(checkoutFacade.getCountries(CountryType.SHIPPING)).willReturn(Collections.singletonList(countryData));
 		BDDMockito.given(userFacade.getTitles()).willReturn(Collections.singletonList(titleData));
 
 		BDDMockito.given(customerData.getFirstName()).willReturn(FIRST_NAME);
@@ -356,7 +357,7 @@ public class AccountPageControllerTest
 	{
 		final String addressBookPage = accountController.editAddress(TEST_CODE, page);
 
-		Mockito.verify(page).addAttribute("countryData", checkoutFacade.getDeliveryCountries());
+		Mockito.verify(page).addAttribute("countryData", checkoutFacade.getCountries(CountryType.SHIPPING));
 		Mockito.verify(page).addAttribute("titleData", userFacade.getTitles());
 		Mockito.verify(page).addAttribute("addressBookEmpty",
 				Boolean.valueOf(CollectionUtils.isEmpty(userFacade.getAddressBook())));

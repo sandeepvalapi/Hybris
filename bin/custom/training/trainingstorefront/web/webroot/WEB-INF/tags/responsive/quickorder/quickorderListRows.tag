@@ -1,16 +1,17 @@
 <%@ tag body-content="empty" trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="theme" tagdir="/WEB-INF/tags/shared/theme" %>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
 <spring:url value="/cart/addQuickOrder" var="quickOrderAddToCartUrl" htmlEscape="false"/>
-<spring:theme code="text.quickOrder.product.quantity.max" var="maxProductQtyMsg"/>
-<spring:theme code="text.quickOrder.form.product.exists" var="productExistsInFormMsg"/>
+<spring:theme code="text.quickOrder.product.quantity.max" var="maxProductQtyMsgHtml"/>
+<spring:theme code="text.quickOrder.form.product.exists" var="productExistsInFormMsgHtml"/>
 
 <div class="js-quick-order-container" data-quick-order-min-rows="${quickOrderMinRows}"
 	 data-quick-order-max-rows="${quickOrderMaxRows}" data-quick-order-add-to-cart-url="${quickOrderAddToCartUrl}"
-	 data-product-exists-in-form-msg="${productExistsInFormMsg}">
+	 data-product-exists-in-form-msg="${productExistsInFormMsgHtml}">
 
 	<ul class="item__list item__list__cart quick-order__list js-ul-container">
 		<li class="hidden-xs hidden-sm">
@@ -83,7 +84,7 @@
 	<div class="item__quantity js-product-info">
 		<input type="text" class="js-quick-order-qty form-control" value="1" maxlength="3" size="1"
 			data-max-product-qty="{{= stock.stockLevel}}" data-stock-level-status="{{= stock.stockLevelStatus.code}}"/>
-		<div class="js-product-info js-qty-validation-container help-block quick-order__help-block" data-max-product-qty-msg="${maxProductQtyMsg}"></div>
+		<div class="js-product-info js-qty-validation-container help-block quick-order__help-block" data-max-product-qty-msg="${maxProductQtyMsgHtml}"></div>
 	</div>
 
 

@@ -1,4 +1,0 @@
-
-result = [
-				"typecode":typecode
-			]

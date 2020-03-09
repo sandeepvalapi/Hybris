@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
- [y] hybris Platform
-
- Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-
- This software is the confidential and proprietary information of SAP
- ("Confidential Information"). You shall not disclose such Confidential
- Information and shall use it only in accordance with the terms of the
- license agreement you entered into with SAP.
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 --><!--
  All hybris buildcallbacks.xml macrodefinitions:
 
@@ -28,10 +21,6 @@
 	 before/after ant macro "compile_web" - the web module of the extension
 		 <macrodef name="trainingtest_before_compile_web" />
 		 <macrodef name="trainingtest_after_compile_web" />
-
-	 before/after ant macro "compile_hmc" - the hmc module of the extension
-		 <macrodef name="trainingtest_before_compile_hmc" />
-		 <macrodef name="trainingtest_after_compile_hmc" />
 
  Preparing extension
 
@@ -70,18 +59,21 @@
 		 <macrodef name="trainingtest_after_dist_copy"/>
 
 --><project name="trainingtest_buildcallbacks">
-
-	<!-- 
+    	
+    <!-- 
 		Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
 
 		${ear.path}: 			path to ear
 	 -->
-	<macrodef name="trainingtest_before_ear">
-		<sequential>
-
-			<!-- you can do anything before the EAR file is being packed -->
-
-		</sequential>
-	</macrodef>
-
+    	
+    <macrodef name="trainingtest_before_ear">
+        		
+        <sequential>
+            			
+            <!-- you can do anything before the EAR file is being packed -->
+            		
+        </sequential>
+        	
+    </macrodef>
+    
 </project>

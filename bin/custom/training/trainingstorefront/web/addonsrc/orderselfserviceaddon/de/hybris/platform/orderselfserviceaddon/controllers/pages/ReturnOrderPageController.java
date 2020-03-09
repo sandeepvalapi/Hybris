@@ -1,7 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company.
  * All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
@@ -42,7 +42,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -60,7 +61,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping(value = "/my-account/order")
 public class ReturnOrderPageController extends AbstractSearchPageController
 {
-	public static final Logger LOG = Logger.getLogger(ReturnOrderPageController.class);
+	public static final Logger LOG = LoggerFactory.getLogger(ReturnOrderPageController.class);
 	public static final String BREADCRUMBS_ATTR = "breadcrumbs";
 	public static final String MY_ACCOUNT_ORDERS = "/my-account/orders";
 	public static final String REDIRECT_TO_ORDERS_HISTORY_PAGE = REDIRECT_PREFIX + MY_ACCOUNT_ORDERS;

@@ -39,7 +39,7 @@
                     </ul>
                 </div>
                 <div class="span-5 suggested_address_submit last">
-                    <form:form method="post" commandName="addressForm" action="${selectSuggestedAddressUrl}">
+                    <form:form method="post" modelAttribute="addressForm" action="${selectSuggestedAddressUrl}">
                         <form:hidden path="addressId" class="add_edit_delivery_address_id"/>
                         <form:hidden path="defaultAddress" value="${fn:escapeXml(inputAddress.defaultAddress)}"/>
                         <input id="titleCode" name="titleCode" type="hidden" value="${fn:escapeXml(suggestedAddress.titleCode)}"/>
@@ -58,10 +58,10 @@
                         </button>
                         <c:choose>
                             <c:when test="${edit}">
-                                <input id="editAddress" name="editAddress" type="hidden" value="${true}"/>
+                                <input id="editAddress" name="editAddress" type="hidden" value="true"/>
                             </c:when>
                             <c:otherwise>
-                                <input id="editAddress" name="editAddress" type="hidden" value="${false}"/>
+                                <input id="editAddress" name="editAddress" type="hidden" value="false"/>
                             </c:otherwise>
                         </c:choose>
                     </form:form>
@@ -95,7 +95,7 @@
             </div>
             <div class="span-5 suggested_address_submit last">
                 <c:if test="${customerBypass}">
-                    <form:form method="post" commandName="addressForm" action="${selectSuggestedAddressUrl}">
+                    <form:form method="post" modelAttribute="addressForm" action="${selectSuggestedAddressUrl}">
                         <form:hidden path="addressId" class="add_edit_delivery_address_id"/>
                         <form:hidden path="defaultAddress" value="${fn:escapeXml(inputAddress.defaultAddress)}"/>
                         <input id="titleCode" name="titleCode" type="hidden" value="${fn:escapeXml(inputAddress.titleCode)}"/>
@@ -114,10 +114,10 @@
                         </button>
                         <c:choose>
                             <c:when test="${edit}">
-                                <input id="editAddress" name="editAddress" type="hidden" value="${true}"/>
+                                <input id="editAddress" name="editAddress" type="hidden" value="true"/>
                             </c:when>
                             <c:otherwise>
-                                <input id="editAddress" name="editAddress" type="hidden" value="${false}"/>
+                                <input id="editAddress" name="editAddress" type="hidden" value="false"/>
                             </c:otherwise>
                         </c:choose>
                     </form:form>

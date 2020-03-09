@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages.checkout.steps;
 
@@ -17,6 +10,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.validation
 import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.util.GlobalMessages;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.commercefacades.order.data.CCPaymentInfoData;
 import com.hybris.training.storefront.controllers.ControllerConstants;
 
@@ -86,8 +80,9 @@ public class HopPaymentResponseController extends PaymentMethodCheckoutStepContr
 		model.addAttribute("redirectUrl", redirectUrl.replace(REDIRECT_PREFIX, ""));
 		model.addAttribute(WebConstants.BREADCRUMBS_KEY,
 				getResourceBreadcrumbBuilder().getBreadcrumbs("checkout.multi.hostedOrderPageError.breadcrumb"));
-		storeCmsPageInModel(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
+		final ContentPageModel multiCheckoutSummaryPage = getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL);
+		storeCmsPageInModel(model, multiCheckoutSummaryPage);
+		setUpMetaDataForContentPage(model, multiCheckoutSummaryPage);
 		setCheckoutStepLinksForModel(model, getCheckoutStep());
 
 		GlobalMessages.addErrorMessage(model, "checkout.multi.hostedOrderPageError.globalError");

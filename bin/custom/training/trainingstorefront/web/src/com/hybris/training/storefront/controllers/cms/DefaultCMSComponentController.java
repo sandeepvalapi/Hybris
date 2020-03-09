@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.cms;
 
@@ -37,9 +30,9 @@ public class DefaultCMSComponentController extends AbstractAcceleratorCMSCompone
 	@Override
 	protected void fillModel(final HttpServletRequest request, final Model model, final AbstractCMSComponentModel component)
 	{
-		// See documentation for CMSComponentService.getEditorProperties, but this will return all frontend
+		// See documentation for CMSComponentService.getReadableEditorProperties, but this will return all frontend
 		// properties which we just inject into the model.
-		for (final String property : getCmsComponentService().getEditorProperties(component))
+		for (final String property : getCmsComponentService().getReadableEditorProperties(component))
 		{
 			try
 			{

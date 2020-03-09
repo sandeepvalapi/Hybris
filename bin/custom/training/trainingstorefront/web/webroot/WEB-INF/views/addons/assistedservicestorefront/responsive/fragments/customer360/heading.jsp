@@ -73,7 +73,7 @@
                 <span class="asm__header__ticket">
                     <c:choose>
                         <c:when test="${not empty headingData.latestOpenedTicketId}">
-                     	    <c:set var="latestOpenedTicketId" value="${fn:escapeXml(headingData.latestOpenedTicketId)})"/>
+                     	    <c:set var="latestOpenedTicketId" value="${fn:escapeXml(headingData.latestOpenedTicketId)}"/>
                             <spring:url value="/my-account/support-ticket/${latestOpenedTicketId}" var="link"
                                         htmlEscape="false"/>
                             <spring:theme code="text.customer360.headline.ticket"/> <a href="${link}">&nbsp;${headingData.latestOpenedTicketId}</a>,

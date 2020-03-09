@@ -29,3 +29,17 @@ config/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 .DS_Store
+.idea
+.metadata
+gensrc
+**/jalo/**
+bin/custom/**/idea-module-files
+bin/platform
+.DS_Store
+bin/custom/training/trainingbackoffice/.settings
+bin/custom/training/trainingbackoffice/.externalToolBuilders
+*.prefs
+
+bin/platform
+bin/custom/training/.idea/
+bin/custom/training/.idea/runConfigurations/Remote_debug.xml

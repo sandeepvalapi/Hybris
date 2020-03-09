@@ -17,21 +17,24 @@ ACC.savedcarts = {
             event.preventDefault();
             var popupTitle = $(this).data('restore-popup-title');
             var cartId = $(this).data('savedcart-id');
-            var url = ACC.config.encodedContextPath +'/my-account/saved-carts/'+cartId+'/restore';
-
-            $.get(url).done(function (data) {
-                ACC.colorbox.open(popupTitle, {
-                    html: data,
-                    width: 500,
-                    onComplete: function () {
-                        ACC.common.refreshScreenReaderBuffer();
-                        ACC.savedcarts.bindRestoreModalHandlers();
-                        ACC.savedcarts.bindPostRestoreSavedCartLink();
-                    },
-                    onClosed: function () {
-                        ACC.common.refreshScreenReaderBuffer();
-                    }
-                });
+            var url = ACC.config.encodedContextPath +'/my-account/saved-carts/'+encodeURIComponent(cartId)+'/restore';
+            var popupTitleHtml = ACC.common.encodeHtml(popupTitle);
+            
+            ACC.common.checkAuthenticationStatusBeforeAction(function(){
+            	$.get(url, undefined, undefined, 'html').done(function (data) {
+            		ACC.colorbox.open(popupTitleHtml, {
+            			html: data,
+            			width: 500,
+            			onComplete: function () {
+            				ACC.common.refreshScreenReaderBuffer();
+            				ACC.savedcarts.bindRestoreModalHandlers();
+            				ACC.savedcarts.bindPostRestoreSavedCartLink();
+            			},
+            			onClosed: function () {
+            				ACC.common.refreshScreenReaderBuffer();
+            			}
+            		});
+            	});
             });
         });
     },
@@ -86,16 +89,20 @@ ACC.savedcarts = {
             var cartName = $('#activeCartName').val();
             var url = $(this).data('restore-url');
             var postData = {preventSaveActiveCart: preventSaveActiveCart, keepRestoredCart: keepRestoredCart, cartName: cartName};
-            $.post(url, postData).done(function (result, data, status) {
-                if (result == "200") {
-                    var url = ACC.config.encodedContextPath + "/cart"
-                    window.location.replace(url);
-                } else {
-                    var errorMsg = status.responseText.slice(1, -1);
-                    $('.js-restore-current-cart-form').addClass('has-error');
-                    $('.js-restore-error-container').html(errorMsg);
-                    $('.js-savedcart_restore_confirm_modal').colorbox.resize();
-                }
+            
+            ACC.common.checkAuthenticationStatusBeforeAction(function(){
+            	$.post(url, postData, undefined, 'html').done(function (result, data, status) {
+            		result = ACC.sanitizer.sanitize(result);
+            		if (result == "200 OK") {
+            			var url = ACC.config.encodedContextPath + "/cart"
+            			window.location.replace(url);
+            		} else {
+            			var errorMsg = status.responseText.slice(1, -1);
+            			$('.js-restore-current-cart-form').addClass('has-error');
+            			$('.js-restore-error-container').html(errorMsg);
+            			$('.js-savedcart_restore_confirm_modal').colorbox.resize();
+            		}
+            	});
             });
         });
 
@@ -109,8 +116,9 @@ ACC.savedcarts = {
             event.preventDefault();
             var cartId = $(this).data('savedcart-id');
             var popupTitle = $(this).data('delete-popup-title');
+            var popupTitleHtml = ACC.common.encodeHtml(popupTitle);
 
-            ACC.colorbox.open(popupTitle, {
+            ACC.colorbox.open(popupTitleHtml, {
                 inline: true,
                 className: "js-savedcart_delete_confirm_modal",
                 href: "#popup_confirm_savedcart_delete_" + cartId,
@@ -126,15 +134,17 @@ ACC.savedcarts = {
         $(document).on("click", '.js-savedcart_delete_confirm', function (event) {
             event.preventDefault();
             var cartId = $(this).data('savedcart-id');
-            var url = ACC.config.encodedContextPath + '/my-account/saved-carts/' + cartId + '/delete';
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                success: function (response) {
-                    ACC.colorbox.close();
-                    var url = ACC.config.encodedContextPath + "/my-account/saved-carts"
-                    window.location.replace(url);
-                }
+            var url = ACC.config.encodedContextPath + '/my-account/saved-carts/' + encodeURIComponent(cartId) + '/delete';
+            ACC.common.checkAuthenticationStatusBeforeAction(function(){
+            	$.ajax({
+            		url: url,
+            		type: 'DELETE',
+            		success: function (response) {
+            			ACC.colorbox.close();
+            			var url = ACC.config.encodedContextPath + "/my-account/saved-carts"
+            			window.location.replace(url);
+            		}
+            	});
             });
         });
 
@@ -150,8 +160,8 @@ ACC.savedcarts = {
 		var saveCart = false;
         var showSaveCartFormCallback = function () {
         var title = $('#saveCart').data("saveCartTitle");
-          
-            ACC.colorbox.open(title, {
+        var titleHtml = ACC.common.encodeHtml(title);  
+            ACC.colorbox.open(titleHtml, {
                 href: "#saveCart",
                 inline: true,
                 width: "620px",
@@ -268,17 +278,17 @@ ACC.savedcarts = {
 						var rowIdIndex = mapCartRow[cart.code]; 
 						if (rowIdIndex != undefined) {
 							var rowSelector = rowId + rowIdIndex;
-							$(rowSelector + " .js-saved-cart-name").removeClass("not-active");
-							$(rowSelector + " .js-saved-cart-date").removeClass("hidden");
-							$(rowSelector + " .js-file-importing").remove();
-							$(rowSelector + " .js-saved-cart-description").text(cart.description);
+							$(document).find(rowSelector + " .js-saved-cart-name").removeClass("not-active");
+							$(document).find(rowSelector + " .js-saved-cart-date").removeClass("hidden");
+							$(document).find(rowSelector + " .js-file-importing").remove();
+							$(document).find(rowSelector + " .js-saved-cart-description").text(cart.description);
 							var numberOfItems = cart.entries.length;
-							$(rowSelector + " .js-saved-cart-number-of-items").text(numberOfItems);
-							$(rowSelector + " .js-saved-cart-total").text(cart.totalPrice.formattedValue);
+							$(document).find(rowSelector + " .js-saved-cart-number-of-items").text(numberOfItems);
+							$(document).find(rowSelector + " .js-saved-cart-total").text(cart.totalPrice.formattedValue);
 							if (numberOfItems > 0) {
-								$(rowSelector + " .js-restore-saved-cart").removeClass(hidden);
+								$(document).find(rowSelector + " .js-restore-saved-cart").removeClass(hidden);
 							}
-							$(rowSelector + " .js-delete-saved-cart").removeClass(hidden);
+							$(document).find(rowSelector + " .js-delete-saved-cart").removeClass(hidden);
 						}
 					}
 				};

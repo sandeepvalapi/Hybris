@@ -1,4 +1,5 @@
 <%@ page trimDirectiveWhitespaces="true" %>
+<%@ page session="false" %>
 <!DOCTYPE html>
 <html>
     <head>

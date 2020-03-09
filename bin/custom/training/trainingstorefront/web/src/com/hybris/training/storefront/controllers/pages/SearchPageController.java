@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages;
 
@@ -19,6 +12,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.controllers.ThirdPartyCon
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.AbstractSearchPageController;
 import de.hybris.platform.acceleratorstorefrontcommons.util.MetaSanitizerUtil;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.cms2.servicelayer.services.CMSComponentService;
 import de.hybris.platform.commercefacades.product.data.ProductData;
 import de.hybris.platform.commercefacades.search.ProductSearchFacade;
@@ -28,12 +22,10 @@ import de.hybris.platform.commercefacades.search.data.SearchStateData;
 import de.hybris.platform.commerceservices.enums.SearchQueryContext;
 import de.hybris.platform.commerceservices.search.facetdata.FacetData;
 import de.hybris.platform.commerceservices.search.facetdata.FacetRefinement;
-import de.hybris.platform.commerceservices.search.facetdata.FacetValueData;
 import de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData;
 import de.hybris.platform.commerceservices.search.pagedata.PageableData;
 import de.hybris.platform.servicelayer.dto.converter.ConversionException;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,8 +42,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.sap.security.core.server.csi.XSSEncoder;
 
 
 @Controller
@@ -86,6 +76,7 @@ public class SearchPageController extends AbstractSearchPageController
 	public String textSearch(@RequestParam(value = "text", defaultValue = "") final String searchText,
 			final HttpServletRequest request, final Model model) throws CMSItemNotFoundException
 	{
+		final ContentPageModel noResultPage = getContentPageForLabelOrId(NO_RESULTS_CMS_PAGE_ID);
 		if (StringUtils.isNotBlank(searchText))
 		{
 			final PageableData pageableData = createPageableData(0, getSearchPageSize(), null, ShowMode.Page);
@@ -96,6 +87,7 @@ public class SearchPageController extends AbstractSearchPageController
 			searchState.setQuery(searchQueryData);
 
 			ProductSearchPageData<SearchStateData, ProductData> searchPageData = null;
+
 			try
 			{
 				searchPageData = encodeSearchPageData(productSearchFacade.textSearch(searchState, pageableData));
@@ -107,7 +99,7 @@ public class SearchPageController extends AbstractSearchPageController
 
 			if (searchPageData == null)
 			{
-				storeCmsPageInModel(model, getContentPageForLabelOrId(NO_RESULTS_CMS_PAGE_ID));
+				storeCmsPageInModel(model, noResultPage);
 			}
 			else if (searchPageData.getKeywordRedirectUrl() != null)
 			{
@@ -117,7 +109,7 @@ public class SearchPageController extends AbstractSearchPageController
 			else if (searchPageData.getPagination().getTotalNumberOfResults() == 0)
 			{
 				model.addAttribute("searchPageData", searchPageData);
-				storeCmsPageInModel(model, getContentPageForLabelOrId(NO_RESULTS_CMS_PAGE_ID));
+				storeCmsPageInModel(model, noResultPage);
 				updatePageTitle(searchText, model);
 			}
 			else
@@ -137,7 +129,7 @@ public class SearchPageController extends AbstractSearchPageController
 		}
 		else
 		{
-			storeCmsPageInModel(model, getContentPageForLabelOrId(NO_RESULTS_CMS_PAGE_ID));
+			storeCmsPageInModel(model, noResultPage);
 		}
 		model.addAttribute("pageType", PageType.PRODUCTSEARCH.name());
 		model.addAttribute(ThirdPartyConstants.SeoRobots.META_ROBOTS, ThirdPartyConstants.SeoRobots.NOINDEX_FOLLOW);
@@ -290,78 +282,4 @@ public class SearchPageController extends AbstractSearchPageController
 				getMessageSource().getMessage("search.meta.title", null, "search.meta.title", getI18nService().getCurrentLocale())
 						+ " " + searchText));
 	}
-
-
-	protected ProductSearchPageData<SearchStateData, ProductData> encodeSearchPageData(
-			final ProductSearchPageData<SearchStateData, ProductData> searchPageData)
-	{
-		final SearchStateData currentQuery = searchPageData.getCurrentQuery();
-
-		if (currentQuery != null)
-		{
-			try
-			{
-				final SearchQueryData query = currentQuery.getQuery();
-				final String encodedQueryValue = XSSEncoder.encodeHTML(query.getValue());
-				query.setValue(encodedQueryValue);
-				currentQuery.setQuery(query);
-				searchPageData.setCurrentQuery(currentQuery);
-				searchPageData.setFreeTextSearch(XSSEncoder.encodeHTML(searchPageData.getFreeTextSearch()));
-
-				final List<FacetData<SearchStateData>> facets = searchPageData.getFacets();
-				if (CollectionUtils.isNotEmpty(facets))
-				{
-					processFacetData(facets);
-				}
-			}
-			catch (final UnsupportedEncodingException e)
-			{
-				if (LOG.isDebugEnabled())
-				{
-					LOG.debug("Error occured during Encoding the Search Page data values", e);
-				}
-			}
-		}
-		return searchPageData;
-	}
-
-	protected void processFacetData(final List<FacetData<SearchStateData>> facets) throws UnsupportedEncodingException
-	{
-		for (final FacetData<SearchStateData> facetData : facets)
-		{
-			final List<FacetValueData<SearchStateData>> topFacetValueDatas = facetData.getTopValues();
-			if (CollectionUtils.isNotEmpty(topFacetValueDatas))
-			{
-				processFacetDatas(topFacetValueDatas);
-			}
-			final List<FacetValueData<SearchStateData>> facetValueDatas = facetData.getValues();
-			if (CollectionUtils.isNotEmpty(facetValueDatas))
-			{
-				processFacetDatas(facetValueDatas);
-			}
-		}
-	}
-
-	protected void processFacetDatas(final List<FacetValueData<SearchStateData>> facetValueDatas)
-			throws UnsupportedEncodingException
-	{
-		for (final FacetValueData<SearchStateData> facetValueData : facetValueDatas)
-		{
-			final SearchStateData facetQuery = facetValueData.getQuery();
-			final SearchQueryData queryData = facetQuery.getQuery();
-			final String queryValue = queryData.getValue();
-			if (StringUtils.isNotBlank(queryValue))
-			{
-				final String[] queryValues = queryValue.split(FACET_SEPARATOR);
-				final StringBuilder queryValueBuilder = new StringBuilder();
-				queryValueBuilder.append(XSSEncoder.encodeHTML(queryValues[0]));
-				for (int i = 1; i < queryValues.length; i++)
-				{
-					queryValueBuilder.append(FACET_SEPARATOR).append(queryValues[i]);
-				}
-				queryData.setValue(queryValueBuilder.toString());
-			}
-		}
-	}
-
 }

@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms.validation;
 
@@ -63,15 +56,15 @@ public class AddressValidator implements Validator
 			switch (CountryCode.lookup(isoCode))
 			{
 				case CHINA:
-					validateStringField(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
+					validateStringFieldLength(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
 					validateFieldNotNull(addressForm.getRegionIso(), AddressField.REGION, errors);
 					break;
 				case CANADA:
-					validateStringField(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
+					validateStringFieldLength(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
 					validateFieldNotNull(addressForm.getRegionIso(), AddressField.REGION, errors);
 					break;
 				case USA:
-					validateStringField(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
+					validateStringFieldLength(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
 					validateFieldNotNull(addressForm.getRegionIso(), AddressField.REGION, errors);
 					break;
 				case JAPAN:
@@ -79,7 +72,7 @@ public class AddressValidator implements Validator
 					validateStringField(addressForm.getLine2(), AddressField.LINE2, MAX_FIELD_LENGTH, errors);
 					break;
 				default:
-					validateStringField(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
+					validateStringFieldLength(addressForm.getTitleCode(), AddressField.TITLE, MAX_FIELD_LENGTH, errors);
 					break;
 			}
 		}
@@ -89,6 +82,15 @@ public class AddressValidator implements Validator
 											  final int maxFieldLength, final Errors errors)
 	{
 		if (addressField == null || StringUtils.isEmpty(addressField) || (StringUtils.length(addressField) > maxFieldLength))
+		{
+			errors.rejectValue(fieldType.getFieldKey(), fieldType.getErrorKey());
+		}
+	}
+
+	protected static void validateStringFieldLength(final String field, final AddressField fieldType, final int maxFieldLength,
+			final Errors errors)
+	{
+		if (StringUtils.isNotEmpty(field) && StringUtils.length(field) > maxFieldLength)
 		{
 			errors.rejectValue(fieldType.getFieldKey(), fieldType.getErrorKey());
 		}

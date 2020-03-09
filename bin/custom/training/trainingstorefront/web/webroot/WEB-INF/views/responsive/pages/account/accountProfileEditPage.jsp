@@ -7,6 +7,8 @@
 <%@ taglib prefix="formElement" tagdir="/WEB-INF/tags/responsive/formElement" %>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 
+<spring:htmlEscape defaultHtmlEscape="true" />
+
 <div class="account-section-header">
     <div class="row">
         <div class="container-lg col-md-6">
@@ -18,9 +20,9 @@
     <div class="container-lg col-md-6">
         <div class="account-section-content">
             <div class="account-section-form">
-                <form:form action="update-profile" method="post" commandName="updateProfileForm">
+                <form:form action="update-profile" method="post" modelAttribute="updateProfileForm">
 
-                    <formElement:formSelectBox idKey="profile.title" labelKey="profile.title" path="titleCode" mandatory="true" skipBlank="false" skipBlankMessageKey="form.select.empty" items="${titleData}" selectCSSClass="form-control"/>
+                    <formElement:formSelectBoxDefaultEnabled idKey="profile.title" labelKey="profile.title" path="titleCode" mandatory="true" skipBlank="false" skipBlankMessageKey="form.select.none" items="${titleData}" selectCSSClass="form-control"/>
                     <formElement:formInputBox idKey="profile.firstName" labelKey="profile.firstName" path="firstName" inputCSS="text" mandatory="true"/>
                     <formElement:formInputBox idKey="profile.lastName" labelKey="profile.lastName" path="lastName" inputCSS="text" mandatory="true"/>
 

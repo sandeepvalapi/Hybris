@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages;
 
@@ -63,8 +56,9 @@ public class DefaultPageController extends AbstractPageController
 		}
 
 		// No page found - display the notFound page with error from controller
-		storeCmsPageInModel(model, getContentPageForLabelOrId(ERROR_CMS_PAGE));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(ERROR_CMS_PAGE));
+		final ContentPageModel errorPage = getContentPageForLabelOrId(ERROR_CMS_PAGE);
+		storeCmsPageInModel(model, errorPage);
+		setUpMetaDataForContentPage(model, errorPage);
 
 		model.addAttribute(WebConstants.MODEL_KEY_ADDITIONAL_BREADCRUMB,
 				resourceBreadcrumbBuilder.getBreadcrumbs("breadcrumb.not.found"));
@@ -77,7 +71,7 @@ public class DefaultPageController extends AbstractPageController
 
 	/**
 	 * Lookup the CMS Content Page for this request.
-	 * 
+	 *
 	 * @param request
 	 *           The request
 	 * @return the CMS content page

@@ -1,14 +1,6 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
-
 package com.hybris.training.storefront.renderer;
 
 import de.hybris.platform.acceleratorcms.component.renderer.CMSComponentRenderer;
@@ -33,7 +25,7 @@ public class ImageMapComponentRenderer implements CMSComponentRenderer<ImageMapC
 
 	@Override
 	public void renderComponent(final PageContext pageContext, final ImageMapComponentModel component)
-			throws ServletException, IOException
+			throws IOException
 	{
 		final StringBuilder html = new StringBuilder();
 		final String altText = StringUtils.defaultIfBlank(component.getMedia().getAltText(), "");

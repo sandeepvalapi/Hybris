@@ -1,8 +1,8 @@
 <%@ page language="java" pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 <div class="consignment-track-popup">
@@ -19,10 +19,10 @@
 				<div class="form-group row carrier-info">
 					<div class="col-sm-12 col-xs-12">
 						<label>
-							<spring:message code="label.delivery.service.name" arguments="${fn:escapeXml(consignment.carrierDetails.name)}" />
+							<spring:message code="label.delivery.service.name" arguments="${consignment.carrierDetails.name}" />
 						</label>
-						<a href="${trackingUrl}" target="_black"> 
-							<spring:message code="label.consignment.tracking.id" arguments="${fn:escapeXml(consignment.trackingID)}" />
+						<a href="${fn:escapeXml(trackingUrl)}" target="_black"> 
+							<spring:message code="label.consignment.tracking.id" arguments="${consignment.trackingID}" />
 						</a>
 					</div>
 				</div>

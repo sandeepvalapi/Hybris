@@ -14,20 +14,20 @@
 <div class="add-to-cart-item">
 		<c:url value="${product.url}" var="entryProductUrl"/>
 		<div class="thumb">
-			<a href="${entryProductUrl}">
+			<a href="${fn:escapeXml(entryProductUrl)}">
 				<product:productPrimaryImage product="${entry.product}" format="cartIcon"/>
 			</a>
 		</div>
 		<div class="details">
-			<a class="name" href="${entryProductUrl}">${fn:escapeXml(product.name)}</a>
-			<div class="qty"><span><spring:theme code="popup.cart.quantity.added"/></span>&nbsp;${quantity}</div>
+			<a class="name" href="${fn:escapeXml(entryProductUrl)}">${fn:escapeXml(product.name)}</a>
+			<div class="qty"><span><spring:theme code="popup.cart.quantity.added"/></span>&nbsp;${fn:escapeXml(quantity)}</div>
 			<c:forEach items="${product.baseOptions}" var="baseOptions">
 				<c:forEach items="${baseOptions.selected.variantOptionQualifiers}" var="baseOptionQualifier">
 					<c:set var="baseOptionQualifierValue" value="${fn:escapeXml(baseOptionQualifier.value)}"/>
 					<c:if test="${baseOptionQualifier.qualifier eq 'style' and not empty baseOptionQualifier.image.url}">
 						<div class="itemColor">
 							<span class="label"><spring:theme code="product.variants.colour"/></span>
-							<img src="${baseOptionQualifier.image.url}"  alt="${baseOptionQualifierValue}" title="${baseOptionQualifierValue}"/>
+							<img src="${fn:escapeXml(baseOptionQualifier.image.url)}"  alt="${baseOptionQualifierValue}" title="${baseOptionQualifierValue}"/>
 						</div>
 					</c:if>
 					<c:if test="${baseOptionQualifier.qualifier eq 'size'}">

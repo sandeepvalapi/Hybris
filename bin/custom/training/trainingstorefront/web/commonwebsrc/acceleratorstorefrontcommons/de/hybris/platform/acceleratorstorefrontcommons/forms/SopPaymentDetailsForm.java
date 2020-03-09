@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms;
 
@@ -61,7 +54,7 @@ public class SopPaymentDetailsForm
 	/**
 	 * @return the card_nameOnCard
 	 */
-	public String getCard_nameOnCard() // NOSONAR  NOPMD
+	public String getCard_nameOnCard() // NOSONAR
 	{
 		return card_nameOnCard;
 	}
@@ -70,7 +63,7 @@ public class SopPaymentDetailsForm
 	 * @param card_nameOnCard
 	 *           the card_nameOnCard to set
 	 */
-	public void setCard_nameOnCard(final String card_nameOnCard) // NOSONAR NOPMD
+	public void setCard_nameOnCard(final String card_nameOnCard) // NOSONAR
 	{
 		this.card_nameOnCard = card_nameOnCard;
 	}
@@ -85,17 +78,17 @@ public class SopPaymentDetailsForm
 		this.amount = amount;
 	}
 
-	public String getBillTo_city() // NOSONAR NOPMD
+	public String getBillTo_city() // NOSONAR
 	{
 		return billTo_city;
 	}
 
-	public void setBillTo_city(final String billTo_city) // NOSONAR NOPMD
+	public void setBillTo_city(final String billTo_city) // NOSONAR
 	{
 		this.billTo_city = billTo_city;
 	}
 
-	public String getBillTo_country() // NOSONAR NOPMD
+	public String getBillTo_country() // NOSONAR
 	{
 		if (billTo_country != null)
 		{
@@ -104,187 +97,187 @@ public class SopPaymentDetailsForm
 		return billTo_country;
 	}
 
-	public void setBillTo_country(final String billTo_country) // NOSONAR NOPMD
+	public void setBillTo_country(final String billTo_country) // NOSONAR
 	{
 		this.billTo_country = billTo_country;
 	}
 
-	public String getBillTo_customerID() // NOSONAR NOPMD
+	public String getBillTo_customerID() // NOSONAR
 	{
 		return billTo_customerID;
 	}
 
-	public void setBillTo_customerID(final String billTo_customerID) // NOSONAR NOPMD
+	public void setBillTo_customerID(final String billTo_customerID) // NOSONAR
 	{
 		this.billTo_customerID = billTo_customerID;
 	}
 
-	public String getBillTo_email() // NOSONAR NOPMD
+	public String getBillTo_email() // NOSONAR
 	{
 		return billTo_email;
 	}
 
-	public void setBillTo_email(final String billTo_email) // NOSONAR NOPMD
+	public void setBillTo_email(final String billTo_email) // NOSONAR
 	{
 		this.billTo_email = billTo_email;
 	}
 
-	public String getBillTo_firstName() // NOSONAR NOPMD
+	public String getBillTo_firstName() // NOSONAR
 	{
 		return billTo_firstName;
 	}
 
-	public void setBillTo_firstName(final String billTo_firstName) // NOSONAR NOPMD
+	public void setBillTo_firstName(final String billTo_firstName) // NOSONAR
 	{
 		this.billTo_firstName = billTo_firstName;
 	}
 
-	public String getBillTo_lastName() // NOSONAR NOPMD
+	public String getBillTo_lastName() // NOSONAR
 	{
 		return billTo_lastName;
 	}
 
-	public void setBillTo_lastName(final String billTo_lastName) // NOSONAR NOPMD
+	public void setBillTo_lastName(final String billTo_lastName) // NOSONAR
 	{
 		this.billTo_lastName = billTo_lastName;
 	}
 
-	public String getBillTo_phoneNumber() // NOSONAR NOPMD
+	public String getBillTo_phoneNumber() // NOSONAR
 	{
 		return billTo_phoneNumber;
 	}
 
-	public void setBillTo_phoneNumber(final String billTo_phoneNumber) // NOSONAR NOPMD
+	public void setBillTo_phoneNumber(final String billTo_phoneNumber) // NOSONAR
 	{
 		this.billTo_phoneNumber = billTo_phoneNumber;
 	}
 
-	public String getBillTo_postalCode() // NOSONAR NOPMD
+	public String getBillTo_postalCode() // NOSONAR
 	{
 		return billTo_postalCode;
 	}
 
-	public void setBillTo_postalCode(final String billTo_postalCode) // NOSONAR NOPMD
+	public void setBillTo_postalCode(final String billTo_postalCode) // NOSONAR
 	{
 		this.billTo_postalCode = billTo_postalCode;
 	}
 
-	public String getBillTo_titleCode() // NOSONAR NOPMD
+	public String getBillTo_titleCode() // NOSONAR
 	{
 		return billTo_titleCode;
 	}
 
-	public void setBillTo_titleCode(final String billTo_titleCode) // NOSONAR NOPMD
+	public void setBillTo_titleCode(final String billTo_titleCode) // NOSONAR
 	{
 		this.billTo_titleCode = billTo_titleCode;
 	}
 
-	public String getBillTo_state() // NOSONAR NOPMD
+	public String getBillTo_state() // NOSONAR
 	{
 		return billTo_state;
 	}
 
-	public void setBillTo_state(final String billTo_state) // NOSONAR NOPMD
+	public void setBillTo_state(final String billTo_state) // NOSONAR
 	{
 		this.billTo_state = billTo_state;
 	}
 
-	public String getBillTo_street1() // NOSONAR NOPMD
+	public String getBillTo_street1() // NOSONAR
 	{
 		return billTo_street1;
 	}
 
-	public void setBillTo_street1(final String billTo_street1) // NOSONAR NOPMD
+	public void setBillTo_street1(final String billTo_street1) // NOSONAR
 	{
 		this.billTo_street1 = billTo_street1;
 	}
 
-	public String getBillTo_street2() // NOSONAR NOPMD
+	public String getBillTo_street2() // NOSONAR
 	{
 		return billTo_street2;
 	}
 
-	public void setBillTo_street2(final String billTo_street2) // NOSONAR NOPMD
+	public void setBillTo_street2(final String billTo_street2) // NOSONAR
 	{
 		this.billTo_street2 = billTo_street2;
 	}
 
-	public String getCard_accountNumber() // NOSONAR NOPMD
+	public String getCard_accountNumber() // NOSONAR
 	{
 		return card_accountNumber;
 	}
 
-	public void setCard_accountNumber(final String card_accountNumber) // NOSONAR NOPMD
+	public void setCard_accountNumber(final String card_accountNumber) // NOSONAR
 	{
 		this.card_accountNumber = card_accountNumber;
 	}
 
-	public String getCard_startMonth() // NOSONAR NOPMD
+	public String getCard_startMonth() // NOSONAR
 	{
 		return card_startMonth;
 	}
 
-	public void setCard_startMonth(final String card_startMonth) // NOSONAR NOPMD
+	public void setCard_startMonth(final String card_startMonth) // NOSONAR
 	{
 		this.card_startMonth = card_startMonth;
 	}
 
-	public String getCard_startYear() // NOSONAR NOPMD
+	public String getCard_startYear() // NOSONAR
 	{
 		return card_startYear;
 	}
 
-	public void setCard_startYear(final String card_startYear) // NOSONAR NOPMD
+	public void setCard_startYear(final String card_startYear) // NOSONAR
 	{
 		this.card_startYear = card_startYear;
 	}
 
-	public String getCard_issueNumber() // NOSONAR NOPMD
+	public String getCard_issueNumber() // NOSONAR
 	{
 		return card_issueNumber;
 	}
 
-	public void setCard_issueNumber(final String card_issueNumber) // NOSONAR NOPMD
+	public void setCard_issueNumber(final String card_issueNumber) // NOSONAR
 	{
 		this.card_issueNumber = card_issueNumber;
 	}
 
-	public String getCard_cardType() // NOSONAR NOPMD
+	public String getCard_cardType() // NOSONAR
 	{
 		return card_cardType;
 	}
 
-	public void setCard_cardType(final String card_cardType) // NOSONAR NOPMD
+	public void setCard_cardType(final String card_cardType) // NOSONAR
 	{
 		this.card_cardType = card_cardType;
 	}
 
-	public String getCard_cvNumber() // NOSONAR NOPMD
+	public String getCard_cvNumber() // NOSONAR
 	{
 		return card_cvNumber;
 	}
 
-	public void setCard_cvNumber(final String card_cvNumber) // NOSONAR NOPMD
+	public void setCard_cvNumber(final String card_cvNumber) // NOSONAR
 	{
 		this.card_cvNumber = card_cvNumber;
 	}
 
-	public String getCard_expirationMonth() // NOSONAR NOPMD
+	public String getCard_expirationMonth() // NOSONAR
 	{
 		return card_expirationMonth;
 	}
 
-	public void setCard_expirationMonth(final String card_expirationMonth) // NOSONAR NOPMD
+	public void setCard_expirationMonth(final String card_expirationMonth) // NOSONAR
 	{
 		this.card_expirationMonth = card_expirationMonth;
 	}
 
-	public String getCard_expirationYear() // NOSONAR NOPMD
+	public String getCard_expirationYear() // NOSONAR
 	{
 		return card_expirationYear;
 	}
 
-	public void setCard_expirationYear(final String card_expirationYear) // NOSONAR NOPMD
+	public void setCard_expirationYear(final String card_expirationYear) // NOSONAR
 	{
 		this.card_expirationYear = card_expirationYear;
 	}
@@ -309,17 +302,17 @@ public class SopPaymentDetailsForm
 		this.currency = currency;
 	}
 
-	public String getShipTo_city() // NOSONAR NOPMD
+	public String getShipTo_city() // NOSONAR
 	{
 		return shipTo_city;
 	}
 
-	public void setShipTo_city(final String shipTo_city) // NOSONAR NOPMD
+	public void setShipTo_city(final String shipTo_city) // NOSONAR
 	{
 		this.shipTo_city = shipTo_city;
 	}
 
-	public String getShipTo_country() // NOSONAR NOPMD
+	public String getShipTo_country() // NOSONAR
 	{
 		if (shipTo_country != null)
 		{
@@ -328,87 +321,87 @@ public class SopPaymentDetailsForm
 		return shipTo_country;
 	}
 
-	public void setShipTo_country(final String shipTo_country) // NOSONAR NOPMD
+	public void setShipTo_country(final String shipTo_country) // NOSONAR
 	{
 		this.shipTo_country = shipTo_country;
 	}
 
-	public String getShipTo_firstName() // NOSONAR NOPMD
+	public String getShipTo_firstName() // NOSONAR
 	{
 		return shipTo_firstName;
 	}
 
-	public void setShipTo_firstName(final String shipTo_firstName) // NOSONAR NOPMD
+	public void setShipTo_firstName(final String shipTo_firstName) // NOSONAR
 	{
 		this.shipTo_firstName = shipTo_firstName;
 	}
 
-	public String getShipTo_lastName() // NOSONAR NOPMD
+	public String getShipTo_lastName() // NOSONAR
 	{
 		return shipTo_lastName;
 	}
 
-	public void setShipTo_lastName(final String shipTo_lastName) // NOSONAR NOPMD
+	public void setShipTo_lastName(final String shipTo_lastName) // NOSONAR
 	{
 		this.shipTo_lastName = shipTo_lastName;
 	}
 
-	public String getShipTo_phoneNumber() // NOSONAR NOPMD
+	public String getShipTo_phoneNumber() // NOSONAR
 	{
 		return shipTo_phoneNumber;
 	}
 
-	public void setShipTo_phoneNumber(final String shipTo_phoneNumber) // NOSONAR NOPMD
+	public void setShipTo_phoneNumber(final String shipTo_phoneNumber) // NOSONAR
 	{
 		this.shipTo_phoneNumber = shipTo_phoneNumber;
 	}
 
-	public String getShipTo_postalCode() // NOSONAR NOPMD
+	public String getShipTo_postalCode() // NOSONAR
 	{
 		return shipTo_postalCode;
 	}
 
-	public void setShipTo_postalCode(final String shipTo_postalCode) // NOSONAR NOPMD
+	public void setShipTo_postalCode(final String shipTo_postalCode) // NOSONAR
 	{
 		this.shipTo_postalCode = shipTo_postalCode;
 	}
 
-	public String getShipTo_shippingMethod() // NOSONAR NOPMD
+	public String getShipTo_shippingMethod() // NOSONAR
 	{
 		return shipTo_shippingMethod;
 	}
 
-	public void setShipTo_shippingMethod(final String shipTo_shippingMethod) // NOSONAR NOPMD
+	public void setShipTo_shippingMethod(final String shipTo_shippingMethod) // NOSONAR
 	{
 		this.shipTo_shippingMethod = shipTo_shippingMethod;
 	}
 
-	public String getShipTo_state() // NOSONAR NOPMD
+	public String getShipTo_state() // NOSONAR
 	{
 		return shipTo_state;
 	}
 
-	public void setShipTo_state(final String shipTo_state) // NOSONAR NOPMD
+	public void setShipTo_state(final String shipTo_state) // NOSONAR
 	{
 		this.shipTo_state = shipTo_state;
 	}
 
-	public String getShipTo_street1() // NOSONAR NOPMD
+	public String getShipTo_street1() // NOSONAR
 	{
 		return shipTo_street1;
 	}
 
-	public void setShipTo_street1(final String shipTo_street1) // NOSONAR NOPMD
+	public void setShipTo_street1(final String shipTo_street1) // NOSONAR
 	{
 		this.shipTo_street1 = shipTo_street1;
 	}
 
-	public String getShipTo_street2() // NOSONAR NOPMD
+	public String getShipTo_street2() // NOSONAR
 	{
 		return shipTo_street2;
 	}
 
-	public void setShipTo_street2(final String shipTo_street2) // NOSONAR NOPMD
+	public void setShipTo_street2(final String shipTo_street2) // NOSONAR
 	{
 		this.shipTo_street2 = shipTo_street2;
 	}

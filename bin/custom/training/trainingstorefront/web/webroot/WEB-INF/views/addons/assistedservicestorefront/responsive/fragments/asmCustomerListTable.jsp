@@ -140,9 +140,17 @@
                                             </c:choose>
                                         </td>
                                         <td>
-                                            <a href="${emulateCustomerUrl}${ycommerce:encodeUrl(customer.uid)}&fwd=${frowardUrl}" class="responsive-table-link">
-                                                <div class="nav-order-tools" title="<spring:theme code="text.asm.customerList.viewOrders" />"></div>
-                                            </a>
+                                            <c:choose>
+                                                <c:when test="${customer.hasOrder}">
+                                                    <a href="${emulateCustomerUrl}${ycommerce:encodeUrl(customer.uid)}&fwd=${frowardUrl}" class="responsive-table-link">
+                                                        <div class="nav-order-tools" title="<spring:theme code="text.asm.customerList.viewOrders" />"></div>
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="nav-order-tools-empty" title="<spring:theme code="text.asm.customerList.viewOrders" />"></div>
+                                                </c:otherwise>
+                                            </c:choose>
+
                                         </td>
                                         <td>
                                              <a href="${emulateCustomerUrl}${ycommerce:encodeUrl(customer.uid)}&enable360View=true" title="<spring:theme code="text.asm.customerList.360view.alt" text="360 View of Customer" />">

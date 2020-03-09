@@ -1,7 +1,7 @@
 /*
  * ----------------------------------------------------------------
  * --- WARNING: THIS FILE IS GENERATED AND WILL BE OVERWRITTEN! ---
- * --- Generated at Mar 15, 2018 5:02:29 PM                     ---
+ * --- Generated at 08-Mar-2020, 12:19:51 AM                    ---
  * ----------------------------------------------------------------
  */
 package com.hybris.training.core.jalo;
@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Generated class for type {@link com.hybris.training.core.jalo.ApparelStyleVariantProduct ApparelStyleVariantProduct}.
  */
-@SuppressWarnings({"deprecation","unused","cast","PMD"})
+@SuppressWarnings({"deprecation","unused","cast"})
 public abstract class GeneratedApparelStyleVariantProduct extends VariantProduct
 {
 	/** Qualifier of the <code>ApparelStyleVariantProduct.style</code> attribute **/

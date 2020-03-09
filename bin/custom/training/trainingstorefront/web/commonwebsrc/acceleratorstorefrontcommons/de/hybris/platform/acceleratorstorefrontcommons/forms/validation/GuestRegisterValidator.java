@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms.validation;
 
@@ -38,9 +31,9 @@ public class GuestRegisterValidator implements Validator
 		final GuestRegisterForm guestRegisterForm = (GuestRegisterForm) object;
 		final String newPasswd = guestRegisterForm.getPwd();
 		final String checkPasswd = guestRegisterForm.getCheckPwd();
+		final boolean termsCheck = guestRegisterForm.isTermsCheck();
 
-		if (StringUtils.isNotEmpty(newPasswd) && StringUtils.isNotEmpty(checkPasswd)
-				&& !StringUtils.equals(newPasswd, checkPasswd))
+		if (StringUtils.isNotEmpty(newPasswd) && StringUtils.isNotEmpty(checkPasswd) && !StringUtils.equals(newPasswd, checkPasswd))
 		{
 			errors.rejectValue(CHECK_PWD, "validation.checkPwd.equals");
 		}
@@ -63,6 +56,15 @@ public class GuestRegisterValidator implements Validator
 			{
 				errors.rejectValue(CHECK_PWD, "register.checkPwd.invalid");
 			}
+		}
+		validateTermsAndConditions(errors, termsCheck);
+	}
+
+	protected void validateTermsAndConditions(final Errors errors, final boolean termsCheck)
+	{
+		if (!termsCheck)
+		{
+			errors.rejectValue("termsCheck", "register.terms.not.accepted");
 		}
 	}
 }

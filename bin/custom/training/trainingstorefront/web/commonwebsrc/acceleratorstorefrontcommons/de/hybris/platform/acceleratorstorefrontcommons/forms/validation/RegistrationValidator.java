@@ -1,19 +1,16 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms.validation;
 
+import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.RegisterForm;
+import de.hybris.platform.servicelayer.config.ConfigurationService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -27,7 +24,8 @@ import org.springframework.validation.Validator;
 @Component("registrationValidator")
 public class RegistrationValidator implements Validator
 {
-	public static final Pattern EMAIL_REGEX = Pattern.compile("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b");
+	@Resource(name = "configurationService")
+	private ConfigurationService configurationService;
 
 	@Override
 	public boolean supports(final Class<?> aClass)
@@ -45,6 +43,7 @@ public class RegistrationValidator implements Validator
 		final String email = registerForm.getEmail();
 		final String pwd = registerForm.getPwd();
 		final String checkPwd = registerForm.getCheckPwd();
+		final boolean termsCheck = registerForm.isTermsCheck();
 
 		validateTitleCode(errors, titleCode);
 		validateName(errors, firstName, "firstName", "register.firstName.invalid");
@@ -59,6 +58,7 @@ public class RegistrationValidator implements Validator
 		validateEmail(errors, email);
 		validatePassword(errors, pwd);
 		comparePasswords(errors, pwd, checkPwd);
+		validateTermsAndConditions(errors, termsCheck);
 	}
 
 	protected void comparePasswords(final Errors errors, final String pwd, final String checkPwd)
@@ -100,7 +100,7 @@ public class RegistrationValidator implements Validator
 		}
 	}
 
-	protected void validateName(final Errors errors, final String name, final String propertyName, String property)
+	protected void validateName(final Errors errors, final String name, final String propertyName, final String property)
 	{
 		if (StringUtils.isBlank(name))
 		{
@@ -114,19 +114,24 @@ public class RegistrationValidator implements Validator
 
 	protected void validateTitleCode(final Errors errors, final String titleCode)
 	{
-		if (StringUtils.isEmpty(titleCode))
-		{
-			errors.rejectValue("titleCode", "register.title.invalid");
-		}
-		else if (StringUtils.length(titleCode) > 255)
+		if (StringUtils.isNotEmpty(titleCode) && StringUtils.length(titleCode) > 255)
 		{
 			errors.rejectValue("titleCode", "register.title.invalid");
 		}
 	}
 
-	public boolean validateEmailAddress(final String email)
+	protected boolean validateEmailAddress(final String email)
 	{
-		final Matcher matcher = EMAIL_REGEX.matcher(email);
+		final Matcher matcher = Pattern.compile(configurationService.getConfiguration().getString(WebConstants.EMAIL_REGEX))
+				.matcher(email);
 		return matcher.matches();
+	}
+
+	protected void validateTermsAndConditions(final Errors errors, final boolean termsCheck)
+	{
+		if (!termsCheck)
+		{
+			errors.rejectValue("termsCheck", "register.terms.not.accepted");
+		}
 	}
 }

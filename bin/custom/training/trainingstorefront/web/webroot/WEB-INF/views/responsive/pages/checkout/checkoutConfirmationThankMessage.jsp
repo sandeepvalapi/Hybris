@@ -5,9 +5,10 @@
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="order" tagdir="/WEB-INF/tags/responsive/order" %>
+<%@ taglib prefix="template" tagdir="/WEB-INF/tags/responsive/template"%>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
-<spring:url value="/login/register/termsandconditions" var="getTermsAndConditionsUrl"/>
+<spring:url value="/login/register/termsandconditions" var="getTermsAndConditionsUrl" htmlEscape="false"/>
 
 <div class="checkout-success">
 	<div class="checkout-success__body">
@@ -25,7 +26,7 @@
 			<div class="checkout__new-account__headline"><spring:theme code="guest.register"/></div>
 			<p><spring:theme code="order.confirmation.guest.register.description"/></p>
 	
-			<form:form method="post" commandName="guestRegisterForm" class="checkout__new-account__form clearfix">
+			<form:form method="post" modelAttribute="guestRegisterForm" class="checkout__new-account__form clearfix">
                 <div class="col-sm-8 col-sm-push-2 col-md-6 col-md-push-3">
                     <form:hidden path="orderCode"/>
                     <form:hidden path="uid"/>
@@ -50,14 +51,15 @@
                             <spring:theme code="registration.consent.link" />
                         </div>
                     </c:if>
-                    
-                    <div class="checkbox">
-						<label class="control-label uncased">
-							<input type="checkbox" id="registerChkTermsConditions" name="registerChkTermsConditions" />
-				            <spring:theme code="register.termsConditions" arguments="${getTermsAndConditionsUrl}" htmlEscape="false" />
-						</label>
-					</div>
-
+                    <template:errorSpanField path="termsCheck">
+	                    <div class="checkbox">
+							<label class="control-label uncased">
+								<form:checkbox id="registerChkTermsConditions" path="termsCheck" disabled="true"/>
+                                <spring:theme var="termsAndConditionsHtml" code="register.termsConditions" arguments="${fn:escapeXml(getTermsAndConditionsUrl)}" htmlEscape="false" />
+                                ${ycommerce:sanitizeHTML(termsAndConditionsHtml)}
+							</label>
+						</div>
+					</template:errorSpanField>
                     <div class="accountActions-bottom">
                         <ycommerce:testId code="guest_Register_button">
                             <button type="submit" class="btn btn-block btn-primary" disabled="disabled">

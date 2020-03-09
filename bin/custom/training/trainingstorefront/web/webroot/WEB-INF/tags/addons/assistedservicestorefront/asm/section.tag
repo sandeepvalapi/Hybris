@@ -6,8 +6,7 @@
 <c:set var="contains" value="false" />
 <c:forEach var="fragment" items="${section.fragments}">
 	<c:if test="${
-			fragment.id == 'profileLoyaltyFragment' or 
-			fragment.id == 'profileSalesStatsFragment' or 
+			fragment.id == 'profileSalesStatsFragment' or
 			fragment.id == 'profileTechnologyUsedFragment'
 		}">
 		<c:set var="contains" value="true" />
@@ -22,11 +21,10 @@
 			<div class="row">
 				<c:forEach items="${section.fragments}" var="fragment">
 					<c:if test="${
-									fragment.id == 'profileLoyaltyFragment' or 
-									fragment.id == 'profileSalesStatsFragment' or 
+									fragment.id == 'profileSalesStatsFragment' or
 									fragment.id == 'profileTechnologyUsedFragment'
 								}">
-						<div class="col-sm-4">
+						<div class="col-sm-6">
 							<asm:fragment id="${fragment.id}" title="${fragment.title}" sectionId="${section.id}"/>
 						</div>
 					</c:if>
@@ -38,8 +36,7 @@
 	<c:forEach items="${section.fragments}" var="fragment">
 		<c:if test="${
 						not (
-							fragment.id == 'profileLoyaltyFragment' or 
-							fragment.id == 'profileSalesStatsFragment' or 
+							fragment.id == 'profileSalesStatsFragment' or
 							fragment.id == 'profileTechnologyUsedFragment'
 						)
 					}">

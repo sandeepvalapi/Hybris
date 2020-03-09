@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.notificationaddon.controllers.pages;
 
@@ -16,9 +9,13 @@ import de.hybris.platform.acceleratorstorefrontcommons.controllers.ThirdPartyCon
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.AbstractPageController;
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.util.GlobalMessages;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
-import de.hybris.platform.notificationaddon.forms.NotificationPreferenceForm;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
+import de.hybris.platform.notificationaddon.forms.NotificationChannelForm;
 import de.hybris.platform.notificationfacades.data.NotificationPreferenceData;
 import de.hybris.platform.notificationfacades.facades.NotificationPreferenceFacade;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -45,35 +42,36 @@ public class NotificationPreferencePageController extends AbstractPageController
 	private static final String NOTIFICATION_PREFERENCE_CMS_PAGE = "notification-preference";
 	private static final String BREADCRUMBS_ATTR = "breadcrumbs";
 	private static final String NOTIFICATION_PREFERENCE_FORM = "notificationPreferenceForm";
+	private static final String[] DISALLOWED_FIELDS = new String[] {};
 
 	@Resource(name = "accountBreadcrumbBuilder")
 	private ResourceBreadcrumbBuilder accountBreadcrumbBuilder;
 
 	@Resource(name = "notificationPreferenceFacade")
 	private NotificationPreferenceFacade notificationPreferenceFacade;
-	
-	final String[] DISALLOWED_FIELDS = new String[]{};
-	
+
 	@InitBinder
-	public void initBinder(WebDataBinder binder) {
+	public void initBinder(final WebDataBinder binder) {
 	    binder.setDisallowedFields(DISALLOWED_FIELDS);
 	}
 
+
 	@RequestMapping(method = RequestMethod.GET)
 	@RequireHardLogIn
-	public String getNotificationPreference(final Model model) throws CMSItemNotFoundException
+	public String getNotificationPreferences(final Model model) throws CMSItemNotFoundException
 	{
-		final NotificationPreferenceForm notificationPreferenceForm = new NotificationPreferenceForm();
-		final NotificationPreferenceData notificationPreferenceData = notificationPreferenceFacade.getNotificationPreference();
 
-		notificationPreferenceForm.setEmailEnabled(notificationPreferenceData.isEmailEnabled());
-		notificationPreferenceForm.setEmailAddress(notificationPreferenceData.getEmailAddress());
-		notificationPreferenceForm.setSmsEnabled(notificationPreferenceData.isSmsEnabled());
-		notificationPreferenceForm.setMobileNumber(notificationPreferenceData.getMobileNumber());
+		final List<NotificationPreferenceData> notificationPreferenceList = notificationPreferenceFacade
+				.getValidNotificationPreferences();
 
-		model.addAttribute(NOTIFICATION_PREFERENCE_FORM, notificationPreferenceForm);
-		storeCmsPageInModel(model, getContentPageForLabelOrId(NOTIFICATION_PREFERENCE_CMS_PAGE));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(NOTIFICATION_PREFERENCE_CMS_PAGE));
+		final NotificationChannelForm form = new NotificationChannelForm();
+		form.setChannels(notificationPreferenceList.stream()
+				.sorted((a, b) -> a.getChannel().getCode().compareTo(b.getChannel().getCode())).collect(Collectors.toList()));
+
+		model.addAttribute(NOTIFICATION_PREFERENCE_FORM, form);
+		final ContentPageModel notificationPreferencePage = getContentPageForLabelOrId(NOTIFICATION_PREFERENCE_CMS_PAGE);
+		storeCmsPageInModel(model, notificationPreferencePage);
+		setUpMetaDataForContentPage(model, notificationPreferencePage);
 
 		model.addAttribute(BREADCRUMBS_ATTR,
 				accountBreadcrumbBuilder.getBreadcrumbs("text.account.profile.notificationPreferenceSetting"));
@@ -84,15 +82,11 @@ public class NotificationPreferencePageController extends AbstractPageController
 
 	@RequestMapping(method = RequestMethod.POST)
 	@RequireHardLogIn
-	public String updateNotificationPreference(final NotificationPreferenceForm notificationPreferenceForm,
+	public String updateNotificationPreference(final NotificationChannelForm notificationPreferenceForm,
 			final BindingResult bindingResult, final Model model, final RedirectAttributes redirectModel)
-					throws CMSItemNotFoundException
+			throws CMSItemNotFoundException
 	{
-		final NotificationPreferenceData notificationPreferenceData = new NotificationPreferenceData();
-		notificationPreferenceData.setEmailEnabled(notificationPreferenceForm.isEmailEnabled());
-		notificationPreferenceData.setSmsEnabled(notificationPreferenceForm.isSmsEnabled());
-
-		notificationPreferenceFacade.updateNotificationPreference(notificationPreferenceData);
+		notificationPreferenceFacade.updateNotificationPreference(notificationPreferenceForm.getChannels());
 
 		model.addAttribute(BREADCRUMBS_ATTR,
 				accountBreadcrumbBuilder.getBreadcrumbs("text.account.profile.notificationPreferenceSetting"));
@@ -103,5 +97,6 @@ public class NotificationPreferencePageController extends AbstractPageController
 
 		return REDIRECT_TO_GET_PREFERENCE_PAGE;
 	}
+
 
 }

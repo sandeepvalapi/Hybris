@@ -51,7 +51,7 @@ ACC.global = {
 
     bindHoverIntentMainNavigation: function () {
 
-        enquire.register("screen and (min-width:" + screenMdMin + ")", {
+        enquire.register("screen and (min-width:" + ACC.common.encodeHtml(screenMdMin) + ")", {
 
             match: function () {
                 // on screens larger or equal screenMdMin (1024px) calculate position for .sub-navigation
@@ -62,14 +62,12 @@ ACC.global = {
                         subNavWidth = $subNav.outerWidth();
                     var $mainNav = $('.js_navigation--bottom'),
                         mainNavWidth = $mainNav.width();
-
-                    console.log($subNav);
+                    
 
                     // get the left position for sub-navigation to be centered under each <li>
                     var leftPos = $this.position().left + itemWidth / 2 - subNavWidth / 2;
                     // get the top position for sub-navigation. this is usually the height of the <li> unless there is more than one row of <li>
                     var topPos = $this.position().top + $this.height();
-
                     if (leftPos > 0 && leftPos + subNavWidth < mainNavWidth) {
                         // .sub-navigation is within bounds of the .main-navigation
                         $subNav.css({
@@ -126,9 +124,12 @@ ACC.global = {
     // usage: ACC.global.addGoogleMapsApi("callback function"); // callback function name like "ACC.global.myfunction"
     addGoogleMapsApi: function (callback) {
         if (callback != undefined && $(".js-googleMapsApi").length == 0) {
-            $('head').append('<script class="js-googleMapsApi" type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=' + ACC.config.googleApiKey + '&sensor=false&callback=' + callback + '"></script>');
+        	var googleApiSrc = "//maps.googleapis.com/maps/api/js?key=" + ACC.common.encodeHtml(ACC.config.googleApiKey) + '&sensor=false&callback=' + ACC.common.encodeHtml(callback);
+    		$('head').append($("<script>").addClass("js-googleMapsApi")
+    								.attr("type", "text/javascript")
+    								.attr("src", googleApiSrc));
         } else if (callback != undefined) {
-            eval(callback + "()");
+            eval(callback + "()"); //NOSONAR
         }
     },
 

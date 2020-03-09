@@ -6,6 +6,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="product" tagdir="/WEB-INF/tags/responsive/product" %>
 
+<spring:htmlEscape defaultHtmlEscape="true" />
+
 <div class="image-gallery js-gallery">
     <span class="image-gallery__zoom-icon glyphicon glyphicon-resize-full"></span>
 
@@ -14,16 +16,23 @@
             <div class="carousel image-gallery__image js-gallery-image">
                 <div class="item">
                     <div>
-                        <spring:theme code="img.missingProductImage.responsive.product" text="/" var="imagePath"/>
+                        <spring:theme code="img.missingProductImage.responsive.product" var="imagePath" htmlEscape="false"/>
                         <c:choose>
                             <c:when test="${originalContextPath ne null}">
-                                <c:url value="${imagePath}" var="imageUrl" context="${originalContextPath}"/>
+								<c:choose>
+									<c:when test='${fn:startsWith(imagePath, originalContextPath)}'>	
+										<c:url value="${imagePath}" var="imageUrl" context="/"/>
+									</c:when>
+									<c:otherwise>
+										<c:url value="${imagePath}" var="imageUrl" context="${originalContextPath}"/>
+									</c:otherwise>
+								</c:choose>
                             </c:when>
                             <c:otherwise>
                                 <c:url value="${imagePath}" var="imageUrl" />
                             </c:otherwise>
                         </c:choose>
-                        <img class="lazyOwl" data-src="${imageUrl}"/>
+                        <img class="lazyOwl" data-src="${fn:escapeXml(imageUrl)}"/>
                     </div>
                 </div>
             </div>
@@ -34,8 +43,8 @@
                 <c:forEach items="${galleryImages}" var="container" varStatus="varStatus">
                     <div class="item">
                         <div>
-                            <img class="lazyOwl" data-src="${container.product.url}"
-                                 data-zoom-image="${container.superZoom.url}"
+                            <img class="lazyOwl" data-src="${fn:escapeXml(container.product.url)}"
+                                 data-zoom-image="${fn:escapeXml(container.superZoom.url)}"
                                  alt="${fn:escapeXml(container.thumbnail.altText)}" >
                         </div>
                     </div>

@@ -3,6 +3,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
+<spring:htmlEscape defaultHtmlEscape="true"/>
+
 <div class="futureStockPopup">
     <br>
     <c:choose>

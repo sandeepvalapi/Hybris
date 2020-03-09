@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 #
 # Import Delivery Modes / Zones
@@ -27,7 +20,8 @@ INSERT_UPDATE Zone                  ; code[unique=true]               ; countrie
                                     ; ca                              ; CA
                                     ; japan                           ; JP
                                     ; china                           ; CN
-
+                                    ; otherAsianRegions	              ; VN,HK,KP,KR,TW,MO
+                                    
 # Zone Delivery Modes
 INSERT_UPDATE ZoneDeliveryMode      ; code[unique=true]               ; net                                                                                                                                             ; active[default=true]
                                     ; premium-net                     ; true
@@ -134,6 +128,21 @@ INSERT_UPDATE ZoneDeliveryModeValue ; deliveryMode(code)[unique=true] ; zone(cod
                                     ; standard-gross                  ;                                                                                                                                                 ; $jpCurrency                    ; 59,99  ; 0,00
                                     ; standard-net                    ;                                                                                                                                                 ; $jpCurrency                    ; 59,99  ; 0,00
                                     ; standard-net                    ;                                                                                                                                                 ; $usCurrency                    ; 18,49  ; 0,00
+
+# otherAsianRegions
+INSERT_UPDATE ZoneDeliveryModeValue ; deliveryMode(code)[unique=true] ; zone(code)[default='otherAsianRegions'][unique=true]                                                                                            ; currency(isocode)[unique=true] ; value  ; minimum[unique=true]
+                                    ; premium-gross                   ;                                                                                                                                                 ; $ukCurrency                    ; 10,99  ; 0,00
+                                    ; premium-gross                   ;                                                                                                                                                 ; $usCurrency                    ; 14,99  ; 0,00
+                                    ; premium-gross                   ;                                                                                                                                                 ; $jpCurrency                    ; 99,99  ; 0,00
+                                    ; premium-gross                   ;                                                                                                                                                 ; $europeCurrency                ; 19,99  ; 0,00
+                                    ; premium-net                     ;                                                                                                                                                 ; $jpCurrency                    ; 99,99  ; 0,00
+                                    ; premium-net                     ;                                                                                                                                                 ; $usCurrency                    ; 17,99  ; 0,00
+                                    ; standard-gross                  ;                                                                                                                                                 ; $ukCurrency                    ; 5,99   ; 0,00
+                                    ; standard-gross                  ;                                                                                                                                                 ; $usCurrency                    ; 7,99   ; 0,00
+                                    ; standard-gross                  ;                                                                                                                                                 ; $jpCurrency                    ; 59,99  ; 0,00
+                                    ; standard-gross                  ;                                                                                                                                                 ; $europeCurrency                ; 9,99   ; 0,00
+                                    ; standard-net                    ;                                                                                                                                                 ; $jpCurrency                    ; 59,99  ; 0,00
+                                    ; standard-net                    ;                                                                                                                                                 ; $usCurrency                    ; 9,99   ; 0,00
 
 # Pickup Delivery Mode
 INSERT_UPDATE PickUpDeliveryMode    ; code[unique=true]               ; active[default=true]                                                                                                                            ; supportedMode(code)

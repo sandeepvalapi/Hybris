@@ -9,7 +9,13 @@
 			<c:forEach items="${banners}" var="banner" varStatus="status">
 				<c:if test="${ycommerce:evaluateRestrictions(banner)}">
 					<c:url value="${banner.urlLink}" var="encodedUrl" />
-					<li><a tabindex="-1" href="${encodedUrl}"<c:if test="${banner.external}"> target="_blank"</c:if>><img src="${banner.media.url}" alt="${not empty banner.headline ? banner.headline : banner.media.altText}" title="${not empty banner.headline ? banner.headline : banner.media.altText}"/></a></li>
+					<li>
+						<a tabindex="-1" href="${fn:escapeXml(encodedUrl)}"<c:if test="${banner.external}"> target="_blank"</c:if>>
+							<img src="${fn:escapeXml(banner.media.url)}" 
+								alt="${not empty banner.headline ? fn:escapeXml(banner.headline) : fn:escapeXml(banner.media.altText)}" 
+								title="${not empty banner.headline ? fn:escapeXml(banner.headline) : fn:escapeXml(banner.media.altText)}"/>
+						</a>
+					</li>
 				</c:if>
 			</c:forEach>
 		</ul>

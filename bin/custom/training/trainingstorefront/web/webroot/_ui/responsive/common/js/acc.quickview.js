@@ -1,9 +1,8 @@
 ACC.quickview = {
 
 	_autoload: [
-		"bindToUiCarouselLink",
+		"bindToUiCarouselLink"
 	],
-		
 		
 	initQuickviewLightbox:function(){
 		ACC.product.enableAddToCartButton();
@@ -22,10 +21,10 @@ ACC.quickview = {
 
 	bindToUiCarouselLink: function ()
 	{
-		var titleHeader = $('#quickViewTitle').html();
+		var titleHeaderHtml = $('#quickViewTitle').html();
 		$(".js-owl-carousel-reference .js-reference-item").colorbox({
 			close:'<span class="glyphicon glyphicon-remove"></span>',
-			title: titleHeader,
+			title: titleHeaderHtml,
 			maxWidth:"100%",
 			onComplete: function ()
 			{

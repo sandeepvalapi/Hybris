@@ -19,7 +19,7 @@
 							<li>
 								<c:url value="${category.url}" var="categoryUrl"/>
                                 <span class="facet__text">
-									<a href="${categoryUrl}">${fn:escapeXml(category.name)}</a>&nbsp;
+									<a href="${fn:escapeXml(categoryUrl)}">${fn:escapeXml(category.name)}</a>&nbsp;
                                         <span class="facet__value__count"></span>
 
 								</span>

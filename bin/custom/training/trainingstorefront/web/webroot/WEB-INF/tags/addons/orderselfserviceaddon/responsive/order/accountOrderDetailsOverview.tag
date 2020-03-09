@@ -44,7 +44,7 @@
             <div class="item-group">
                 <ycommerce:testId code="orderDetail_overviewOrderTotal_label">
                     <span class="item-label"><spring:theme code="text.account.order.total"/></span>
-                    <span class="item-value"><format:price priceData="${order.totalPrice}"/></span>
+                    <span class="item-value"><format:price priceData="${order.totalPriceWithTax}"/></span>
                 </ycommerce:testId>
             </div>
         </div>

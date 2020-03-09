@@ -1,20 +1,13 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.breadcrumb.impl;
 
 import de.hybris.platform.acceleratorstorefrontcommons.breadcrumb.Breadcrumb;
 import de.hybris.platform.acceleratorstorefrontcommons.history.BrowseHistory;
-import de.hybris.platform.catalog.model.classification.ClassificationClassModel;
 import de.hybris.platform.category.model.CategoryModel;
 import de.hybris.platform.commercefacades.product.data.ProductData;
+import de.hybris.platform.commerceservices.helper.ProductAndCategoryHelper;
 import de.hybris.platform.commerceservices.url.UrlResolver;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.product.ProductService;
@@ -38,8 +31,8 @@ public class ProductBreadcrumbBuilder
 	private UrlResolver<ProductModel> productModelUrlResolver;
 	private UrlResolver<CategoryModel> categoryModelUrlResolver;
 	private BrowseHistory browseHistory;
-
 	private ProductService productService;
+	private ProductAndCategoryHelper productAndCategoryHelper;
 
 	/**
 	 * Returns a list of breadcrumbs for the given product.
@@ -55,7 +48,7 @@ public class ProductBreadcrumbBuilder
 		final Collection<CategoryModel> categoryModels = new ArrayList<>();
 		final Breadcrumb last;
 
-		final ProductModel baseProductModel = getBaseProduct(productModel);
+		final ProductModel baseProductModel = getProductAndCategoryHelper().getBaseProduct(productModel);
 		last = getProductBreadcrumb(baseProductModel);
 		categoryModels.addAll(baseProductModel.getSupercategories());
 		last.setLinkClass(LAST_LINK_CLASS);
@@ -83,7 +76,7 @@ public class ProductBreadcrumbBuilder
 
 		for (final CategoryModel categoryModel : categoryModels)
 		{
-			if (!(categoryModel instanceof ClassificationClassModel))
+			if (getProductAndCategoryHelper().isValidProductCategory(categoryModel))
 			{
 				if (categoryToDisplay == null)
 				{
@@ -98,6 +91,10 @@ public class ProductBreadcrumbBuilder
 		return categoryToDisplay;
 	}
 
+	/**
+	 * @deprecated As of 1905 - use {@link ProductAndCategoryHelper#getBaseProduct(ProductModel)} instead
+	 */
+	@Deprecated
 	protected ProductModel getBaseProduct(final ProductModel product)
 	{
 		if (product instanceof VariantProductModel)
@@ -162,4 +159,18 @@ public class ProductBreadcrumbBuilder
 	{
 		this.productService = productService;
 	}
+
+	protected ProductAndCategoryHelper getProductAndCategoryHelper()
+	{
+		return productAndCategoryHelper;
+	}
+
+	@Required
+	public void setProductAndCategoryHelper(final ProductAndCategoryHelper productAndCategoryHelper)
+	{
+		this.productAndCategoryHelper = productAndCategoryHelper;
+	}
+
+
+
 }

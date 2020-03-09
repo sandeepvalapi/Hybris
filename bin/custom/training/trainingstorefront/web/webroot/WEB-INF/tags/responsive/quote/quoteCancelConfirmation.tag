@@ -7,21 +7,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 
-<%--
-    ~ /*
-    ~  * [y] hybris Platform
-    ~  *
-    ~  * Copyright (c) 2000-2017 SAP SE or an SAP affiliate company.
-    ~  * All rights reserved.
-    ~  *
-    ~  * This software is the confidential and proprietary information of SAP
-    ~  * ("Confidential Information"). You shall not disclose such Confidential
-    ~  * Information and shall use it only in accordance with the terms of the
-    ~  * license agreement you entered into with SAP.
-    ~  *
-    ~  */
---%>
-
 <spring:htmlEscape defaultHtmlEscape="true" />
 <spring:url value="/quote/{/quoteCode}/cancel/" var="cancelQuoteUrl" htmlEscape="false">
     <spring:param name="quoteCode"  value="${quoteData.code}"/>
@@ -29,8 +14,8 @@
 
 <div style="display:none">
 	<spring:theme code="text.quote.cancel.confirmation.modal.title" arguments="${quoteData.code}"
-				  var="cancelConfirmationModalTitle"/>
-	<div id="js-quote-cancel-modal" data-cancel-confirmation-modal-title="${cancelConfirmationModalTitle}">
+				  var="cancelConfirmationModalTitleHtml"/>
+	<div id="js-quote-cancel-modal" data-cancel-confirmation-modal-title="${cancelConfirmationModalTitleHtml}">
 		<div class="modal__top">
             <label class="modal__top--label">
                 <spring:theme code="text.quote.name.label"/>

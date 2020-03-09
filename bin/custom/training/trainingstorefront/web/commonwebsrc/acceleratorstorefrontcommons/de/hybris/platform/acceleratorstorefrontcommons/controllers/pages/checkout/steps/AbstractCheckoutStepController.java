@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.checkout.steps;
 
@@ -25,6 +18,7 @@ import de.hybris.platform.commercefacades.order.CartFacade;
 import de.hybris.platform.commercefacades.product.ProductFacade;
 import de.hybris.platform.commercefacades.user.data.CountryData;
 import de.hybris.platform.commercefacades.user.data.TitleData;
+import de.hybris.platform.commerceservices.enums.CountryType;
 import de.hybris.platform.servicelayer.exceptions.UnknownIdentifierException;
 
 import java.util.ArrayList;
@@ -104,7 +98,7 @@ public abstract class AbstractCheckoutStepController extends AbstractCheckoutCon
 	@ModelAttribute("countries")
 	public Collection<CountryData> getCountries()
 	{
-		return getCheckoutFacade().getDeliveryCountries();
+		return getCheckoutFacade().getCountries(CountryType.SHIPPING);
 	}
 
 	@ModelAttribute("countryDataMap")
@@ -155,9 +149,10 @@ public abstract class AbstractCheckoutStepController extends AbstractCheckoutCon
 	protected void prepareDataForPage(final Model model) throws CMSItemNotFoundException
 	{
 		model.addAttribute("isOmsEnabled", Boolean.valueOf(getSiteConfigService().getBoolean("oms.enabled", false)));
-		model.addAttribute("supportedCountries", getCartFacade().getDeliveryCountries());
+		model.addAttribute("supportedCountries", getCheckoutFacade().getCountries(CountryType.SHIPPING));
 		model.addAttribute("expressCheckoutAllowed", Boolean.valueOf(getCheckoutFacade().isExpressCheckoutAllowedForCart()));
 		model.addAttribute("taxEstimationEnabled", Boolean.valueOf(getCheckoutFacade().isTaxEstimationEnabledForCart()));
+		model.addAttribute("supportedBillingCountries", getCheckoutFacade().getCountries(CountryType.BILLING));
 	}
 
 	protected CheckoutStep getCheckoutStep(final String currentController)

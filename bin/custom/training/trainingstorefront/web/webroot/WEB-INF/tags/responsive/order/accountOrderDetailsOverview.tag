@@ -7,6 +7,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 
+<spring:htmlEscape defaultHtmlEscape="true" />
+
 <div class="order-detail-overview">
     <div class="row">
         <div class="col-sm-3">
@@ -39,18 +41,20 @@
             <div class="item-group">
                 <ycommerce:testId code="orderDetail_overviewOrderTotal_label">
                     <span class="item-label"><spring:theme code="text.account.order.total"/></span>
-                    <span class="item-value"><format:price priceData="${order.totalPrice}"/></span>
+                    <span class="item-value"><format:price priceData="${order.totalPriceWithTax}"/></span>
                 </ycommerce:testId>
             </div>
         </div>
         <c:if test="${orderData.quoteCode ne null}">
 			  <div class="col-sm-3">
 			  	  <div class="item-group">
-					  <spring:url htmlEscape="false" value="/my-account/my-quotes/${orderData.quoteCode}" var="quoteDetailUrl"/>
+					  <spring:url htmlEscape="false" value="/my-account/my-quotes/{/quoteCode}" var="quoteDetailUrl">
+					  <spring:param name="quoteCode"  value="${orderData.quoteCode}"/>
+					  </spring:url>
 		              <ycommerce:testId code="orderDetail_overviewQuoteId_label">
 							  <span class="item-label"><spring:theme code="text.account.quote.code"/></span>
 							  <span class="item-value">
-								  <a href="${quoteDetailUrl}" >
+								  <a href="${fn:escapeXml(quoteDetailUrl)}" >
 								  	  ${fn:escapeXml(orderData.quoteCode)}
 								  </a>
 							  </span>

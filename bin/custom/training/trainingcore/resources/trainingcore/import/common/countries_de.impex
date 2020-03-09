@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 #
 # Import Countries
@@ -112,7 +105,7 @@ UPDATE Country;isocode[unique=true];name[lang=$lang]
  ;GU;"Guam"
  ;GW;"Guinea-Bissau"
  ;GY;"Guyana"
- ;HK;"Hongkong"
+ ;HK;"Hongkong, China"
  ;HM;"Heard und die McDonaldinseln"
  ;HN;"Honduras"
  ;HR;"Kroatien"
@@ -165,7 +158,7 @@ UPDATE Country;isocode[unique=true];name[lang=$lang]
  ;ML;"Mali"
  ;MM;"Myanmar"
  ;MN;"Mongolei"
- ;MO;"Macao"
+ ;MO;"Macao, China"
  ;MP;"Nördliche Marianen"
  ;MQ;"Martinique"
  ;MR;"Mauretanien"
@@ -244,7 +237,7 @@ UPDATE Country;isocode[unique=true];name[lang=$lang]
  ;TR;"Türkei"
  ;TT;"Trinidad und Tobago"
  ;TV;"Tuvalu"
- ;TW;"Taiwan"
+ ;TW;"Taiwan, China"
  ;TZ;"Tansania"
  ;UA;"Ukraine"
  ;UG;"Uganda"

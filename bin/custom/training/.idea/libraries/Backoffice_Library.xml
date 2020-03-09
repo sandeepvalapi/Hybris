@@ -1,0 +1,64 @@
+<component name="libraryTable">
+  <library name="Backoffice Library">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/adaptive-search/adaptivesearchbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/api-registry/apiregistrybackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/backoffice-framework/backofficesolrsearch/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/base-commerce/basecommercebackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/web-content-management-system/cmsbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/commerce-services/commerceservicesbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/consignment-tracking/consignmenttrackingbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/coupon/couponbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/customer-service/customersupportbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/integration-apis/integrationbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/integration-apis/integrationmonitoringbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/sap-cloud-platform-extension-factory-integration/kymaintegrationbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/cds-merchandising/merchandisingservicesbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/integration-apis/outboundsyncbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/backoffice-applications/pcmbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization/personalizationcmsbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization-integration/personalizationintegrationbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization-promotion/personalizationpromotionsbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization-search/personalizationsearchbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization/personalizationservicesbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/backoffice-framework/platformbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/promotion-engine/promotionenginebackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/base-commerce/promotionsbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/rule-engine/rulebuilderbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/rule-engine/ruleenginebackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/search-and-navigation/solrfacetsearchbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/base-commerce/voucherbackoffice/resources/backoffice" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/yforms/xyformsbackoffice/resources/backoffice" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/adaptive-search/adaptivesearchbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/api-registry/apiregistrybackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/backoffice-applications/pcmbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/backoffice-framework/backofficesolrsearch/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/backoffice-framework/platformbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/base-commerce/basecommercebackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/base-commerce/promotionsbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/base-commerce/voucherbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/cds-merchandising/merchandisingservicesbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/commerce-services/commerceservicesbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/consignment-tracking/consignmenttrackingbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/coupon/couponbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/customer-service/customersupportbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/integration-apis/integrationbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/integration-apis/integrationmonitoringbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/integration-apis/outboundsyncbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization-integration/personalizationintegrationbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization-promotion/personalizationpromotionsbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization-search/personalizationsearchbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization/personalizationcmsbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/personalization/personalizationservicesbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/promotion-engine/promotionenginebackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/rule-engine/rulebuilderbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/rule-engine/ruleenginebackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/sap-cloud-platform-extension-factory-integration/kymaintegrationbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/search-and-navigation/solrfacetsearchbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/web-content-management-system/cmsbackoffice/resources/backoffice" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/modules/yforms/xyformsbackoffice/resources/backoffice" recursive="true" />
+  </library>
+</component>

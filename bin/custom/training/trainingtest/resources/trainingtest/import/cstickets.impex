@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 $defaultPassword=12341234
 
@@ -53,27 +46,29 @@ INSERT_UPDATE CommentType;code[unique=true];name;domain[unique=true](code);metaT
 INSERT_UPDATE CsAgentGroup;uid[unique=true];ticketstores(uid);defaultAssignee(uid)
 ;zohanAgentGroup;;
 
+INSERT_UPDATE Employee;uid[unique=true];name;groups(uid)
+;yacctestcsagent;Agent for Test;zohanAgentGroup
+
 INSERT_UPDATE CsCustomerEvent;code[unique=true];author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);subject;text
-;0001000-create;csagent;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
-;0002000-create;csagent;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
-;0003000-create;csagent;ticketSystem;customerEmail;'';'Ticket email note';
-;0004000-create;csagent;ticketSystem;ticketCreationEvent;'';'Ticket Created problem';
-;0005000-create;csagent;ticketSystem;ticketChangeEvent;'';'Ticket Changed problem';
-;0006000-create;csagent;ticketSystem;ticketCreationEvent;'';'Ticket Created incident';
-;0007000-create;csagent;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
-;0008000-update;csagent;ticketSystem;ticketCreationEvent;'';'My tripod has broken and I need to order new leg for my tripod. Do you sell spare parts for your tripods?  I need to purchase a leg to replace the broken leg.';
+;0001000-create;yacctestcsagent;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;0002000-create;yacctestcsagent;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;0003000-create;yacctestcsagent;ticketSystem;customerEmail;'';'Ticket email note';
+;0004000-create;yacctestcsagent;ticketSystem;ticketCreationEvent;'';'Ticket Created problem';
+;0005000-create;yacctestcsagent;ticketSystem;ticketChangeEvent;'';'Ticket Changed problem';
+;0006000-create;yacctestcsagent;ticketSystem;ticketCreationEvent;'';'Ticket Created incident';
+;0007000-create;yacctestcsagent;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;0008000-update;yacctestcsagent;ticketSystem;ticketCreationEvent;'';'My tripod has broken and I need to order new leg for my tripod. Do you sell spare parts for your tripods?  I need to purchase a leg to replace the broken leg.';
 
 INSERT_UPDATE CsTicket;state[default='Open'](code);ticketID[unique=true];customer(uid);order(code);category(code);priority(code);assignedAgent(uid);assignedGroup(uid);headline;comments(code);resolution(code);
-;;0001000;zohan@customer.com;zohan-00-1;Incident;High;csagent;fraudAgentGroup;'Order 00-1 Incident';0001000-create;
-;;0002000;zohan@customer.com;zohan-00-1;Note;High;csagent;fraudAgentGroup;'Order 00-1 note';0002000-create;
-;;0003000;zohan@customer.com;zohan-00-2;Incident;Medium;csagent;fraudAgentGroup;'Order 00-2 Incident';0003000-create;
-;;0004000;zohan@customer.com;zohan-00-2;Note;High;csagent;zohanAgentGroup;'Order 00-2 note';0004000-create;
-;;0005000;zohan@customer.com;;Fraud;High;csagent;fraudAgentGroup;'Possible Zohan customer fraud detected';0005000-create;
-;;0006000;zohan@customer.com;;Incident;Low;csagent;zohanAgentGroup;'Customer incident';0006000-create;
-;;0007000;zohan@customer.com;;Problem;Low;csagent;fraudAgentGroup;'Customer Zohan problem';0007000-create;
-
-;;0008000;aaron.customer@hybris.com;;Enquiry;Low;csagent;fraudAgentGroup;'Where is my order?';0008000-update;
-;;0009000;aaron.customer@hybris.com;;Enquiry;Low;csagent;fraudAgentGroup;'Is this bag battery fireproof?';0008000-update;
-;;0010000;aaron.customer@hybris.com;;Complaint;High;csagent;fraudAgentGroup;'I'd like to purchase a sports zoom lense?';0008000-update;
-;;0011000;aaron.customer@hybris.com;;Enquiry;Low;csagent;fraudAgentGroup;'Rude in-store customer service!';0008000-update;
-;;0012000;aaron.customer@hybris.com;;Problem;Low;csagent;fraudAgentGroup;'Suitable digital memory';0008000-update;
+;;0001000;zohan@customer.com;zohan-00-1;Incident;High;yacctestcsagent;fraudAgentGroup;'Order 00-1 Incident';0001000-create;
+;;0002000;zohan@customer.com;zohan-00-1;Note;High;yacctestcsagent;fraudAgentGroup;'Order 00-1 note';0002000-create;
+;;0003000;zohan@customer.com;zohan-00-2;Incident;Medium;yacctestcsagent;fraudAgentGroup;'Order 00-2 Incident';0003000-create;
+;;0004000;zohan@customer.com;zohan-00-2;Note;High;yacctestcsagent;zohanAgentGroup;'Order 00-2 note';0004000-create;
+;;0005000;zohan@customer.com;;Fraud;High;yacctestcsagent;fraudAgentGroup;'Possible Zohan customer fraud detected';0005000-create;
+;;0006000;zohan@customer.com;;Incident;Low;yacctestcsagent;zohanAgentGroup;'Customer incident';0006000-create;
+;;0007000;zohan@customer.com;;Problem;Low;yacctestcsagent;fraudAgentGroup;'Customer Zohan problem';0007000-create;
+;;0008000;aaron.customer@hybris.com;;Enquiry;Low;yacctestcsagent;fraudAgentGroup;'Where is my order?';0008000-update;
+;;0009000;aaron.customer@hybris.com;;Enquiry;Low;yacctestcsagent;fraudAgentGroup;'Is this bag battery fireproof?';0008000-update;
+;;0010000;aaron.customer@hybris.com;;Complaint;High;yacctestcsagent;fraudAgentGroup;'I'd like to purchase a sports zoom lense?';0008000-update;
+;;0011000;aaron.customer@hybris.com;;Enquiry;Low;yacctestcsagent;fraudAgentGroup;'Rude in-store customer service!';0008000-update;
+;;0012000;aaron.customer@hybris.com;;Problem;Low;yacctestcsagent;fraudAgentGroup;'Suitable digital memory';0008000-update;

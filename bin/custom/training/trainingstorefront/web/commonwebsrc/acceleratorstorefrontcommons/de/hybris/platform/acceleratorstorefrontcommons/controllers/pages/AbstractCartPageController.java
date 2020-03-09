@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.controllers.pages;
 
@@ -16,6 +9,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.SaveCartForm;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.UpdateQuantityForm;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.commercefacades.order.CartFacade;
 import de.hybris.platform.commercefacades.order.SaveCartFacade;
 import de.hybris.platform.commercefacades.order.data.CartData;
@@ -63,8 +57,9 @@ public abstract class AbstractCartPageController extends AbstractPageController
 		final CartData cartData = cartFacade.getSessionCartWithEntryOrdering(false);
 		createProductEntryList(model, cartData);
 
-		storeCmsPageInModel(model, getContentPageForLabelOrId(CART_CMS_PAGE_LABEL));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(CART_CMS_PAGE_LABEL));
+		final ContentPageModel cartPage = getContentPageForLabelOrId(CART_CMS_PAGE_LABEL);
+		storeCmsPageInModel(model, cartPage);
+		setUpMetaDataForContentPage(model, cartPage);
 	}
 
 	protected void createProductEntryList(final Model model, final CartData cartData)

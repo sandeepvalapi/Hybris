@@ -21,37 +21,22 @@
             </c:when>
             <c:otherwise>
             	<c:forEach items="${fragmentData}" var="productAffinityData">
-                    <c:set var="viewedSince" value="${assistedserviceutils:timeSince(productAffinityData.updated)}" scope="page"/>
                     <spring:url value="${productAffinityData.productData.url}" var="productUrl" htmlEscape="false"/>
                     <div class="col-sm-6 col-md-4">
                         <div class="asm__customer360-overview-product-view">
-                            <div class="asm__customer360-overview-product-img">                           
+                            <div class="asm__customer360-overview-product-img">
                                 <a href="${productUrl}" class="responsive-table-link text-nowrap">
                                     <product:productPrimaryImage product="${productAffinityData.productData}" format="thumbnail" />
                                 </a>
                             </div>
                             <div class="asm__customer360-overview-product-name">
-                            	 <c:set var="productName" value="${fn:escapeXml(productAffinityData.productData.name)}" scope="page"/>                            	
+                            	 <c:set var="productName" value="${fn:escapeXml(productAffinityData.productData.name)}" scope="page"/>
                                 <a href="${productUrl}" class="responsive-table-link text-nowrap" title="${productName}">
                                     <div class="hide_overflow">${productName}</div>
                                 </a>
                             </div>
                             <div class="asm__customer360-overview-product-sku">${fn:escapeXml(productAffinityData.productData.code)}</div>
                             <div class="asm__customer360-overview-product-price">${fn:escapeXml(productAffinityData.productData.price.formattedValue)}</div>
-                            <div class="asm__customer360-overview-product-views">${fn:escapeXml(productAffinityData.viewCount)}&nbsp;
-                                <c:choose>
-                                    <c:when test="${productAffinityData.viewCount > 1}">
-                                        <spring:theme code="text.customer360.yprofile.recent.views" text="views" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        <spring:theme code="text.customer360.yprofile.recent.view" text="view" />
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                            <div class="asm__customer360-overview-product-time">
-                                <spring:theme code="text.asm.util.${viewedSince}" arguments="${viewedSince.value}"/>&nbsp;
-                                <spring:theme code="text.asm.util.ago" text="ago"/>
-                            </div>
                         </div>
                     </div>
                 </c:forEach>

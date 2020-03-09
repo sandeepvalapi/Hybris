@@ -18,7 +18,6 @@ ACC.tabs = {
 			autoAnchor:true
 		});
 
-
 		$e.on("click",".tabhead",function(e){
 			e.preventDefault();
 
@@ -28,7 +27,7 @@ ACC.tabs = {
 				$(this).parents(".js-tabs").children(".tabs-list").find("a[href='"+"#"+$(this).attr("id")+"']").click();
 
 				var offset = $(this).offset().top;
-				$("body,html").scrollTop(offset)
+				$("body,html").scrollTop(offset);
 			}
 			
 		});
@@ -70,34 +69,30 @@ ACC.tabs = {
 			}		
 		});
 
-		$(document).on("click",".js-openTab",function(){
+		$(document).on("click",".js-openTab",function() {
             tabs.showAccessibleTabSelector($(this).attr("href")); 
-		})
-	
+		});
 	},
 	
 	showReviewsAction: function (s)
 	{
-		$.get($("#reviews").data(s), function (result){
-			$('#reviews').html(result);
+		$.get($("#reviews").data(s), undefined, function (result){
+			$('#reviews').html(ACC.sanitizer.sanitize(result));
 			if($(".js-ratingCalc").length > 0){
 				ACC.ratingstars.bindRatingStars();
 				ACC.tabs.showingAllReviews();
 			}
-		});
-		
+		}, 'html');
 	},
 	
-	hideReviewBtn: function (btnClass){
+	hideReviewBtn: function (btnClass) {
 
-		btnClass = (btnClass == undefined)? ".less-reviews-btn" : btnClass;
+		btnClass = (btnClass === undefined) ? ".less-reviews-btn" : btnClass;
 		$(btnClass).hide();
-		
 	},
 	
-	showReviewBtn: function (btnClass){
+	showReviewBtn: function (btnClass) {
 		$(btnClass).show();
-
 	},
 	
 	showingAllReviews: function()
@@ -110,9 +105,8 @@ ACC.tabs = {
 	
 	determineToDisplayReviews: function ()
 	{
-		if(location.hash == "#tabreview"){
+		if(location.hash === "#tabreview"){
 			ACC.tabs.showReviewsAction('reviews');
 		}
-	},
-
+	}
 };

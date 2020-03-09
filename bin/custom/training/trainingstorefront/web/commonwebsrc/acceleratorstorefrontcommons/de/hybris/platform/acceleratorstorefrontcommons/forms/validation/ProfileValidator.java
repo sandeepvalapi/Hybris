@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms.validation;
 
@@ -39,11 +32,7 @@ public class ProfileValidator implements Validator
 		final String firstName = profileForm.getFirstName();
 		final String lastName = profileForm.getLastName();
 
-		if (StringUtils.isEmpty(title))
-		{
-			errors.rejectValue("titleCode", "profile.title.invalid");
-		}
-		else if (StringUtils.length(title) > 255)
+		if (StringUtils.isNotEmpty(title) && StringUtils.length(title) > 255)
 		{
 			errors.rejectValue("titleCode", "profile.title.invalid");
 		}

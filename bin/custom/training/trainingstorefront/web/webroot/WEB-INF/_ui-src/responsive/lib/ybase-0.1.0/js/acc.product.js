@@ -12,7 +12,8 @@ ACC.product = {
         $(document).on("click", ".js-show-facets", function (e) {
             e.preventDefault();
             var selectRefinementsTitle = $(this).data("selectRefinementsTitle");
-            ACC.colorbox.open(selectRefinementsTitle, {
+            var colorBoxTitleHtml = ACC.common.encodeHtml(selectRefinementsTitle);
+            ACC.colorbox.open(colorBoxTitleHtml, {
                 href: ".js-product-facet",
                 inline: true,
                 width: "480px",

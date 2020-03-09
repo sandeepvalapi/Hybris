@@ -13,6 +13,7 @@
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="template" tagdir="/WEB-INF/tags/responsive/template"%>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags"%>
@@ -21,16 +22,16 @@
 
 <template:errorSpanField path="${path}">
 	<ycommerce:testId code="LoginPage_Item_${idKey}">
-		<label class="control-label ${labelCSS}" for="${idKey}">
+		<label class="control-label ${fn:escapeXml(labelCSS)}" for="${fn:escapeXml(idKey)}">
 			<spring:theme code="${labelKey}" />
 			<c:if test="${mandatory != null && mandatory == false}">
 				<span>&nbsp;<spring:theme code="login.optional" /></span>
 			</c:if>
 		</label>
 			
-		<spring:theme code="${placeholder}" var="placeHolderMessage" />
+		<spring:theme code="${placeholder}" var="placeHolderMessage" htmlEscape="false"/>
 
-		<form:input cssClass="${inputCSS} form-control" id="${idKey}" path="${path}"
+		<form:input cssClass="${fn:escapeXml(inputCSS)} form-control" id="${idKey}" path="${path}"
 					tabindex="${tabindex}" autocomplete="${autocomplete}" placeholder="${placeHolderMessage}"
 					disabled="${disabled}" maxlength="${maxlength}"/>
 						

@@ -12,10 +12,3 @@
 <c:if test="${not empty store.openingHours}">
 	"openings":<store:openingSchedule openingSchedule="${store.openingHours}" />
 </c:if>
-
-
-<%-- <c:if test="${not empty store.openingHours.specialDayOpeningList}">
-	"specialOpenings":<store:openingSpecialDays openingSchedule="${store.openingHours}" />
-</c:if> --%>
-
-

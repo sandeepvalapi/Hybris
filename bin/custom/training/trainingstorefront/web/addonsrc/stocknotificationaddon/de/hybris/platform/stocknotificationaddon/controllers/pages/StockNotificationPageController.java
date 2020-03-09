@@ -1,14 +1,6 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
-
 package de.hybris.platform.stocknotificationaddon.controllers.pages;
 
 import de.hybris.platform.acceleratorfacades.futurestock.FutureStockFacade;
@@ -20,7 +12,6 @@ import de.hybris.platform.commercefacades.product.data.FutureStockData;
 import de.hybris.platform.commercefacades.product.data.ProductData;
 import de.hybris.platform.customerinterestsfacades.data.ProductInterestData;
 import de.hybris.platform.customerinterestsfacades.productinterest.ProductInterestFacade;
-import de.hybris.platform.notificationfacades.data.NotificationPreferenceData;
 import de.hybris.platform.notificationfacades.facades.NotificationPreferenceFacade;
 import de.hybris.platform.notificationservices.enums.NotificationType;
 import de.hybris.platform.stocknotificationaddon.controllers.StocknotificationaddonControllerConstants;
@@ -56,8 +47,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class StockNotificationPageController extends AbstractPageController
 {
 	private static final String PRODUCT_CODE_PATH_VARIABLE_PATTERN = "{productCode:.*}";
-	private static final String expiryDay = "customerinterestsservices.expiryDay";
+	private static final String EXPIRY_DAY = "customerinterestsservices.expiryDay";
 	private static final String PRODUCT_DETAIL_PAGE = "pdp";
+	private static final String[] DISALLOWED_FIELDS = new String[] {};
 
 	@Resource(name = "productInterestFacade")
 	private ProductInterestFacade productInterestFacade;
@@ -74,7 +66,6 @@ public class StockNotificationPageController extends AbstractPageController
 	@Resource(name = "futureStockFacade")
 	private FutureStockFacade futureStockFacade;
 
-	final String[] DISALLOWED_FIELDS = new String[]{};
 
 	@InitBinder
 	public void initBinder(final WebDataBinder binder) {
@@ -103,12 +94,11 @@ public class StockNotificationPageController extends AbstractPageController
 		}
 		else
 		{
-			final NotificationPreferenceData preferenceData = notificationPreferenceFacade.getNotificationPreference();
-			model.addAttribute("stockNotificationForm",
-					stockNotificationHandler.prepareStockNotifcationFormByCustomer(preferenceData));
+			model.addAttribute("stockNotificationForm", stockNotificationHandler
+					.prepareStockNotifcationFormByCustomer(notificationPreferenceFacade.getValidNotificationPreferences()));
 		}
 		model.addAttribute("action", "/my-account/my-stocknotification/add/" + productCode);
-		model.addAttribute("expiryDay", Config.getParameter(expiryDay));
+		model.addAttribute("expiryDay", Config.getParameter(EXPIRY_DAY));
 
 		final List<FutureStockData> availabilities = futureStockFacade.getFutureAvailability(productCode);
 		if (!CollectionUtils.isEmpty(availabilities))

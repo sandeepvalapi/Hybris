@@ -4,7 +4,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Terminal+Dosis">
-<link rel="stylesheet" type="text/css" media="all" href="/yacceleratorstorefront/_ui/addons/assistedservicestorefront/responsive/common/css/customer360.css">
 
 <div class="asm__customer360">
     

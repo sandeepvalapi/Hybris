@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms;
 
@@ -22,9 +15,8 @@ public class RegisterForm
 	private String email;
 	private String pwd;
 	private String checkPwd;
-	private String captcha;
-	private String mobileNumber;
 	private ConsentForm consentForm;
+	private boolean termsCheck;
 
 	/**
 	 * @return the titleCode
@@ -128,26 +120,6 @@ public class RegisterForm
 		this.checkPwd = checkPwd;
 	}
 
-	public String getCaptcha()
-	{
-		return captcha;
-	}
-
-	public void setCaptcha(final String captcha)
-	{
-		this.captcha = captcha;
-	}
-
-	public String getMobileNumber()
-	{
-		return mobileNumber;
-	}
-
-	public void setMobileNumber(final String mobileNumber)
-	{
-		this.mobileNumber = mobileNumber;
-	}
-
 	public ConsentForm getConsentForm()
 	{
 		return consentForm;
@@ -156,5 +128,15 @@ public class RegisterForm
 	public void setConsentForm(final ConsentForm consentForm)
 	{
 		this.consentForm = consentForm;
+	}
+
+	public boolean isTermsCheck()
+	{
+		return termsCheck;
+	}
+
+	public void setTermsCheck(final boolean termsCheck)
+	{
+		this.termsCheck = termsCheck;
 	}
 }

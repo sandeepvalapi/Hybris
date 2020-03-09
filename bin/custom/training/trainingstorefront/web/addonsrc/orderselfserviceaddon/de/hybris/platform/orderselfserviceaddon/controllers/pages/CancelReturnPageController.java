@@ -1,7 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company.
  * All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
@@ -38,7 +38,8 @@ import javax.annotation.Resource;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,7 +64,7 @@ public class CancelReturnPageController extends AbstractSearchPageController
 	protected static final String RETURN_BREADCRUMB_LABEL = "text.account.returns.returnBreadcrumb";
 	protected static final String CANCEL_RETURN_LABEL = "text.account.return.cancelReturn";
 
-	private static final Logger LOG = Logger.getLogger(CancelReturnPageController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CancelReturnPageController.class);
 
 	@Resource(name = "omsReturnFacade")
 	private OmsReturnFacade omsReturnFacade;

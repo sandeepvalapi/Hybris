@@ -4,36 +4,20 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags"%>
 <%@ taglib prefix="cart" tagdir="/WEB-INF/tags/responsive/cart" %>
+<c:set var="productName" value="${fn:escapeXml(product.name)}" />
 
-{"cartData": {
-"total": "${cartData.totalPrice.value}",
-"products": [
-<c:forEach items="${cartData.entries}" var="cartEntry" varStatus="status">
-	{
-		"sku":		"${fn:escapeXml(cartEntry.product.code)}",
-		"name": 	"<c:out value='${cartEntry.product.name}' />",
-		"qty": 		"${cartEntry.quantity}",
-		"price": 	"${cartEntry.basePrice.value}",
-		"categories": [
-		<c:forEach items="${cartEntry.product.categories}" var="category" varStatus="categoryStatus">
-			"<c:out value='${category.name}' />"<c:if test="${not categoryStatus.last}">,</c:if>
-		</c:forEach>
-		]
-	}<c:if test="${not status.last}">,</c:if>
-</c:forEach>
-]
-},
-
-"quickOrderErrorData": [
+{"quickOrderErrorData": [
 <c:forEach items="${quickOrderErrorData}" var="quickOrderEntry" varStatus="status">
+	<c:set var="productCode" value="${fn:escapeXml(quickOrderEntry.productData.code)}" />
+	<spring:theme code="${quickOrderEntry.errorMsg}" var="quickOrderEntryErrorMsg" htmlEscape="true"/>
 	{
-		"sku":		"${fn:escapeXml(quickOrderEntry.productData.code)}",
-		"errorMsg": "<spring:theme code='${quickOrderEntry.errorMsg}' htmlEscape="true"/>"
+		"sku":		"${ycommerce:encodeJSON(productCode)}",
+		"errorMsg": "${ycommerce:encodeJSON(quickOrderEntryErrorMsg)}"
 	}<c:if test="${not status.last}">,</c:if>
 </c:forEach>
 ],
 
-"cartAnalyticsData":{"cartCode" : "${cartCode}","productPostPrice":"${entry.basePrice.value}","productName":"<c:out value='${product.name}' />"}
+"cartAnalyticsData":{"cartCode" : "${ycommerce:encodeJSON(cartCode)}","productPostPrice":"${ycommerce:encodeJSON(entry.basePrice.value)}","productName":"${ycommerce:encodeJSON(productName)}"}
 ,
 "addToCartLayer":"<spring:escapeBody javaScriptEscape="true" htmlEscape="false">
 	<spring:htmlEscape defaultHtmlEscape="true">
@@ -73,7 +57,7 @@
             </c:choose>
 
             <ycommerce:testId code="checkoutLinkInPopup">
-                <a href="${cartUrl}" class="btn btn-primary btn-block add-to-cart-button">
+                <a href="${fn:escapeXml(cartUrl)}" class="btn btn-primary btn-block add-to-cart-button">
 	                <c:choose>
 		                <c:when test="${isQuote}">
 		                	<spring:theme code="quote.view" />

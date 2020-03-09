@@ -39,7 +39,7 @@
                                             </p>
                                         </div>
                                         <div class="col-md-2 col-lg-1 col-sm-3">
-                                            <a href="${editGroupUrl}"><spring:theme code="cart.groups.edit"/></a>
+                                            <a href="${fn:escapeXml(editGroupUrl)}"><spring:theme code="cart.groups.edit"/></a>
                                         </div>
                                     </div>
                                 </th>
@@ -51,7 +51,7 @@
                                                 ${fn:escapeXml(entryGroup.label)}
                                         </div>
                                         <div class="col-md-2 col-lg-1 col-sm-3">
-                                            <a href="${editGroupUrl}"><spring:theme code="cart.groups.edit"/></a>
+                                            <a href="${fn:escapeXml(editGroupUrl)}"><spring:theme code="cart.groups.edit"/></a>
                                         </div>
                                     </div>
                                 </th>

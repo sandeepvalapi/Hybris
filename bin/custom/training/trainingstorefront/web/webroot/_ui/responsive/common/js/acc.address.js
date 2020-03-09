@@ -73,6 +73,7 @@ ACC.address = {
 			url: getDeliveryAddressFormUrl,
 			data: {addressId: ACC.address.addressID, createUpdateStatus: ''},
 			type: 'GET',
+            dataType: 'html',
 			success: function (data)
 			{
 				$('#summaryDeliveryAddressFormContainer').html(data);
@@ -110,7 +111,7 @@ ACC.address = {
 			},
 			error: function (xht, textStatus, ex)
 			{
-				alert("Failed to update cart. Error details [" + xht + ", " + textStatus + ", " + ex + "]");
+				console.log("Failed to update cart. Error details [" + xht + ", " + textStatus + ", " + ex + "]");  // NOSONAR
 			}
 		};
 
@@ -131,7 +132,7 @@ ACC.address = {
 			},
 			error: function (xht, textStatus, ex)
 			{
-				alert("Failed to update address book. Error details [" + xht + ", " + textStatus + ", " + ex + "]");
+				console.log("Failed to update address book. Error details [" + xht + ", " + textStatus + ", " + ex + "]");  // NOSONAR
 			}
 		};
 
@@ -148,7 +149,7 @@ ACC.address = {
 		}
 		else
 		{
-			alert("Failed to set delivery address");
+			console.log("Failed to set delivery address");  // NOSONAR
 		}
 	},
 
@@ -179,7 +180,7 @@ ACC.address = {
 				},
 				error: function (xht, textStatus, ex)
 				{
-					alert("Failed to update cart. Error details [" + xht + ", " + textStatus + ", " + ex + "]");
+					console.log("Failed to update cart. Error details [" + xht + ", " + textStatus + ", " + ex + "]");  // NOSONAR
 				},
 				complete: function ()
 				{

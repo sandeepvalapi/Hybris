@@ -26,7 +26,7 @@
             <div class="account-section-content">
                 <div class="account-section-form">
                     <div id="customer-ticketing-alerts"></div>
-                    <form:form method="post" commandName="supportTicketForm" enctype="multipart/form-data">
+                    <form:form method="post" modelAttribute="supportTicketForm" enctype="multipart/form-data">
                         <formElement:formInputBox idKey="createTicket-subject" labelKey="text.account.supporttickets.createTicket.subject" path="subject" inputCSS="text" mandatory="true" />
                         <div id="NotEmpty-supportTicketForm-subject" class="help-block" style="display: none;">
                             <span id="subject-errors"></span>

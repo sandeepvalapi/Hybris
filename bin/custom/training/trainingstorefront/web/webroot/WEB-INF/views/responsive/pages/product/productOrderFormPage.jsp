@@ -10,7 +10,7 @@
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
-<c:url value="/${product.url}" var="productUrl"/>
+<c:url value="${product.url}" var="productUrl"/>
 
 <template:page pageTitle="${pageTitle}">
 
@@ -23,7 +23,7 @@
         </c:if>
 
         <div class="back-link border product-details">
-            <a href="${productUrl}">
+            <a href="${fn:escapeXml(productUrl)}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 <span class="label"><spring:theme code="order.form"/></span>
             </a>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="product-details page-title">
-            <ycommerce:testId code="productDetails_productNamePrice_label_${fn:escapeXml(product.code)}">
+            <ycommerce:testId code="productDetails_productNamePrice_label_${product.code}">
                 <div class="name product-details-toggle">${fn:escapeXml(product.name)}<span class="sku">ID</span><span
                         class="code">${fn:escapeXml(product.code)}</span><span class="glyphicon glyphicon-chevron-right"></span></div>
             </ycommerce:testId>
@@ -71,7 +71,7 @@
 
         <div class="add-to-cart-order-form-wrap">
             <c:url value="/cart/addGrid" var="addToCartGridUrl"/>
-            <spring:theme code="product.grid.confirmQtys.message" var="gridConfirmMessage"/>
+            <spring:theme code="product.grid.confirmQtys.message" var="gridConfirmMessage" htmlEscape="false"/>
 
             <form:form name="AddToCartOrderForm" id="AddToCartOrderForm" class="add_to_cart_order_form scrollContent visible"
                        action="${addToCartGridUrl}" method="post"

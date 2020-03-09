@@ -6,10 +6,11 @@
 <%@ taglib prefix="format" tagdir="/WEB-INF/tags/shared/format" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
-<div class="subtotals ${subtotalsCssClasses}">
+<div class="subtotals ${fn:escapeXml(subtotalsCssClasses)}">
 	<div class="subtotal">
 		<spring:theme code="basket.page.totals.subtotal"/>
 		<span>

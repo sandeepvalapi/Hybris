@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.fulfilmentprocess.warehouse;
 
@@ -14,7 +7,6 @@ import de.hybris.platform.basecommerce.enums.ConsignmentStatus;
 import de.hybris.platform.commerceservices.model.PickUpDeliveryModeModel;
 import de.hybris.platform.core.PK;
 import de.hybris.platform.core.Registry;
-import de.hybris.platform.core.threadregistry.RegistrableThread;
 import de.hybris.platform.ordersplitting.model.ConsignmentEntryModel;
 import de.hybris.platform.ordersplitting.model.ConsignmentModel;
 import de.hybris.platform.servicelayer.model.ModelService;
@@ -44,10 +36,8 @@ public class MockProcess2WarehouseAdapter implements Process2WarehouseAdapter
 		}
 		consignment.setStatus(ConsignmentStatus.READY);
 		getModelService().save(consignment);
-
-		final Thread warehouse = new Thread(
-				new Warehouse(Registry.getCurrentTenant().getTenantID(), consignment.getPk().getLongValue()));
-		warehouse.start();
+		final Runnable runnable = new Warehouse(Registry.getCurrentTenant().getTenantID(), consignment.getPk().getLongValue());
+		new Thread(runnable).start();
 
 		try
 		{
@@ -59,7 +49,7 @@ public class MockProcess2WarehouseAdapter implements Process2WarehouseAdapter
 		}
 	}
 
-	public class Warehouse extends RegistrableThread
+	public class Warehouse implements Runnable
 	{
 		private final long consignment;
 		private final String tenant;
@@ -73,7 +63,7 @@ public class MockProcess2WarehouseAdapter implements Process2WarehouseAdapter
 		}
 
 		@Override
-		public void internalRun()
+		public void run()
 		{
 			Registry.setCurrentTenant(Registry.getTenantByID(tenant));
 			try

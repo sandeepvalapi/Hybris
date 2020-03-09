@@ -1,7 +1,7 @@
 /*
  * ----------------------------------------------------------------
  * --- WARNING: THIS FILE IS GENERATED AND WILL BE OVERWRITTEN! ---
- * --- Generated at Mar 15, 2018 5:02:29 PM                     ---
+ * --- Generated at 08-Mar-2020, 12:19:51 AM                    ---
  * ----------------------------------------------------------------
  */
 package com.hybris.training.core.jalo;
@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Generated class for type {@link com.hybris.training.core.jalo.ElectronicsColorVariantProduct ElectronicsColorVariantProduct}.
  */
-@SuppressWarnings({"deprecation","unused","cast","PMD"})
+@SuppressWarnings({"deprecation","unused","cast"})
 public abstract class GeneratedElectronicsColorVariantProduct extends VariantProduct
 {
 	/** Qualifier of the <code>ElectronicsColorVariantProduct.color</code> attribute **/

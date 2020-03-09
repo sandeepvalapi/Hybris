@@ -26,7 +26,7 @@ ACC.pickupinstore = {
 		var pageEndPos = (((totalCount/displayCount)-1) * (displayCount*listItemHeight)) * -1;
 
 
-		$("#colorbox .js-pickup-store-pager-item-all").html(totalCount);
+		$("#colorbox .js-pickup-store-pager-item-all").text(totalCount);
 
 		$("#colorbox .store-navigation-pager").show();
 
@@ -51,7 +51,7 @@ ACC.pickupinstore = {
 		function checkPosition(){
 
 			var curPage = Math.ceil((curPos/(displayCount*listItemHeight))*-1)+1;
-			$("#colorbox .js-pickup-store-pager-item-from").html(curPage*displayCount-4);
+			$("#colorbox .js-pickup-store-pager-item-from").text(curPage*displayCount-4);
 
 			var tocount = (curPage*displayCount > totalCount)? totalCount :curPage*displayCount;
 
@@ -68,7 +68,7 @@ ACC.pickupinstore = {
 			}
 
 
-			$("#colorbox .js-pickup-store-pager-item-to").html(tocount);
+			$("#colorbox .js-pickup-store-pager-item-to").text(tocount);
 		}
 	},
 
@@ -138,14 +138,14 @@ ACC.pickupinstore = {
 		});
 	},
 
-	locationSearchSubmit: function (location, cartPage, entryNumber, productCode, latitude, longitude)
+	locationSearchSubmit: function (location, cartPage, entryNumber, actionUrl, latitude, longitude)
 	{
 		$("#colorbox .js-add-to-cart-for-pickup-popup, #colorbox .js-qty-selector-minus, #colorbox .js-qty-selector-input, #colorbox .js-qty-selector-plus").attr("disabled","disabled");
 
-		$.ajax({
-			url: productCode,
+		$.post({
+			url: actionUrl,
 			data: {locationQuery: location, cartPage: cartPage, entryNumber: entryNumber, latitude: latitude, longitude: longitude},
-			type: "post",
+			dataType: "text",
 			success: function (response)
 			{
 				ACC.pickupinstore.refreshPickupInStoreColumn(response);
@@ -155,35 +155,51 @@ ACC.pickupinstore = {
 
 	createListItemHtml: function (data,id){
 
-		var item="";
-		item+='<li class="pickup-store-list-entry">';
-		item+='<input type="radio" name="storeNamePost" value="'+data.displayName+'" id="pickup-entry-'+id+'" class="js-pickup-store-input" data-id="'+id+'">';
-		item+='<label for="pickup-entry-'+id+'" class="js-select-store-label">';
-		item+='<span class="pickup-store-info">';
-		item+='<span class="pickup-store-list-entry-name">'+data.displayName+'</span>';
-		item+='<span class="pickup-store-list-entry-address">'+data.line1+' '+data.line2+'</span>';
-		item+='<span class="pickup-store-list-entry-city">'+data.town+'</span>';
-		item+='</span>';
-		item+='<span class="store-availability">';
-		item+='<span class="available">'+data.formattedDistance+'<br>'+data.stockPickup+'</span>';
-		item+='</span>';
-		item+='</label>';
-		item+='</li>';
-
-		return item;
+		
+		var $rdioEl = $("<input>").attr("type","radio")
+							.attr("name","storeNamePost")
+							.attr("id","pickup-entry-" + id)
+							.attr("data-id", id)
+							.addClass("js-pickup-store-input")
+							.val(data.displayName);
+		
+		var $spanElStInfo = $("<span>")
+							.addClass("pickup-store-info")
+							.append($("<span>").addClass("pickup-store-list-entry-name").text(data.displayName))
+							.append($("<span>").addClass("pickup-store-list-entry-address").text(data.line1 + " " + data.line2))
+							.append($("<span>").addClass("pickup-store-list-entry-city").text(data.town));
+			
+		var $spanElStAvail = $("<span>")
+							.addClass("store-availability")
+							.append(
+									$("<span>")
+									.addClass("available")
+									.append(document.createTextNode(data.formattedDistance))
+									.append("<br>")
+									.append(data.stockPickupHtml)
+							);
+		
+		var $lblEl = $("<label>").addClass("js-select-store-label")
+						.attr("for","pickup-entry-" + id)
+						.append($spanElStInfo)
+						.append($spanElStAvail);
+		
+		return $("<li>").addClass("pickup-store-list-entry")
+						.append($rdioEl)
+						.append($lblEl);
 	},
 
 	refreshPickupInStoreColumn: function (data){
 		data = $.parseJSON(data);
-		var listitems = "";
-
+		var $storeList = $('#colorbox .js-pickup-store-list');
+		$storeList.empty();
+		
 		$("#colorbox .js-pickup-component").data("data",data);
 
 		for(i = 0;i < data["data"].length;i++){
-			listitems += ACC.pickupinstore.createListItemHtml(data["data"][i],i)
+			$storeList.append(ACC.pickupinstore.createListItemHtml(data["data"][i],i));
 		}
 
-		$('#colorbox .js-pickup-store-list').html(listitems);
 		ACC.pickupinstore.unbindPickupPaginationResults()
 		ACC.pickupinstore.bindPickupPaginationResults()
 
@@ -254,26 +270,19 @@ ACC.pickupinstore = {
 					$("#colorbox #pickupModal").attr("id", productId);
 
 					// insert the product image
-					$("#colorbox #" + productId + " .thumb").html(ele.data("img"));
+					$("#colorbox #" + productId + " .thumb").html(ele.data("imgHtml"));
 
 					// insert the product cart details
 					$("#colorbox #" + productId + " .js-pickup-product-price").html(ele.data("productcart"));
 
-
 					var variants=ele.data("productcartVariants");
-					var variantsOut="";
-
+					var variantsBox = $("#colorbox #" + productId + " .js-pickup-product-variants");
 					$.each(variants,function(key,value){
-
-						variantsOut += "<span>"+value+"</span>";
-
-					})
-
-					$("#colorbox #" + productId + " .js-pickup-product-variants").html(variantsOut);
-
+					    variantsBox.append($("<span>").text(value));
+					});
 
 					// insert the product name
-					$("#colorbox  #" + productId + " .js-pickup-product-info").text(ele.data("productname"))
+					$("#colorbox  #" + productId + " .js-pickup-product-info").html(ele.data("productnameHtml"))
 
 					// insert the form action
 					$("#colorbox #" + productId + " form.searchPOSForm").attr("action", ele.data("actionurl"));
@@ -295,7 +304,7 @@ ACC.pickupinstore = {
 								ACC.pickupinstore.locationSearchSubmit('', $('#atCartPage').val(),  ele.data("entrynumber"), ele.data("actionurl"),position.coords.latitude, position.coords.longitude);
 							},
 							function (error){
-									console.log("An error occurred... The error code and message are: " + error.code + "/" + error.message);
+									console.log("An error occurred... The error code and message are: " + error.code + "/" + error.message);    // NOSONAR
 							}
 						);
 					}
@@ -328,44 +337,35 @@ ACC.pickupinstore = {
 
 			$.each(storeData[storeId],function(key,value){
 				if(key=="url"){
+					$ele.find(".js-store-image").empty();
 					if(value!=""){
-						$ele.find(".js-store-image").html('<img src="'+value+'" alt="" />');
-					}else{
-						$ele.find(".js-store-image").html('');
+						$ele.find(".js-store-image").append($("<img>").attr("src", value).attr("alt", ""));
 					}
 				}else if(key=="productcode"){
 					$ele.find(".js-store-productcode").val(value);
 				}
 				else if(key=="openings"){
+					var $oele = $ele.find(".js-store-"+key);
+					$oele.empty();
 					if(value!=""){
-						var $oele = $ele.find(".js-store-"+key);
-						var openings = "";
 						$.each(value,function(key2,value2){
-							openings += "<dt>"+key2+"</dt>";
-							openings += "<dd>"+value2+"</dd>";
+							$oele.append($("<dt>").text(key2));
+							$oele.append($("<dd>").text(value2));
 						});
-
-						$oele.html(openings);
-
-					}else{
-						$ele.find(".js-store-"+key).html('');
 					}
 
 				}
-				else if(key=="specialOpenings"){}
+				else if(key=="specialOpenings")
+				{}
 				else{
 					if(value!=""){
-						$ele.find(".js-store-"+key).html(value);
+						$ele.find(".js-store-"+key).text(value);
 					}else{
-						$ele.find(".js-store-"+key).html('');
+						$ele.find(".js-store-"+key).empty();
 					}
 				}
 
 			})
-
-
-
-
 
 			$(document).one("click", "#colorbox .js-pickup-map-tab",function(){
 				ACC.pickupinstore.storeId = storeData[storeId];
@@ -495,7 +495,7 @@ ACC.pickupinstore = {
 				icon: "https://maps.google.com/mapfiles/marker" + 'A' + ".png"
 			});
 			var infowindow = new google.maps.InfoWindow({
-				content: storeInformation["name"],
+				content: ACC.common.encodeHtml(storeInformation["name"]),
 				disableAutoPan: true
 			});
 			google.maps.event.addListener(marker, 'click', function (){

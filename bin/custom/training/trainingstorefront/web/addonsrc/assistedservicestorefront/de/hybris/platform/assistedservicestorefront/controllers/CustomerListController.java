@@ -1,8 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
- * All rights reserved.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
  * ("Confidential Information"). You shall not disclose such Confidential
@@ -48,8 +47,8 @@ public class CustomerListController extends AbstractSearchPageController
 {
 	private static final Logger LOG = Logger.getLogger(CustomerListController.class);
 
-	private static String DEFAULT_CUSTOMER_LIST = "defaultList";
-	private static String AVAILABLE_CUSTOMER_LIST = "availableLists";
+	private static final String DEFAULT_CUSTOMER_LIST = "defaultList";
+	private static final String AVAILABLE_CUSTOMER_LIST = "availableLists";
 	private static final String CUSTOMER_LIST_DATA = "customerListData";
 	private static final String QUERY = "query";
 
@@ -87,7 +86,7 @@ public class CustomerListController extends AbstractSearchPageController
 			model.addAttribute(DEFAULT_CUSTOMER_LIST, customerLists.get(0).getUid());
 		}
 
-		return AssistedservicestorefrontControllerConstants.Views.Fragments.CustomerListComponent.ASMCustomerListPopup;
+		return AssistedservicestorefrontControllerConstants.Views.Fragments.CustomerListComponent.ASM_CUSTOMER_LIST_POPUP;
 	}
 
 	/**
@@ -120,7 +119,7 @@ public class CustomerListController extends AbstractSearchPageController
 			if (!StringUtils.isBlank(customerListUid))
 			{
 				// Populate customer list data
-				String agentUid = assistedServiceFacade.getAsmSession().getAgent().getUid();
+				final String agentUid = assistedServiceFacade.getAsmSession().getAgent().getUid();
 				final CustomerListData customerListData = customerListFacade.getCustomerListForUid(customerListUid,
 						agentUid);
 				model.addAttribute(CUSTOMER_LIST_DATA, customerListData);
@@ -150,7 +149,7 @@ public class CustomerListController extends AbstractSearchPageController
 		{
 			LOG.error(exp, exp);
 		}
-		return AssistedservicestorefrontControllerConstants.Views.Fragments.CustomerListComponent.ASMCustomerListTable;
+		return AssistedservicestorefrontControllerConstants.Views.Fragments.CustomerListComponent.ASM_CUSTOMER_LIST_TABLE;
 	}
 
 	@Override

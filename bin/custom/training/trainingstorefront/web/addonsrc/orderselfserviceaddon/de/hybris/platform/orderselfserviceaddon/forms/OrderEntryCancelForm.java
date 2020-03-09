@@ -1,7 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company.
  * All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP

@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.customerinterestsaddon.controllers.pages;
 
@@ -16,7 +9,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.breadcrumb.ResourceBreadc
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.ThirdPartyConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.AbstractSearchPageController;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
-import de.hybris.platform.commercefacades.product.data.ProductData;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.commerceservices.search.pagedata.PageableData;
 import de.hybris.platform.commerceservices.search.pagedata.PaginationData;
 import de.hybris.platform.commerceservices.search.pagedata.SearchPageData;
@@ -26,7 +19,6 @@ import de.hybris.platform.customerinterestsfacades.productinterest.ProductIntere
 import de.hybris.platform.servicelayer.config.ConfigurationService;
 import de.hybris.platform.servicelayer.media.MediaService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,11 +74,6 @@ public class MyInterestsPageController extends AbstractSearchPageController
 		final List<ProductInterestRelationData> sortedProductInterests = getProductInterestFacade()
 				.getProductsByCustomerInterests(pageableData);
 
-		sortedProductInterests.stream().forEach(productInterestRelation->{
-			final ProductData product = productInterestRelation.getProduct();
-			product.setFutureStocks(getFutureStockFacade().getFutureAvailability(product.getCode()));
-		});
-
 		final int total = getProductInterestFacade().getProductsCountByCustomerInterests(pageableData);
 		final SearchPageData<ProductInterestRelationData> pagedProductInterestRelationData = new SearchPageData<ProductInterestRelationData>();
 		pagedProductInterestRelationData.setResults(sortedProductInterests);
@@ -96,8 +83,9 @@ public class MyInterestsPageController extends AbstractSearchPageController
 		pagedProductInterestRelationData.setSorts(result);
 		populateModel(model, pagedProductInterestRelationData, showMode);
 
-		storeCmsPageInModel(model, getContentPageForLabelOrId(MY_INTERESTS_CMS_PAGE));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(MY_INTERESTS_CMS_PAGE));
+		final ContentPageModel myInterestsPage = getContentPageForLabelOrId(MY_INTERESTS_CMS_PAGE);
+		storeCmsPageInModel(model, myInterestsPage);
+		setUpMetaDataForContentPage(model, myInterestsPage);
 		model.addAttribute(BREADCRUMBS_ATTR, accountBreadcrumbBuilder.getBreadcrumbs("text.account.myInterests"));
 		model.addAttribute(ThirdPartyConstants.SeoRobots.META_ROBOTS, ThirdPartyConstants.SeoRobots.NOINDEX_NOFOLLOW);
 		return getViewForPage(model);
@@ -108,7 +96,7 @@ public class MyInterestsPageController extends AbstractSearchPageController
 	@RequireHardLogIn
 	public String show(@PathVariable("productCode") final String encodedProductCode,
 			@PathVariable("notificationType") final String notificationType, final HttpServletRequest request,
-			final HttpServletResponse response, final Model model) throws IOException
+			final HttpServletResponse response, final Model model)
 	{
 		final String urlKey = NOTIFICATION_URL_PREFIX + notificationType;
 		return REDIRECT_PREFIX + getConfigurationService().getConfiguration().getString(urlKey) + "/"
@@ -119,9 +107,8 @@ public class MyInterestsPageController extends AbstractSearchPageController
 	@RequireHardLogIn
 	public void removeAllInterestForProduct(@PathVariable("productCode") final String encodedProductCode,
 			final HttpServletRequest request, final HttpServletResponse response, final Model model)
-					throws IOException, CMSItemNotFoundException
 	{
-		getProductInterestFacade().removeProductInterestByProduct(decodeWithScheme(encodedProductCode, UTF_8));
+		getProductInterestFacade().removeAllProductInterests(decodeWithScheme(encodedProductCode, UTF_8));
 	}
 
 	protected ResourceBreadcrumbBuilder getAccountBreadcrumbBuilder()

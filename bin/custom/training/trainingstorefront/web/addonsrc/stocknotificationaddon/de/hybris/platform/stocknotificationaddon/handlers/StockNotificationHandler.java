@@ -1,24 +1,18 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.stocknotificationaddon.handlers;
 
-import de.hybris.platform.commercefacades.i18n.I18NFacade;
 import de.hybris.platform.customerinterestsfacades.data.ProductInterestData;
 import de.hybris.platform.notificationfacades.data.NotificationPreferenceData;
+import de.hybris.platform.notificationservices.enums.NotificationChannel;
 import de.hybris.platform.notificationservices.enums.NotificationType;
+import de.hybris.platform.stocknotificationaddon.forms.NotificationChannelForm;
 import de.hybris.platform.stocknotificationaddon.forms.StockNotificationForm;
 
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 
@@ -26,31 +20,57 @@ import org.springframework.stereotype.Component;
 @Component("stockNotificationHandler")
 public class StockNotificationHandler
 {
-	@Resource(name = "i18NFacade")
-	protected I18NFacade i18NFacade;
 
 	public void prepareInterestData(final StockNotificationForm stockNotificationForm,
-			ProductInterestData productInterestData)
+			final ProductInterestData productInterestData)
 	{
-		productInterestData.setEmailNotificationEnabled(stockNotificationForm.isEmailNotificationEnabled());
-		productInterestData.setSmsNotificationEnabled(stockNotificationForm.isSmsNotificationEnabled());
+		final List<NotificationPreferenceData> enabledChannels = new ArrayList<>();
+		stockNotificationForm.getChannels().forEach(c -> {
+			final NotificationPreferenceData channel = new NotificationPreferenceData();
+			channel.setChannel(NotificationChannel.valueOf(c.getChannel()));
+			channel.setEnabled(c.isEnabled());
+			channel.setVisible(c.isVisible());
+			enabledChannels.add(channel);
+		});
+
+		productInterestData.setNotificationChannels(enabledChannels);
 		productInterestData.setNotificationType(NotificationType.BACK_IN_STOCK);
 	}
 
-	public StockNotificationForm prepareStockNotifcationFormByInterest(ProductInterestData productInterestData)
+	public StockNotificationForm prepareStockNotifcationFormByInterest(final ProductInterestData productInterestData)
 	{
-		StockNotificationForm stockNotificationForm = new StockNotificationForm();
-		BeanUtils.copyProperties(productInterestData, stockNotificationForm);
+		final StockNotificationForm stockNotificationForm = new StockNotificationForm();
+		final List<NotificationChannelForm> channels = new ArrayList<>();
+
+		productInterestData.getNotificationChannels().forEach(c -> {
+			final NotificationChannelForm channel = new NotificationChannelForm();
+			channel.setChannel(c.getChannel().getCode());
+			channel.setValue(c.getValue());
+			channel.setEnabled(c.isEnabled());
+			channel.setVisible(c.isVisible());
+
+			channels.add(channel);
+		});
+		stockNotificationForm.setChannels(channels);
+
 		return stockNotificationForm;
 	}
 
-	public StockNotificationForm prepareStockNotifcationFormByCustomer(NotificationPreferenceData notificationPreferenceData)
+	public StockNotificationForm prepareStockNotifcationFormByCustomer(final List<NotificationPreferenceData> preferences)
 	{
-		StockNotificationForm stockNotificationForm = new StockNotificationForm();
-		stockNotificationForm.setEmailAddress(notificationPreferenceData.getEmailAddress());
-		stockNotificationForm.setEmailNotificationEnabled(notificationPreferenceData.isEmailEnabled());
-		stockNotificationForm.setMobileNumber(notificationPreferenceData.getMobileNumber());
-		stockNotificationForm.setSmsNotificationEnabled(notificationPreferenceData.isSmsEnabled());
+		final StockNotificationForm stockNotificationForm = new StockNotificationForm();
+		final List<NotificationChannelForm> channels = new ArrayList<>();
+
+		preferences.forEach(c -> {
+			final NotificationChannelForm channel = new NotificationChannelForm();
+			channel.setChannel(c.getChannel().getCode());
+			channel.setValue(c.getValue());
+			channel.setEnabled(c.isEnabled());
+			channel.setVisible(c.isVisible());
+			channels.add(channel);
+		});
+		stockNotificationForm.setChannels(channels);
+
 		return stockNotificationForm;
 	}
 

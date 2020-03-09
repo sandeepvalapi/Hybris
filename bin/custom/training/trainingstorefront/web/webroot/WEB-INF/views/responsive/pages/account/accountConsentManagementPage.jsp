@@ -17,7 +17,7 @@
     <div class="container-lg col-md-6">
         <div class="account-section-content">
             <div class="account-section-form consent-section-form">
-                <div id="consent-management-form" data-consent-management-url="${consentManagementUrl}">
+                <div id="consent-management-form" data-consent-management-url="${fn:escapeXml(consentManagementUrl)}">
                     <c:if test="${not empty consentTemplateDataList}">
                     	<div class="consent-management-intro">
 							<p> <spring:theme code="text.account.consent.consentManagement.general.text"/> </p>
@@ -55,13 +55,13 @@
 
                                             <c:choose>
                                                 <c:when test="${not empty consentTemplateData.consentData && empty consentTemplateData.consentData.consentWithdrawnDate}">
-                                                    <input tabindex="0" id="${consentTemplateId}" type="checkbox" class="toggle-button__input" checked>
+                                                    <input tabindex="0" id="${consentTemplateId}" type="checkbox" class="toggle-button__input" disabled="disabled" checked>
                                                     <label for="${consentTemplateId}">
                                                         <div class="toggle-button__switch is-checked"></div>
                                                     </label>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <input tabindex="0" id="${consentTemplateId}" type="checkbox" class="toggle-button__input">
+                                                    <input tabindex="0" id="${consentTemplateId}" type="checkbox" class="toggle-button__input" disabled="disabled">
                                                     <label for="${consentTemplateId}">
                                                         <div class="toggle-button__switch"></div>
                                                     </label>

@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 #
 # Import Access Rights for CMS Cockpit
@@ -14,11 +7,29 @@
 
 $START_USERRIGHTS;;;;;;;;;
 Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
-UserGroup;cmsmanagergroup;cockpitgroup,employeegroup;;;;;;;
+UserGroup;cmsmanagergroup;employeegroup;;;;;;;
 
 # general
-;;;;Item;+;;;;;
-;;;;UserGroup;+;;;;;
+;;;;Item;+;+;;;;
+;;;;UserGroup;+;+;;;;
+;;;;Employee;+;+;;;;
+;;;;ItemSyncTimestamp;+;;;;;
+;;;;SyncItemJob;+;;;;;
+;;;;Type;+;;;;;
+
+# access rights for Products, Store, Site and Catalogs
+;;;;Product;+;+;;;;
+;;;;Category;+;+;;;;
+;;;;VariantType;+;;;;;
+;;;;BaseSite;+;+;-;-;-;
+;;;;BaseStore;+;-;-;-;-;
+;;;;Catalog;+;;;;;
+;;;;CatalogVersion;+;+;;;;
+;;;;ContentCatalog;+;+;+;+;+;
+;;;;MediaContainer;+;+;+;+;+;
+;;;;MediaContext;+;+;+;+;+;
+;;;;MediaFormat;+;+;+;+;+;
+;;;;MediaFormatMapping;+;+;+;+;+;
 
 # cms2 items
 ;;;;AbstractComponentContainer;+;+;+;+;+;
@@ -27,46 +38,26 @@ UserGroup;cmsmanagergroup;cockpitgroup,employeegroup;;;;;;;
 ;;;;AbstractCMSComponent.itemtype;;-;-;-;-;
 ;;;;AbstractCMSAction;+;+;+;+;+;
 ;;;;AbstractCMSAction.itemtype;;-;-;-;-;
-;;;;SimpleCMSAction;+;+;+;+;+;
-;;;;PickUpInStoreAction;+;+;+;+;+;
-;;;;AddToCartAction;+;+;+;+;+;
-;;;;ShareOnSocialNetworkAction;+;+;+;+;+;
-;;;;AbstractPage;+;+;+;+;+;
-;;;;AbstractPage.itemtype;;-;-;-;-;
-;;;;AbstractRestriction;+;+;+;+;+;
-;;;;AbstractRestriction.itemtype;;-;-;-;-;
-;;;;BaseSite;-;+;-;-;-;
-;;;;BaseStore;+;-;-;-;-;
 ;;;;CMSItem;+;+;+;+;+;
-;;;;CMSItem.itemtype;;-;;;;
+;;;;CMSItem.itemtype;;-;-;-;-;
+;;;;CMSPageType;+;+;+;+;+;
 ;;;;CMSRelation;+;+;+;+;+;
 ;;;;CMSCatalogRestriction;;;+;+;+;
 ;;;;CMSCategoryRestriction;;;+;+;+;
 ;;;;CMSProductRestriction;;;+;+;+;
 ;;;;CatalogPage;-;-;-;-;-;
 ;;;;CategoryPage;;;+;+;+;
-;;;;ContentCatalog;+;+;+;+;+;
 ;;;;ContentPage;;;+;+;+;
+;;;;ProductPage;;;+;+;+;
 ;;;;ContentSlot;+;+;+;+;+;
 ;;;;ContentSlotForPage;+;+;+;+;+;
 ;;;;ContentSlotForTemplate;+;+;+;+;+;
 ;;;;ContentSlotName;+;+;+;+;+;
+;;;;ComponentTypeGroup;+;+;+;+;+;
 ;;;;ElementsForContainer;+;+;+;+;+;
 ;;;;ElementsForSlot;+;+;+;+;+;
-;;;;CMSImageComponent;;;+;+;+;
-;;;;BannerComponent;;;+;+;+;
-;;;;CMSLinkComponent;;;+;+;+;
-;;;;Media;+;+;+;+;+;
 ;;;;CockpitUIScriptConfigMedia;-;-;-;-;-;
-;;;;MediaContainer;+;+;+;+;+;
-;;;;MediaContext;+;+;+;+;+;
-;;;;MediaFormat;+;+;+;+;+;
-;;;;MediaFormatMapping;+;+;+;+;+;
 ;;;;PageRestrictions;+;+;+;+;+;
-;;;;PageTemplate;+;+;+;+;+;
-;;;;CMSParagraphComponent;;;+;+;+;
-;;;;ProductPage;;;+;+;+;
-;;;;SimpleCMSComponent;;;+;+;+;
 ;;;;CatalogsForCMSSite;+;+;+;+;+;
 ;;;;AvailableSlotsForTemplate;+;+;+;+;+;
 ;;;;RestrictionsForPages;+;+;+;+;+;
@@ -78,32 +69,7 @@ UserGroup;cmsmanagergroup;cockpitgroup,employeegroup;;;;;;;
 ;;;;PreviewDataToCatalogVersion;+;+;+;+;+;
 ;;;;PreviewData;+;+;+;+;+;
 ;;;;CMSSite;+;+;+;+;+;
-;;;;MiniCartComponent;+;+;+;+;+;
-;;;;CategoryFeatureComponent;+;+;+;+;+;
-;;;;ProductFeatureComponent;+;+;+;+;+;
-;;;;ProductVariantSelectorComponent;+;+;+;+;+;
-;;;;ProductAddToCartComponent;+;+;+;+;+;
-;;;;ProductReferencesComponent;+;+;+;+;+;
-;;;;SimpleSuggestionComponent;+;+;+;+;+;
-;;;;PurchasedCategorySuggestionComponent;+;+;+;+;+;
-;;;;CartSuggestionComponent;+;+;+;+;+;
-;;;;SearchBoxComponent;+;+;+;+;+;
-;;;;CMSMediaParagraphComponent;+;+;+;+;+;
-;;;;CMSUiExperienceRestriction;+;+;+;+;+;
-;;;;CMSActionRestriction;+;+;+;+;+;
-;;;;AccountNavigationComponent;+;+;+;+;+;
-;;;;AccountNavigationCollectionComponent;+;+;+;+;+;
-;;;;JspIncludeComponent;+;+;+;+;+;
-;;;;AccountBookmarkComponent;+;+;+;+;+;
-
-# Access Rights for Products & Catalog;;;;;;;;;
-;;;;ItemSyncTimestamp;+;;;
-;;;;SyncItemJob;+;;;
-;;;;Type;+;;;
-;;;;Product;+;;;
-;;;;Category;+;;;
-;;;;variantType;+;;;
-;;;;Catalog;+;;;
-;;;;CatalogVersion;+;;;
+;;;;CMSVersion;+;+;+;+;+;
+;;;;BusinessProcess;+;+;+;+;+;
 
 $END_USERRIGHTS;;;;;

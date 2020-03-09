@@ -3,7 +3,7 @@
 		tablesorterPager: new function() {
 
 			function updatePageDisplay(c) {
-				var s = $(c.cssPageDisplay,c.container).val((c.page+1) + c.seperator + c.totalPages);
+				$(c.cssPageDisplay,c.container).val((c.page+1) + c.seperator + c.totalPages);
 			}
 
 			function moveToPage(table) {
@@ -33,8 +33,6 @@
 				$.tablesorter.clearTableBody(table);
 
 				for(var i = s; i < e; i++) {
-
-					//tableBody.append(rows[i]);
 
 					var o = rows[i];
 					var l = o.length;

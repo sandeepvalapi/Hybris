@@ -1,14 +1,12 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.fulfilmentprocess.test;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import de.hybris.bootstrap.annotations.IntegrationTest;
 import de.hybris.platform.core.Registry;
@@ -29,21 +27,24 @@ import de.hybris.platform.testframework.HybrisJUnit4Test;
 import de.hybris.platform.testframework.TestUtils;
 import de.hybris.platform.util.Utilities;
 import com.hybris.training.fulfilmentprocess.test.actions.TestActionTemp;
-import org.apache.log4j.Logger;
-import org.junit.*;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.*;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 
 
 @IntegrationTest
@@ -59,7 +60,7 @@ public class ProcessFlowTest extends HybrisJUnit4Test
 
 
 	@BeforeClass
-	public static void prepare() throws Exception //NOPMD
+	public static void prepare() throws Exception
 	{
 		Registry.activateStandaloneMode();
 		Utilities.setJUnitTenant();
@@ -72,8 +73,9 @@ public class ProcessFlowTest extends HybrisJUnit4Test
 		//		final ConfigurationService configurationService = (ConfigurationService) appCtx.getBean("configurationService");
 		//		configurationService.getConfiguration().setProperty("processengine.event.lockProcess", "true");
 
-		assertTrue("Application context of type " + appCtx.getClass() + " is not a subclass of "
-				+ ConfigurableApplicationContext.class, appCtx instanceof ConfigurableApplicationContext);
+		assertTrue(
+				"Application context of type " + appCtx.getClass() + " is not a subclass of " + ConfigurableApplicationContext.class,
+				appCtx instanceof ConfigurableApplicationContext);
 
 		final ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) appCtx;
 		final ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
@@ -81,12 +83,12 @@ public class ProcessFlowTest extends HybrisJUnit4Test
 				beanFactory instanceof BeanDefinitionRegistry);
 		final XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader((BeanDefinitionRegistry) beanFactory);
 		xmlReader.setDocumentReaderClass(ScopeTenantIgnoreDocReader.class);
-		xmlReader.loadBeanDefinitions(new ClassPathResource(
-				"/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-test.xml"));
+		xmlReader.loadBeanDefinitions(
+				new ClassPathResource("/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-test.xml"));
 		xmlReader
 				.loadBeanDefinitions(new ClassPathResource("/trainingfulfilmentprocess/test/process/order-process-spring.xml"));
-		xmlReader.loadBeanDefinitions(new ClassPathResource(
-				"/trainingfulfilmentprocess/test/process/consignment-process-spring.xml"));
+		xmlReader.loadBeanDefinitions(
+				new ClassPathResource("/trainingfulfilmentprocess/test/process/consignment-process-spring.xml"));
 
 
 		modelService = (ModelService) getBean("modelService");
@@ -103,10 +105,11 @@ public class ProcessFlowTest extends HybrisJUnit4Test
 
 
 		//setup command factory to mock
-		taskServiceStub = appCtx.getBean(TaskServiceStub.class);
+		taskServiceStub = appCtx.getBean("taskServiceStub", TaskServiceStub.class);
 		processService.setTaskService(taskServiceStub);
 
-		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean(DefaultCommandFactoryRegistryImpl.class);
+		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean("commandFactoryRegistry",
+				DefaultCommandFactoryRegistryImpl.class);
 		commandFactoryReg.setCommandFactoryList(Arrays.asList((CommandFactory) appCtx.getBean("mockupCommandFactory")));
 
 	}
@@ -133,25 +136,27 @@ public class ProcessFlowTest extends HybrisJUnit4Test
 
 		final ApplicationContext appCtx = Registry.getApplicationContext();
 
-		assertTrue("Application context of type " + appCtx.getClass() + " is not a subclass of "
-				+ ConfigurableApplicationContext.class, appCtx instanceof ConfigurableApplicationContext);
+		assertTrue(
+				"Application context of type " + appCtx.getClass() + " is not a subclass of " + ConfigurableApplicationContext.class,
+				appCtx instanceof ConfigurableApplicationContext);
 
 		final ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) appCtx;
 		final ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
 		assertTrue("Bean Factory of type " + beanFactory.getClass() + " is not of type " + BeanDefinitionRegistry.class,
 				beanFactory instanceof BeanDefinitionRegistry);
 		final XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader((BeanDefinitionRegistry) beanFactory);
-		xmlReader.loadBeanDefinitions(new ClassPathResource(
-				"/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-testcleanup.xml"));
+		xmlReader.loadBeanDefinitions(
+				new ClassPathResource("/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-testcleanup.xml"));
 
 
 		//cleanup command factory
 		final Map<String, CommandFactory> commandFactoryList = applicationContext.getBeansOfType(CommandFactory.class);
 		commandFactoryList.remove("mockupCommandFactory");
-		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean(DefaultCommandFactoryRegistryImpl.class);
+		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean("commandFactoryRegistry",
+				DefaultCommandFactoryRegistryImpl.class);
 		commandFactoryReg.setCommandFactoryList(commandFactoryList.values());
 
-		processService.setTaskService(appCtx.getBean(DefaultTaskService.class));
+		processService.setTaskService(appCtx.getBean("taskService", DefaultTaskService.class));
 		definitonFactory = null;
 		processService = null;
 	}

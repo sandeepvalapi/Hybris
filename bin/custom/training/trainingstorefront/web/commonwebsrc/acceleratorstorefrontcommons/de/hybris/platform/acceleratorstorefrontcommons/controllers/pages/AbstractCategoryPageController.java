@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.controllers.pages;
 
@@ -21,6 +14,7 @@ import de.hybris.platform.category.model.CategoryModel;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
 import de.hybris.platform.cms2.model.pages.CategoryPageModel;
 import de.hybris.platform.cms2.servicelayer.services.CMSPageService;
+import de.hybris.platform.cms2.servicelayer.services.CMSPreviewService;
 import de.hybris.platform.commercefacades.product.data.CategoryData;
 import de.hybris.platform.commercefacades.product.data.ProductData;
 import de.hybris.platform.commercefacades.search.ProductSearchFacade;
@@ -78,6 +72,9 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 	@Resource(name = "customerLocationService")
 	private CustomerLocationService customerLocationService;
 
+	@Resource(name = "cmsPreviewService")
+	private CMSPreviewService cmsPreviewService;
+
 	@ExceptionHandler(UnknownIdentifierException.class)
 	public String handleUnknownIdentifierException(final UnknownIdentifierException exception, final HttpServletRequest request)
 	{
@@ -86,8 +83,7 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 	}
 
 
-	protected String performSearchAndGetResultsPage(final String categoryCode, final String searchQuery,
-			final int page, // NOSONAR
+	protected String performSearchAndGetResultsPage(final String categoryCode, final String searchQuery, final int page, // NOSONAR
 			final ShowMode showMode, final String sortCode, final Model model, final HttpServletRequest request,
 			final HttpServletResponse response) throws UnsupportedEncodingException
 	{
@@ -138,8 +134,8 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 			model.addAttribute(ThirdPartyConstants.SeoRobots.META_ROBOTS, ThirdPartyConstants.SeoRobots.NOINDEX_FOLLOW);
 		}
 
-		final String metaKeywords = MetaSanitizerUtil.sanitizeKeywords(category.getKeywords().stream()
-				.map(keywordModel -> keywordModel.getKeyword()).collect(Collectors.toSet()));
+		final String metaKeywords = MetaSanitizerUtil.sanitizeKeywords(
+				category.getKeywords().stream().map(keywordModel -> keywordModel.getKeyword()).collect(Collectors.toSet()));
 		final String metaDescription = MetaSanitizerUtil.sanitizeDescription(category.getDescription());
 		setUpMetaData(model, metaKeywords, metaDescription);
 
@@ -228,7 +224,7 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 	{
 		try
 		{
-			return getCmsPageService().getPageForCategory(category);
+			return getCmsPageService().getPageForCategory(category, getCMSPreviewService().getPagePreviewCriteria());
 		}
 		catch (final CMSItemNotFoundException ignore) // NOSONAR
 		{
@@ -267,8 +263,8 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 		private boolean showCategoriesOnly;
 		private ProductCategorySearchPageData<SearchStateData, ProductData, CategoryData> searchPageData;
 
-		public CategorySearchEvaluator(final String categoryCode, final String searchQuery, final int page,
-				final ShowMode showMode, final String sortCode, final CategoryPageModel categoryPage)
+		public CategorySearchEvaluator(final String categoryCode, final String searchQuery, final int page, final ShowMode showMode,
+				final String sortCode, final CategoryPageModel categoryPage)
 		{
 			this.categoryCode = categoryCode;
 			this.searchQueryData.setValue(searchQuery);
@@ -294,7 +290,7 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 			else
 			{
 				// We have some search filtering
-				if (categoryPage == null || !categoryHasDefaultPage(categoryPage))
+				if (categoryPage == null)
 				{
 					// Load the default category page
 					categoryPage = getDefaultCategoryPage();
@@ -305,7 +301,10 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 
 				final PageableData pageableData = createPageableData(page, getSearchPageSize(), sortCode, showMode);
 				searchPageData = getProductSearchFacade().categorySearch(categoryCode, searchState, pageableData);
+
 			}
+			//Encode SearchPageData
+			searchPageData = (ProductCategorySearchPageData) encodeSearchPageData(searchPageData);
 		}
 
 		public int getPage()
@@ -371,6 +370,14 @@ public class AbstractCategoryPageController extends AbstractSearchPageController
 	public CustomerLocationService getCustomerLocationService()
 	{
 		return customerLocationService;
+	}
+
+	/**
+	 * @return the cmsPreviewService
+	 */
+	public CMSPreviewService getCMSPreviewService()
+	{
+		return cmsPreviewService;
 	}
 
 

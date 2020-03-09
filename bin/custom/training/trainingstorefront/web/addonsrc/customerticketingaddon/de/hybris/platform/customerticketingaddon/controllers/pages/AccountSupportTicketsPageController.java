@@ -1,8 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
- * All rights reserved.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
  * ("Confidential Information"). You shall not disclose such Confidential
@@ -29,6 +28,7 @@ import de.hybris.platform.customerticketingaddon.forms.SupportTicketForm;
 import de.hybris.platform.customerticketingfacades.TicketFacade;
 import de.hybris.platform.customerticketingfacades.data.StatusData;
 import de.hybris.platform.customerticketingfacades.data.TicketData;
+import de.hybris.platform.ticket.service.TicketException;
 import de.hybris.platform.ticket.service.UnsupportedAttachmentException;
 
 import java.util.List;
@@ -262,6 +262,12 @@ public class AccountSupportTicketsPageController extends AbstractSearchPageContr
 		try
 		{
 			final TicketData ticketData = ticketFacade.getTicket(XSSEncoder.encodeHTML(ticketId));
+
+			if(ticketData == null)
+			{
+				throw new TicketException("Current customer has no ticket with given ID " + ticketId);
+			}
+
 			model.addAttribute(CustomerticketingaddonConstants.SUPPORT_TICKET_DATA, ticketData);
 		}
 		catch (final Exception e)

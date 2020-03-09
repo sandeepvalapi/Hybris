@@ -2,7 +2,7 @@
 <!--
  [y] hybris Platform
 
- Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
 
  This software is the confidential and proprietary information of SAP
  ("Confidential Information"). You shall not disclose such Confidential
@@ -355,6 +355,11 @@
 				<xs:documentation>Whether it is possible to add new values by runtime. Also results in different types of enums: 'true' results in 'classic' hybris enums, 'false' results in Java enums. Default is false. Both kinds of enums are API compatible, and switching between enum types is possible by running a system update. </xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+        <xs:attribute name="deprecatedSince" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>Marks enum as deprecated since specified version.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="enumtypesType">
 		<xs:annotation>
@@ -625,7 +630,8 @@
 		<xs:attribute name="deprecatedSince" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					Version since when this method is marked as deprecated.
+					Version since when this method is marked as deprecated. Settting deprecatedSince attribute automatically
+                    sets deprecated attribute to true.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -779,6 +785,11 @@
 				<xs:documentation>The (meta)type which describes the assigned type. Must be a type extensing ComposedType. Default is 'ComposedType'.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+        <xs:attribute name="deprecatedSince" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>Marks item as deprecated since specified version.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="itemtypesType">

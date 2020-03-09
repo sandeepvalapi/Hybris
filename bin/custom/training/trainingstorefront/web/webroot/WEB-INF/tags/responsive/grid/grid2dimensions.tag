@@ -10,12 +10,12 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:set var="loopIndex" value="0"/>
-<c:set var="titleQuantityText"><spring:theme code="product.grid.quantityText" /></c:set>
+<c:set var="titleQuantityText"><spring:theme htmlEscape="false" code="product.grid.quantityText" /></c:set>
 
 <c:forEach items="${product.variantMatrix}" var="headVariant" varStatus="loop">
 	<c:if test="${empty(filterSkus) || (!empty(filterSkus) && fn:contains(filterSkus, firstVariant.variantOption.code) ) }">
 		<div class="orderForm_grid_group">
-			<c:set var="skusId" value="${fn:escapeXml(headVariant.variantOption.code)}"/>
+			<c:set var="skusId" value="${headVariant.variantOption.code}"/>
 			<grid:coreTableHeader variant="${headVariant}"
 								  product="${product}"
 								  skusId="${skusId}"

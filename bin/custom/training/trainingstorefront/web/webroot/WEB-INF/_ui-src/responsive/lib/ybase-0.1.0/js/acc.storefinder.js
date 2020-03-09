@@ -14,33 +14,43 @@ ACC.storefinder = {
 
 	createListItemHtml: function (data,id){
 
-		var item="";
-		item+='<li class="list__entry">';
-		item+='<input type="radio" name="storeNamePost" value="'+data.displayName+'" id="store-filder-entry-'+id+'" class="js-store-finder-input" data-id="'+id+'">';
-		item+='<label for="store-filder-entry-'+id+'" class="js-select-store-label">';
-		item+='<span class="entry__info">';
-		item+='<span class="entry__name">'+data.displayName+'</span>';
-		item+='<span class="entry__address">'+data.line1+' '+data.line2+'</span>';
-		item+='<span class="entry__city">'+data.town+'</span>';
-		item+='</span>';
-		item+='<span class="entry__distance">';
-		item+='<span>'+data.formattedDistance+'</span>';
-		item+='</span>';
-		item+='</label>';
-		item+='</li>';
-		return item;
+		var $rdioEl = $("<input>").addClass("js-store-finder-input")
+							.attr("type","radio")
+							.attr("name","storeNamePost")
+							.attr("id","store-filder-entry-" + id)
+							.attr("data-id",id)
+							.val(data.displayName);
+				
+		var $spanInfo = $("<span>").addClass("entry__info")
+							.append($("<span>").addClass("entry__name").text(data.displayName))
+							.append($("<span>").addClass("entry__address").text(data.line1 + ' ' + data.line2))
+							.append($("<span>").addClass("entry__city").text(data.town));
+							
+		
+		var $spanDistance = $("<span>").addClass("entry__distance")
+							.append($("<span>").text(data.formattedDistance));
+							
+		var $label = $("<label>").addClass("js-select-store-label")
+							.attr("for","store-filder-entry-" + id)
+							.append($spanInfo)
+							.append($spanDistance);					
+		
+		return $("<li>").addClass("list__entry")
+					.append($rdioEl)
+					.append($label)
+		
 	},
 
 	refreshNavigation: function (){
-		var listitems = "";
 		data = ACC.storefinder.storeData
+		
+		var $storeList = $(".js-store-finder-navigation-list");
+		$storeList.empty();
 		
 		if(data){
 			for(i = 0;i < data["data"].length;i++){
-				listitems += ACC.storefinder.createListItemHtml(data["data"][i],i)
+				$storeList.append(ACC.storefinder.createListItemHtml(data["data"][i],i));
 			}
-	
-			$(".js-store-finder-navigation-list").html(listitems);
 	
 			// select the first store
 			var firstInput= $(".js-store-finder-input")[0];
@@ -49,11 +59,11 @@ ACC.storefinder = {
 
 
 		var page = ACC.storefinder.storeSearchData.page;
-		$(".js-store-finder-pager-item-from").html(page*10+1);
+		$(".js-store-finder-pager-item-from").text(page*10+1);
 
 		var to = ((page*10+10)>ACC.storefinder.storeData.total)? ACC.storefinder.storeData.total : page*10+10 ;
-		$(".js-store-finder-pager-item-to").html(to);
-		$(".js-store-finder-pager-item-all").html(ACC.storefinder.storeData.total);
+		$(".js-store-finder-pager-item-to").text(to);
+		$(".js-store-finder-pager-item-all").text(ACC.storefinder.storeData.total);
 		$(".js-store-finder").removeClass("show-store");
 
 	},
@@ -122,45 +132,39 @@ ACC.storefinder = {
 
 			$.each(storeData[storeId],function(key,value){
 				if(key=="image"){
+					$ele.find(".js-store-image").empty();
 					if(value!=""){
-						$ele.find(".js-store-image").html('<img src="'+value+'" alt="" />');
-					}else{
-						$ele.find(".js-store-image").html('');
+						$ele.find(".js-store-image").append($("<img>").attr("src", value).attr("alt", ""));
 					}
 				}else if(key=="productcode"){
 					$ele.find(".js-store-productcode").val(value);
 				}
 				else if(key=="openings"){
+					var $oele = $ele.find(".js-store-"+key);
+					$oele.empty();
 					if(value!=""){
-						var $oele = $ele.find(".js-store-"+key);
-						var openings = "";
 						$.each(value,function(key2,value2){
-							openings += "<dt>"+key2+"</dt>";
-							openings += "<dd>"+value2+"</dd>";
+							$oele.append($("<dt>").text(key2));
+							$oele.append($("<dd>").text(value2));
 						});
-
-						$oele.html(openings);
-
-					}else{
-						$ele.find(".js-store-"+key).html('');
+						
 					}
 
 				}
-				else if(key=="specialOpenings"){}
+				else if(key=="specialOpenings")
+				{}
 				else if(key=="features"){
-					var features="";
+					var $features = $ele.find(".js-store-"+key);
+					$features.empty();
 					$.each(value,function(key2,value2){
-						features += "<li>"+value2+"</li>";
+						$features.append($("<li>").text(value2));
 					});
-
-					$ele.find(".js-store-"+key).html(features);
-
 				}
 				else{
 					if(value!=""){
-						$ele.find(".js-store-"+key).html(value);
+						$ele.find(".js-store-"+key).text(value);
 					}else{
-						$ele.find(".js-store-"+key).html('');
+						$ele.find(".js-store-"+key).empty();
 					}
 				}
 
@@ -218,7 +222,7 @@ ACC.storefinder = {
 				icon: "https://maps.google.com/mapfiles/marker" + 'A' + ".png"
 			});
 			var infowindow = new google.maps.InfoWindow({
-				content: storeInformation["name"],
+                content: ACC.common.encodeHtml(storeInformation["name"]),
 				disableAutoPan: true
 			});
 			google.maps.event.addListener(marker, 'click', function (){
@@ -241,7 +245,14 @@ ACC.storefinder = {
 				if($(".js-storefinder-alert").length<1){
 					var emptySearchMessage = $(".btn-primary").data("searchEmpty")
 					$(".js-store-finder").hide();
-					$("#storeFinder").before('<div class="js-storefinder-alert alert alert-danger alert-dismissable getAccAlert" ><button class="close closeAccAlert" type="button" data-dismiss="alert" aria-hidden="true">×</button>' + emptySearchMessage + '</div>');
+					$("#storeFinder").before(
+							$("<div>").addClass("js-storefinder-alert alert alert-danger alert-dismissable getAccAlert")
+								.append($("<button>").addClass("close closeAccAlert")
+										.attr("type", "button")
+										.attr("data-dismiss", "alert")
+										.attr("aria-hidden", "true")
+										.text("x"))
+								.text(emptySearchMessage));
                     $(".closeAccAlert").on("click", function () {
                         $(this).parent('.getAccAlert').remove();
                     });
@@ -268,8 +279,9 @@ ACC.storefinder = {
 			url: url,
 			data: ACC.storefinder.storeSearchData,
 			type: "get",
+            dataType: 'json',
 			success: function (response){
-				ACC.storefinder.storeData = $.parseJSON(response);
+                ACC.storefinder.storeData = response;
 				ACC.storefinder.refreshNavigation();
 				if(ACC.storefinder.storeData.total < 10){
 					$(".js-store-finder-pager-next").attr("disabled","disabled");
@@ -313,7 +325,7 @@ ACC.storefinder = {
 				},
 				function (error)
 				{
-					console.log("An error occurred... The error code and message are: " + error.code + "/" + error.message);
+					console.log("An error occurred... The error code and message are: " + error.code + "/" + error.message);    // NOSONAR
 				}
 			);
 		}

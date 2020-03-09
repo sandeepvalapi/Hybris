@@ -10,7 +10,7 @@
 <c:set var="headerVariant" value="${product.variantMatrix[0]}"/>
 
 <div class="orderForm_grid_group">
-	<c:set var="skusId" value="${fn:escapeXml(headerVariant.variantOption.code)}"/>
+	<c:set var="skusId" value="${headerVariant.variantOption.code}"/>
 
 	<grid:coreTableHeader variant="${headerVariant}"
 						  product="${product}"

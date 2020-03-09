@@ -1,13 +1,6 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
-*/
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+ */
 package de.hybris.platform.configurablebundleaddon.controllers.pages;
 
 import de.hybris.platform.acceleratorservices.controllers.page.PageType;
@@ -90,7 +83,7 @@ public class BundlePageController extends AbstractSearchPageController
 		model.addAttribute("entryGroupNumber", groupNumber);
 
 		final PageableData pageableData = createPageableData(page, getSearchPageSize(), sortCode, showMode);
-		ProductSearchPageData<SearchStateData, ProductData> searchPageData;
+		final ProductSearchPageData<SearchStateData, ProductData> searchPageData;
 		try
 		{
 			searchPageData = getBundleCartFacade().getAllowedProducts(groupNumber, searchQuery, pageableData);

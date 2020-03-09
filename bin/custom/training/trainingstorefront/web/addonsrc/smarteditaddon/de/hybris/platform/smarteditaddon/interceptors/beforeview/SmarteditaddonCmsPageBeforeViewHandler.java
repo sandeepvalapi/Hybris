@@ -1,15 +1,11 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company. All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.smarteditaddon.interceptors.beforeview;
 
+import static de.hybris.platform.smarteditaddon.constants.SmarteditContractHTMLAttributes.SMARTEDIT_CONTRACT_CATALOG_VERSION_UUID_PARTIAL_CLASS;
+import static de.hybris.platform.smarteditaddon.constants.SmarteditContractHTMLAttributes.SMARTEDIT_CONTRACT_PAGE_UID_PARTIAL_CLASS;
+import static de.hybris.platform.smarteditaddon.constants.SmarteditContractHTMLAttributes.SMARTEDIT_CONTRACT_PAGE_UUID_PARTIAL_CLASS;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.AbstractPageController;
@@ -33,9 +29,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class SmarteditaddonCmsPageBeforeViewHandler implements BeforeViewHandler
 {
 
-	private static final String CSS_CODE_PREFIX_UID = "smartedit-page-uid-";
-	private static final String CSS_CODE_PREFIX_UUID = "smartedit-page-uuid-";
-	private static final String CSS_CODE_PREFIX_CATALOG_VERSION_UUID = "smartedit-catalog-version-uuid-";
 	private static final String PAGE_BODY_CSS_CLASSES = "pageBodyCssClasses";
 	private static final String PAGEUID_CHARACTER_EXCLUSION_REGEXP = "[^a-zA-Z0-9-_]";
 
@@ -46,15 +39,18 @@ public class SmarteditaddonCmsPageBeforeViewHandler implements BeforeViewHandler
 	public void beforeView(final HttpServletRequest request, final HttpServletResponse response, final ModelAndView modelAndView)
 	{
 
+		final UniqueItemIdentifierService uiis = getUniqueItemIdentifierService();
+
 		final AbstractPageModel page = (AbstractPageModel) modelAndView.getModel().get(AbstractPageController.CMS_PAGE_MODEL);
+
 		if (page != null && page.getUid() != null)
 		{
 			final String presetCssClasses = (String) modelAndView.getModelMap().get(PAGE_BODY_CSS_CLASSES);
 
-			final ItemData pageData = getUniqueItemIdentifierService().getItemData(page).orElseThrow(
+			final ItemData pageData = uiis.getItemData(page).orElseThrow(
 					() -> new UnknownIdentifierException("Cannot generate uuid for page in SmarteditaddonCmsPageBeforeViewHandler"));
 
-			final ItemData catalogVersionData = getUniqueItemIdentifierService().getItemData(page.getCatalogVersion()).orElseThrow(
+			final ItemData catalogVersionData = uiis.getItemData(page.getCatalogVersion()).orElseThrow(
 					() -> new UnknownIdentifierException("Cannot generate uuid for component in CMSSmartEditDynamicAttributeService"));
 
 			final StringBuilder cssClasses = new StringBuilder();
@@ -66,14 +62,15 @@ public class SmarteditaddonCmsPageBeforeViewHandler implements BeforeViewHandler
 			}
 
 			// PAGE UID
-			cssClasses.append(CSS_CODE_PREFIX_UID).append(page.getUid().replaceAll(PAGEUID_CHARACTER_EXCLUSION_REGEXP, "-"))
+			cssClasses.append(SMARTEDIT_CONTRACT_PAGE_UID_PARTIAL_CLASS)
+					.append(page.getUid().replaceAll(PAGEUID_CHARACTER_EXCLUSION_REGEXP, "-")).append(' ');
+
+			// PAGE UUID
+			cssClasses.append(SMARTEDIT_CONTRACT_PAGE_UUID_PARTIAL_CLASS).append(pageData.getItemId()).append(' ');
+
+			// PAGE CATALOG VERSION UUID
+			cssClasses.append(SMARTEDIT_CONTRACT_CATALOG_VERSION_UUID_PARTIAL_CLASS).append(catalogVersionData.getItemId())
 					.append(' ');
-
-			// PAGE UUID
-			cssClasses.append(CSS_CODE_PREFIX_UUID).append(pageData.getItemId()).append(' ');
-
-			// PAGE UUID
-			cssClasses.append(CSS_CODE_PREFIX_CATALOG_VERSION_UUID).append(catalogVersionData.getItemId()).append(' ');
 
 			modelAndView.addObject(PAGE_BODY_CSS_CLASSES, cssClasses.toString());
 		}

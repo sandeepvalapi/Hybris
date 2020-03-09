@@ -50,14 +50,14 @@
 		<c:url value="${entry.product.url}" var="productUrl"/>
 		<li class="checkout-order-summary-list-items">
 			<div class="thumb">
-				<a href="${productUrl}">
+				<a href="${fn:escapeXml(productUrl)}">
 					<product:productPrimaryImage product="${entry.product}" format="thumbnail"/>
 				</a>
 			</div>
 			<div class="price"><format:price priceData="${entry.basePrice}" displayFreeForZero="true"/></div>
 			<div class="details">
-				<div class="name"><a href="${productUrl}">${fn:escapeXml(entry.product.name)}</a></div>
-				<div class="qty"> <span> <spring:theme code="basket.page.qty"/>&nbsp;${entry.quantity} </span> </div>
+				<div class="name"><a href="${fn:escapeXml(productUrl)}">${fn:escapeXml(entry.product.name)}</a></div>
+				<div class="qty"> <span> <spring:theme code="basket.page.qty"/>&nbsp;${fn:escapeXml(entry.quantity)} </span> </div>
 				<div class="variants">
 					<c:forEach items="${entry.product.baseOptions}" var="option">
 						<c:if test="${not empty option.selected and option.selected.url eq entry.product.url}">

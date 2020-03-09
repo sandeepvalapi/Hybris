@@ -10,7 +10,7 @@ ACC.navigation = {
 
     offcanvasNavigation: function(){
 
-        enquire.register("screen and (max-width:"+screenSmMax+")", {
+    	enquire.register("screen and (max-width:"+ ACC.common.encodeHtml(screenSmMax) +")", {
 
             match : function() {
 
@@ -55,7 +55,7 @@ ACC.navigation = {
         $('.js-mobile-logo').html( $('.js-site-logo a').clone());
 
         //Add the order form img in the navigation
-        $('.nav-form').html($('<span class="glyphicon glyphicon-list-alt"></span>'));
+        $('.nav-form').append($("<span>").addClass("glyphicon glyphicon-list-alt"));
 
 
         var aAcctData = [];
@@ -77,14 +77,17 @@ ACC.navigation = {
             }
         }
 
-        var navClose = '';
-        navClose += '<div class="close-nav">';
-        navClose += '<button type="button" class="js-toggle-sm-navigation btn"><span class="glyphicon glyphicon-remove"></span></button>';
-        navClose += '</div>';
+        var navClose = $("<div>").addClass("close-nav")
+		.append($("<button>").attr("type", "button")
+				.addClass("js-toggle-sm-navigation btn")
+				.append($("<span>").addClass("glyphicon glyphicon-remove")));
 
         //create Sign In/Sign Out Button
         if($(".liOffcanvas a") && $(".liOffcanvas a").length > 0){
-            sSignBtn += '<li class=\"auto liUserSign\" ><a class=\"userSign\" href=\"' + $(".liOffcanvas a")[0].href + '\">' + $(".liOffcanvas a")[0].innerHTML + '</a></li>';
+        	sSignBtn = $("<li>").addClass("auto liUserSign")
+			.append($("<a>").addClass("userSign")
+					.attr("href", $(".liOffcanvas a")[0].href)
+					.text($(".liOffcanvas a")[0].innerHTML));
         }
 
         //create Welcome User + expand/collapse and close button
@@ -93,28 +96,36 @@ ACC.navigation = {
         //Check to see if user is logged in
         if(oUserInfo && oUserInfo.length === 1)
         {
-            var sUserBtn = '';
-            sUserBtn += '<li class=\"auto \">';
-            sUserBtn += '<div class=\"userGroup\">';
-            sUserBtn += '<span class="glyphicon glyphicon-user myAcctUserIcon"></span>';
-            sUserBtn += '<div class=\"userName\">' + oUserInfo[0].innerHTML + '</div>';
+        	var sUserBtn = $("<li>").addClass("auto")
+			.append($("<div>")
+					.addClass("userGroup")
+					.append($("<span>")
+							.addClass("glyphicon glyphicon-user myAcctUserIcon"))
+							.append($("<div>")
+									.addClass("userName")
+									.html(oUserInfo[0].innerHTML)));
+
             if(aAcctData.length > 0){
-                sUserBtn += '<a class=\"collapsed js-nav-collapse\" id="signedInUserOptionsToggle" data-toggle=\"collapse\"  data-target=\".offcanvasGroup1\">';
-                sUserBtn += '<span class="glyphicon glyphicon-chevron-up myAcctExp"></span>';
-                sUserBtn += '</a>';
+            	$(sUserBtn).find(".userGroup").append($("<a>").addClass("collapsed js-nav-collapse")
+        				.attr("id", "signedInUserOptionsToggle")
+        				.attr("data-toggle", "collapse")
+        				.attr("data-target", ".offcanvasGroup1")
+        				.append($("<span>").addClass("glyphicon glyphicon-chevron-up myAcctExp")));
             }
-            sUserBtn += '</div>';
-            sUserBtn += navClose;
+            sUserBtn.append(navClose);
 
             $('.js-sticky-user-group').html(sUserBtn);
 
-
             $('.js-userAccount-Links').append(sSignBtn);
-            $('.js-userAccount-Links').append($('<li class="auto"><div class="myAccountLinksContainer js-myAccountLinksContainer"></div></li>'));
+            $('.js-userAccount-Links').append($("<li>").addClass("auto").append($("<div>").addClass("myAccountLinksContainer js-myAccountLinksContainer")));
 
 
             //FOR DESKTOP
-            var myAccountHook = $('<div class=\"myAccountLinksHeader js-myAccount-toggle\" data-toggle=\"collapse\" data-parent=".nav__right" >' + oMyAccountData.data("title") + '</div>');
+            var myAccountHook = $("<div>").addClass("myAccountLinksHeader js-myAccount-toggle")
+			.attr("data-toggle", "collapse")
+			.attr("data-parent", ".nav__right")
+			.text(oMyAccountData.data("title"));
+
             myAccountHook.insertBefore(oMyAccountData);
 
             //*For toggling collapse myAccount on Desktop instead of with Bootstrap.js
@@ -130,19 +141,20 @@ ACC.navigation = {
 
             //FOR MOBILE
             //create a My Account Top link for desktop - in case more components come then more parameters need to be passed from the backend
-            var myAccountHook = [];
-            myAccountHook.push('<div class="sub-nav">');
-            myAccountHook.push('<a id="signedInUserAccountToggle" class=\"myAccountLinksHeader collapsed js-myAccount-toggle\" data-toggle=\"collapse\" data-target=".offcanvasGroup2">');
-            myAccountHook.push(oMyAccountData.data("title"));
-            myAccountHook.push('<span class="glyphicon glyphicon-chevron-down myAcctExp"></span>');
-            myAccountHook.push('</a>');
-            myAccountHook.push('</div>');
+            var myAccountHook = $("<div>").addClass("sub-nav")
+			.append($("<a>").attr("id", "signedInUserAccountToggle")
+					.addClass("myAccountLinksHeader collapsed js-myAccount-toggle")
+					.attr("data-toggle", "collapse")
+					.attr("data-target", ".offcanvasGroup2")
+					.text(oMyAccountData.data("title"))
+					.append($("<span>").addClass("glyphicon glyphicon-chevron-down myAcctExp")));
 
-
-            $('.js-myAccountLinksContainer').append(myAccountHook.join(''));
+            $('.js-myAccountLinksContainer').append(myAccountHook);
 
             //add UL element for nested collapsing list
-            $('.js-myAccountLinksContainer').append($('<ul data-trigger="#signedInUserAccountToggle" class="offcanvasGroup2 offcanvasNoBorder collapse js-nav-collapse-body subNavList js-myAccount-root sub-nav"></ul>'));
+            $('.js-myAccountLinksContainer').append($("<ul>")
+					.attr("data-trigger" ,"#signedInUserAccountToggle")
+					.addClass("offcanvasGroup2 offcanvasNoBorder collapse js-nav-collapse-body subNavList js-myAccount-root sub-nav"));
 
             //*For toggling collapse on Mobile instead of with Bootstrap.js
             $('#signedInUserAccountToggle').click(function () {
@@ -159,15 +171,13 @@ ACC.navigation = {
                 }
             });
 
-
-
             //offcanvas items
             //TODO Follow up here to see the output of the account data in the offcanvas menu
             for(var i = aAcctData.length - 1; i >= 0; i--){
                 var oLink = oDoc.createElement("a");
                 oLink.title = aAcctData[i].text;
                 oLink.href = aAcctData[i].link;
-                oLink.innerHTML = aAcctData[i].text;
+                oLink.innerHTML = ACC.common.encodeHtml(aAcctData[i].text);
 
                 var oListItem = oDoc.createElement("li");
                 oListItem.appendChild(oLink);
@@ -177,8 +187,11 @@ ACC.navigation = {
             }
 
         } else {
-            var navButtons = (sSignBtn.substring(0, sSignBtn.length - 5) + navClose) + '</li>';
-            $('.js-sticky-user-group').html(navButtons);
+        	if(sSignBtn)
+        		{
+        			var navButtons = sSignBtn.append(navClose);
+        			$('.js-sticky-user-group').append(navButtons);
+        		}
         }
 
         //desktop
@@ -186,7 +199,7 @@ ACC.navigation = {
             var oLink = oDoc.createElement("a");
             oLink.title = aAcctData[i].text;
             oLink.href = aAcctData[i].link;
-            oLink.innerHTML = aAcctData[i].text;
+            oLink.innerHTML = ACC.common.encodeHtml(aAcctData[i].text);
 
             var oListItem = oDoc.createElement("li");
             oListItem.appendChild(oLink);
@@ -195,7 +208,7 @@ ACC.navigation = {
             oMMainNavDesktop.get(0).appendChild(oListItem.get(0));
         }
 
-        //hide and show contnet areas for desktop
+        //hide and show content areas for desktop
         $('.js-secondaryNavAccount').on('shown.bs.collapse', function () {
 
             if($('.js-secondaryNavCompany').hasClass('in')){
@@ -212,36 +225,29 @@ ACC.navigation = {
 
         });
 
-
         //change icons for up and down
         $('.js-nav-collapse-body').on('hidden.bs.collapse', function(e){
 
             var target = $(e.target);
-            var targetSpan = target.attr('data-trigger') + ' > span';
+            var targetSpanSelector = target.attr('data-trigger') + ' > span';
             if(target.hasClass('in')) {
-                $(targetSpan).removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                $(document).find(targetSpanSelector).removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
             }
             else {
-                $(targetSpan).removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                $(document).find(targetSpanSelector).removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
             }
-
         });
 
         $('.js-nav-collapse-body').on('show.bs.collapse', function(e){
-            var target = $(e.target)
-            var targetSpan = target.attr('data-trigger') + ' > span';
+            var target = $(e.target);
+            var targetSpanSelector = target.attr('data-trigger') + ' > span';
             if(target.hasClass('in')) {
-                $(targetSpan).removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-
+                $(document).find(targetSpanSelector).removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
             }
             else {
-                $(targetSpan).removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                $(document).find(targetSpanSelector).removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
             }
-
         });
-
-        //$('.offcanvasGroup1').collapse();
-
 
     },
 

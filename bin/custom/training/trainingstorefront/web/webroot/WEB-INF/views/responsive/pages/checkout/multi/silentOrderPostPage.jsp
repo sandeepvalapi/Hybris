@@ -30,15 +30,15 @@
 
 							    <ycommerce:testId code="paymentDetailsForm">
 							
-								<form:form id="silentOrderPostForm" name="silentOrderPostForm" commandName="sopPaymentDetailsForm" action="${paymentFormUrl}" method="POST">
+								<form:form id="silentOrderPostForm" name="silentOrderPostForm" modelAttribute="sopPaymentDetailsForm" action="${paymentFormUrl}" method="POST">
 									<input type="hidden" name="orderPage_receiptResponseURL" value="${fn:escapeXml(silentOrderPageData.parameters['orderPage_receiptResponseURL'])}"/>
 									<input type="hidden" name="orderPage_declineResponseURL" value="${fn:escapeXml(silentOrderPageData.parameters['orderPage_declineResponseURL'])}"/>
 									<input type="hidden" name="orderPage_cancelResponseURL" value="${fn:escapeXml(silentOrderPageData.parameters['orderPage_cancelResponseURL'])}"/>
 									<c:forEach items="${sopPaymentDetailsForm.signatureParams}" var="entry" varStatus="status">
-										<input type="hidden" id="${entry.key}" name="${entry.key}" value="${fn:escapeXml(entry.value)}"/>
+										<input type="hidden" id="${fn:escapeXml(entry.key)}" name="${fn:escapeXml(entry.key)}" value="${fn:escapeXml(entry.value)}"/>
 									</c:forEach>
 									<c:forEach items="${sopPaymentDetailsForm.subscriptionSignatureParams}" var="entry" varStatus="status">
-										<input type="hidden" id="${entry.key}" name="${entry.key}" value="${fn:escapeXml(entry.value)}"/>
+										<input type="hidden" id="${fn:escapeXml(entry.key)}" name="${fn:escapeXml(entry.key)}" value="${fn:escapeXml(entry.value)}"/>
 									</c:forEach>
 									<input type="hidden" value="${fn:escapeXml(silentOrderPageData.parameters['billTo_email'])}" name="billTo_email" id="billTo_email">
 						
@@ -131,7 +131,7 @@
                                     </c:if>
 				  
                                     <input type="hidden" value="${fn:escapeXml(silentOrderPageData.parameters['billTo_email'])}" class="text" name="billTo_email" id="billTo_email">
-                                    <address:billAddressFormSelector supportedCountries="${countries}" regions="${regions}" tabindex="12"/>
+                                    <address:billAddressFormSelector supportedCountries="${supportedBillingCountries}" regions="${regions}" tabindex="12"/>
 				
 									<p class="help-block"><spring:theme code="checkout.multi.paymentMethod.seeOrderSummaryForMoreInformation"/></p>							
 								
@@ -151,20 +151,23 @@
 							</div>
 						</div>
 						<div id="savedpaymentsbody">
+                            <spring:url var="choosePaymentMethodUrl" value="{contextPath}/checkout/multi/payment-method/choose" htmlEscape="false">
+                                <spring:param name="contextPath" value="${request.contextPath}" />
+                            </spring:url>
 							<c:forEach items="${paymentInfos}" var="paymentInfo" varStatus="status">
 								<div class="saved-payment-entry">
-									<form action="${request.contextPath}/checkout/multi/payment-method/choose" method="GET">
+									<form action="${fn:escapeXml(choosePaymentMethodUrl)}" method="GET">
 										<input type="hidden" name="selectedPaymentMethodId" value="${fn:escapeXml(paymentInfo.id)}"/>
 											<ul>
 												<strong>${fn:escapeXml(paymentInfo.billingAddress.firstName)}&nbsp; ${fn:escapeXml(paymentInfo.billingAddress.lastName)}</strong><br/>
 												${fn:escapeXml(paymentInfo.cardTypeData.name)}<br/>
 												${fn:escapeXml(paymentInfo.cardNumber)}<br/>
-												<spring:theme code="checkout.multi.paymentMethod.paymentDetails.expires" arguments="${fn:escapeXml(paymentInfo.expiryMonth)},${fn:escapeXml(paymentInfo.expiryYear)}"/><br/>
+												<spring:theme code="checkout.multi.paymentMethod.paymentDetails.expires" arguments="${paymentInfo.expiryMonth},${paymentInfo.expiryYear}"/><br/>
 												${fn:escapeXml(paymentInfo.billingAddress.line1)}<br/>
 												${fn:escapeXml(paymentInfo.billingAddress.town)}&nbsp; ${fn:escapeXml(paymentInfo.billingAddress.region.isocodeShort)}<br/>
 												${fn:escapeXml(paymentInfo.billingAddress.postalCode)}&nbsp; ${fn:escapeXml(paymentInfo.billingAddress.country.isocode)}<br/>
 											</ul>
-											<button type="submit" class="btn btn-primary btn-block" tabindex="${(status.count * 2) - 1}"><spring:theme code="checkout.multi.paymentMethod.addPaymentDetails.useThesePaymentDetails"/></button>
+											<button type="submit" class="btn btn-primary btn-block" tabindex="${fn:escapeXml((status.count * 2) - 1)}"><spring:theme code="checkout.multi.paymentMethod.addPaymentDetails.useThesePaymentDetails"/></button>
 									</form>
 								</div>
 							</c:forEach>

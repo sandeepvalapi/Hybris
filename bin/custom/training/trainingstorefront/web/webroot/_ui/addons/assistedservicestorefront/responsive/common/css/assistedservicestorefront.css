@@ -3,7 +3,7 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     -ms-word-break: break-all;
-    word-break: break-word;
+    word-break: break-all;
 }
 #_asm * {
     -webkit-box-sizing: border-box;
@@ -885,8 +885,10 @@
 #_asm .affix {
     position: fixed;
 }
+
+/*value is supported by all common browsers*/
 @-ms-viewport {
-    width: device-width;
+    width: device-width; /*NOSONAR*/
 }
 #_asm .visible-xs,
 #_asm .visible-sm,
@@ -1012,7 +1014,7 @@
     position: relative;
     top: 1px;
     display: inline-block;
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     font-style: normal;
     font-weight: normal;
     line-height: 1;
@@ -1033,7 +1035,7 @@
     content: '\e802';
     vertical-align: middle;
     display: inline-block;
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     font-style: normal;
     font-weight: normal;
     line-height: 1;
@@ -1041,7 +1043,7 @@
 }
 
 .ASM_icon-user:before {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     content: '\e810';
     vertical-align: middle;
     display: inline-block;
@@ -1052,7 +1054,7 @@
     min-width: 14px;
 }
 .ASM_icon-lock:before {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     content: '\e811';
     vertical-align: middle;
     display: inline-block;
@@ -1088,7 +1090,7 @@
     opacity: .5;
 }
 .ASM_icon-lock:before{
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     font-style: normal;
     font-weight: normal;
     line-height: 1;
@@ -1332,11 +1334,6 @@ select[multiple]#_asm .ASM-input {
     height: 60px;
     padding-top: 10px;
 }
-#_asm .ASM_header .navigation.navigation--top,
-#_asm .ASM_session .navigation.navigation--top{
-    .full-width-padding();
-}
-
 #_asm .ASM_header .ASM_logo {
     font-family: "Dosis", Helvetica, Arial, sans-serif;
     float: left;
@@ -1601,7 +1598,7 @@ select[multiple]#_asm .ASM-input {
     position: relative;
     top: 1px;
     display: inline-block;
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     font-style: normal;
     font-weight: normal;
     line-height: 1;
@@ -1620,7 +1617,7 @@ select[multiple]#_asm .ASM-input {
 }
 #_asm .ASM_control .ASM_control_collapse .ASM_control_collapse_indicator {
     display: inline-block;
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     font-style: normal;
     font-weight: normal;
     line-height: 1;
@@ -1850,8 +1847,27 @@ select[multiple]#_asm .ASM-input {
 .ASM_customer-list-modal .asm-account-section table .nav-order-tools:before{
     color: #0486e0;
 }
+.ASM_customer-list-modal .asm-account-section table .nav-order-tools-empty{
+    border-right: 0;
+    padding: 0 15px 0 10px;
+}
+.ASM_customer-list-modal .asm-account-section table .nav-order-tools-empty:before{
+    color: #E4E4E4;
+    content: "\e032";
+    font-family: 'Glyphicons Halflings';
+    position: relative;
+    top: 23%;
+    display: inline;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 30px;
+    cursor: pointer;
+}
 @media(max-width: 668px){
     .ASM_customer-list-modal .asm-account-section table .nav-order-tools{
+        padding: 0;
+    }
+    .ASM_customer-list-modal .asm-account-section table .nav-order-tools-empty{
         padding: 0;
     }
 }
@@ -1872,7 +1888,7 @@ select[multiple]#_asm .ASM-input {
       content: '\e801';
 }
 .ASM_customer-list-modal .asm-account-section .default-pic {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     color: #A6A6A6;
     font-size: 55px;
     line-height: 55px;
@@ -1908,7 +1924,7 @@ select[multiple]#_asm .ASM-input {
     box-shadow: none;
 }
 .ASM_customer-list-modal .customer-list-select-wrapper:after {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     content: '\e80a';
     color: #0486e0;
     font-size: 30px;
@@ -1964,7 +1980,7 @@ select[multiple]#_asm .ASM-input {
 }
 
 .ASM-customer360_icon:before {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     content: '\e800';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -2079,7 +2095,6 @@ select[multiple]#_asm .ASM-input {
         word-wrap: break-word;
         -ms-word-break: break-all;
         word-break: break-all;
-        word-break: break-word;
         -ms-hyphens: auto;
         -moz-hyphens: auto;
         -webkit-hyphens: auto;
@@ -2153,6 +2168,9 @@ select[multiple]#_asm .ASM-input {
         vertical-align: middle;
     }
     .ASM_customer-list-modal .asm-account-section table .nav-order-tools{
+        padding-bottom: 7px;
+    }
+    .ASM_customer-list-modal .asm-account-section table .nav-order-tools-empty{
         padding-bottom: 7px;
     }
     .ASM_customer-list-modal .asm-account-section a.default-pic{

@@ -87,7 +87,7 @@
 	  }
 
 	  @media (min-width: @screen-md-min) {
-		
+
 
 		.pickup-in-store-available {
 		  .ProductGridComponent-ListPickUpInStoreAction,
@@ -99,6 +99,21 @@
 			width: 49%;
 			display: inline-block;
 			float: left;
+		  }
+		  .ProductGridComponent-ListAddToCartAction {
+		  	position: relative;
+		  	right: 1%;
+		  	float: right;
+		  }
+		  .ProductGridComponent-ListPickUpInStoreAction {
+		  	position: relative;
+		  	left: 1%;
+		  }
+		  @media (min-width: @screen-lg-min) {
+		  	.ProductGridComponent-ListAddToCartAction,
+		  	.ProductGridComponent-ListPickUpInStoreAction {
+		  		width: calc(~'49% - 4px');
+		  	}
 		  }
 		}
 	  }
@@ -116,9 +131,43 @@
 		  .SearchResultsGrid-ListAddToCartAction {
 			padding: 0 (@grid-gutter-width/6);
 		  }
+
 		}
 	  }
 	}
+
+	&.product__list .product__list--item,
+	&.product__grid .product-item {
+		&.tag-highlighted {
+			position: relative;
+
+			&:before {
+				content: "";
+				z-index: -1;
+				position: absolute;
+				border: 2px solid @brand-primary;
+				top: 14px;
+				left: 12px;
+				right: 12px;
+				bottom: 14px;
+			}
+			&:after {
+				&:extend(.glyphicon);
+				content: "\e006";
+				top: 18px;
+				left: 16px;
+				color: @brand-primary;
+				width: 24px;
+				line-height: 22px;
+				height: 24px;
+				font-size: 18px;
+				padding: 0;
+				text-align: center;
+				position: absolute;
+			}
+		}
+	}
+
 
 	&.product__list {
 	  .product__list--item {
@@ -129,10 +178,36 @@
 		  background-color: @table-2n-line-bg;
 		}
 
-		@media (max-width: @screen-md) {
-		  padding-left: 20px;
-		  padding-right: 20px;
-		}
+			@media (max-width: @screen-md) {
+			  padding-left: 20px;
+			  padding-right: 20px;
+			}
+			&.tag-highlighted {
+				&:before {
+					left: 0;
+					right: 0;
+					top: 1px;
+					bottom: 0;
+				}
+				&:after {
+					font-size: 16px;
+					top: 8px;
+					left: 7px;
+				}
+				&:first-child {
+					&:before {
+						top: 0;
+					}
+				}
+				&:nth-of-type(2n) {
+					background: transparent;
+
+					&:before {
+						top: 1px;
+						background-color: @table-2n-line-bg;
+					}
+				}
+			}
 	  }
 
 	  .product__list--thumb {
@@ -194,6 +269,9 @@
 		&:first-child {
 		  margin-left: -1px;
 		}
+			&.tag-highlighted {
+				position: relative;
+			}
 	  }
 
 	  .thumb {

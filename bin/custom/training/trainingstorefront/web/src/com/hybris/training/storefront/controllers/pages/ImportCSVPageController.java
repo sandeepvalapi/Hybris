@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages;
 
@@ -19,6 +12,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.Abstrac
 import de.hybris.platform.acceleratorstorefrontcommons.forms.ImportCSVSavedCartForm;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.validation.ImportCSVSavedCartFormValidator;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import com.hybris.training.storefront.controllers.ControllerConstants;
 
 import java.io.IOException;
@@ -26,6 +20,7 @@ import java.io.InputStream;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,8 +30,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import org.apache.log4j.Logger;
 
 
 
@@ -68,8 +61,9 @@ public class ImportCSVPageController extends AbstractPageController
 	{
 		model.addAttribute("csvFileMaxSize", getSiteConfigService().getLong(IMPORT_CSV_FILE_MAX_SIZE_BYTES_KEY, 0));
 
-		storeCmsPageInModel(model, getContentPageForLabelOrId(IMPORT_CSV_SAVED_CART_CMS_PAGE));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(IMPORT_CSV_SAVED_CART_CMS_PAGE));
+		final ContentPageModel importCsvSavedCartPage = getContentPageForLabelOrId(IMPORT_CSV_SAVED_CART_CMS_PAGE);
+		storeCmsPageInModel(model, importCsvSavedCartPage);
+		setUpMetaDataForContentPage(model, importCsvSavedCartPage);
 		model.addAttribute(WebConstants.BREADCRUMBS_KEY, resourceBreadcrumbBuilder.getBreadcrumbs("import.csv.savedCart.title"));
 		model.addAttribute(ThirdPartyConstants.SeoRobots.META_ROBOTS, ThirdPartyConstants.SeoRobots.NOINDEX_NOFOLLOW);
 
@@ -101,7 +95,7 @@ public class ImportCSVPageController extends AbstractPageController
 			}
 			catch (final IOException e)
 			{
-				if (LOG.isDebugEnabled()) 
+				if (LOG.isDebugEnabled())
 				{
 					LOG.debug(e.getMessage(), e);
 				}

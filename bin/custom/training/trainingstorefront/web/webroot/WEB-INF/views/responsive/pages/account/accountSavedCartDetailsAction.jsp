@@ -24,7 +24,7 @@
         <div class="col-xs-12 col-sm-6 col-md-3 pull-right">
             <ycommerce:testId code="savedCartDetails_backToSavedCarts_button">
                 <spring:url value="/my-account/saved-carts" var="savedCartsUrl" htmlEscape="false" />
-                <a href="${savedCartsUrl}">
+                <a href="${fn:escapeXml(savedCartsUrl)}">
                     <button type="button" class="btn btn-default savedCartBackBtn btn-block">
                         <spring:theme code="text.account.savedCart.backToSavedCarts" />
                     </button>

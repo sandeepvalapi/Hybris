@@ -34,7 +34,7 @@
             <%-- chevron for multi-d products --%>
             <div class="hidden-xs hidden-sm item__toggle">
                 <c:if test="${orderEntry.product.multidimensional}" >
-                    <div class="js-show-multiD-grid-in-order" data-index="${loop.index}">
+                    <div class="js-show-multiD-grid-in-order" data-index="${fn:escapeXml(loop.index)}">
                         <span class="glyphicon glyphicon-chevron-down"></span>
                     </div>
                 </c:if>
@@ -42,14 +42,14 @@
 
             <%-- product image --%>
             <div class="item__image">
-                <a href="${productUrl}">
+                <a href="${fn:escapeXml(productUrl)}">
                     <product:productPrimaryImage product="${orderEntry.product}" format="thumbnail"/>
                 </a>
             </div>
 
             <%-- product name, code, promotions --%>
             <div class="item__info">
-                <a href="${orderEntry.product.purchasable ? productUrl : ''}"><span class="item__name">${fn:escapeXml(orderEntry.product.name)}</span></a>
+                <a href="${orderEntry.product.purchasable ? fn:escapeXml(productUrl) : ''}"><span class="item__name">${fn:escapeXml(orderEntry.product.name)}</span></a>
 
                 <div class="item__code">
                     ${fn:escapeXml(orderEntry.product.code)}
@@ -117,7 +117,7 @@
 
                 <ycommerce:testId code="orderDetails_productQuantity_label">
                     <label class="visible-xs visible-sm"><spring:theme code="basket.page.qty"/>:</label>
-                    <span class="qtyValue">${orderEntry.quantity}</span>
+                    <span class="qtyValue">${fn:escapeXml(orderEntry.quantity)}</span>
                 </ycommerce:testId>
             </div>
 
@@ -150,10 +150,10 @@
                     <c:set var="showMultiDGridClass" value="js-show-multiD-grid-in-order" />
                 </c:if>
 
-                <div class="details ${showMultiDGridClass}" data-index="${loop.index}">
+                <div class="details ${fn:escapeXml(showMultiDGridClass)}" data-index="${fn:escapeXml(loop.index)}">
                     <div class="qty">
                         <label><spring:theme code="basket.page.qty"/>:</label>
-                        <span class="qtyValue">${orderEntry.quantity}</span>
+                        <span class="qtyValue">${fn:escapeXml(orderEntry.quantity)}</span>
                         <c:if test="${orderEntry.product.multidimensional}">
                             <span class="glyphicon glyphicon-chevron-right"></span>
                         </c:if>

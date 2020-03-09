@@ -1,8 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
- * All rights reserved.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
  * ("Confidential Information"). You shall not disclose such Confidential
@@ -14,6 +13,7 @@ package de.hybris.platform.assistedservicestorefront.util;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import de.hybris.platform.assistedserviceservices.exception.AssistedServiceException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +35,19 @@ public class SubscriptionFacadeReflectionWrapper
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	public void updateProfile(final Map<String, String> paramMap) throws ReflectiveOperationException
+	public void updateProfile(final Map<String, String> paramMap) throws AssistedServiceException
 	{
-		Object subscriptionFacadeObject = null;
 		try
 		{
+			Object subscriptionFacadeObject = null;
+
 			subscriptionFacadeObject = applicationContext.getBean(SUBSCRIPTION_FACADE_BEAN_NAME);
+			if (subscriptionFacadeObject != null)
+			{
+				final Class<?> c = Class.forName(SUBSCRIPTION_FACADE_CLASS_NAME);
+				final Method updateProfileMethod = c.getDeclaredMethod(SUBSCRIPTION_FACADE_UPDATEPROFILE_METHOD, Map.class);
+				updateProfileMethod.invoke(subscriptionFacadeObject, paramMap);
+			}
 		}
 		catch (final BeansException e)
 		{
@@ -49,11 +56,10 @@ public class SubscriptionFacadeReflectionWrapper
 					SUBSCRIPTION_FACADE_BEAN_NAME, SUBSCRIPTION_FACADE_UPDATEPROFILE_METHOD));
 			LOG.debug(e.getMessage(), e);
 		}
-		if (subscriptionFacadeObject != null)
+		catch (final Exception ex)
 		{
-			final Class<?> c = Class.forName(SUBSCRIPTION_FACADE_CLASS_NAME);
-			final Method updateProfileMethod = c.getDeclaredMethod(SUBSCRIPTION_FACADE_UPDATEPROFILE_METHOD, Map.class);
-			updateProfileMethod.invoke(subscriptionFacadeObject, paramMap);
+			LOG.error("Subscription profile updating failed", ex);
+			throw new AssistedServiceException("Subscription profile updating failed", ex);
 		}
 	}
 }

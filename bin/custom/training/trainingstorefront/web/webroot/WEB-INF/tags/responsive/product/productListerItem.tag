@@ -14,13 +14,18 @@
 
 <c:set value="${not empty product.potentialPromotions}" var="hasPromotion"/>
 
-<li class="product__list--item">
+<c:set value="product__list--item" var="productTagClasses"/>
+<c:forEach var="tag" items="${product.tags}">
+	<c:set value="${productTagClasses} tag-${tag}" var="productTagClasses"/>
+</c:forEach>
+
+<li class="${fn:escapeXml(productTagClasses)}">
 	<ycommerce:testId code="test_searchPage_wholeProduct">
-		<a class="product__list--thumb" href="${productUrl}" title="${fn:escapeXml(product.name)}" >
+		<a class="product__list--thumb" href="${fn:escapeXml(productUrl)}" title="${fn:escapeXml(product.name)}" >
 			<product:productPrimaryImage product="${product}" format="thumbnail"/>
 		</a>
 		<ycommerce:testId code="searchPage_productName_link_${product.code}">
-			<a class="product__list--name" href="${productUrl}">${ycommerce:sanitizeHTML(product.name)}</a>
+			<a class="product__list--name" href="${fn:escapeXml(productUrl)}">${ycommerce:sanitizeHTML(product.name)}</a>
 		</ycommerce:testId>
 
 		<div class="product__list--price-panel">

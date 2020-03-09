@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 #
 # Import Countries
@@ -107,7 +100,7 @@ INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active[default=true]
 ;GU;"Guam"
 ;GW;"Guinea-Bissau"
 ;GY;"Guyana"
-;HK;"Hong Kong"
+;HK;"Hong Kong, China"
 ;HM;"Heard Island and McDonald Islands"
 ;HN;"Honduras"
 ;HR;"Croatia"
@@ -160,7 +153,7 @@ INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active[default=true]
 ;ML;"Mali"
 ;MM;"Myanmar"
 ;MN;"Mongolia"
-;MO;"Macao"
+;MO;"Macao, China"
 ;MP;"Northern Mariana Islands"
 ;MQ;"Martinique"
 ;MR;"Mauritania"
@@ -239,7 +232,7 @@ INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active[default=true]
 ;TR;"Turkey"
 ;TT;"Trinidad and Tobago"
 ;TV;"Tuvalu"
-;TW;"Taiwan"
+;TW;"Taiwan, China"
 ;TZ;"Tanzania"
 ;UA;"Ukraine"
 ;UG;"Uganda"
@@ -349,7 +342,7 @@ INSERT_UPDATE Region;country(isocode);isocode[unique=true];isocodeShort;name[lan
 ;CN;CN-31;31;"Shanghai"
 ;CN;CN-12;12;"Tianjin"
 ;CN;CN-34;34;"Anhui"
-;CN;CN-35;35;"Fujan"
+;CN;CN-35;35;"Fujian"
 ;CN;CN-62;62;"Gansu"
 ;CN;CN-44;44;"Guangdong"
 ;CN;CN-52;52;"Guizhou"
@@ -368,7 +361,6 @@ INSERT_UPDATE Region;country(isocode);isocode[unique=true];isocodeShort;name[lan
 ;CN;CN-37;37;"Shandong"
 ;CN;CN-14;14;"Shanxi"
 ;CN;CN-51;51;"Sichuan"
-;CN;CN-71;71;"Taiwan"
 ;CN;CN-53;53;"Yunnan"
 ;CN;CN-33;33;"Zhejiang"
 ;CN;CN-45;45;"Guangxi"
@@ -376,8 +368,6 @@ INSERT_UPDATE Region;country(isocode);isocode[unique=true];isocodeShort;name[lan
 ;CN;CN-64;64;"Ningxia"
 ;CN;CN-65;65;"Xinjiang"
 ;CN;CN-54;54;"Xizang"
-;CN;CN-91;91;"Xianggang"
-;CN;CN-92;92;"Aomen"
 
 #
 # ISO 3166-2:JP

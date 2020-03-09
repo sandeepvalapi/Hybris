@@ -1,31 +1,33 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.controllers.pages;
 
 
+import de.hybris.platform.commercefacades.product.data.ProductData;
+import de.hybris.platform.commercefacades.search.data.SearchQueryData;
 import de.hybris.platform.commercefacades.search.data.SearchStateData;
 import de.hybris.platform.commerceservices.search.facetdata.BreadcrumbData;
 import de.hybris.platform.commerceservices.search.facetdata.FacetData;
 import de.hybris.platform.commerceservices.search.facetdata.FacetValueData;
+import de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData;
 import de.hybris.platform.commerceservices.search.pagedata.PageableData;
 import de.hybris.platform.commerceservices.search.pagedata.PaginationData;
 import de.hybris.platform.commerceservices.search.pagedata.SearchPageData;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.ui.Model;
+
+import com.sap.security.core.server.csi.XSSEncoder;
 
 
 /**
@@ -34,6 +36,8 @@ public abstract class AbstractSearchPageController extends AbstractPageControlle
 {
 	public static final int MAX_PAGE_LIMIT = 100; // should be configured
 	private static final String PAGINATION_NUMBER_OF_RESULTS_COUNT = "pagination.number.results.count";
+	private static final Logger LOG = Logger.getLogger(AbstractSearchPageController.class);
+	private static final String FACET_SEPARATOR = ":";
 
 	public enum ShowMode
 	{
@@ -100,9 +104,8 @@ public abstract class AbstractSearchPageController extends AbstractPageControlle
 
 	protected Boolean calculateShowPaged(final SearchPageData<?> searchPageData, final ShowMode showMode)
 	{
-		return Boolean
-				.valueOf(showMode == ShowMode.All
-						&& (searchPageData.getPagination().getNumberOfPages() > 1 || searchPageData.getPagination().getPageSize() == getMaxSearchPageSize()));
+		return Boolean.valueOf(showMode == ShowMode.All && (searchPageData.getPagination().getNumberOfPages() > 1
+				|| searchPageData.getPagination().getPageSize() == getMaxSearchPageSize()));
 	}
 
 	protected Map<String, FacetData<SearchStateData>> convertBreadcrumbsToFacets(
@@ -192,7 +195,7 @@ public abstract class AbstractSearchPageController extends AbstractPageControlle
 
 	/**
 	 * Get the default search page size.
-	 * 
+	 *
 	 * @return the number of results per page, <tt>0</tt> (zero) indicated 'default' size should be used
 	 */
 	protected int getSearchPageSize()
@@ -232,4 +235,75 @@ public abstract class AbstractSearchPageController extends AbstractPageControlle
 		}
 	}
 
+	protected ProductSearchPageData<SearchStateData, ProductData> encodeSearchPageData(
+			final ProductSearchPageData<SearchStateData, ProductData> searchPageData)
+	{
+		final SearchStateData currentQuery = searchPageData.getCurrentQuery();
+
+		if (currentQuery != null)
+		{
+			try
+			{
+				final SearchQueryData query = currentQuery.getQuery();
+				final String encodedQueryValue = XSSEncoder.encodeHTML(query.getValue());
+				query.setValue(encodedQueryValue);
+				currentQuery.setQuery(query);
+				searchPageData.setCurrentQuery(currentQuery);
+				searchPageData.setFreeTextSearch(XSSEncoder.encodeHTML(searchPageData.getFreeTextSearch()));
+
+				final List<FacetData<SearchStateData>> facets = searchPageData.getFacets();
+				if (CollectionUtils.isNotEmpty(facets))
+				{
+					processFacetData(facets);
+				}
+			}
+			catch (final UnsupportedEncodingException e)
+			{
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug("Error occured during Encoding the Search Page data values", e);
+				}
+			}
+		}
+		return searchPageData;
+	}
+
+	protected void processFacetData(final List<FacetData<SearchStateData>> facets) throws UnsupportedEncodingException
+	{
+		for (final FacetData<SearchStateData> facetData : facets)
+		{
+			final List<FacetValueData<SearchStateData>> topFacetValueDatas = facetData.getTopValues();
+			if (CollectionUtils.isNotEmpty(topFacetValueDatas))
+			{
+				processFacetDatas(topFacetValueDatas);
+			}
+			final List<FacetValueData<SearchStateData>> facetValueDatas = facetData.getValues();
+			if (CollectionUtils.isNotEmpty(facetValueDatas))
+			{
+				processFacetDatas(facetValueDatas);
+			}
+		}
+	}
+
+	protected void processFacetDatas(final List<FacetValueData<SearchStateData>> facetValueDatas)
+			throws UnsupportedEncodingException
+	{
+		for (final FacetValueData<SearchStateData> facetValueData : facetValueDatas)
+		{
+			final SearchStateData facetQuery = facetValueData.getQuery();
+			final SearchQueryData queryData = facetQuery.getQuery();
+			final String queryValue = queryData.getValue();
+			if (StringUtils.isNotBlank(queryValue))
+			{
+				final String[] queryValues = queryValue.split(FACET_SEPARATOR);
+				final StringBuilder queryValueBuilder = new StringBuilder();
+				queryValueBuilder.append(XSSEncoder.encodeHTML(queryValues[0]));
+				for (int i = 1; i < queryValues.length; i++)
+				{
+					queryValueBuilder.append(FACET_SEPARATOR).append(queryValues[i]);
+				}
+				queryData.setValue(queryValueBuilder.toString());
+			}
+		}
+	}
 }

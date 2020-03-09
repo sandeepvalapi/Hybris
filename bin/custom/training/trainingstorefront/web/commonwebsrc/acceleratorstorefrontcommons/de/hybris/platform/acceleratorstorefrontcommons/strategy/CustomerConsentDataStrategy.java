@@ -1,23 +1,14 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.strategy;
 
 /**
- * Strategy for Customer Consent Management Operations in Storefront.
+ * Facade interface providing an API for performing operations on consents of customers.
+ *
+ * Deprecated since 2005, please use {@link de.hybris.platform.commercefacades.consent.CustomerConsentDataStrategy}
  */
-public interface CustomerConsentDataStrategy
+@Deprecated(since = "1905")
+public interface CustomerConsentDataStrategy extends de.hybris.platform.commercefacades.consent.CustomerConsentDataStrategy
 {
-	/**
-	 * Injects the customer consents into the session as a Hashmap.
-	 *
-	 */
-	void populateCustomerConsentDataInSession();
 }

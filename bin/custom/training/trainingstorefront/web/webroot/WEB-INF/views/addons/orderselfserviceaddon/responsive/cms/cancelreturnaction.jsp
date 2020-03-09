@@ -1,6 +1,6 @@
 <%--[y] hybris Platform--%>
 
-<%--Copyright (c) 2000-2017 SAP SE--%>
+<%--Copyright (c) 2000-2018 SAP SE--%>
 <%--All rights reserved.--%>
 
 <%--This software is the confidential and proprietary information of SAP--%>
@@ -18,7 +18,7 @@
 <c:url var="cancelReturnUrl" value="${fn:escapeXml(fn:replace(url, '{returnCode}', returnCode))}" scope="page"/>
 
 <c:if test="${returnCancellable}">
-    <form:form action="${cancelReturnUrl}" id="cancelreturnForm" commandName="cancelreturnForm"
+    <form:form action="${cancelReturnUrl}" id="cancelreturnForm" modelAttribute="cancelreturnForm"
                class="cancelreturnForm--ButtonWrapper">
             <button type="submit" class="btn btn-primary btn-block pull-right" id="cancelReturnButton">
                 <spring:theme code="text.return.cancelreturnbutton"/>

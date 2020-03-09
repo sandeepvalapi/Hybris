@@ -3,9 +3,11 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="product" tagdir="/WEB-INF/tags/responsive/product" %>
 
+<spring:htmlEscape defaultHtmlEscape="true" />
+
 <div class="product__list--wrapper">
     <div class="results">
-        <h1><spring:theme code="search.page.searchText" arguments="${searchPageData.freeTextSearch}"/></h1>
+        <h1><spring:theme code="search.page.searchText" arguments="${searchPageData.freeTextSearch}" htmlEscape="false"/></h1>
     </div>
 
     <nav:searchSpellingSuggestion spellingSuggestion="${searchPageData.spellingSuggestion}" />

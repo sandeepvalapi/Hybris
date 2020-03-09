@@ -8,7 +8,8 @@ ACC.close = {
         $('.js-close-account-popup-button').click(function (event) {
             event.preventDefault();
             var popupTitle = $('.js-close-account-popup-button').data("popupTitle");
-            ACC.colorbox.open(popupTitle, {
+            var popupTitleHtml = ACC.common.encodeHtml(popupTitle);
+            ACC.colorbox.open(popupTitleHtml, {
                 inline: true,
                 href: "#popup_confirm_account_removal",
                 className: "js-close-account-popup",
@@ -33,7 +34,7 @@ ACC.close = {
                     window.location.replace(url);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert("Failed to close account. Error: [" + errorThrown + "]");
+                    console.log("Failed to close account. Error: [" + errorThrown + "]");   // NOSONAR
                     window.location.reload();
                 }
             });

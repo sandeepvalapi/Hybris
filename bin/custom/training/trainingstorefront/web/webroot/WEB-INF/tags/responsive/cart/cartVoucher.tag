@@ -19,10 +19,10 @@
 </c:set>
 <c:if test="${empty cartData.quoteData}">
 <div class="form-group js-voucher-respond ${containerClass}">
-    <spring:theme code="text.voucher.apply.input.placeholder" var="voucherInputPlaceholder"/>
+    <spring:theme code="text.voucher.apply.input.placeholder" var="voucherInputPlaceholder" htmlEscape="false"/>
     <label class="control-label cart-voucher__label" for="voucher-code"><spring:theme
             code="text.voucher.apply.input.label"/></label>
-    <form:form id="applyVoucherForm" action="${applyVoucherAction}" method="post" commandName="voucherForm">
+    <form:form id="applyVoucherForm" action="${applyVoucherAction}" method="post" modelAttribute="voucherForm">
         <form:input cssClass="js-voucher-code cart-voucher__input form-control input-sm" name="voucher-code"
                     id="js-voucher-code-text" maxlength="100" placeholder="${voucherInputPlaceholder}"
                     path="voucherCode" disabled="${disableUpdate}"/>
@@ -43,7 +43,7 @@
     <c:forEach items="${cartData.appliedVouchers}" var="voucher" varStatus="loop">
         <li class="voucher-list__item">
             <form:form id="removeVoucherForm${loop.index}" action="${removeVoucherAction}" method="post"
-                       commandName="voucherForm">
+                       modelAttribute="voucherForm">
                 <span class="js-release-voucher voucher-list__item-box" id="voucher-code-${fn:escapeXml(voucher)}">
                      ${fn:escapeXml(voucher)}
                      <form:input hidden="hidden" value="${fn:escapeXml(voucher)}" path="voucherCode"/>

@@ -53,19 +53,19 @@
                 	<c:choose>
                 		<c:when test="${savedCart.importStatus eq 'PROCESSING' }">
                 			<c:set var="importCartIsProcessing" value="true"/>
-                			<c:set var="cartIdRowMapping" value="${cartIdRowMapping}${fn:escapeXml(savedCart.code)}:${loop.index},"/>
+                			<c:set var="cartIdRowMapping" value="${cartIdRowMapping}${savedCart.code}:${loop.index},"/>
                 		</c:when>
                 		<c:otherwise>
                 			<c:set var="importCartIsProcessing" value="false"/>
                 		</c:otherwise>
                 	</c:choose>
-                    <tr id="row-${loop.index}" class="responsive-table-item"> 		
+                    <tr id="row-${loop.index}" class="responsive-table-item">
           				<td class="hidden-sm hidden-md hidden-lg">
           					<spring:theme code='text.account.savedCart.name'/>
           				</td>
                   		<td class="responsive-table-cell saved-cart-name">
                       		<ycommerce:testId code="savedCarts_name_link">
-                          		<a href="${savedCartsLink}${ycommerce:encodeUrl(savedCart.code)}"
+                          		<a href="${fn:escapeXml(savedCartsLink)}${ycommerce:encodeUrl(savedCart.code)}"
 									class="responsive-table-link js-saved-cart-name ${importCartIsProcessing ? 'not-active' : '' }">
                           			${fn:escapeXml(savedCart.name)}
                           		</a>
@@ -98,7 +98,7 @@
 									<c:choose>
 										<c:when test="${importCartIsProcessing}">
 											<span class="file-importing js-file-importing">
-												<img src="${commonResourcePath}/images/3dots.gif" width="25" height="25" />
+												<img src="${fn:escapeXml(commonResourcePath)}/images/3dots.gif" width="25" height="25" />
 											</span>
 										</c:when>
 										<c:otherwise>
@@ -153,12 +153,13 @@
 								</a>
 							</ycommerce:testId>
 						</td>
-                		<cart:savedCartDeleteModal savedCart="${savedCart}"/>                 
+                		<cart:savedCartDeleteModal savedCart="${savedCart}"/>
                     </tr>
                 </c:forEach>
             </table>
-			<div class="js-uploading-saved-carts-update" data-id-row-mapping="${cartIdRowMapping}" data-refresh-cart="${refreshSavedCart}" 
-				data-refresh-interval="${refreshSavedCartInterval}"></div>
+			<div class="js-uploading-saved-carts-update" data-id-row-mapping="${fn:escapeXml(cartIdRowMapping)}"
+				 data-refresh-cart="${fn:escapeXml(refreshSavedCart)}"
+				 data-refresh-interval="${fn:escapeXml(refreshSavedCartInterval)}"></div>
         </div>
 
         <div class="account-orderhistory-pagination">

@@ -10,6 +10,8 @@
 <%@ taglib prefix="multi-checkout" tagdir="/WEB-INF/tags/responsive/checkout/multi" %>
 <%@ taglib prefix="order" tagdir="/WEB-INF/tags/responsive/order" %>
 
+<spring:htmlEscape defaultHtmlEscape="true" />
+
 <div class="checkout-summary-headline"><spring:theme code="checkout.multi.order.summary" /></div>
 
 <div class="checkout-order-summary">

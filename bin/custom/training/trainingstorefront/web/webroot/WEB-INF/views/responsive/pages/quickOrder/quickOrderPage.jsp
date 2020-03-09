@@ -4,7 +4,6 @@
 <%@ taglib prefix="cms" uri="http://hybris.com/tld/cmstags"%>
 <%@ taglib prefix="product" tagdir="/WEB-INF/tags/responsive/product" %>
 <%@ taglib prefix="quickorder" tagdir="/WEB-INF/tags/responsive/quickorder" %>
-<%@ taglib prefix="theme" tagdir="/WEB-INF/tags/shared/theme" %>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 <spring:theme code="product.grid.confirmQtys.message" var="gridConfirmMessage"/>

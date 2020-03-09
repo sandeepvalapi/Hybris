@@ -58,7 +58,7 @@
 		                            	<spring:url value="/my-account/my-quotes/{/quotecode}/" var="quoteDetailLink" htmlEscape="false">
 		                            		<spring:param name="quotecode"  value="${quote.code}"/>
 		                            	</spring:url>
-										<a href="${quoteDetailLink}" class="responsive-table-link">${fn:escapeXml(quote.name)}</a>
+										<a href="${fn:escapeXml(quoteDetailLink)}" class="responsive-table-link">${fn:escapeXml(quote.name)}</a>
 									</td>
 									<td class="hidden-sm hidden-md hidden-lg">
 										<spring:theme code="text.account.quote.code"/>

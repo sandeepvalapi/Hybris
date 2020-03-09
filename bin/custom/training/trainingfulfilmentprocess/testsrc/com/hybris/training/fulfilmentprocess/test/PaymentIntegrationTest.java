@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.fulfilmentprocess.test;
 
@@ -112,7 +105,7 @@ public class PaymentIntegrationTest extends ServicelayerTest
 	private static TaskServiceStub taskServiceStub;
 
 	@BeforeClass
-	public static void prepare() throws Exception //NOPMD
+	public static void prepare() throws Exception
 	{
 		Registry.activateStandaloneMode();
 		Utilities.setJUnitTenant();
@@ -120,8 +113,9 @@ public class PaymentIntegrationTest extends ServicelayerTest
 
 		final ApplicationContext appCtx = Registry.getGlobalApplicationContext();
 
-		assertTrue("Application context of type " + appCtx.getClass() + " is not a subclass of "
-				+ ConfigurableApplicationContext.class, appCtx instanceof ConfigurableApplicationContext);
+		assertTrue(
+				"Application context of type " + appCtx.getClass() + " is not a subclass of " + ConfigurableApplicationContext.class,
+				appCtx instanceof ConfigurableApplicationContext);
 
 		final ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) appCtx;
 		final ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
@@ -129,8 +123,8 @@ public class PaymentIntegrationTest extends ServicelayerTest
 				beanFactory instanceof BeanDefinitionRegistry);
 		final XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader((BeanDefinitionRegistry) beanFactory);
 		xmlReader.setDocumentReaderClass(ScopeTenantIgnoreDocReader.class);
-		xmlReader.loadBeanDefinitions(new ClassPathResource(
-				"/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-test.xml"));
+		xmlReader.loadBeanDefinitions(
+				new ClassPathResource("/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-test.xml"));
 		xmlReader.loadBeanDefinitions(new ClassPathResource(
 				"/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-test-fraudcheck.xml"));
 		xmlReader
@@ -143,10 +137,11 @@ public class PaymentIntegrationTest extends ServicelayerTest
 		definitonFactory.add("classpath:/trainingfulfilmentprocess/test/process/payment-process.xml");
 
 		//setup command factory to mock
-		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean(DefaultCommandFactoryRegistryImpl.class);
+		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean("commandFactoryRegistry",
+				DefaultCommandFactoryRegistryImpl.class);
 		commandFactoryReg.setCommandFactoryList(Arrays.asList((CommandFactory) appCtx.getBean("mockupCommandFactory")));
 
-		taskServiceStub = appCtx.getBean(TaskServiceStub.class);
+		taskServiceStub = appCtx.getBean("taskServiceStub", TaskServiceStub.class);
 		productService = appCtx.getBean("defaultProductService", DefaultProductService.class);
 		cartService = appCtx.getBean("defaultCartService", DefaultCartService.class);
 		userService = appCtx.getBean("defaultUserService", DefaultUserService.class);
@@ -182,16 +177,17 @@ public class PaymentIntegrationTest extends ServicelayerTest
 
 		final ApplicationContext appCtx = Registry.getGlobalApplicationContext();
 
-		assertTrue("Application context of type " + appCtx.getClass() + " is not a subclass of "
-				+ ConfigurableApplicationContext.class, appCtx instanceof ConfigurableApplicationContext);
+		assertTrue(
+				"Application context of type " + appCtx.getClass() + " is not a subclass of " + ConfigurableApplicationContext.class,
+				appCtx instanceof ConfigurableApplicationContext);
 
 		final ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) appCtx;
 		final ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
 		assertTrue("Bean Factory of type " + beanFactory.getClass() + " is not of type " + BeanDefinitionRegistry.class,
 				beanFactory instanceof BeanDefinitionRegistry);
 		final XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader((BeanDefinitionRegistry) beanFactory);
-		xmlReader.loadBeanDefinitions(new ClassPathResource(
-				"/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-testcleanup.xml"));
+		xmlReader.loadBeanDefinitions(
+				new ClassPathResource("/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-testcleanup.xml"));
 
 		//cleanup command factory
 		final Map<String, CommandFactory> commandFactoryList = applicationContext.getBeansOfType(CommandFactory.class);
@@ -206,7 +202,7 @@ public class PaymentIntegrationTest extends ServicelayerTest
 		//			definitonFactory.remove("testPlaceorder");
 		//			definitonFactory.remove("testConsignmentFulfilmentSubprocess");
 		//		}
-		processService.setTaskService(appCtx.getBean(DefaultTaskService.class));
+		processService.setTaskService(appCtx.getBean("taskService", DefaultTaskService.class));
 		definitonFactory = null;
 		processService = null;
 	}
@@ -310,8 +306,9 @@ public class PaymentIntegrationTest extends ServicelayerTest
 			card.setExpirationYear(Integer.valueOf(Calendar.getInstance().get(Calendar.YEAR) - 2));
 		}
 
-		final PaymentTransactionModel paymentTransaction = paymentService.authorize("code4" + codeNo++, BigDecimal.ONE,
-				Currency.getInstance("EUR"), deliveryAddress, deliveryAddress, card).getPaymentTransaction();
+		final PaymentTransactionModel paymentTransaction = paymentService
+				.authorize("code4" + codeNo++, BigDecimal.ONE, Currency.getInstance("EUR"), deliveryAddress, deliveryAddress, card)
+				.getPaymentTransaction();
 
 		cart.setPaymentTransactions(Collections.singletonList(paymentTransaction));
 		modelService.save(cart);

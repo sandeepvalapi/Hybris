@@ -4,6 +4,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
+<spring:htmlEscape defaultHtmlEscape="true" />
+
 <c:url value="/" var="homeUrl" />
 
 <ol class="breadcrumb">
@@ -12,7 +14,7 @@
 	</li>
 
 	<c:forEach items="${breadcrumbs}" var="breadcrumb" varStatus="status">
-		<c:url value="${breadcrumb.url}" var="breadcrumbUrl" />
+		<spring:url htmlEscape="false" value="${breadcrumb.url}" var="breadcrumbUrl" />
 		<c:choose>
 			<c:when test="${status.last}">
 				<li class="active">${fn:escapeXml(breadcrumb.name)}</li>
@@ -24,7 +26,7 @@
 			</c:when>
 			<c:otherwise>
 				<li>
-					<a href="${breadcrumbUrl}">${fn:escapeXml(breadcrumb.name)}</a>
+					<a href="${fn:escapeXml(breadcrumbUrl)}">${fn:escapeXml(breadcrumb.name)}</a>
 				</li>
 			</c:otherwise>
 		</c:choose>

@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 #
 # Import Sample Customers
@@ -43,10 +36,10 @@ INSERT_UPDATE StandardPaymentModeValue;paymentmode(code)[unique=true];currency(i
 ;advance;USD;0;;;;;;
 ;advance;GBP;0;;;;;;
 ;;
-INSERT_UPDATE DeliveryMode;code[unique=true];active;net;supportedpaymentmodes(code);
-;courier;true;false;creditcard;Kreditkarte;creditcard,debitentry,invoice,advance;
-;postService;true;false;creditcard,debitentry,invoice,advance;
-;collect;true;false;invoice,advance;
+INSERT_UPDATE DeliveryMode;code[unique=true];active;supportedpaymentmodes(code);
+;courier;true;creditcard;Kreditkarte;creditcard,debitentry,invoice,advance;
+;postService;true;creditcard,debitentry,invoice,advance;
+;collect;true;invoice,advance;
 ;;
 
 # Sample customers

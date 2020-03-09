@@ -3,7 +3,7 @@
 <c:set var="screenSm" value="640px" scope="session"/>
 <c:set var="screenMd" value="1024px" scope="session"/>
 <c:set var="screenLg" value="1400px" scope="session"/>
-  
+
 <c:set var="screenXsMin" value="480px" scope="session"/>
 <c:set var="screenSmMin" value="640px" scope="session"/>
 <c:set var="screenMdMin" value="1024px" scope="session"/>

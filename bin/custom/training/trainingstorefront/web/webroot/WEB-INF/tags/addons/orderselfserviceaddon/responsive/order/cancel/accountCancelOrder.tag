@@ -14,7 +14,7 @@
 
 <form:form action="${request.contextPath}/my-account/order/${fn:escapeXml(order.code)}/cancel/cancelconfirmation"
            id="confirmcancelorderForm"
-           commandName="orderEntryCancelForm"
+           modelAttribute="orderEntryCancelForm"
            class="account-cancel-order-form">
 
 

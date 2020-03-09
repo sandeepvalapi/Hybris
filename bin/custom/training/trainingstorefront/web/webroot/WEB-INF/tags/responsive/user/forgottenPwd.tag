@@ -8,7 +8,7 @@
 
 <div class="forgotten-password">
 	<div class="description"><spring:theme code="forgottenPwd.description"/></div>
-	<form:form method="post" commandName="forgottenPwdForm">
+	<form:form method="post" modelAttribute="forgottenPwdForm">
 		<div class="control-group">
 			<ycommerce:testId code="login_forgotPasswordEmail_input">
 				<formElement:formInputBox idKey="forgottenPwd.email" labelKey="forgottenPwd.email" path="email" mandatory="true"/>

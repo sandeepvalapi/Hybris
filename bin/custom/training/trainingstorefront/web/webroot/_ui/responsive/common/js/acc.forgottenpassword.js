@@ -8,8 +8,9 @@ ACC.forgottenpassword = {
 		$(document).on("click",".js-password-forgotten",function(e){
 			e.preventDefault();
 
+			var titleHtml = ACC.common.encodeHtml($(this).data("cboxTitle"));
 			ACC.colorbox.open(
-				$(this).data("cboxTitle"),
+				titleHtml,
 				{
 					href: $(this).data("link"),
 					width:"350px",

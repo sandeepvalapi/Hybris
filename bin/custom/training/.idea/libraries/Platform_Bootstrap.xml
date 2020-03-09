@@ -1,0 +1,26 @@
+<component name="libraryTable">
+  <library name="Platform Bootstrap">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/ant/lib" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tomcat-8.5.50/lib" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tomcat-8.5.50/bin" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tanukiwrapper/lib" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tanukiwrapper/bin" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/bootstrap/bin" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/tomcat/bin" />
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/tomcat/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/bootstrap/gensrc" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/bootstrap/bin" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/ant/lib" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tanukiwrapper/bin" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tanukiwrapper/lib" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tomcat-8.5.50/bin" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/resources/tomcat-8.5.50/lib" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/tomcat/bin" recursive="true" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../Softwares/Hybris/COMM_1905/hybris/bin/platform/tomcat/lib" recursive="true" />
+  </library>
+</component>

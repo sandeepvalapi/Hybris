@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.filters.cms;
 
@@ -109,22 +102,20 @@ public class CMSSiteFilter extends OncePerRequestFilter implements CMSFilter
 			{
 				final String contextPath = httpRequest.getContextPath();
 				final String encodedRedirectUrl = httpResponse.encodeRedirectURL(contextPath + redirectURL);
-				httpResponse.sendRedirect(encodedRedirectUrl);
+				httpResponse.sendRedirect(encodedRedirectUrl);	//NOSONAR
 			}
 			else
 			{
 				final String encodedRedirectUrl = httpResponse.encodeRedirectURL(redirectURL);
-				httpResponse.sendRedirect(encodedRedirectUrl);
+				httpResponse.sendRedirect(encodedRedirectUrl);	//NOSONAR
 			}
 
 			// next filter in chain won't be invoked!!!
 		}
 		else
 		{
-			if (httpRequest.getSession().isNew())
-			{
-				processPreviewData(httpRequest, cmsPageRequestContextData.getPreviewData());
-			}
+			processPreviewData(httpRequest, cmsPageRequestContextData.getPreviewData());
+
 			// proceed filters
 			filterChain.doFilter(httpRequest, httpResponse);
 		}
@@ -226,12 +217,6 @@ public class CMSSiteFilter extends OncePerRequestFilter implements CMSFilter
 			final CmsPageRequestContextData cmsPageRequestContextData)
 	{
 		final PreviewDataModel previewDataModel = cmsPageRequestContextData.getPreviewData();
-		final BaseSiteModel currentBaseSite = getBaseSiteService().getCurrentBaseSite();
-		if (currentBaseSite != null && !currentBaseSite.equals(previewDataModel.getActiveSite()))
-		{
-			httpRequest.getSession(false).invalidate();
-			return httpRequest.getRequestURL() + "?" + httpRequest.getQueryString();
-		}
 		processPreviewData(httpRequest, previewDataModel);
 
 		//generate destination URL

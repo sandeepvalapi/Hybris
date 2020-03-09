@@ -27,7 +27,8 @@
 			<c:when test="${showDeliveryAddress and not empty deliveryAddress}">
 				<div class="title"><spring:theme code="checkout.pickup.items.to.be.shipped"/></div>
 				<div class="address">
-					${fn:escapeXml(deliveryAddress.title)}&nbsp;${fn:escapeXml(deliveryAddress.firstName)}&nbsp;${fn:escapeXml(deliveryAddress.lastName)}
+					<c:if test="${ not empty deliveryAddress.title }"> ${fn:escapeXml(deliveryAddress.title)}&nbsp;</c:if>
+					${fn:escapeXml(deliveryAddress.firstName)}&nbsp;${fn:escapeXml(deliveryAddress.lastName)}
 					<br>
 					<c:if test="${ not empty deliveryAddress.line1 }">
 						${fn:escapeXml(deliveryAddress.line1)},&nbsp;
@@ -66,13 +67,13 @@
 		<c:url value="${entry.product.url}" var="productUrl"/>
 		<li class="checkout-order-summary-list-items">
 			<div class="thumb">
-				<a href="${productUrl}">
+				<a href="${fn:escapeXml(productUrl)}">
 					<product:productPrimaryImage product="${entry.product}" format="thumbnail"/>
 				</a>
 			</div>
 			<div class="price"><format:price priceData="${entry.totalPrice}" displayFreeForZero="true"/></div>
 			<div class="details">
-				<div class="name"><a href="${productUrl}">${fn:escapeXml(entry.product.name)}</a></div>
+				<div class="name"><a href="${fn:escapeXml(productUrl)}">${fn:escapeXml(entry.product.name)}</a></div>
 				<div>
                     <span class="label-spacing"><spring:theme code="order.itemPrice" />:</span>
 					<c:if test="${entry.product.multidimensional}">
@@ -93,7 +94,7 @@
 						<format:price priceData="${entry.basePrice}" displayFreeForZero="true" />
 					</c:if>
 				</div>
-				<div class="qty"><span><spring:theme code="basket.page.qty"/>:</span>${entry.quantity}</div>
+				<div class="qty"><span><spring:theme code="basket.page.qty"/>:</span>${fn:escapeXml(entry.quantity)}</div>
 				<div>
 					<c:forEach items="${entry.product.baseOptions}" var="option">
 						<c:if test="${not empty option.selected and option.selected.url eq entry.product.url}">

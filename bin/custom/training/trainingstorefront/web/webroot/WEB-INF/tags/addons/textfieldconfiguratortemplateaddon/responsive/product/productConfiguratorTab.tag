@@ -10,14 +10,14 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <c:set var="configurationId" value="configurationsKeyValueMap[${fn:escapeXml(configuration.configuratorType)}][${fn:escapeXml(configuration.configurationLabel)}]"/>
+                        <c:set var="configurationId" value="configurationsKeyValueMap[${configuration.configuratorType}][${configuration.configurationLabel}]"/>
 
-                        <label for="${configurationId}">
+                        <label for="${fn:escapeXml(configurationId)}">
                                 ${fn:escapeXml(configuration.configurationLabel)}
                         </label>
                         <input <c:if test="${readOnly}"> readonly </c:if>
-                               id="${configurationId}"
-                               name="${configurationId}"
+                               id="${fn:escapeXml(configurationId)}"
+                               name="${fn:escapeXml(configurationId)}"
                                class="form-control" type="text" value="${fn:escapeXml(configuration.configurationValue)}">
                     </div>
                 </div>

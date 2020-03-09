@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.util;
 
@@ -23,7 +16,7 @@ public final class XSSFilterUtil
 	}
 
 	/**
-	 * 
+	 *
 	 * @param value
 	 *           to be sanitized
 	 * @return sanitized content
@@ -35,9 +28,11 @@ public final class XSSFilterUtil
 			return null;
 		}
 		String sanitized = value;
-		sanitized = sanitized.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-		sanitized = sanitized.replaceAll("\\(", "&#40;").replaceAll("\\)", "&#41;");
-		sanitized = sanitized.replaceAll("'", "&#39;");
+		// Simple characters
+		sanitized = sanitized.replace("<", "&lt;").replace(">", "&gt;");
+		sanitized = sanitized.replace("(", "&#40;").replace(")", "&#41;");
+		sanitized = sanitized.replace("'", "&#39;");
+		// RegEx pattern
 		sanitized = sanitized.replaceAll("eval\\((.*)\\)", "");
 		sanitized = sanitized.replaceAll("[\\\"\\\'][\\s]*javascript:(.*)[\\\"\\\']", "\"\"");
 		return sanitized;

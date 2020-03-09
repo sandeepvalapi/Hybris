@@ -64,7 +64,7 @@
 					<ul class="cts-attach-list">
 						<c:forEach items="${ticketEventData.attachments}" var="attachment">
 							<li class="cts-attach-file">
-								<a href="${attachment.URL}" target="_new" download="${fn:escapeXml(attachment.filename)}"><span class="glyphicon glyphicon-paperclip"></span>${fn:escapeXml(attachment.filename)}</a>
+								<a href="../../../../${attachment.URL}" target="_new" download="${fn:escapeXml(attachment.filename)}"><span class="glyphicon glyphicon-paperclip"></span>${fn:escapeXml(attachment.filename)}</a>
 							</li>
 						</c:forEach>
 					</ul>

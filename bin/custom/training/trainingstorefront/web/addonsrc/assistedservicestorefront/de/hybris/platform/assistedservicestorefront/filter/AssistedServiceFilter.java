@@ -1,8 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
- * All rights reserved.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
  * ("Confidential Information"). You shall not disclose such Confidential
@@ -54,24 +53,7 @@ public class AssistedServiceFilter extends OncePerRequestFilter
 		{
 			try
 			{
-				//in case it is a logout request then remove the saml cookie if exist and proceed with the normal logout flow
-				if ("/assisted-service/logoutasm".equalsIgnoreCase(httpservletrequest.getServletPath()))
-				{
-					AssistedServiceUtils.eraseSamlCookie(httpservletresponse);
-				}
-				final LoginToken token = new CookieBasedLoginToken(AssistedServiceUtils.getSamlCookie(httpservletrequest));
-				// perform login only in case token doesn't belong to currently logged in agent
-				if (!getAssistedServiceFacade().isAssistedServiceAgentLoggedIn()
-						|| !getAssistedServiceFacade().getAsmSession().getAgent().getUid().equals(token.getUser().getUid()))
-				{
-					if (getAssistedServiceFacade().isAssistedServiceAgentLoggedIn())
-					{
-						getAssistedServiceFacade().logoutAssistedServiceAgent();
-					}
-					getAssistedServiceFacade().loginAssistedServiceAgentSAML(token.getUser().getUid(), token.getPassword());
-					getAssistedServiceAgentLoginStrategy().login(token.getUser().getUid(), httpservletrequest, httpservletresponse);
-					getAssistedServiceFacade().emulateAfterLogin();
-				}
+				performLogin(httpservletrequest, httpservletresponse);
 			}
 			catch (final AssistedServiceException e)
 			{
@@ -86,8 +68,7 @@ public class AssistedServiceFilter extends OncePerRequestFilter
 				LOG.debug(e.getMessage(), e);
 			}
 		}
-
-
+		
 		final String asmRequestParam = httpservletrequest.getParameter(AssistedservicestorefrontConstants.ASM_REQUEST_PARAM);
         
 		if (Boolean.TRUE.toString().equals(asmRequestParam))
@@ -101,15 +82,41 @@ public class AssistedServiceFilter extends OncePerRequestFilter
 		}
 
 	}
+	
+	private void performLogin(final HttpServletRequest httpservletrequest, final HttpServletResponse httpservletresponse)
+			throws AssistedServiceException
+	{
+		//in case it is a logout request then remove the saml cookie if exist and proceed with the normal logout flow
+		if ("/assisted-service/logoutasm".equalsIgnoreCase(httpservletrequest.getServletPath()))
+		{
+			AssistedServiceUtils.eraseSamlCookie(httpservletresponse);
+		}
+
+		final LoginToken token = new CookieBasedLoginToken(AssistedServiceUtils.getSamlCookie(httpservletrequest));
+
+		// terminate in case token doesn't belong to currently logged in agent
+		if (getAssistedServiceFacade().isAssistedServiceAgentLoggedIn()
+				&& getAssistedServiceFacade().getAsmSession().getAgent().getUid().equals(token.getUser().getUid()))
+		{
+			return;
+		}
+		if (getAssistedServiceFacade().isAssistedServiceAgentLoggedIn())
+		{
+			getAssistedServiceFacade().logoutAssistedServiceAgent();
+		}
+		getAssistedServiceFacade().loginAssistedServiceAgentSAML(token.getUser().getUid(), token.getPassword());
+		getAssistedServiceAgentLoginStrategy().login(token.getUser().getUid(), httpservletrequest, httpservletresponse);
+		getAssistedServiceFacade().emulateAfterLogin();
+	}
 
 	protected String createProfileTrackingPauseCookie()
 	{
 		final String cookieName = Config.getString(AssistedservicestorefrontConstants.PROFILE_COOKIE_NAME, AssistedservicestorefrontConstants.ASM_PROFILE_TRACKING_PAUSE_COOKIE);
-		StringBuffer buf = new StringBuffer(cookieName);
+		final StringBuilder buf = new StringBuilder(cookieName);
 		buf.append("=");
 		buf.append(StringUtils.EMPTY);
 
-		long age = AssistedservicestorefrontConstants.IMPERSISTENCE_COOKIE_INDEX;
+		final long age = AssistedservicestorefrontConstants.IMPERSISTENCE_COOKIE_INDEX;
 		buf.append("; Max-Age=\"");
 		buf.append(age);
 		buf.append("\"");
@@ -120,8 +127,7 @@ public class AssistedServiceFilter extends OncePerRequestFilter
 
 		buf.append("; Secure");
 		buf.append("; HttpOnly");
-		final String string = buf.toString();
-		return string;
+		return buf.toString();
 	}
 
 	/**

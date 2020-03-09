@@ -68,23 +68,24 @@
                 ${fn:escapeXml(variant.variantValueCategory.name)}
             </div>
 
-            <span class="price" data-variant-price="${variant.variantOption.priceData.value}">
+            <span class="price" data-variant-price="${fn:escapeXml(variant.variantOption.priceData.value)}">
                 <c:set var="disableForOutOfStock" value="${inputDisabled}"/>
                 <format:price priceData="${variant.variantOption.priceData}"/>
             </span>
-            <input type=hidden id="productPrice[${loopIndex}]" value="${variant.variantOption.priceData.value}" />
+            <input type=hidden id="productPrice[${fn:escapeXml(loopIndex)}]" value="${fn:escapeXml(variant.variantOption.priceData.value)}" />
 
             <c:if test="${variant.variantOption.stock.stockLevel == 0}">
                 <c:set var="disableForOutOfStock" value="disabled"/>
             </c:if>
 
-            <input type="hidden" class="${fn:escapeXml(skusId)} sku" name="cartEntries[${loopIndex}].sku" id="cartEntries[${loopIndex}].sku" value="${fn:escapeXml(variant.variantOption.code)}" />
+            <input type="hidden" class="${fn:escapeXml(skusId)} sku" name="cartEntries[${fn:escapeXml(loopIndex)}].sku" id="cartEntries[${fn:escapeXml(loopIndex)}].sku" value="${fn:escapeXml(variant.variantOption.code)}" />
             <br/>
-            <input type="textbox" maxlength="3" class="sku-quantity" data-instock="${variant.variantOption.stock.stockLevel}"  data-variant-id="variant_${loopIndex}" name="cartEntries[${loopIndex}].quantity" data-product-selection='{"product":"${fn:escapeXml(variant.variantOption.code)}"}' id="cartEntries[${loopIndex}].quantity" value="0" ${disableForOutOfStock} data-parent-id="${fn:escapeXml(product.code)}"/>
+            <input type="textbox" maxlength="3" class="sku-quantity" data-instock="${fn:escapeXml(variant.variantOption.stock.stockLevel)}"
+                   data-variant-id="variant_${fn:escapeXml(loopIndex)}" name="cartEntries[${fn:escapeXml(loopIndex)}].quantity" data-product-selection='{"product":"${fn:escapeXml(variant.variantOption.code)}"}' id="cartEntries[${fn:escapeXml(loopIndex)}].quantity" value="0" ${disableForOutOfStock} data-parent-id="${fn:escapeXml(product.code)}"/>
 
             <grid:coreTableStockRow variant="${variant}" />
 
-            <span class="data-grid-total" data-grid-total-id="total_value_${loopIndex}"></span>
+            <span class="data-grid-total" data-grid-total-id="total_value_${fn:escapeXml(loopIndex)}"></span>
 
             <c:set var="loopIndex" value="${loopIndex +1}"/>
             <c:set var="skuIndex" scope="session" value="${sessionScope.skuIndex + 1}"/>

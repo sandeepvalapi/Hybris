@@ -5,8 +5,11 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="storepickup" tagdir="/WEB-INF/tags/responsive/storepickup" %>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<c:url var="pickUpInStoreFormAction" value="${empty actionUrl ? defaultUrl : actionUrl}"/>
+<spring:htmlEscape defaultHtmlEscape="true" />
+
+<c:url var="pickUpInStoreFormActionUrl" value="${empty actionUrl ? defaultUrl : actionUrl}"/>
 
 <div id="pickupTitle" class="display-none">
 	<div class="pickup-header">
@@ -31,7 +34,7 @@
 
 					<div class="pickup-search-product">
 						<div class="pickup-search-bar">
-							<form:form name="pickupInStoreForm" action="${pickUpInStoreFormAction}" method="post" class="searchPOSForm clearfix">
+							<form:form name="pickupInStoreForm" action="${pickUpInStoreFormActionUrl}" method="post" class="searchPOSForm clearfix">
 								<div class="input-group">
 									<input type="text"  class="form-control"  name="locationQuery" data-id="locationForSearch" placeholder="<spring:theme code="pickup.search.message" />" />
 									<span class="input-group-btn">
@@ -40,8 +43,8 @@
 										</button>
 									</span>
 								</div>
-								<input type="hidden" name="cartPage" data-id="atCartPage" value="${cartPage}" />
-								<input type="hidden" name="entryNumber" value="${entryNumber}" data-id="entryNumber" />
+								<input type="hidden" name="cartPage" data-id="atCartPage" value="${fn:escapeXml(cartPage)}" />
+								<input type="hidden" name="entryNumber" value="${fn:escapeXml(entryNumber)}" data-id="entryNumber" />
 							</form:form>
 						</div>
 					</div>
@@ -56,7 +59,12 @@
 					<div class="store-navigation-pager">
 						<a class="prev js-pickup-store-pager-prev" href="#"><span class="glyphicon glyphicon-chevron-left"></span> <spring:theme code="pickup.pagination.previous"></spring:theme></a>
 						<a class="next js-pickup-store-pager-next" href="#"><spring:theme code="pickup.pagination.next"></spring:theme> <span class="glyphicon glyphicon-chevron-right"></span></a>
-						<div class="position"><span class="js-pickup-store-pager-item-from"></span>-<span class="js-pickup-store-pager-item-to"></span> <spring:theme code="pickup.pagination.from"></spring:theme>  <span class="js-pickup-store-pager-item-all"></span> <spring:theme code="pickup.pagination.stores"></spring:theme></div>
+						<div class="position">
+							<span class="js-pickup-store-pager-item-from"></span>-<span class="js-pickup-store-pager-item-to"></span> 
+							<spring:theme code="pickup.pagination.from" htmlEscape="false"/>
+							<span class="js-pickup-store-pager-item-all"></span> 
+							<spring:theme code="pickup.pagination.stores" htmlEscape="false"/>
+						</div>
 					</div>
 				</div>
 				

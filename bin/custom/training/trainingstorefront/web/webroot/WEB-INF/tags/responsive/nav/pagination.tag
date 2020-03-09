@@ -67,6 +67,7 @@
                                     <c:catch var="errorException">
                                         <spring:eval expression="searchPageData.currentQuery.query"
                                                      var="dummyVar"/><%-- This will throw an exception is it is not supported --%>
+                                                     <!-- searchPageData.currentQuery.query.value is html output encoded in the backend -->
                                         <input type="hidden" name="q" value="${searchPageData.currentQuery.query.value}"/>
                                     </c:catch>
 										

@@ -1,9 +1,10 @@
 <%@ page trimDirectiveWhitespaces="true" %>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="order" tagdir="/WEB-INF/tags/responsive/order" %>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
+<spring:htmlEscape defaultHtmlEscape="true" />
 
 <div class="account-orderdetail well well-tertiary">
     <div class="well-headline">

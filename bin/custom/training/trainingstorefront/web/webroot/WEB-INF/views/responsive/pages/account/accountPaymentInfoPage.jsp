@@ -53,7 +53,7 @@
                             </div>
                             <c:if test="${not paymentInfo.defaultPaymentInfo}" >
                                 <c:url value="/my-account/set-default-payment-details" var="setDefaultPaymentActionUrl"/>
-                                <form:form id="setDefaultPaymentDetails${fn:escapeXml(paymentInfo.id)}" action="${setDefaultPaymentActionUrl}" method="post">
+                                <form:form id="setDefaultPaymentDetails${paymentInfo.id}" action="${setDefaultPaymentActionUrl}" method="post">
                                     <input type="hidden" name="paymentInfoId" value="${fn:escapeXml(paymentInfo.id)}"/>
                                     <ycommerce:testId code="paymentDetails_setAsDefault_button" >
                                         <button type="submit" class="account-set-default-address">
@@ -83,7 +83,7 @@
 	                                </c:if>
 	                            </div>
 	                            <c:url value="/my-account/remove-payment-method" var="removePaymentActionUrl"/>
-	                            <form:form id="removePaymentDetails${fn:escapeXml(paymentInfo.id)}" action="${removePaymentActionUrl}" method="post">
+	                            <form:form id="removePaymentDetails${paymentInfo.id}" action="${removePaymentActionUrl}" method="post">
 	                                <input type="hidden" name="paymentInfoId" value="${fn:escapeXml(paymentInfo.id)}"/>
 	                                <br />
 	                                <div class="modal-actions">

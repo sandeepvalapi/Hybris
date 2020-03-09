@@ -11,19 +11,19 @@
 <spring:htmlEscape defaultHtmlEscape="true" />
 
 <c:set var="qtyMinus" value="1" />
-<c:url value="${product.url}" var="productUrl" />
+<c:url value="${fn:escapeXml(product.url)}" var="productUrlHtml" />
 
 <div class="quick-view-popup">
 
 	<div class="product-image">
-		<a  href="${productUrl}"> 
+		<a  href="${productUrlHtml}"> 
 			<product:productPrimaryImage product="${product}" format="product" />
 		</a>
 	</div>
 	<div class="product-details">
 
 		<div class="name">
-			<a href="${productUrl}"><c:out value="${product.name}" /></a>
+			<a href="${productUrlHtml}"><c:out value="${product.name}" /></a>
 		</div>
 
 		<product:productReviewSummary product="${product}" showLinks="false" starsClass="quick-view-stars"/>
@@ -63,31 +63,30 @@
 					<span class="input-group-btn">
 						<button class="btn btn-primary js-qty-selector-minus" type="button" <c:if test="${qtyMinus <= 1}"><c:out value="disabled='disabled'"/></c:if> ><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
 					</span>
-					<input type="text" maxlength="3" class="form-control js-qty-selector-input" size="1" value="${qtyMinus}" data-max="${product.stock.stockLevel}" data-min="1" id="qty" name="qty"  />
+					<input type="text" maxlength="3" class="form-control js-qty-selector-input" size="1" value="${fn:escapeXml(qtyMinus)}" data-max="${fn:escapeXml(product.stock.stockLevel)}" data-min="1" id="qty" name="qty"  />
 					<span class="input-group-btn">
 						<button class="btn btn-primary js-qty-selector-plus" type="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
 					</span>
 				</div>
 				
 				<c:if test="${product.stock.stockLevel gt 0}">
-					<c:set var="productStockLevel">${product.stock.stockLevel}&nbsp;
+					<c:set var="productStockLevelHtml">${fn:escapeXml(product.stock.stockLevel)}&nbsp;
 						<spring:theme code="product.variants.in.stock"/>
 					</c:set>
 				</c:if>
 				<c:if test="${product.stock.stockLevelStatus.code eq 'lowStock'}">
-					<c:set var="productStockLevel">
+					<c:set var="productStockLevelHtml">
 						<spring:theme code="product.variants.only.left" arguments="${product.stock.stockLevel}"/>
 					</c:set>
 				</c:if>
 				<c:if test="${product.stock.stockLevelStatus.code eq 'inStock' and empty product.stock.stockLevel}">
-					<c:set var="productStockLevel">
+					<c:set var="productStockLevelHtml">
 						<spring:theme code="product.variants.available"/>
 					</c:set>
 				</c:if>
 				<div class="stock-status">
-					${productStockLevel}
+					${productStockLevelHtml}
 				</div>
-
 
 			<c:set var="buttonType">button</c:set>
 			<c:if test="${product.purchasable and product.stock.stockLevelStatus.code ne 'outOfStock' }">

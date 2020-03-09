@@ -204,4 +204,22 @@
 		<function-signature>java.lang.String sanitizeHTML(java.lang.String)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			Sanitizes the provided html tag name. If invalid, returns div by default
+		</description>
+		<name>sanitizeHtmlTagName</name>
+		<function-class>de.hybris.platform.acceleratorstorefrontcommons.tags.Functions</function-class>
+		<function-signature>java.lang.String sanitizeHtmlTagName(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			Helper class used for efficient encoding of JSON String values using Jackson JsonStringEncoder.
+		</description>
+		<name>encodeJSON</name>
+		<function-class>de.hybris.platform.acceleratorstorefrontcommons.tags.JSONUtils</function-class>
+		<function-signature>java.lang.String encode(java.lang.String)</function-signature>
+	</function>
+
 </taglib>

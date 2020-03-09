@@ -10,7 +10,7 @@ ACC.futurelink = {
 			var url = $(this).attr("href");
 			var title = $(this).attr("title");
 
-			ACC.colorbox.open(title,{
+			ACC.colorbox.open(ACC.common.encodeHtml(title),{
 				href: url,
 				maxWidth:"100%",
 				width:"320px",

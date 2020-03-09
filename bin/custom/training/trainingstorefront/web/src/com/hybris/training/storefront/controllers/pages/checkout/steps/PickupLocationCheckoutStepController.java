@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages.checkout.steps;
 
@@ -19,6 +12,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.validation
 import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.checkout.steps.AbstractCheckoutStepController;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.commerceservices.order.CommerceCartModificationException;
 import com.hybris.training.storefront.controllers.ControllerConstants;
 
@@ -49,8 +43,9 @@ public class PickupLocationCheckoutStepController extends AbstractCheckoutStepCo
 		model.addAttribute("cartData", getCheckoutFacade().getCheckoutCart());
 		model.addAttribute("pickupConsolidationOptions", getCheckoutFacade().getConsolidatedPickupOptions());
 		model.addAttribute("userLocation", getCustomerLocationService().getUserLocation());
-		storeCmsPageInModel(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
+		final ContentPageModel multiCheckoutSummaryPage = getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL);
+		storeCmsPageInModel(model, multiCheckoutSummaryPage);
+		setUpMetaDataForContentPage(model, multiCheckoutSummaryPage);
 		model.addAttribute(WebConstants.BREADCRUMBS_KEY,
 				getResourceBreadcrumbBuilder().getBreadcrumbs("checkout.multi.deliveryMethod.breadcrumb"));
 		model.addAttribute("metaRobots", "noindex,nofollow");
@@ -74,8 +69,10 @@ public class PickupLocationCheckoutStepController extends AbstractCheckoutStepCo
 		model.addAttribute("validationData", getCheckoutFacade().consolidateCheckoutCart(posName));
 		model.addAttribute("cartData", getCheckoutFacade().getCheckoutCart());
 		model.addAttribute("userLocation", getCustomerLocationService().getUserLocation());
-		storeCmsPageInModel(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
+		final ContentPageModel multiCheckoutSummaryPage = getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL);
+		storeCmsPageInModel(model, multiCheckoutSummaryPage);
+		setUpMetaDataForContentPage(model, multiCheckoutSummaryPage);
+
 		model.addAttribute(WebConstants.BREADCRUMBS_KEY,
 				getResourceBreadcrumbBuilder().getBreadcrumbs("checkout.multi.deliveryMethod.breadcrumb"));
 		model.addAttribute("metaRobots", "noindex,nofollow");

@@ -9,7 +9,7 @@
 <c:url var="returnOrderUrl" value="${fn:escapeXml(fn:replace(url, '{orderCode}', orderCode))}" scope="page"/>
 
 <c:if test="${orderReturnable}">
-    <form:form action="${returnOrderUrl}" id="returnorderForm" commandName="returnorderForm"
+    <form:form action="${returnOrderUrl}" id="returnorderForm" modelAttribute="returnorderForm"
                class="returnorderForm--ButtonWrapper">
             <button type="submit" class="btn btn-default btn-block" id="returnOrderButton">
                 <spring:theme code="text.order.returnorderbutton"/>

@@ -8,8 +8,6 @@
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
-<c:set var="firstPickupItem" value="true"></c:set>
-
 <c:forEach items="${cartData.pickupOrderGroups}" var="groupData" varStatus="status">
     <hr/>
 	<div class="checkout-shipping-items row">
@@ -22,13 +20,11 @@
 
             <ul>
                 <c:forEach items="${groupData.entries}" var="entry">
-                    <c:url value="${entry.product.url}" var="productUrl"/>
                     <li class="row">
                         <span class="name col-xs-8">${fn:escapeXml(entry.product.name)}</span>
-                        <span class="qty col-xs-4"><spring:theme code="basket.page.qty"/>&nbsp;${entry.quantity}</span>
+                        <span class="qty col-xs-4"><spring:theme code="basket.page.qty"/>&nbsp;${fn:escapeXml(entry.quantity)}</span>
                     </li>
                 </c:forEach>
-                <c:set var="firstPickupItem" value="true"></c:set>
             </ul>
         </div>
 

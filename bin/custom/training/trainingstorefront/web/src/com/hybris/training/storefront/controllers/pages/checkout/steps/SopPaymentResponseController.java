@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages.checkout.steps;
 
@@ -18,6 +11,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.forms.SopPaymentDetailsFo
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
 import de.hybris.platform.commercefacades.order.data.CCPaymentInfoData;
 import de.hybris.platform.commercefacades.user.data.AddressData;
+import de.hybris.platform.commerceservices.enums.CountryType;
 import com.hybris.training.storefront.controllers.ControllerConstants;
 
 import java.util.Map;
@@ -53,7 +47,7 @@ public class SopPaymentResponseController extends PaymentMethodCheckoutStepContr
 		final boolean savePaymentInfo = sopPaymentDetailsForm.isSavePaymentInfo()
 				|| getCheckoutCustomerStrategy().isAnonymousCheckout();
 		final PaymentSubscriptionResultData paymentSubscriptionResultData = this.getPaymentFacade().completeSopCreateSubscription(
-				resultMap, savePaymentInfo);
+				resultMap, savePaymentInfo, false);
 
 		if (paymentSubscriptionResultData.isSuccess())
 		{
@@ -146,7 +140,7 @@ public class SopPaymentResponseController extends PaymentMethodCheckoutStepContr
 	public String getCountryAddressForm(@RequestParam("countryIsoCode") final String countryIsoCode,
 			@RequestParam("useDeliveryAddress") final boolean useDeliveryAddress, final Model model)
 	{
-		model.addAttribute("supportedCountries", getCountries());
+		model.addAttribute("supportedCountries", getCheckoutFacade().getCountries(CountryType.BILLING));
 		model.addAttribute("regions", getI18NFacade().getRegionsForCountryIso(countryIsoCode));
 		model.addAttribute("country", countryIsoCode);
 

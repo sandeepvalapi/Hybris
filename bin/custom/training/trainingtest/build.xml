@@ -2,7 +2,7 @@
 <!--
  [y] hybris Platform
 
- Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
 
  This software is the confidential and proprietary information of SAP
  ("Confidential Information"). You shall not disclose such Confidential
@@ -26,11 +26,9 @@
 
           IF YOU WANT TO ADAPT THE BUILD PROCESS, CREATE A FILE
           CALLED buildcallbacks.xml IN YOUR EXTENSION.
-          PLEASE ALSO REFER TO THE DOCUMENTATION ON THE HYBRIS DEVNET
-          (https://wiki.hybris.com/x/YIVvAg).
+          PLEASE ALSO REFER TO THE DOCUMENTATION ON THE HYBRIS HELP SITE
+          (https://help.hybris.com/1811/hcd/8b6ded0d86691014a6fab18e171c1f91.html).
 
-          For a sample buildcallbacks.xml file,
-          please refer to the hybris Management Console (platform/ext/hmc).
 
  *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 -->
@@ -49,10 +47,6 @@
 
 	<target name="deploy" description="deploy complete extension">
 		<deploy />
-	</target>
-
-	<target name="log4j">
-		<log4j />
 	</target>
 
 	<target name="jspcompile" description="do jspcompile even if switched off">
@@ -98,12 +92,8 @@
 		<cleanwar extname="${extname}" />
 	</target>
 
-	<target name="pmd" description="Tests the source code with the pmd rules.">
-		<pmd_start extensions="${extname}" />
-	</target>
-	
-	<target name="sonar" description="Executes sonar to check this project with the sonar rules.">
-		<sonarsingle extensions="${extname}"/>
+	<target name="sonarcheck" description="Executes sonar to check this project with the sonar rules.">
+		<sonarcheck extensions="${extname}"/>
 	</target>
 
 	<!-- deprecated junit targets -->
@@ -146,7 +136,7 @@
 	</target>
 
 	<target name="codequality" description="executes all codequality tests for this extension">
-		<pmd extensions="${extname}" />
+		<sonarcheck extensions="${extname}" />
 	</target>
 
 	<target name="localizationtest" description="runs the localizationtest to see if all types are localized within the extension">

@@ -30,32 +30,35 @@ ACC.autocomplete = {
 				cache:{}, // init cache per instance
 				focus: function (){return false;}, // prevent textfield value replacement on item focus
 				select: function (event, ui){
-					ui.item.value = ACC.sanitizer.sanitize(ui.item.value, false);
+					ui.item.value = ACC.sanitizer.sanitize(ui.item.value);
                     window.location.href = ui.item.url;
                 }
 			},
 			_renderItem : function (ul, item){
 				
 				if (item.type == "autoSuggestion"){
-					var renderHtml = "<a href='"+ item.url + "' ><div class='name'>" + item.value + "</div></a>";
+					var renderHtml = $("<a>").attr("href", item.url)
+							.append($("<div>").addClass("name").text(item.value));
 					return $("<li>")
 							.data("item.autocomplete", item)
 							.append(renderHtml)
 							.appendTo(ul);
 				}
 				else if (item.type == "productResult"){
+					var renderHtml = $("<a>").attr("href", item.url)
+							.append(
+									item.image  
+											? $("<div>").addClass("thumb")
+													.append($("<img>").attr("src", item.image))
+											: null
+							)
+							.append($("<div>").addClass("name").html(ACC.sanitizer.sanitize(item.value)))
+							.append($("<div>").addClass("price").text(item.price));
 
-					var renderHtml = "<a href='" + item.url + "' >";
-
-					if (item.image != null){
-						renderHtml += "<div class='thumb'><img src='" + item.image + "'  /></div>";
-					}
-
-					renderHtml += 	"<div class='name'>" + item.value +"</div>";
-					renderHtml += 	"<div class='price'>" + item.price +"</div>";
-					renderHtml += 	"</a>";
-
-					return $("<li>").data("item.autocomplete", item).append(renderHtml).appendTo(ul);
+					return $("<li>")
+							.data("item.autocomplete", item)
+							.append(renderHtml)
+							.appendTo(ul);
 				}
 			},
 			source: function (request, response)
@@ -75,7 +78,7 @@ ACC.autocomplete = {
 						{
 							autoSearchData.push({
 								value: obj.term,
-								url: ACC.config.encodedContextPath + "/search?text=" + obj.term,
+								url: ACC.config.encodedContextPath + "/search?text=" + encodeURIComponent(obj.term),
 								type: "autoSuggestion"
 							});
 						});

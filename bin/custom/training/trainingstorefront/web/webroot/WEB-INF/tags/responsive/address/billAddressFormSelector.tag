@@ -16,13 +16,13 @@
 	                           skipBlankMessageKey="address.selectCountry"
 	                           items="${supportedCountries}"
 	                           itemValue="isocode"
-	                           tabindex="${tabIndex}"
+	                           tabindex="${tabindex}"
 	                           selectCSSClass="form-control" />
 </div>
 
 <div id="billingAddressForm" class="billingAddressForm">
 		<address:billingAddressFormElements regions="${regions}"
 		                                    country="${country}"
-											tabindex="${tabIndex + 1}"/>
+											tabindex="${tabindex + 1}"/>
 </div>
 

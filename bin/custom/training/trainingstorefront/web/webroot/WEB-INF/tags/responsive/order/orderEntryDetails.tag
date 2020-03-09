@@ -42,7 +42,7 @@
     <%-- product image --%>
     <div class="item__image">
         <ycommerce:testId code="orderDetail_productThumbnail_link">
-            <a href="${productUrl}">
+            <a href="${fn:escapeXml(productUrl)}">
                 <product:productPrimaryImage product="${orderEntry.product}" format="thumbnail"/>
             </a>
         </ycommerce:testId>
@@ -51,7 +51,7 @@
     <%-- product name, code, promotions --%>
     <div class="item__info">
         <ycommerce:testId code="orderDetails_productName_link">
-            <a href="${orderEntry.product.purchasable ? productUrl : ''}"><span class="item__name">${fn:escapeXml(orderEntry.product.name)}</span></a>
+            <a href="${orderEntry.product.purchasable ? fn:escapeXml(productUrl) : ''}"><span class="item__name">${fn:escapeXml(orderEntry.product.name)}</span></a>
         </ycommerce:testId>
 
         <div class="item__code">
@@ -135,10 +135,10 @@
             <span class="qtyValue">
                 <c:choose>
                     <c:when test="${consignmentEntry ne null }">
-                        ${consignmentEntry.quantity}
+                        ${fn:escapeXml(consignmentEntry.quantity)}
                     </c:when>
                     <c:otherwise>
-                        ${orderEntry.quantity}
+                        ${fn:escapeXml(orderEntry.quantity)}
                     </c:otherwise>
                 </c:choose>
             </span>
@@ -167,10 +167,10 @@
                         <span class="qtyValue">
                             <c:choose>
                                 <c:when test="${consignmentEntry ne null }">
-                                    ${consignmentEntry.quantity}
+                                    ${fn:escapeXml(consignmentEntry.quantity)}
                                 </c:when>
                                 <c:otherwise>
-                                    ${orderEntry.quantity}
+                                    ${fn:escapeXml(orderEntry.quantity)}
                                 </c:otherwise>
                             </c:choose>
                         </span>

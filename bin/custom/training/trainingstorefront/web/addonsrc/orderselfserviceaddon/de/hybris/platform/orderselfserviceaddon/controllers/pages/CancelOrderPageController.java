@@ -1,7 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company.
  * All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
@@ -42,7 +42,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -59,7 +60,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping(value = "/my-account/order")
 public class CancelOrderPageController extends AbstractSearchPageController
 {
-	private static final Logger LOG = Logger.getLogger(CancelOrderPageController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CancelOrderPageController.class);
 	private static final String BREADCRUMBS_ATTR = "breadcrumbs";
 	private static final String REDIRECT_TO_ORDERS_HISTORY_PAGE = REDIRECT_PREFIX + "/my-account/orders";
 	private static final String CANCEL_ORDER_CMS_PAGE = "cancel-order";
@@ -288,23 +289,36 @@ public class CancelOrderPageController extends AbstractSearchPageController
 		final Map<Integer, Integer> cancelEntryQuantity = new HashMap<>();
 		if (CollectionUtils.isNotEmpty(orderData.getEntries()))
 		{
-			for (OrderEntryData orderEntryData : orderData.getEntries())
-			{
-				if (orderEntryData.getProduct().getMultidimensional() != null && orderEntryData.getProduct().getMultidimensional())
-				{
-					for (OrderEntryData nestedOrderEntryData : orderEntryData.getEntries())
-					{
-						cancelEntryQuantity.put(nestedOrderEntryData.getEntryNumber(), 0);
-					}
-				}
-				else
-				{
-					cancelEntryQuantity.put(orderEntryData.getEntryNumber(), 0);
-				}
-			}
+			populateOrderCancelEntries(orderData, cancelEntryQuantity);
 		}
 		orderEntryCancelForm.setCancelEntryQuantityMap(cancelEntryQuantity);
 		return orderEntryCancelForm;
+	}
+
+	/**
+	 * Populates the order cancel entries quantity map
+	 *
+	 * @param orderData
+	 * 		the {@link OrderData} which is used to populate the map
+	 * @param cancelEntryQuantity
+	 * 		the map to be populated
+	 */
+	protected void populateOrderCancelEntries(final OrderData orderData, final Map<Integer, Integer> cancelEntryQuantity)
+	{
+		for (final OrderEntryData orderEntryData : orderData.getEntries())
+		{
+			if (orderEntryData.getProduct().getMultidimensional() != null && orderEntryData.getProduct().getMultidimensional())
+			{
+				for (final OrderEntryData nestedOrderEntryData : orderEntryData.getEntries())
+				{
+					cancelEntryQuantity.put(nestedOrderEntryData.getEntryNumber(), 0);
+				}
+			}
+			else
+			{
+				cancelEntryQuantity.put(orderEntryData.getEntryNumber(), 0);
+			}
+		}
 	}
 
 }

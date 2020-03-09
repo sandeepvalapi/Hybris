@@ -23,29 +23,30 @@
 			<span class="input-group-btn">
 				<button class="btn btn-default js-qty-selector-minus" type="button" <c:if test="${qtyMinus <= 1}"><c:out value="disabled='disabled'"/></c:if> ><span class="glyphicon glyphicon-minus" aria-hidden="true" ></span></button>
 			</span>
-				<input type="text" maxlength="3" class="form-control js-qty-selector-input" size="1" value="${qtyMinus}" data-max="${maxQty}" data-min="1" name="pdpAddtoCartInput"  id="pdpAddtoCartInput" />
+				<input type="text" maxlength="3" class="form-control js-qty-selector-input" size="1" value="${fn:escapeXml(qtyMinus)}"
+					   data-max="${fn:escapeXml(maxQty)}" data-min="1" name="pdpAddtoCartInput"  id="pdpAddtoCartInput" />
 			<span class="input-group-btn">
 				<button class="btn btn-default js-qty-selector-plus" type="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
 			</span>
 		</div>
 		</c:if>
 		<c:if test="${product.stock.stockLevel gt 0}">
-			<c:set var="productStockLevel">${product.stock.stockLevel}&nbsp;
+			<c:set var="productStockLevelHtml">${fn:escapeXml(product.stock.stockLevel)}&nbsp;
 				<spring:theme code="product.variants.in.stock"/>
 			</c:set>
 		</c:if>
 		<c:if test="${product.stock.stockLevelStatus.code eq 'lowStock'}">
-			<c:set var="productStockLevel">
+			<c:set var="productStockLevelHtml">
 				<spring:theme code="product.variants.only.left" arguments="${product.stock.stockLevel}"/>
 			</c:set>
 		</c:if>
 		<c:if test="${isForceInStock}">
-			<c:set var="productStockLevel">
+			<c:set var="productStockLevelHtml">
 				<spring:theme code="product.variants.available"/>
 			</c:set>
 		</c:if>
 		<div class="stock-wrapper clearfix">
-			${productStockLevel}
+			${productStockLevelHtml}
 		</div>
 		 <div class="actions">
         <c:if test="${multiDimensionalProduct}" >

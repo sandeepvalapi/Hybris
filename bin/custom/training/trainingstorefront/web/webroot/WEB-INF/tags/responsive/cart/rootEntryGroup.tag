@@ -23,7 +23,10 @@
                     </div>
                     <div class="col-md-2 col-lg-1 col-sm-3">
                         <c:if test="${entryGroup.groupNumber != null}">
-                            <c:url value="/cart/entrygroups/${entryGroup.groupNumber}" var="removeGroupAction"/>
+                            <spring:url value="/cart/entrygroups/{/groupNumber}" var="removeGroupAction" htmlEscape="false">
+                                <spring:param name="groupNumber" value="${entryGroup.groupNumber}" />
+                            </spring:url>
+
                             <form:form id="removeGroup${entryGroup.groupNumber}"
                                        action="${removeGroupAction}" method="post">
                                 <a class=item__remove" onclick="$(this).closest('form').submit()"

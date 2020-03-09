@@ -119,7 +119,7 @@
             <div style="display:none;" id="ct-add-new-msg">
                 <div id="customer-ticketing-alerts"></div>
                 <div id="global-alerts" class="global-alerts"></div>
-                <form:form method="post" commandName="supportTicketForm" enctype="multipart/form-data">
+                <form:form method="post" modelAttribute="supportTicketForm" enctype="multipart/form-data">
                     <form:hidden path="subject" value="${ticketData.subject}"/>
                     <input id="currentTicketStatus" type="hidden" value="${ticketData.status.id}">
                     <form:hidden path="id" value="${ticketData.id}"/>

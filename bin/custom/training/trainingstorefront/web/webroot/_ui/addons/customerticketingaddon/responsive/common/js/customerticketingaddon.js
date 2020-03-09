@@ -1,3 +1,13 @@
+/*
+ * [y] hybris Platform
+ *
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+ *
+ * This software is the confidential and proprietary information of SAP
+ * ("Confidential Information"). You shall not disclose such Confidential
+ * Information and shall use it only in accordance with the terms of the
+ * license agreement you entered into with SAP.
+ */
 ACC.customerticketingaddon = {
 
 	_autoload: [
@@ -87,7 +97,7 @@ ACC.customerticketingaddon = {
                   $('#ct-add-new-msg').hide();
                 }
             });
-        })
+        });
     },
 
     isSelectedFilesValid: function (selectedFiles) {
@@ -157,7 +167,7 @@ ACC.customerticketingaddon = {
         $(document).on('click', '#addTicket',
             function (event) {
                 event.preventDefault();
-
+                $('#addTicket').prop('disabled',true);
                 ACC.customerticketingaddon.formPostAction("support-tickets?ticketAdded=true");
             });
     },
@@ -166,7 +176,7 @@ ACC.customerticketingaddon = {
         $(document).on('click', '#updateTicket',
             function (event) {        	
                 event.preventDefault();
-
+                $('#updateTicket').prop('disabled',true);
                 ACC.customerticketingaddon.formPostAction('?ticketUpdated=true');
             });
     },
@@ -197,6 +207,7 @@ ACC.customerticketingaddon = {
                 window.location.replace(successRedirectUrl);
             },
             error: function (jqXHR) {
+                $(form).find(':submit').prop('disabled',false);
                 ACC.customerticketingaddon.processErrorResponse(jqXHR);
             }
         });

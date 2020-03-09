@@ -1,2 +1,8 @@
+#set ( $siteUrl = $ctx.urlResolutionService.getWebsiteUrlForSite($ctx.site,false,$ctx.urlLink) )
 #set ( $mediaUrl = $ctx.urlResolutionService.getMediaUrlForSite($ctx.site,false,$ctx.media.url) )
-<img src="${mediaUrl}" alt="#if(${ctx.media.altText})${ctx.media.altText}#end" border="0"/>
+
+<div style="text-align: center;">
+	<a href="${siteUrl}">
+        <img src="${mediaUrl}" alt="#if(${ctx.media.altText})${ctx.media.altText}#end" border="0"/>
+    </a>
+</div>

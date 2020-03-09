@@ -2,7 +2,11 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="theme" tagdir="/WEB-INF/tags/shared/theme" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ attribute name="stockData" required="true" type="de.hybris.platform.commercefacades.product.data.StockData" %>
+
+<spring:htmlEscape defaultHtmlEscape="true" />
+
 <c:choose>
 	<c:when test="${stockData.stockLevelStatus.code eq 'outOfStock'}">
 		<div class='resultStock negative'><spring:theme code="pickup.out.of.stock"/></div>

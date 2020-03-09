@@ -9,7 +9,7 @@
 <c:url var="cancelOrderUrl" value="${fn:escapeXml(fn:replace(url, '{orderCode}', orderCode))}" scope="page"/>
 
 <c:if test="${orderCancellable}">
-    <form:form action="${cancelOrderUrl}" id="cancelorderForm" commandName="cancelorderForm"
+    <form:form action="${cancelOrderUrl}" id="cancelorderForm" modelAttribute="cancelorderForm"
                class="cancelorderForm--ButtonWrapper">
             <button type="submit" class="btn btn-default btn-block" id="cancelOrderButton">
                 <spring:theme code="text.order.cancelorderbutton"/>

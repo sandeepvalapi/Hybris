@@ -62,7 +62,7 @@ ACC.productorderform = {
             }
         });
 
-        $(skuQuantityClass).on('blur keypress', function (event) {
+        $(document).find(skuQuantityClass).on('blur keypress', function (event) {
             var code = event.keyCode || event.which || event.charCode;
 
             if (code != 13 && code != undefined) {
@@ -73,7 +73,7 @@ ACC.productorderform = {
             var currentIndex = parseInt($(this).attr("id").match(indexPattern));
             var totalPrice = 0;
             var _this = this;
-            var currentPrice = $("input[id='productPrice[" + currentIndex + "]']").val();
+            var currentPrice = $(document).find("input[id='productPrice[" + currentIndex + "]']").val();
             this.value = ACC.productorderform.filterSkuEntry(this.value);
             var $currentTotalItems = $('.js-total-items-count');
             var currentTotalItemsValue = $currentTotalItems.html();
@@ -299,7 +299,7 @@ ACC.productorderform = {
                     ACC.productorderform.updateFuture($gridContainer, $skus, data, skusId, showFutureStockLink , hideFutureStockInfo);
                 },
                 error: function (xht, textStatus, ex) {
-                    alert("Failed to get delivery modes. Error details [" + xht + ", " + textStatus + ", " + ex + "]");
+                    console.log("Failed to get delivery modes. Error details [" + xht + ", " + textStatus + ", " + ex + "]");   // NOSONAR
                 }
             });
         });
@@ -420,7 +420,7 @@ ACC.productorderform = {
             variants: ACC.productorderform.selectedVariants
         }).appendTo(currentVariant);
         // save selectedVariantData
-        $('.variant-summary .variant-property').html($('.variant-detail').data('variant-property'));
+        $('.variant-summary .variant-property').text($('.variant-detail').data('variant-property'));
         currentVariant.data(ACC.productorderform.selectedVariantData, ACC.productorderform.selectedVariants);
         currentVariant.removeClass('currentVariant');
     },
@@ -438,7 +438,7 @@ ACC.productorderform = {
             }
 
             var titleHeader = variantSelectBtn.html();
-            var tableWrap = $('#'+parentId).clone().empty().attr('id', parentId+'Variant');
+            var tableWrap = $(document).find('#'+parentId).clone().empty().attr('id', ACC.common.encodeHtml(parentId) + 'Variant');
 
             currentVariant.addClass('currentVariant');
             var popupContent = $(this).parents('.orderForm_grid_group').clone();
@@ -517,7 +517,7 @@ ACC.productorderform = {
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     // log the error to the console
-                    console.log("The following error occured: " + textStatus, errorThrown);
+                    console.log("The following error occured: " + textStatus, errorThrown); // NOSONAR
                 }
             });
         });
@@ -652,7 +652,7 @@ ACC.productorderform = {
         var $gridGroup = _this.parents('.orderForm_grid_group');
         var indexPattern = "[0-9]+";
         var currentIndex = parseInt(_this.attr("id").match(indexPattern));
-        var currentPrice = $("input[id='productPrice[" + currentIndex + "]']").val();
+        var currentPrice = $(document).find("input[id='productPrice[" + currentIndex + "]']").val();
         var $gridTotalValue = $gridGroup.find("[data-grid-total-id=" + 'total_value_' + currentIndex + "]");
         if(quantityToAdd > 0)
             $gridTotalValue.html(ACC.productorderform.formatTotalsCurrency(parseFloat(currentPrice) * parseInt(quantityToAdd)));

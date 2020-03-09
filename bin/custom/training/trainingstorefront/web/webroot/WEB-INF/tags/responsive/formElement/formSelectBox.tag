@@ -21,31 +21,31 @@
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<spring:htmlEscape defaultHtmlEscape="true" />
-<c:set var="escapedPath" value="${fn:escapeXml(path)}"/>
-<c:set var="escapedIdKey" value="${fn:escapeXml(idKey)}"/>
+<spring:htmlEscape defaultHtmlEscape="true"/>
+
 <template:errorSpanField path="${path}">
-	<ycommerce:testId code="LoginPage_Item_${idKey}">
-			<label class="control-label ${fn:escapeXml(labelCSS)}" for="${escapedIdKey}">
-				<spring:theme code="${labelKey}"/>
-				<c:if test="${mandatory != null && mandatory == true}">
+    <ycommerce:testId code="LoginPage_Item_${idKey}">
+        <label class="control-label ${fn:escapeXml(labelCSS)}" for="${fn:escapeXml(idKey)}">
+            <spring:theme code="${labelKey}"/>
+            <c:if test="${mandatory != null && mandatory == true}">
 					<span class="mandatory">
-						<spring:theme code="login.required" var="loginRequiredText" />
+						<spring:theme code="login.required" var="loginRequiredText"/>
 					</span>
-				</c:if>
-					<span class="skip">
-						<form:errors path="${escapedPath}"/>
+            </c:if>
+            <span class="skip">
+						<form:errors path="${path}"/>
 					</span>
-			</label>
-			<div class="control">
-				<form:select id="${escapedIdKey}" path="${escapedPath}" cssClass="${fn:escapeXml(selectCSSClass)}" tabindex="${fn:escapeXml(tabindex)}" disabled="${disabled}">
-					<c:if test="${skipBlank == null || skipBlank == false}">
-						<option value="" disabled="disabled" ${empty selectedValue ? 'selected="selected"' : ''}>
-							<spring:theme code='${skipBlankMessageKey}'/>
-						</option>
-					</c:if>
-					<form:options items="${items}" itemValue="${not empty itemValue ? itemValue :'code'}" itemLabel="${not empty itemLabel ? itemLabel :'name'}" htmlEscape="true"/>
-				</form:select>
-			</div>
-	</ycommerce:testId>
+        </label>
+        <div class="control">
+            <form:select id="${idKey}" path="${path}" cssClass="${fn:escapeXml(selectCSSClass)}" tabindex="${tabindex}" disabled="${disabled}">
+                <c:if test="${skipBlank == null || skipBlank == false}">
+                    <option value="" disabled="disabled" ${empty selectedValue ? 'selected="selected"' : ''}>
+                        <spring:theme code='${skipBlankMessageKey}'/>
+                    </option>
+                </c:if>
+                <form:options items="${items}" itemValue="${not empty itemValue ? itemValue :'code'}"
+                              itemLabel="${not empty itemLabel ? itemLabel :'name'}"/>
+            </form:select>
+        </div>
+    </ycommerce:testId>
 </template:errorSpanField>

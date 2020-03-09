@@ -1,14 +1,10 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms.validation;
+
+import de.hybris.platform.acceleratorservices.config.SiteConfigService;
+import de.hybris.platform.acceleratorstorefrontcommons.forms.ImportCSVSavedCartForm;
 
 import javax.annotation.Resource;
 
@@ -17,9 +13,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
 
-import de.hybris.platform.acceleratorservices.config.SiteConfigService;
-import de.hybris.platform.acceleratorstorefrontcommons.forms.ImportCSVSavedCartForm;
-
 
 @Component("importCSVSavedCartFormValidator")
 public class ImportCSVSavedCartFormValidator implements Validator
@@ -27,6 +20,7 @@ public class ImportCSVSavedCartFormValidator implements Validator
 	public static final String IMPORT_CSV_FILE_MAX_SIZE_BYTES_KEY = "import.csv.file.max.size.bytes";
 	public static final String CSV_FILE_FIELD = "csvFile";
 	public static final String TEXT_CSV_CONTENT_TYPE = "text/csv";
+	public static final String TEXT_CSV_LONG_CONTENT_TYPE = "text/comma-separated-values";
 	public static final String APP_EXCEL_CONTENT_TYPE = "application/vnd.ms-excel";
 	public static final String CSV_FILE_EXTENSION = ".csv";
 
@@ -34,13 +28,13 @@ public class ImportCSVSavedCartFormValidator implements Validator
 	private SiteConfigService siteConfigService;
 
 	@Override
-	public boolean supports(Class<?> aClass)
+	public boolean supports(final Class<?> aClass)
 	{
 		return ImportCSVSavedCartForm.class.equals(aClass);
 	}
 
 	@Override
-	public void validate(Object target, Errors errors)
+	public void validate(final Object target, final Errors errors)
 	{
 		final ImportCSVSavedCartForm importCSVSavedCartForm = (ImportCSVSavedCartForm) target;
 		final MultipartFile csvFile = importCSVSavedCartForm.getCsvFile();
@@ -54,7 +48,8 @@ public class ImportCSVSavedCartFormValidator implements Validator
 		final String fileContentType = csvFile.getContentType();
 		final String fileName = csvFile.getOriginalFilename();
 
-		if (!(TEXT_CSV_CONTENT_TYPE.equalsIgnoreCase(fileContentType) || APP_EXCEL_CONTENT_TYPE.equalsIgnoreCase(fileContentType))
+		if (!(TEXT_CSV_CONTENT_TYPE.equalsIgnoreCase(fileContentType) || APP_EXCEL_CONTENT_TYPE.equalsIgnoreCase(fileContentType) || TEXT_CSV_LONG_CONTENT_TYPE
+				.equalsIgnoreCase(fileContentType))
 				|| fileName == null || !fileName.toLowerCase().endsWith(CSV_FILE_EXTENSION))
 		{
 			errors.rejectValue(CSV_FILE_FIELD, "import.csv.savedCart.fileCSVRequired");

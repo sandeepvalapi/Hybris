@@ -160,11 +160,11 @@
 
 
 
-.asm__customer360-overview-info .col-sm-4{
+.asm__customer360-overview-info .col-sm-6{
     position: static;
 }
 
-.asm__customer360-overview-info .col-sm-4:before {
+.asm__customer360-overview-info .col-sm-6:before {
     content: '';
     position: absolute;
     top: 20px;
@@ -175,7 +175,7 @@
     margin-left: -10px;
 }
 
-.asm__customer360-overview-info .col-sm-4:first-child:before {
+.asm__customer360-overview-info .col-sm-6:first-child:before {
     display: none;
 }
 
@@ -419,12 +419,12 @@
     .asm__customer360-overview-info-headline {
         padding-top: 30px;
     }
-    .asm__customer360-overview-info .col-sm-4{
+    .asm__customer360-overview-info .col-sm-6{
         width: auto;
         float: none;
         position: relative;
     }
-    .asm__customer360-overview-info .col-sm-4:before {
+    .asm__customer360-overview-info .col-sm-6:before {
         left: 10px;
         right: 10px;
         bottom: auto;
@@ -515,7 +515,7 @@
 }
 
 @media (max-width: 667px) {
-    .asm__customer360-overview-recent-section .col-sm-4{
+    .asm__customer360-overview-recent-section .col-sm-6{
         float: none;
         width: auto;
         margin-bottom: 20px;
@@ -667,7 +667,7 @@
 }
 
 @media (max-width: 667px) {
-    .asm__customer360-overview-saved-section .col-sm-4{
+    .asm__customer360-overview-saved-section .col-sm-6{
         float: none;
         width: auto;
         margin-bottom: 20px;
@@ -880,7 +880,7 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     -ms-word-break: break-all;
-    word-break: break-word;
+    word-break: break-all;
 }
 
 .ASM_customer360-modal .asm-customer360-tab.generic{
@@ -953,7 +953,7 @@
     content: '\e801';
 }
 .ASM_customer360-modal .default-pic {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     color: #A6A6A6;
     font-size: 110px;
     line-height: 1;
@@ -997,7 +997,7 @@
 }
 
 .ASM_customer360-modal .headerSortDown:after {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     content: '\e80f';
     font-style: normal;
     font-size: 14px;
@@ -1006,7 +1006,7 @@
     color: #7f90a4;
 }
 .ASM_customer360-modal .headerSortUp:after {
-    font-family: 'asm_icons';
+    font-family: 'asm_icons', sans-serif;
     content: '\e80e';
     font-style: normal;
     font-size: 14px;
@@ -1049,7 +1049,8 @@
 .asm__customer360-overview-product-view {
     border: 1px solid #ebeef1;
     font-size: 15px;
-    margin-bottom: 20px;
+    padding-top: 10px;
+    padding-bottom: 55px;
     box-shadow: -1px 1px 1px #eff0f2;
 }
 .asm__customer360-overview-product-img {

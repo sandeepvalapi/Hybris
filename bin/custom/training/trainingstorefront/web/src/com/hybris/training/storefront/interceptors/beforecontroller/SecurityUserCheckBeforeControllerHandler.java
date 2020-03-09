@@ -1,17 +1,12 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.interceptors.beforecontroller;
 
 import de.hybris.platform.acceleratorcms.services.CMSPageContextService;
 import de.hybris.platform.acceleratorstorefrontcommons.interceptors.BeforeControllerHandler;
+import de.hybris.platform.core.model.user.UserModel;
+import de.hybris.platform.servicelayer.time.TimeService;
 import de.hybris.platform.servicelayer.user.UserService;
 
 import java.io.IOException;
@@ -35,15 +30,21 @@ public class SecurityUserCheckBeforeControllerHandler implements BeforeControlle
 {
 	private static final Logger LOG = Logger.getLogger(SecurityUserCheckBeforeControllerHandler.class);
 
+	private static final String LOGOUT_TRUE_CLOSE_ACC_TRUE = "/?logout=true&closeAcc=true";
+	private static final String REDIRECT_PATH = "/";
+
 	@Resource(name = "userService")
 	private UserService userService;
 
 	@Resource(name = "cmsPageContextService")
 	private CMSPageContextService cmsPageContextService;
 
+	@Resource(name = "timeService")
+	private TimeService timeService;
 
 	@Override
-	public boolean beforeController(final HttpServletRequest request, final HttpServletResponse response, final HandlerMethod handler) throws IOException
+	public boolean beforeController(final HttpServletRequest request, final HttpServletResponse response,
+			final HandlerMethod handler) throws IOException
 	{
 		// Skip this security check when run from within the WCMS Cockpit
 		if (isPreviewDataModelValid(request))
@@ -58,18 +59,25 @@ public class SecurityUserCheckBeforeControllerHandler implements BeforeControlle
 			if (principal instanceof String)
 			{
 				final String springSecurityUserId = (String) principal;
+				final UserModel currentUser = userService.getCurrentUser();
+				final String hybrisUserId = currentUser.getUid();
 
-				final String hybrisUserId = userService.getCurrentUser().getUid();
+				// check if the user is deactivated
+				if (isUserDeactivated(currentUser))
+				{
+					LOG.error("User account [" + hybrisUserId + "] has already bean closed. Invalidating session.");
+
+					invalidateSessionAndRedirect(request, response, LOGOUT_TRUE_CLOSE_ACC_TRUE);
+					return false;
+				}
+
+				// check if spring uid is the same as hybris uid
 				if (!springSecurityUserId.equals(hybrisUserId))
 				{
 					LOG.error("User miss-match springSecurityUserId [" + springSecurityUserId + "] hybris session user ["
 							+ hybrisUserId + "]. Invalidating session.");
 
-					// Invalidate session and redirect to the root page
-					request.getSession().invalidate();
-
-					final String encodedRedirectUrl = response.encodeRedirectURL(request.getContextPath() + "/");
-					response.sendRedirect(encodedRedirectUrl);
+					invalidateSessionAndRedirect(request, response, REDIRECT_PATH);
 					return false;
 				}
 			}
@@ -77,9 +85,26 @@ public class SecurityUserCheckBeforeControllerHandler implements BeforeControlle
 		return true;
 	}
 
+	protected void invalidateSessionAndRedirect(final HttpServletRequest request, final HttpServletResponse response,
+			final String redirectPath) throws IOException
+	{
+		// Invalidate session and redirect
+		request.getSession().invalidate();
+		response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + redirectPath));	//NOSONAR
+	}
+
+	protected boolean isUserDeactivated(final UserModel userModel)
+	{
+		if (userModel.getDeactivationDate() == null)
+		{
+			return false;
+		}
+		return !timeService.getCurrentTime().before(userModel.getDeactivationDate());
+	}
+
 	/**
 	 * Checks whether there is a preview data setup for the current request
-	 * 
+	 *
 	 * @param httpRequest
 	 *           current request
 	 * @return true whether is valid otherwise false

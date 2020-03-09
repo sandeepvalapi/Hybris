@@ -78,13 +78,13 @@
 						<%-- Decide which class to use -- End --%>
 						
 						<c:if test="${not empty childLevel1.children}"><span class="glyphicon  glyphicon-chevron-right hidden-md hidden-lg nav__link--drill__down js_nav__link--drill__down"></span>
-							<div class="sub__navigation js_sub__navigation ${subNavigationClass}">
+							<div class="sub__navigation js_sub__navigation ${fn:escapeXml(subNavigationClass)}">
 								<a class="sm-back js-enquire-sub-close hidden-md hidden-lg" href="#">Back</a>
 								<div class="row">
 									<c:choose>
 									    <c:when test="${hasSubChild}">
 									        <c:forEach items="${childLevel1.children}" var="childLevel2"> 
-												<div class="sub-navigation-section ${subNavigationItemClass}">
+												<div class="sub-navigation-section ${fn:escapeXml(subNavigationItemClass)}">
 													<c:if test="${not empty childLevel2.title}">
 														<div class="title">${fn:escapeXml(childLevel2.title)}</div>
 													</c:if>
@@ -96,7 +96,7 @@
 																		</ul>
 																	</div>
 																</c:if>
-																<div class="sub-navigation-section ${subNavigationItemClass}">
+																<div class="sub-navigation-section ${fn:escapeXml(subNavigationItemClass)}">
 																	<ul class="sub-navigation-list <c:if test="${not empty childLevel2.title}">has-title</c:if>">
 															</c:if>
 															<c:forEach items="${childLevel2.children}" var="childLevel3" begin="${i.index}" end="${i.index + component.wrapAfter - 1}">
@@ -110,7 +110,7 @@
 											</c:forEach>
 									    </c:when>    
 									    <c:otherwise>
-									    	<div class="sub-navigation-section ${subNavigationItemClass}">
+									    	<div class="sub-navigation-section ${fn:escapeXml(subNavigationItemClass)}">
 									    		<ul class="sub-navigation-list <c:if test="${not empty childLevel2.title}">has-title</c:if>">
 										        	<c:forEach items="${childLevel1.children}" var="childLevel2"> 
 														<c:forEach items="${childLevel2.entries}" var="childlink2">

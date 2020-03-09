@@ -2,6 +2,8 @@
 <%@ taglib prefix="template" tagdir="/WEB-INF/tags/responsive/template" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
+<spring:htmlEscape defaultHtmlEscape="true"/>
+
 <template:page pageTitle="${pageTitle}">
 	<div class="item_container_holder">
 		<div class="title_holder">

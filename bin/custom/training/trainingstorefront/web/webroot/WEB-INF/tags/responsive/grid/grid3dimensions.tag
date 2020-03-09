@@ -14,7 +14,7 @@
 <c:forEach items="${product.variantMatrix}" var="firstVariant" varStatus="parentLoop">
 	<c:if test="${empty(filterSkus) || (!empty(filterSkus) && fn:contains(filterSkus, firstVariant.variantOption.code) ) }">
 		<div class="orderForm_grid_group">
-			<c:set var="skusId" value="${fn:escapeXml(firstVariant.variantOption.code)}"/>
+			<c:set var="skusId" value="${firstVariant.variantOption.code}"/>
 			<grid:coreTableHeader variant="${firstVariant}"
 								  product="${product}"
 								  skusId="${skusId}"

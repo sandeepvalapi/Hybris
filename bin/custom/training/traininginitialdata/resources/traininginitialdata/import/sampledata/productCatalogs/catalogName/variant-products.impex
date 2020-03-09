@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 # ImpEx for Importing Variant Products
 
@@ -27,8 +20,8 @@ $approved=approvalstatus(code)[default='check']
 INSERT_UPDATE ApparelProduct;code[unique=true];ean;unit(code);supercategories(code,$catalogVersion);varianttype(code);genders(code);$approved;$catalogVersion
 
 # Create Variants
-INSERT_UPDATE ApparelStyleVariantProduct;code[unique=true];$baseProduct;ean;unit(code);swatchColour;supercategories(code,$catalogVersion);varianttype(code);$approved;$catalogVersion
+INSERT_UPDATE ApparelStyleVariantProduct;code[unique=true];$baseProduct;ean;unit(code);swatchColors;supercategories(code,$catalogVersion);varianttype(code);$approved;$catalogVersion
 
-INSERT_UPDATE ApparelSizeVariantProduct;code[unique=true];$baseProduct;ean;unit(code);swatchColour;supercategories(code,$catalogVersion);$approved;$catalogVersion
+INSERT_UPDATE ApparelSizeVariantProduct;code[unique=true];$baseProduct;ean;unit(code);swatchColors;supercategories(code,$catalogVersion);$approved;$catalogVersion
 
-INSERT_UPDATE ElectronicsColorVariantProduct;code[unique=true];$baseProduct;ean;unit(code);swatchColour;supercategories(code,$catalogVersion);$approved;$catalogVersion
+INSERT_UPDATE ElectronicsColorVariantProduct;code[unique=true];$baseProduct;ean;unit(code);color;supercategories(code,$catalogVersion);$approved;$catalogVersion

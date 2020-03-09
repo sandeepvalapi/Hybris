@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 # Import essential data for the Accelerator
 #
@@ -109,6 +102,3 @@ INSERT_UPDATE ServicelayerJob;code[unique=true];springId[unique=true]
 # Deactivate Frontend Restriction on category by default for perfomance purposes
 UPDATE SearchRestriction;code[unique=true];active[default=false]
 ;Frontend_RestrictedCategory
-
-INSERT_UPDATE Script  ; scriptType(code)  ; active  ; code[unique=true]     ; version   ; content;
-                      ; GROOVY            ; true    ; confirmPickup         ; 0         ; "import de.hybris.platform.basecommerce.enums.ConsignmentStatus; import com.hybris.cockpitng.actions.ActionContext; import com.hybris.cockpitng.actions.ActionResult; import de.hybris.platform.ordersplitting.model.ConsignmentModel; import de.hybris.platform.ordersplitting.model.ConsignmentProcessModel; import de.hybris.platform.processengine.BusinessProcessService; import com.hybris.cockpitng.util.BackofficeSpringUtil; import com.hybris.cockpitng.actions.CockpitAction; import com.hybris.cockpitng.dataaccess.facades.object.ObjectFacade; import com.hybris.cockpitng.dataaccess.facades.object.exceptions.ObjectSavingException;  public class PickupConfirmationAction implements CockpitAction {        public ActionResult perform(final ActionContext ctx)      {         final Object data = ctx.getData();         if(data instanceof ConsignmentModel){             try{                 ((ConsignmentModel)data).setStatus(ConsignmentStatus.PICKUP_COMPLETE);                 getObjectFacade().save(data);                 for (final ConsignmentProcessModel process : ((ConsignmentModel)data).getConsignmentProcesses())                 {                     getBusinessProcessService().triggerEvent(process.getCode() + ""_ConsignmentPickup"");                 }             }             catch(final ObjectSavingException e){                 throw new RuntimeException(e);             };             return new ActionResult(ActionResult.SUCCESS);         };         return new ActionResult(ActionResult.ERROR);     };      public boolean canPerform(final ActionContext ctx)     {         return (ctx.getData() instanceof ConsignmentModel) && ((ConsignmentModel)ctx.getData()).getStatus().equals(ConsignmentStatus.READY_FOR_PICKUP)     };      public boolean needsConfirmation(final ActionContext ctx)     {         return false;     };      public String getConfirmationMessage(final ActionContext ctx)     {         return ""Are you sure?"";     };       public ObjectFacade getObjectFacade(){         return (ObjectFacade) BackofficeSpringUtil.getBean(""objectFacade"");     };       protected BusinessProcessService getBusinessProcessService()     {         return BackofficeSpringUtil.getBean(""businessProcessService"", BusinessProcessService.class);     } }";

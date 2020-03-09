@@ -3,7 +3,8 @@
 <%@ taglib prefix="template" tagdir="/WEB-INF/tags/responsive/template" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="cms" uri="http://hybris.com/tld/cmstags" %>
-<%@ taglib prefix="common" tagdir="/WEB-INF/tags/responsive/common" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <spring:htmlEscape defaultHtmlEscape="true" />
 
 <c:url value="${redirectUrl}" var="continueUrl"/>
@@ -17,7 +18,7 @@
 			<spring:theme code="checkout.multi.hostedOrderPageError.${decision}.${reasonCode}"/>
 		
 		<div class="action">
-			<a class="btn btn-primary" href="${continueUrl}"><spring:theme code="checkout.multi.hostedOrderPageError.continue"/></a>
+			<a class="btn btn-primary" href="${fn:escapeXml(continueUrl)}"><spring:theme code="checkout.multi.hostedOrderPageError.continue"/></a>
 		</div>
 	</div>
 	

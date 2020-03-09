@@ -14,7 +14,7 @@
 	<c:otherwise>
 		<form:form id="addToEntryGroupForm${fn:escapeXml(product.code)}" action="${addToEntryGroupUrl}" method="POST" class="configure_form">
 			<input type="hidden" name="productCode" value="${fn:escapeXml(product.code)}"/>
-			<input type="hidden" name="entryGroupNumber" value="${entryGroupNumber}"/>
+			<input type="hidden" name="entryGroupNumber" value="${fn:escapeXml(entryGroupNumber)}"/>
 			
 			<c:choose>
 				<c:when test="${product.stock.stockLevelStatus.code eq 'outOfStock'}">

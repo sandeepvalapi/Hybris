@@ -16,10 +16,10 @@
     <spring:param name="quoteCode" value="${cartData.quoteData.code}"/>
 </spring:url>
 
-<spring:theme code="text.quote.dateformat.datepicker.selection" var="dateFormatForDatePicker" />
-<spring:theme code="text.quote.dateformat.datepicker.selection.hint" var="dateFormatHint" />
+<spring:theme code="text.quote.dateformat.datepicker.selection" var="dateFormatForDatePickerHtml" />
+<spring:theme code="text.quote.dateformat.datepicker.selection.hint" var="dateFormatHintHtml" />
 
-<form:form method="post" commandName="quoteForm" id="quoteForm" action="#">
+<form:form method="post" modelAttribute="quoteForm" id="quoteForm" action="#">
     <c:if test="${cartData.totalPrice.value lt 0}">
         <div class="alert alert-danger getAccAlert" role="alert">
             <button type="button" class="close closeAccAlert" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -33,7 +33,7 @@
                 <div class="col-sm-4 col-md-3 ">
                     <button type="button"
                         class="btn btn-default btn-block btn--continue-shopping js-continue-shopping-button"
-                        data-continue-shopping-url="${continueShoppingUrl}">
+                        data-continue-shopping-url="${fn:escapeXml(continueShoppingUrl)}">
                         <spring:theme code="cart.page.continue" />
                     </button>
                 </div>
@@ -50,12 +50,12 @@
             <c:if test="${ycommerce:isQuoteUserSalesRep()}">
                 <div class="col-xs-12 col-sm-4 col-md-offset-2">
                     <div class="form-element-icon datepicker quote__expiration" id="js-quote-expiration-time"
-                         data-date-format-for-date-picker="${dateFormatForDatePicker}"
-                         data-expiration-time-url="${expirationTimeUrl}"
+                         data-date-format-for-date-picker="${dateFormatForDatePickerHtml}"
+                         data-expiration-time-url="${fn:escapeXml(expirationTimeUrl)}"
                          data-min-offer-validity-period-days="${fn:escapeXml(minOfferValidityPeriodDays)}">
                         <formElement:formInputBox idKey="expirationTime"
                                                   labelKey="text.quote.expiration.time.label" labelCSS="quote__expiration--label" path="expirationTime"
-                                                  inputCSS="text quote__expiration--input" mandatory="true" placeholder="${dateFormatHint}"/>
+                                                  inputCSS="text quote__expiration--input" mandatory="true" placeholder="${dateFormatHintHtml}"/>
                         <i class="glyphicon glyphicon-calendar js-open-datepicker-quote-expiration-time"></i>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
         </div>
     </div>
     <div id="quote__form--collapse" class="collapse in">
-        <div id="quoteFormDiv" class="js-quote-form" data-metadata-url="${metadataUrl}">
+        <div id="quoteFormDiv" class="js-quote-form" data-metadata-url="${fn:escapeXml(metadataUrl)}">
             <div class="quote__form--section">
                 <div class="row">
                     <div class="col-xs-12 col-sm-6 col-md-4" id="js-quote-name-wrapper">

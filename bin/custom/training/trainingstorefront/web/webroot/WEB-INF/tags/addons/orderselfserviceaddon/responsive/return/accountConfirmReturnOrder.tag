@@ -14,7 +14,7 @@
 
 <form:form action="${request.contextPath}/my-account/order/${fn:escapeXml(order.code)}/returns/submit"
            id="submitreturnorderform"
-           commandName="orderEntryReturnForm"
+           modelAttribute="orderEntryReturnForm"
            class="account-confirm-return-order">
     <ul class="item__list cart__list return-order__list">
         <li class="hidden-xs hidden-sm">

@@ -55,14 +55,14 @@
 
 						<c:if test="${not address.defaultAddress}">
 							<ycommerce:testId code="addressBook_isDefault_button">
-								<a class="account-set-default-address" href="set-default-address/${fn:escapeXml(address.id)}">
+								<a class="account-set-default-address" href="set-default-address/${fn:escapeXml(ycommerce:encodeUrl(address.id))}">
 									<spring:theme code="text.setDefault"/>
 								</a>
 							</ycommerce:testId>
 						</c:if>
 						<div class="account-cards-actions pull-left">
 							<ycommerce:testId code="addressBook_editAddress_button">
-								<a class="action-links" href="edit-address/${fn:escapeXml(address.id)}">
+								<a class="action-links" href="edit-address/${fn:escapeXml(ycommerce:encodeUrl(address.id))}">
 									<span class="glyphicon glyphicon-pencil"></span>
 								</a>
 							</ycommerce:testId>
@@ -109,7 +109,7 @@
                                 <div class="row">
                                     <ycommerce:testId code="addressRemove_delete_button">
                                         <div class="col-xs-12 col-sm-6 col-sm-push-6">
-                                            <a class="btn btn-primary btn-block" data-address-id="${fn:escapeXml(address.id)}" href="remove-address/${fn:escapeXml(address.id)}">
+                                            <a class="btn btn-primary btn-block" data-address-id="${fn:escapeXml(address.id)}" href="remove-address/${fn:escapeXml(ycommerce:encodeUrl(address.id))}">
                                                 <spring:theme code="text.address.delete" />
                                             </a>
                                         </div>

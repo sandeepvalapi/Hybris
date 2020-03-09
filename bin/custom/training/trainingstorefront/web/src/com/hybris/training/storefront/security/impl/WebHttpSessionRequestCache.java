@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.security.impl;
 
@@ -18,6 +11,7 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,13 +28,15 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 /**
  * Extension of HttpSessionRequestCache that allows pass through of cookies from the current request. This is required
  * to allow the GUIDInterceptor to see the secure cookie written during authentication.
- * 
+ *
  * The <tt>RequestCache</tt> stores the <tt>SavedRequest</tt> in the HttpSession, this is then restored perfectly.
  * Unfortunately the saved request also hides new cookies that have been written since the saved request was created.
  * This implementation allows the current request's cookie values to override the cookies within the saved request.
  */
 public class WebHttpSessionRequestCache extends HttpSessionRequestCache implements Serializable
 {
+	private static final Logger LOG = Logger.getLogger(WebHttpSessionRequestCache.class);
+	
 	private static final long serialVersionUID = 1L;
 	private static final String REFERER = "referer";
 
@@ -50,7 +46,7 @@ public class WebHttpSessionRequestCache extends HttpSessionRequestCache implemen
 	private transient RequestMatcher requestMatcher = AnyRequestMatcher.INSTANCE;
 	private boolean createSessionAllowed = true;
 
-	private SessionService sessionService;
+	private transient SessionService sessionService;
 
 	@Required
 	public void setSessionService(final SessionService sessionService)
@@ -120,12 +116,12 @@ public class WebHttpSessionRequestCache extends HttpSessionRequestCache implemen
 				if (isCreateSessionAllowed() || request.getSession(false) != null)
 				{
 					request.getSession().setAttribute(SAVED_REQUEST, savedRequest);
-					logger.debug("DefaultSavedRequest added to Session: " + savedRequest);
+					LOG.debug("DefaultSavedRequest added to Session: " + savedRequest);
 				}
 			}
 			else
 			{
-				logger.debug("Request not saved as configured RequestMatcher did not match");
+				LOG.debug("Request not saved as configured RequestMatcher did not match");
 			}
 		}
 	}
@@ -162,7 +158,7 @@ public class WebHttpSessionRequestCache extends HttpSessionRequestCache implemen
 		if (UrlUtils.isAbsoluteUrl(url))
 		{
 			String relUrl = url.substring(url.indexOf("://") + 3);
-			String modifiedContextPath = StringUtils.isNotEmpty(contextPath)? contextPath : "/";
+			String modifiedContextPath = StringUtils.isNotEmpty(contextPath) ? contextPath : "/";
 			final String urlEncodingAttributes = getSessionService().getAttribute(WebConstants.URL_ENCODING_ATTRIBUTES);
 			if (urlEncodingAttributes != null && !url.contains(urlEncodingAttributes)
 					&& modifiedContextPath.contains(urlEncodingAttributes))
@@ -170,9 +166,9 @@ public class WebHttpSessionRequestCache extends HttpSessionRequestCache implemen
 				modifiedContextPath = StringUtils.remove(modifiedContextPath, urlEncodingAttributes);
 			}
 
-            relUrl =  relUrl.substring(relUrl.indexOf(modifiedContextPath) + modifiedContextPath.length());
+			relUrl = relUrl.substring(relUrl.indexOf(modifiedContextPath) + modifiedContextPath.length());
 
-			return StringUtils.isEmpty(relUrl)? "/" : relUrl;
+			return StringUtils.isEmpty(relUrl) ? "/" : relUrl;
 		}
 		else
 		{

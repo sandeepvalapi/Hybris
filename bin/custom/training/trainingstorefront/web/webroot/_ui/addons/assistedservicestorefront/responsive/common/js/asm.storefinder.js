@@ -1,7 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company.
  * All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
@@ -48,11 +48,11 @@ ASM.storefinder = {
 
 	refreshNavigation: function (){
 		var listitems = "";
-		data = ASM.storefinder.storeData
+		data = ASM.storefinder.storeData;
 		
 		if(data){
 			for(i = 0;i < data["data"].length;i++){
-				listitems += ASM.storefinder.createListItemHtml(data["data"][i],i)
+				listitems += ASM.storefinder.createListItemHtml(data["data"][i],i);
 			}
 	
 			$(".js-asm-store-finder-navigation-list").html(listitems);
@@ -79,28 +79,28 @@ ASM.storefinder = {
 		$(document).on("click",".js-asm-store-finder-pager-prev",function(e){
 			e.preventDefault();
 			var page = ASM.storefinder.storeSearchData.page;
-			ASM.storefinder.getStoreData(page-1)
+			ASM.storefinder.getStoreData(page-1);
 			checkStatus(page-1);
-		})
+		});
 
 		$(document).on("click",".js-asm-store-finder-pager-next",function(e){
 			e.preventDefault();
 			var page = ASM.storefinder.storeSearchData.page;
-			ASM.storefinder.getStoreData(page+1)
+			ASM.storefinder.getStoreData(page+1);
 			checkStatus(page+1);
-		})
+		});
 
 		function checkStatus(page){
-			if(page==0){
-				$(".js-asm-store-finder-pager-prev").attr("disabled","disabled")
+			if(page===0){
+				$(".js-asm-store-finder-pager-prev").attr("disabled","disabled");
 			}else{
-				$(".js-asm-store-finder-pager-prev").removeAttr("disabled")
+				$(".js-asm-store-finder-pager-prev").removeAttr("disabled");
 			}
 			
-			if(page == Math.floor(ASM.storefinder.storeData.total/10)){
-				$(".js-asm-store-finder-pager-next").attr("disabled","disabled")
+			if(page === Math.floor(ASM.storefinder.storeData.total/10)){
+				$(".js-asm-store-finder-pager-next").attr("disabled","disabled");
 			}else{
-				$(".js-asm-store-finder-pager-next").removeAttr("disabled")
+				$(".js-asm-store-finder-pager-next").removeAttr("disabled");
 			}
 		}
 
@@ -122,17 +122,17 @@ ASM.storefinder = {
 
 
 			$.each(storeData[storeId],function(key,value){
-				if(key=="image"){
-					if(value!=""){
+				if(key==="image"){
+					if(value!==""){
 						$ele.find(".js-asm-store-image").html('<img src="'+value+'" alt="" />');
 					}else{
 						$ele.find(".js-asm-store-image").html('');
 					}
-				}else if(key=="productcode"){
+				}else if(key==="productcode"){
 					$ele.find(".js-asm-store-productcode").val(value);
 				}
-				else if(key=="openings"){
-					if(value!=""){
+				else if(key==="openings"){
+					if(value!==""){
 						var $oele = $ele.find(".js-asm-store-"+key);
 						var openings = "";
 						$.each(value,function(key2,value2){
@@ -147,8 +147,7 @@ ASM.storefinder = {
 					}
 
 				}
-				else if(key=="specialOpenings"){}
-				else if(key=="features"){
+				else if(key==="features"){
 					var features="";
 					$.each(value,function(key2,value2){
 						features += "<li>"+value2+"</li>";
@@ -158,19 +157,19 @@ ASM.storefinder = {
 
 				}
 				else{
-					if(value!=""){
+					if(value!==""){
 						$ele.find(".js-asm-store-"+key).html(value);
 					}else{
 						$ele.find(".js-asm-store-"+key).html('');
 					}
 				}
 
-			})
+			});
 
 			ASM.storefinder.storeId = storeData[storeId];
 			ASM.storefinder.initGoogleMap();
 
-		})
+		});
 	},
 
 
@@ -188,7 +187,7 @@ ASM.storefinder = {
 
 		if($(".js-asm-store-finder-map").length > 0)
 		{			
-			$(".js-asm-store-finder-map").attr("id","asm-store-finder-map")
+			$(".js-asm-store-finder-map").attr("id","asm-store-finder-map");
 			var centerPoint = new google.maps.LatLng(storeInformation["latitude"], storeInformation["longitude"]);
 			
 			var mapOptions = {
@@ -198,17 +197,17 @@ ASM.storefinder = {
 				streetViewControl: false,
 				mapTypeId: google.maps.MapTypeId.ROADMAP,
 				center: centerPoint
-			}
+			};
 			
 			var map = new google.maps.Map(document.getElementById("asm-store-finder-map"), mapOptions);
 			
 			// Prevent the store info has been stored, when the first page is loaded, which is needed only for the driving instructions. 
-			if(ASM.storefinder.originalStore == "" ) {
+			if(ASM.storefinder.originalStore === "" ) {
 				ASM.storefinder.originalStore = data["data"][0];
 			}
 
 			//Driving Options
-			if(ACC.config.googleApiKey != "" && ASM.storefinder.originalStore["latitude"] != storeInformation["latitude"]) {
+			if(ACC.config.googleApiKey !== "" && ASM.storefinder.originalStore["latitude"] !== storeInformation["latitude"]) {
 				var directionsDisplay = new google.maps.DirectionsRenderer();
 				var directionsService = new google.maps.DirectionsService();
 				var originPoint = new google.maps.LatLng(ASM.storefinder.originalStore["latitude"], ASM.storefinder.originalStore["longitude"]);
@@ -220,7 +219,7 @@ ASM.storefinder = {
 				};
 				
 				directionsService.route(request, function(response, status) {
-				    if (status == 'OK') {
+				    if (status === 'OK') {
 				      directionsDisplay.setDirections(response);
 				    }
 				  });				
@@ -235,7 +234,7 @@ ASM.storefinder = {
 			});
 			
 			var infowindow = new google.maps.InfoWindow({
-				content: storeInformation["name"],
+				content: ACC.common.encodeHtml(storeInformation["name"]),
 				disableAutoPan: true
 			});
 			
@@ -245,7 +244,7 @@ ASM.storefinder = {
 			
 			var markerPosition=storeInformation["latitude"]+","+ storeInformation["longitude"];
 			map.addListener('click', function(e) {
-				if(ACC.config.googleApiKey != "")
+				if(ACC.config.googleApiKey !== "")
 			{
 			window.open("https://www.google.de/maps/dir/"+originAddress+"/"+markerPosition,'_blank');
 		}
@@ -263,26 +262,26 @@ ASM.storefinder = {
 	bindSearch:function(){
 
 		$(document).on("submit",'#storeFinderForm', function(e){
-			e.preventDefault()
+			e.preventDefault();
 			var q = $(".js-asm-store-finder-search-input").val();
 
 			if(q.length>0){
 				ASM.storefinder.getInitStoreData(q);
 			}else{
 				if($(".js-asm-storefinder-alert").length<1){
-					var emptySearchMessage = $(".btn-primary").data("searchEmpty")
+					var emptySearchMessage = $(".btn-primary").data("searchEmpty");
 					$(".js-asm-store-finder").hide();
 					$("#storeFinder").before('<div class="js-asm-storefinder-alert alert alert-danger alert-dismissable getAccAlert" ><button class="close closeAccAlert" type="button" data-dismiss="alert" aria-hidden="true">×</button>' + emptySearchMessage + '</div>');
 				}
 			}
-		})
+		});
 
 
 		$(".js-asm-store-finder").hide();
 		$(document).on("click",'#findStoresNearMe', function(e){
-			e.preventDefault()
+			e.preventDefault();
 			ASM.storefinder.getInitStoreData(null,ASM.storefinder.coords.latitude, ASM.storefinder.coords.longitude);
-		})
+		});
 
 
 	},
@@ -310,7 +309,7 @@ ASM.storefinder = {
 		data ={
 			"q":"" ,
 			"page":0
-		}
+		};
 		if(q != null){
 			data.q = q;
 		}
@@ -326,8 +325,8 @@ ASM.storefinder = {
 		ASM.storefinder.storeSearchData = data;
 		ASM.storefinder.getStoreData(data.page);
 		$(".js-asm-store-finder").show();
-		$(".js-asm-store-finder-pager-prev").attr("disabled","disabled")
-		$(".js-asm-store-finder-pager-next").removeAttr("disabled")
+		$(".js-asm-store-finder-pager-prev").attr("disabled","disabled");
+		$(".js-asm-store-finder-pager-next").removeAttr("disabled");
 	},
 
 	init:function(){

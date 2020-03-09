@@ -1,17 +1,9 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.controllers.pages;
 
 import de.hybris.platform.acceleratorstorefrontcommons.breadcrumb.Breadcrumb;
-import de.hybris.platform.acceleratorstorefrontcommons.consent.data.ConsentCookieData;
 import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.util.GlobalMessages;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.ConsentForm;
@@ -25,6 +17,7 @@ import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
 import de.hybris.platform.cms2.model.pages.AbstractPageModel;
 import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.commercefacades.consent.ConsentFacade;
+import de.hybris.platform.commercefacades.consent.data.AnonymousConsentData;
 import de.hybris.platform.commercefacades.user.UserFacade;
 import de.hybris.platform.commercefacades.user.data.RegisterData;
 import de.hybris.platform.commercefacades.user.data.TitleData;
@@ -45,13 +38,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.WebUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static de.hybris.platform.commercefacades.constants.CommerceFacadesConstants.CONSENT_GIVEN;
 
 
 public abstract class AbstractRegisterPageController extends AbstractPageController
@@ -143,6 +139,7 @@ public abstract class AbstractRegisterPageController extends AbstractPageControl
 	{
 		if (bindingResult.hasErrors())
 		{
+			form.setTermsCheck(false);
 			model.addAttribute(form);
 			model.addAttribute(new LoginForm());
 			model.addAttribute(new GuestForm());
@@ -166,7 +163,8 @@ public abstract class AbstractRegisterPageController extends AbstractPageControl
 		}
 		catch (final DuplicateUidException e)
 		{
-			LOGGER.warn("registration failed: ", e);
+			LOGGER.debug("registration failed.");
+			form.setTermsCheck(false);
 			model.addAttribute(form);
 			model.addAttribute(new LoginForm());
 			model.addAttribute(new GuestForm());
@@ -197,9 +195,9 @@ public abstract class AbstractRegisterPageController extends AbstractPageControl
 			try
 			{
 				final ObjectMapper mapper = new ObjectMapper();
-				final List<ConsentCookieData> consentCookieDataList = Arrays.asList(mapper.readValue(
-						URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8.displayName()), ConsentCookieData[].class));
-				consentCookieDataList.stream().filter(consentData -> WebConstants.CONSENT_GIVEN.equals(consentData.getConsentState()))
+				final List<AnonymousConsentData> anonymousConsentDataList = Arrays.asList(mapper.readValue(
+						URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8.displayName()), AnonymousConsentData[].class));
+				anonymousConsentDataList.stream().filter(consentData -> CONSENT_GIVEN.equals(consentData.getConsentState()))
 						.forEach(consentData -> consentFacade.giveConsent(consentData.getTemplateCode(),
 								Integer.valueOf(consentData.getTemplateVersion())));
 			}
@@ -253,7 +251,7 @@ public abstract class AbstractRegisterPageController extends AbstractPageControl
 		}
 		catch (final DuplicateUidException e)
 		{
-			LOGGER.warn("guest registration failed: ", e);
+			LOGGER.debug("guest registration failed.");
 			GlobalMessages.addErrorMessage(model, FORM_GLOBAL_ERROR);
 			return handleRegistrationError(model);
 		}

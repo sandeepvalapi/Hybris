@@ -1,6 +1,6 @@
 ACC.common = {
 	currentCurrency: $("main").data('currencyIsoCode') || "USD",
-	processingMessage: $("<img src='" + ACC.config.commonResourcePath + "/images/spinner.gif'/>"),
+	processingMessage: $("<img>").attr("src", ACC.config.commonResourcePath + "/images/spinner.gif"),
 
 
 	blockFormAndShowProcessingMessage: function (submitButton)
@@ -25,12 +25,24 @@ ACC.common = {
 					location.href = ACC.config.loginUrl;
 				}
 			},
+			dataType: 'json',
 			success: function (data) {
 				if (data == "authenticated") {
 					actionCallback();
 				}
 			}
 		});
+	},
+
+	encodeHtml: function (rawText)
+	{
+		return rawText.toString()
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#39;')
+				.replace(/\//g, '&#47;');
 	}
 };
 

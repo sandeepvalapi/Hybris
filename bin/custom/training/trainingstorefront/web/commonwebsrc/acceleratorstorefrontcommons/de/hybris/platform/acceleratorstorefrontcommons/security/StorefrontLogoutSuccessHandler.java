@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.security;
 
@@ -24,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+
+import static de.hybris.platform.commercefacades.constants.CommerceFacadesConstants.USER_CONSENTS;
 
 
 public class StorefrontLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
@@ -60,7 +55,7 @@ public class StorefrontLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandle
 			final Authentication authentication) throws IOException, ServletException
 	{
 		getGuidCookieStrategy().deleteCookie(request, response);
-		getSessionService().removeAttribute(WebConstants.USER_CONSENTS);
+		getSessionService().removeAttribute(USER_CONSENTS);
 
 		// Delegate to default redirect behaviour
 		super.onLogoutSuccess(request, response, authentication);

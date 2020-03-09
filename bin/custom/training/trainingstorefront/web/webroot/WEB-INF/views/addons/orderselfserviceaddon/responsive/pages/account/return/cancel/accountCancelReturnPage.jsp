@@ -1,6 +1,6 @@
 <%--[y] hybris Platform--%>
 
-<%--Copyright (c) 2000-2017 SAP SE--%>
+<%--Copyright (c) 2000-2018 SAP SE--%>
 <%--All rights reserved.--%>
 
 <%--This software is the confidential and proprietary information of SAP--%>

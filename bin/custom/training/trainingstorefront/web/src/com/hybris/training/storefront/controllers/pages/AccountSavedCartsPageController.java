@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages;
 
@@ -25,15 +18,14 @@ import de.hybris.platform.acceleratorstorefrontcommons.forms.SaveCartForm;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.validation.RestoreSaveCartFormValidator;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.validation.SaveCartFormValidator;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.commercefacades.order.CartFacade;
 import de.hybris.platform.commercefacades.order.SaveCartFacade;
 import de.hybris.platform.commercefacades.order.data.CartData;
 import de.hybris.platform.commercefacades.order.data.CommerceSaveCartParameterData;
 import de.hybris.platform.commercefacades.order.data.CommerceSaveCartResultData;
-import de.hybris.platform.commercefacades.order.data.OrderEntryData;
 import de.hybris.platform.commercefacades.product.ProductFacade;
 import de.hybris.platform.commercefacades.product.ProductOption;
-import de.hybris.platform.commercefacades.product.data.ProductData;
 import de.hybris.platform.commerceservices.order.CommerceSaveCartException;
 import de.hybris.platform.commerceservices.search.pagedata.PageableData;
 import de.hybris.platform.commerceservices.search.pagedata.SearchPageData;
@@ -43,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 
@@ -118,8 +109,9 @@ public class AccountSavedCartsPageController extends AbstractSearchPageControlle
 		model.addAttribute("refreshSavedCart", getSiteConfigService().getBoolean(REFRESH_UPLOADING_SAVED_CART, false));
 		model.addAttribute("refreshSavedCartInterval", getSiteConfigService().getLong(REFRESH_UPLOADING_SAVED_CART_INTERVAL, 0));
 
-		storeCmsPageInModel(model, getContentPageForLabelOrId(SAVED_CARTS_CMS_PAGE));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(SAVED_CARTS_CMS_PAGE));
+		final ContentPageModel savedCartsPage = getContentPageForLabelOrId(SAVED_CARTS_CMS_PAGE);
+		storeCmsPageInModel(model, savedCartsPage);
+		setUpMetaDataForContentPage(model, savedCartsPage);
 		model.addAttribute(WebConstants.BREADCRUMBS_KEY, accountBreadcrumbBuilder.getBreadcrumbs("text.account.savedCarts"));
 		model.addAttribute(ThirdPartyConstants.SeoRobots.META_ROBOTS, ThirdPartyConstants.SeoRobots.NOINDEX_NOFOLLOW);
 		return getViewForPage(model);
@@ -163,9 +155,10 @@ public class AccountSavedCartsPageController extends AbstractSearchPageControlle
 			GlobalMessages.addFlashMessage(redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER, "system.error.page.not.found", null);
 			return REDIRECT_TO_SAVED_CARTS_PAGE;
 		}
-		storeCmsPageInModel(model, getContentPageForLabelOrId(SAVED_CART_DETAILS_CMS_PAGE));
+		final ContentPageModel savedCartDetailsPage = getContentPageForLabelOrId(SAVED_CART_DETAILS_CMS_PAGE);
+		storeCmsPageInModel(model, savedCartDetailsPage);
 		model.addAttribute(ThirdPartyConstants.SeoRobots.META_ROBOTS, ThirdPartyConstants.SeoRobots.NOINDEX_NOFOLLOW);
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(SAVED_CART_DETAILS_CMS_PAGE));
+		setUpMetaDataForContentPage(model, savedCartDetailsPage);
 		return getViewForPage(model);
 	}
 

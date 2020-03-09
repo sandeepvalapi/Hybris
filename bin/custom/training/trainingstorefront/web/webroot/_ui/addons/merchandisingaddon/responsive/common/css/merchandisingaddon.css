@@ -1,0 +1,17 @@
+.merchcarousel_custom-color:before {
+	background-color: transparent !important;
+	content:"" !important;
+}
+
+.merchcarousel_custom-color:after {
+	background-color: transparent !important;
+	content:"" !important;
+}
+
+.owl-prev:before {
+	content : "" !important;
+}
+
+.owl-next:before {
+	content: "" !important;
+}

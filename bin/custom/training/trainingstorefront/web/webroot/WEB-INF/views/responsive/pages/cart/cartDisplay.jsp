@@ -25,12 +25,12 @@
             <sec:authorize access="!hasAnyRole('ROLE_ANONYMOUS')">
                 <c:if test="${not empty savedCartCount and savedCartCount ne 0}">
                     <spring:url value="/my-account/saved-carts" var="listSavedCartUrl" htmlEscape="false"/>
-                    <a href="${listSavedCartUrl}" class="save__cart--link cart__head--link">
+                    <a href="${fn:escapeXml(listSavedCartUrl)}" class="save__cart--link cart__head--link">
                         <spring:theme code="saved.cart.total.number" arguments="${savedCartCount}"/>
                     </a>
                     <c:if test="${not empty quoteCount and quoteCount ne 0}">
                         <spring:url value="/my-account/my-quotes" var="listQuotesUrl" htmlEscape="false"/>
-                        <a href="${listQuotesUrl}" class="cart__quotes--link cart__head--link">
+                        <a href="${fn:escapeXml(listQuotesUrl)}" class="cart__quotes--link cart__head--link">
                             <spring:theme code="saved.quote.total.number" arguments="${quoteCount}"/>
                         </a>
                     </c:if>
@@ -55,7 +55,7 @@
                 <div class="row">
                     <div class="col-sm-4 col-md-3 pull-right">
                         <ycommerce:testId code="checkoutButton">
-                            <button class="btn btn-primary btn-block btn--continue-checkout js-continue-checkout-button" data-checkout-url="${checkoutUrl}">
+                            <button class="btn btn-primary btn-block btn--continue-checkout js-continue-checkout-button" data-checkout-url="${fn:escapeXml(checkoutUrl)}">
                                 <spring:theme code="checkout.checkout"/>
                             </button>
                         </ycommerce:testId>
@@ -63,14 +63,14 @@
 
                     <c:if test="${not empty siteQuoteEnabled and siteQuoteEnabled eq 'true'}">
                         <div class="col-sm-4 col-md-3 col-md-offset-3 pull-right">
-                            <button class="btn btn-default btn-block btn-create-quote js-create-quote-button" data-create-quote-url="${createQuoteUrl}">
+                            <button class="btn btn-default btn-block btn-create-quote js-create-quote-button" data-create-quote-url="${fn:escapeXml(createQuoteUrl)}">
                                 <spring:theme code="quote.create"/>
                             </button>
                         </div>
                     </c:if>
 
                     <div class="col-sm-4 col-md-3 pull-right">
-                        <button class="btn btn-default btn-block btn--continue-shopping js-continue-shopping-button" data-continue-shopping-url="${continueShoppingUrl}">
+                        <button class="btn btn-default btn-block btn--continue-shopping js-continue-shopping-button" data-continue-shopping-url="${fn:escapeXml(continueShoppingUrl)}">
                             <spring:theme code="cart.page.continue"/>
                         </button>
                     </div>

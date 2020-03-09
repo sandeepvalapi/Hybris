@@ -1,8 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 
 <spring:htmlEscape defaultHtmlEscape="true"/>
 
@@ -18,7 +16,8 @@
         <div class="account-section-content">
             <div class="account-section-form ">
                 <div>
-                    <spring:theme code="text.account.closeAccount.retention.info" htmlEscape="false"/>
+                    <spring:theme code="text.account.closeAccount.retention.info" var="retentionInfoHtml" htmlEscape="false"/>
+                    ${ycommerce:sanitizeHTML(retentionInfoHtml)}
                 </div>
             </div>
             <button type="button" class="btn btn-primary pull-right js-close-account-popup-button" data-popup-title="<spring:theme code="text.account.closeAccount.popup.title"/>">

@@ -23,7 +23,6 @@
                 <tr>
                     <c:forEach items="${technologyUsedDataList}" var="index">
                         <td>
-                            <div class="asm__customer360-overview-info-uses-value">${fn:escapeXml(index.percentage)}%</div>
                             <div class="asm__customer360-overview-info-uses-name">${fn:replace(fn:escapeXml(index.device), '_',' ')}</div>
                         </td>
                     </c:forEach>

@@ -9,6 +9,7 @@
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="template" tagdir="/WEB-INF/tags/responsive/template"%>
 
@@ -19,7 +20,7 @@
 
 	   	<div class="checkbox">
 	   		
-	   		<label class="control-label ${labelCSS}" for="${themeIdKey}">
+	   		<label class="control-label ${fn:escapeXml(labelCSS)}" for="${fn:escapeXml(themeIdKey)}">
 	   			<form:checkbox cssClass="${inputCSS}" id="${themeIdKey}" path="${path}" tabindex="${tabindex}"/>
 	   			<spring:theme code="${labelKey}"/>
 	   			<c:if test="${mandatory != null && mandatory == true}">

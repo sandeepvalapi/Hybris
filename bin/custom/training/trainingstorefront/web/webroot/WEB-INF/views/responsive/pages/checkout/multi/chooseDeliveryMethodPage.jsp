@@ -4,6 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="multi-checkout" tagdir="/WEB-INF/tags/responsive/checkout/multi"%>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
@@ -22,12 +23,16 @@
 						<multi-checkout:shipmentItems cartData="${cartData}" showDeliveryAddress="true" />
 						<div class="checkout-indent">
 							<div class="headline"><spring:theme code="checkout.summary.deliveryMode.selectDeliveryMethodForOrder" /></div>
-							<form id="selectDeliveryMethodForm" action="${request.contextPath}/checkout/multi/delivery-method/select" method="get">
+							<spring:url var="selectDeliveryMethodUrl" value="{contextPath}/checkout/multi/delivery-method/select" htmlEscape="false" >
+								<spring:param name="contextPath" value="${request.contextPath}" />
+							</spring:url>
+							<form id="selectDeliveryMethodForm" action="${fn:escapeXml(selectDeliveryMethodUrl)}" method="get">
 								<div class="form-group">
 									<multi-checkout:deliveryMethodSelector deliveryMethods="${deliveryMethods}" selectedDeliveryMethodId="${cartData.deliveryMode.code}"/>
 								</div>
 							</form>
-							<p><spring:theme code="checkout.multi.deliveryMethod.message" htmlEscape="false"/></p>
+							<spring:theme var="deliveryMethodMessageHtml" code="checkout.multi.deliveryMethod.message" htmlEscape="false"/>
+							<p>${ycommerce:sanitizeHTML(deliveryMethodMessageHtml)}</p>
 						</div>
 					</div>
 					<button id="deliveryMethodSubmit" type="button" class="btn btn-primary btn-block checkout-next"><spring:theme code="checkout.multi.deliveryMethod.continue"/></button>

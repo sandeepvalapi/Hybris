@@ -12,14 +12,14 @@
 	<c:when test="${not empty primaryImage}">
 		<c:choose>
 			<c:when test="${not empty primaryImage.altText}">
-			<img class="item lazyOwl" data-src="${primaryImage.url}" alt="${fn:escapeXml(primaryImage.altText)}" title="${fn:escapeXml(primaryImage.altText)}">
+				<img class="item lazyOwl" data-src="${fn:escapeXml(primaryImage.url)}" alt="${fn:escapeXml(primaryImage.altText)}" title="${fn:escapeXml(primaryImage.altText)}">
 			</c:when>
 			<c:otherwise>
-			<img class="lazyOwl item" data-src="${primaryImage.url}" alt="${fn:escapeXml(product.name)}" title="${fn:escapeXml(product.name)}"/>
+				<img class="lazyOwl item" data-src="${fn:escapeXml(primaryImage.url)}" alt="${fn:escapeXml(product.name)}" title="${fn:escapeXml(product.name)}"/>
 			</c:otherwise>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
-		<theme:image code="img.missingProductImage.responsive.${format}" alt="${fn:escapeXml(product.name)}" title="${fn:escapeXml(product.name)}"/>
+		<theme:image code="img.missingProductImage.responsive.${format}" alt="${product.name}" title="${product.name}"/>
 	</c:otherwise>
 </c:choose>

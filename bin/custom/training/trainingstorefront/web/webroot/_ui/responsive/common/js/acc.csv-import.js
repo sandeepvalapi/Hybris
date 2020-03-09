@@ -1,5 +1,6 @@
 ACC.csvimport = {
     TEXT_CSV_CONTENT_TYPE: 'text/csv',
+    TEXT_CSV_LONG_CONTENT_TYPE: 'text/comma-separated-values',
     APP_EXCEL_CONTENT_TYPE: 'application/vnd.ms-excel',
 
     _autoload: [
@@ -8,31 +9,14 @@ ACC.csvimport = {
     ],
 
     changeFileUploadAppearance: function() {
-        $('.js-file-upload__input').on('change',function () {
+    	$('.js-file-upload__input').on('change',function () {
             var files = (this.files);
-            var fileNames = "";
-
-            for (var i = 0; i < files.length; i++) {
-                fileNames += (files[i].name) + '<br/>';
-
-            }
-
+            var spanFileNames = document.createElement("span");
+            spanFileNames.insertAdjacentText("beforeend", files[0].name.toLowerCase());
+            spanFileNames.insertAdjacentElement("beforeend", document.createElement("br"));
+			
             $('.js-file-upload__file-name').unbind('mouseenter mouseleave');
-
-            if (files.length > 1) {
-                $('.js-file-upload__file-name').html(files.length + " files");
-                $('.js-file-upload__file-name').hover(
-
-                    function mouseIn() {
-                        $(this).html(fileNames.toLowerCase());
-                    }, function mouseOut() {
-
-                        $(this).html(files.length + " files");
-                    }
-                );
-            } else {
-                $('.js-file-upload__file-name').html(fileNames.toLowerCase());
-            }
+            $('.js-file-upload__file-name').html(spanFileNames);
 
             if($('.js-file-upload').parents('#cboxLoadedContent').length > 0){
                 ACC.colorbox.resize();
@@ -99,7 +83,8 @@ ACC.csvimport = {
         if (window.File && window.Blob) {
             if (selectedFile) {
                 if (!(selectedFile.type == ACC.csvimport.TEXT_CSV_CONTENT_TYPE ||
-                    selectedFile.type == ACC.csvimport.APP_EXCEL_CONTENT_TYPE)) {
+                    selectedFile.type == ACC.csvimport.APP_EXCEL_CONTENT_TYPE||
+                    selectedFile.type == ACC.csvimport.TEXT_CSV_LONG_CONTENT_TYPE)) {
                     ACC.csvimport.displayGlobalAlert({type: 'error', messageId: 'import-csv-file-csv-required'});
                     return false;
                 }
@@ -144,7 +129,7 @@ ACC.csvimport = {
 
         if (typeof options.messageId != 'undefined')
         {
-            $('#import-csv-alerts').append($(alertTemplateSelector).tmpl({message: $('#' + options.messageId).text()}));
+            $('#import-csv-alerts').append($(alertTemplateSelector).tmpl({message: $(document).find('#' + options.messageId).text()}));
         }
 
         $(".closeAccAlert").on("click", function () {

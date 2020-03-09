@@ -15,7 +15,7 @@ ACC.carousel = {
 		"rotating-image":{
 			navigation:false,
 			pagination:true,
-			singleItem : true,
+			singleItem : true
 		},
 		"lazy-reference":{
 			navigation:true,
@@ -25,17 +25,17 @@ ACC.carousel = {
 			itemsDesktopSmall : [1200,5], 
 			itemsTablet: [768,4], 
 			itemsMobile : [480,3], 
-			lazyLoad:true,		
+			lazyLoad:true
 		}
 	},
 
 	bindCarousel: function(){
 		
 		$(".js-owl-carousel").each(function(){
-			var $c = $(this)
+			var $c = $(this);
 			$.each(ACC.carousel.carouselConfig,function(key,config){
 				if($c.hasClass("js-owl-"+key)){
-					var $e = $(".js-owl-"+key);
+					var $e = $(document).find(".js-owl-"+key);
 					$e.owlCarousel(config);
 				}
 			});

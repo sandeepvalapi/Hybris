@@ -8,13 +8,15 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="common" tagdir="/WEB-INF/tags/responsive/common" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<spring:htmlEscape defaultHtmlEscape="true" />
 
 <c:if test="${readOnly != true}">
     <div class="update-future-stock hidden-xs">
-        <spring:url value="${product.url}/grid/skusFutureStock"	var="skusFutureStockUrl" />
-        <a href="#" class="update_future_stock_button positive" data-skus-id="${skusId}" data-skus-future-stock-url="${skusFutureStockUrl}">
+        <spring:url htmlEscape="false" value="${product.url}/grid/skusFutureStock" var="skusFutureStockUrl" />
+        <a href="#" class="update_future_stock_button positive" data-skus-id="${fn:escapeXml(skusId)}" 
+        			data-skus-future-stock-url="${fn:escapeXml(skusFutureStockUrl)}">
             <spring:theme code="product.grid.futurestock.updatefuture.availability" />
         </a>
         <a href="#" class="hide_future_stock_info positive">

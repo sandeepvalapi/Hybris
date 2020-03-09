@@ -1,6 +1,5 @@
 <%@ tag body-content="empty" trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="theme" tagdir="/WEB-INF/tags/shared/theme" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="format" tagdir="/WEB-INF/tags/shared/format" %>
 <%@ taglib prefix="product" tagdir="/WEB-INF/tags/responsive/product" %>
@@ -37,8 +36,8 @@
                                     <c:forEach items="${productMatrix}" var="variantCategory">
                                         <li <c:if test="${variantCategory.variantOption.url eq product.url}">class="selected"</c:if>>
                                             <c:url value="${variantCategory.variantOption.url}" var="productStyleUrl"/>
-                                            <a href="${productStyleUrl}" class="swatchVariant"
-                                               name="${variantCategory.variantOption.url}">
+                                            <a href="${fn:escapeXml(productStyleUrl)}" class="swatchVariant"
+                                               name="${fn:escapeXml(productStyleUrl)}">
                                                 <product:productImage product="${product}"
                                                                       code="${variantCategory.variantOption.code}"
                                                                       format="styleSwatch"/>
@@ -55,8 +54,8 @@
                                 <select id="priority${loop.index}" class="selectPriority form-control">
                                     <c:forEach items="${productMatrix}" var="variantCategory">
                                         <c:url value="${variantCategory.variantOption.url}" var="productStyleUrl"/>
-                                        <option value="${productStyleUrl}" ${(variantCategory.variantOption.code eq product.code) ? 'selected="selected"' : ''}>
-                                        ${fn:escapeXml(variantCategory.variantValueCategory.name)}</option>
+                                        <option value="${fn:escapeXml(productStyleUrl)}" ${(variantCategory.variantOption.code eq product.code) ? 'selected="selected"' : ''}>
+                                                ${fn:escapeXml(variantCategory.variantValueCategory.name)}</option>
                                         <c:if test="${(variantCategory.variantOption.code eq product.code)}">
                                             <c:set var="selectedIndex" value="${i}"/>
                                         </c:if>
@@ -116,21 +115,21 @@
                             <c:forEach items="${variantStyles}" var="variantStyle">
                                 <c:forEach items="${variantStyle.variantOptionQualifiers}" var="variantOptionQualifier">
                                     <c:if test="${variantOptionQualifier.qualifier eq 'style'}">
-                                        <c:set var="styleValue" value="${fn:escapeXml(variantOptionQualifier.value)}"/>
+                                        <c:set var="styleValueHtml" value="${fn:escapeXml(variantOptionQualifier.value)}"/>
                                         <c:set var="imageData" value="${variantOptionQualifier.image}"/>
                                     </c:if>
                                 </c:forEach>
                                 <li <c:if test="${variantStyle.url eq currentStyleUrl}"> class="active"</c:if>>
                                     <c:if test="${variantStyle.url eq currentStyleUrl}">
-                                        <div id="currentStyleValue" data-style-value="${styleValue}"></div>
+                                        <div id="currentStyleValue" data-style-value="${styleValueHtml}"></div>
                                     </c:if>
                                     <c:url value="${variantStyle.url}" var="productStyleUrl"/>
-                                    <a href="${productStyleUrl}" class="colorVariant" name="${variantStyle.url}">
+                                    <a href="${fn:escapeXml(productStyleUrl)}" class="colorVariant" name="${fn:escapeXml(variantStyle.url)}">
                                         <c:if test="${not empty imageData}">
-                                            <img src="${imageData.url}" title="${styleValue}" alt="${styleValue}"/>
+                                            <img src="${fn:escapeXml(imageData.url)}" title="${styleValueHtml}" alt="${styleValueHtml}"/>
                                         </c:if>
                                         <c:if test="${empty imageData}">
-                                            <span class="swatch_colour_a" title="${styleValue}"></span>
+                                            <span class="swatch_colour_a" title="${styleValueHtml}"></span>
                                         </c:if>
                                     </a>
                                 </li>
@@ -140,58 +139,55 @@
                 </c:if>
                 <c:if test="${not empty variantSizes}">
                     <div class="variant-selector">
-                            <div class="variant-name">
-                                <label for="Size"><spring:theme code="product.variants.size"/><span
-                                        class="variant-selected sizeName"></span></label>
-                            </div>
-                            <select id="Size" class="form-control variant-select" disabled="disabled">
-                                <c:if test="${empty variantSizes}">
-                                    <option selected="selected"><spring:theme
-                                            code="product.variants.select.style"/></option>
-                                </c:if>
-                                <c:if test="${not empty variantSizes}">
-                                    <option value="${currentStyledProductUrl}"
-                                            <c:if test="${empty variantParams['size']}">selected="selected"</c:if>>
-                                        <spring:theme code="product.variants.select.size"/>
-                                    </option>
-                                    <c:forEach items="${variantSizes}" var="variantSize">
-                                        <c:set var="optionsString" value=""/>
-                                        <c:set var="nameString" value=""/>
-                                        <c:forEach items="${variantSize.variantOptionQualifiers}" var="variantOptionQualifier">
-                                            <c:if test="${variantOptionQualifier.qualifier eq 'size'}">
-                                                <c:set var="variantOptionQualifierValue" value="${fn:escapeXml(variantOptionQualifier.value)}"/>
-                                                <c:set var="optionsString">${optionsString}&nbsp;${fn:escapeXml(variantOptionQualifier.name)}&nbsp;${variantOptionQualifierValue}, </c:set>
-                                                <c:set var="nameString">${variantOptionQualifierValue}</c:set>
-                                            </c:if>
-                                        </c:forEach>
-
-                                        <c:if test="${(variantSize.stock.stockLevel gt 0) and (variantSize.stock.stockLevelStatus ne 'outOfStock')}">
-                                            <c:set var="stockLevel">${variantSize.stock.stockLevel}&nbsp;<spring:theme
-                                                    code="product.variants.in.stock"/></c:set>
+                        <div class="variant-name">
+                            <label for="Size"><spring:theme code="product.variants.size"/><span class="variant-selected sizeName"></span></label>
+                        </div>
+                        <select id="Size" class="form-control variant-select" disabled="disabled">
+                            <c:if test="${empty variantSizes}">
+                                <option selected="selected"><spring:theme code="product.variants.select.style"/></option>
+                            </c:if>
+                            <c:if test="${not empty variantSizes}">
+                                <option value="${fn:escapeXml(currentStyledProductUrl)}"
+                                        <c:if test="${empty variantParams['size']}">selected="selected"</c:if>>
+                                    <spring:theme code="product.variants.select.size"/>
+                                </option>
+                                <c:forEach items="${variantSizes}" var="variantSize">
+                                    <c:set var="optionsStringHtml" value=""/>
+                                    <c:set var="nameStringHtml" value=""/>
+                                    <c:forEach items="${variantSize.variantOptionQualifiers}" var="variantOptionQualifier">
+                                        <c:if test="${variantOptionQualifier.qualifier eq 'size'}">
+                                            <c:set var="variantOptionQualifierValueHtml" value="${fn:escapeXml(variantOptionQualifier.value)}"/>
+                                            <c:set var="optionsStringHtml">${optionsStringHtml}&nbsp;${fn:escapeXml(variantOptionQualifier.name)}&nbsp;${variantOptionQualifierValueHtml}, </c:set>
+                                            <c:set var="nameStringHtml">${variantOptionQualifierValueHtml}</c:set>
                                         </c:if>
-                                        <c:if test="${(variantSize.stock.stockLevel le 0) and (variantSize.stock.stockLevelStatus eq 'inStock')}">
-                                            <c:set var="stockLevel"><spring:theme
-                                                    code="product.variants.available"/></c:set>
-                                        </c:if>
-                                        <c:if test="${(variantSize.stock.stockLevel le 0) and (variantSize.stock.stockLevelStatus ne 'inStock')}">
-                                            <c:set var="stockLevel"><spring:theme code="product.variants.out.of.stock"/></c:set>
-                                        </c:if>
-
-                                        <c:if test="${(variantSize.url eq product.url)}">
-                                            <c:set var="showAddToCart" value="${true}" scope="session"/>
-                                            <c:set var="currentSize" value="${nameString}"/>
-                                        </c:if>
-
-                                        <c:url value="${variantSize.url}" var="variantOptionUrl"/>
-
-                                        <option value="${variantOptionUrl}" ${(variantSize.url eq product.url) ? 'selected="selected"' : ''}>
-                                                ${optionsString}&nbsp;<format:price
-                                                priceData="${variantSize.priceData}"/>&nbsp;&nbsp;${variantSize.stock.stockLevel}
-                                        </option>
                                     </c:forEach>
-                                </c:if>
-                            </select>
-                            <div id="currentSizeValue" data-size-value="${currentSize}"></div>
+
+                                    <c:if test="${(variantSize.stock.stockLevel gt 0) and (variantSize.stock.stockLevelStatus ne 'outOfStock')}">
+                                        <c:set var="stockLevelHtml">${fn:escapeXml(variantSize.stock.stockLevel)}&nbsp;
+                                            <spring:theme code="product.variants.in.stock"/></c:set>
+                                    </c:if>
+                                    <c:if test="${(variantSize.stock.stockLevel le 0) and (variantSize.stock.stockLevelStatus eq 'inStock')}">
+                                        <c:set var="stockLevelHtml"><spring:theme code="product.variants.available"/></c:set>
+                                    </c:if>
+                                    <c:if test="${(variantSize.stock.stockLevel le 0) and (variantSize.stock.stockLevelStatus ne 'inStock')}">
+                                        <c:set var="stockLevelHtml"><spring:theme code="product.variants.out.of.stock"/></c:set>
+                                    </c:if>
+
+                                    <c:if test="${(variantSize.url eq product.url)}">
+                                        <c:set var="showAddToCart" value="${true}" scope="session"/>
+                                        <c:set var="currentSizeHtml" value="${nameStringHtml}"/>
+                                    </c:if>
+
+                                    <c:url value="${variantSize.url}" var="variantOptionUrl"/>
+
+                                    <option value="${fn:escapeXml(variantOptionUrl)}" ${(variantSize.url eq product.url) ? 'selected="selected"' : ''}>
+                                            ${optionsStringHtml}&nbsp;<format:price
+                                            priceData="${variantSize.priceData}"/>&nbsp;&nbsp;${fn:escapeXml(variantSize.stock.stockLevel)}
+                                    </option>
+                                </c:forEach>
+                            </c:if>
+                        </select>
+                        <div id="currentSizeValue" data-size-value="${currentSizeHtml}"></div>
                         <a href="#" class="size-guide" title="<spring:theme code="product.variants.size.guide"/>">&nbsp;</a>
                     </div>
                 </c:if>
@@ -208,22 +204,22 @@
                         <option selected="selected" disabled="disabled"><spring:theme
                                 code="product.variants.select.variant"/></option>
                         <c:forEach items="${variantOptions}" var="variantOption">
-                            <c:set var="optionsString" value=""/>
-                            <c:set var="nameString" value=""/>
+                            <c:set var="optionsStringHtml" value=""/>
+                            <c:set var="nameStringHtml" value=""/>
                             <c:forEach items="${variantOption.variantOptionQualifiers}" var="variantOptionQualifier">
-                                <c:set var="optionsString">${optionsString}&nbsp;${fn:escapeXml(variantOptionQualifier.name)}&nbsp;${fn:escapeXml(variantOptionQualifier.value)}, </c:set>
-                                <c:set var="nameString">${fn:escapeXml(variantOptionQualifier.value)}</c:set>
+                                <c:set var="optionsStringHtml">${optionsStringHtml}&nbsp;
+                                    ${fn:escapeXml(variantOptionQualifier.name)}&nbsp;${fn:escapeXml(variantOptionQualifier.value)}, </c:set>
+                                <c:set var="nameStringHtml">${fn:escapeXml(variantOptionQualifier.value)}</c:set>
                             </c:forEach>
 
                             <c:if test="${(variantOption.stock.stockLevel gt 0) and (variantSize.stock.stockLevelStatus ne 'outOfStock')}">
-                                <c:set var="stockLevel">${variantOption.stock.stockLevel} <spring:theme
-                                        code="product.variants.in.stock"/></c:set>
+                                <c:set var="stockLevelHtml">${fn:escapeXml(variantOption.stock.stockLevel)} <spring:theme code="product.variants.in.stock"/></c:set>
                             </c:if>
                             <c:if test="${(variantOption.stock.stockLevel le 0) and (variantSize.stock.stockLevelStatus eq 'inStock')}">
-                                <c:set var="stockLevel"><spring:theme code="product.variants.available"/></c:set>
+                                <c:set var="stockLevelHtml"><spring:theme code="product.variants.available"/></c:set>
                             </c:if>
                             <c:if test="${(variantOption.stock.stockLevel le 0) and (variantSize.stock.stockLevelStatus ne 'inStock')}">
-                                <c:set var="stockLevel"><spring:theme code="product.variants.out.of.stock"/></c:set>
+                                <c:set var="stockLevelHtml"><spring:theme code="product.variants.out.of.stock"/></c:set>
                             </c:if>
                             <c:choose>
                                 <c:when test="${product.purchasable and product.stock.stockLevelStatus.code ne 'outOfStock' }">
@@ -236,15 +232,15 @@
                             <c:url value="${variantOption.url}" var="variantOptionUrl"/>
                             <c:if test="${(variantOption.url eq product.url)}">
                                 <c:set var="showAddToCart" value="${true}" scope="session"/>
-                                <c:set var="currentSize" value="${nameString}"/>
+                                <c:set var="currentSizeHtml" value="${nameStringHtml}"/>
                             </c:if>
-                            <option value="${variantOptionUrl}" ${(variantOption.url eq product.url) ? 'selected="selected"' : ''}>
-                                <span class="variant-selected">${optionsString}&nbsp;<format:price
-                                        priceData="${variantOption.priceData}"/>&nbsp;&nbsp;${variantOption.stock.stockLevel}</span>
+                            <option value="${fn:escapeXml(variantOptionUrl)}" ${(variantOption.url eq product.url) ? 'selected="selected"' : ''}>
+                                <span class="variant-selected">${optionsStringHtml}&nbsp;<format:price
+                                        priceData="${variantOption.priceData}"/>&nbsp;&nbsp;${fn:escapeXml(variantOption.stock.stockLevel)}</span>
                             </option>
                         </c:forEach>
                     </select>
-                    <div id="currentTypeValue" data-type-value="${currentSize}"></div>
+                    <div id="currentTypeValue" data-type-value="${currentSizeHtml}"></div>
                 </div>
             </div>
         </c:if>

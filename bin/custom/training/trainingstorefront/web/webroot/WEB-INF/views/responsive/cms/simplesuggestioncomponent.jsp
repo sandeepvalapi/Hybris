@@ -19,7 +19,7 @@
 				<c:forEach end="${component.maximumNumberProducts}" items="${suggestions}" var="suggestion">
 					<c:url value="${suggestion.url}/quickView" var="productQuickViewUrl"/>
 					<div class="item">
-						<a href="${productQuickViewUrl}" class="js-reference-item">
+						<a href="${fn:escapeXml(productQuickViewUrl)}" class="js-reference-item">
                             <div class="thumb">
                                 <product:productPrimaryReferenceImage product="${suggestion}" format="product"/>
                             </div>

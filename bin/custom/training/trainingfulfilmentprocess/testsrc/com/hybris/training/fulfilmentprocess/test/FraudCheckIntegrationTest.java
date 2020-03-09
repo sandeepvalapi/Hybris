@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.fulfilmentprocess.test;
 
@@ -98,7 +91,7 @@ import junit.framework.AssertionFailedError;
  * Integration test which test flow of order-process process when fraudCheck node return FRAUD
  */
 @Ignore
-//Not a good test for CI
+//Ignore it due to incompatible for b2c_china.
 @IntegrationTest
 public class FraudCheckIntegrationTest extends ServicelayerTest
 {
@@ -146,8 +139,8 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 		//EMPTY
 	}
 
-	public static class OrderFraudEmployeeEventListener extends
-			TestEventListenerCountingEvents<OrderFraudEmployeeNotificationEvent>
+	public static class OrderFraudEmployeeEventListener
+			extends TestEventListenerCountingEvents<OrderFraudEmployeeNotificationEvent>
 	{
 		//EMPTY
 	}
@@ -172,8 +165,9 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 		LOG.debug("Preparing...");
 
 		final ApplicationContext appCtx = Registry.getApplicationContext();
-		assertTrue("Application context of type " + appCtx.getClass() + " is not a subclass of "
-				+ ConfigurableApplicationContext.class, appCtx instanceof ConfigurableApplicationContext);
+		assertTrue(
+				"Application context of type " + appCtx.getClass() + " is not a subclass of " + ConfigurableApplicationContext.class,
+				appCtx instanceof ConfigurableApplicationContext);
 
 		final ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) appCtx;
 		final ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
@@ -183,7 +177,8 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 		xmlReader.setDocumentReaderClass(ScopeTenantIgnoreDocReader.class);
 		xmlReader.loadBeanDefinitions(new ClassPathResource(
 				"/trainingfulfilmentprocess/test/trainingfulfilmentprocess-spring-test-fraudcheck.xml"));
-		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean(DefaultCommandFactoryRegistryImpl.class);
+		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean("commandFactoryRegistry",
+				DefaultCommandFactoryRegistryImpl.class);
 		commandFactoryReg.setCommandFactoryList(Arrays.asList((CommandFactory) appCtx.getBean("mockupCommandFactory")));
 	}
 
@@ -199,8 +194,9 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 
 		final ApplicationContext appCtx = Registry.getApplicationContext();
 
-		assertTrue("Application context of type " + appCtx.getClass() + " is not a subclass of "
-				+ ConfigurableApplicationContext.class, appCtx instanceof ConfigurableApplicationContext);
+		assertTrue(
+				"Application context of type " + appCtx.getClass() + " is not a subclass of " + ConfigurableApplicationContext.class,
+				appCtx instanceof ConfigurableApplicationContext);
 
 		final ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) appCtx;
 		final ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
@@ -210,7 +206,8 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 		//cleanup command factory
 		final Map<String, CommandFactory> commandFactoryList = applicationContext.getBeansOfType(CommandFactory.class);
 		commandFactoryList.remove("mockupCommandFactory");
-		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean(DefaultCommandFactoryRegistryImpl.class);
+		final DefaultCommandFactoryRegistryImpl commandFactoryReg = appCtx.getBean("commandFactoryRegistry",
+				DefaultCommandFactoryRegistryImpl.class);
 		commandFactoryReg.setCommandFactoryList(commandFactoryList.values());
 	}
 
@@ -272,8 +269,8 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 
 	protected void setMinPeriodWaitingForCleanUpConfigParam(final int numberOfSeconds)
 	{
-		minPeriodWaitingForCleanUpInSecondsOldValue = Integer.valueOf(Config
-				.getParameter(PARAM_NAME_MIN_PERIOD_WAITING_FOR_CLEANUP_IN_SECONDS));
+		minPeriodWaitingForCleanUpInSecondsOldValue = Integer
+				.valueOf(Config.getParameter(PARAM_NAME_MIN_PERIOD_WAITING_FOR_CLEANUP_IN_SECONDS));
 		Config.setParameter(PARAM_NAME_MIN_PERIOD_WAITING_FOR_CLEANUP_IN_SECONDS, Integer.toString(numberOfSeconds));
 	}
 
@@ -334,8 +331,9 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 		card.setExpirationMonth(Integer.valueOf(12));
 		card.setExpirationYear(Integer.valueOf(Calendar.getInstance().get(Calendar.YEAR) + 2));
 		card.setCv2Number("123");
-		final PaymentTransactionModel paymentTransaction = paymentService.authorize("code3" + codeNo++, BigDecimal.ONE,
-				Currency.getInstance("EUR"), deliveryAddress, deliveryAddress, card).getPaymentTransaction();
+		final PaymentTransactionModel paymentTransaction = paymentService
+				.authorize("code3" + codeNo++, BigDecimal.ONE, Currency.getInstance("EUR"), deliveryAddress, deliveryAddress, card)
+				.getPaymentTransaction();
 
 		cart.setPaymentTransactions(Collections.singletonList(paymentTransaction));
 		modelService.save(cart);
@@ -419,8 +417,7 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 	}
 
 	/**
-	 * unregister events registered in {@link #before()}, and revert config parameter values which was changed during
-	 * test
+	 * unregister events registered in {@link #before()}, and revert config parameter values which was changed during test
 	 */
 	@After
 	public void after()
@@ -569,8 +566,8 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 	 * @throws InterruptedException
 	 */
 	@Test
-	public void testUsersOrderIsEvaluatedAsFraudAndIsCleanedUp() throws InvalidCartException, CalculationException,
-			InterruptedException
+	public void testUsersOrderIsEvaluatedAsFraudAndIsCleanedUp()
+			throws InvalidCartException, CalculationException, InterruptedException
 	{
 		final int newScoreLimit = 20;
 		final int newScoreTolerance = 30;
@@ -625,8 +622,8 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 
 	/** Test scenario: Users order is evaluated as a potential, but CS Agent decide that order is correct **/
 	@Test
-	public void testUsersOrderIsEvaluatedAsPotentialFraudButCsAgentDecideThatOrderIsCorrect() throws InvalidCartException,
-			CalculationException, InterruptedException
+	public void testUsersOrderIsEvaluatedAsPotentialFraudButCsAgentDecideThatOrderIsCorrect()
+			throws InvalidCartException, CalculationException, InterruptedException
 	{
 		final int newScoreLimit = 0;
 		final int newScoreTolerance = 2000;
@@ -676,8 +673,8 @@ public class FraudCheckIntegrationTest extends ServicelayerTest
 	 * @throws InvalidCartException
 	 **/
 	@Test
-	public void testUsersOrderIsEvaluatedAsPotentialFraudAndCsAgentDecideThatOrderIsFraudulent() throws InvalidCartException,
-			CalculationException
+	public void testUsersOrderIsEvaluatedAsPotentialFraudAndCsAgentDecideThatOrderIsFraudulent()
+			throws InvalidCartException, CalculationException
 	{
 		final int newScoreLimit = 0;
 		final int newScoreTolerance = 2000;

@@ -4,6 +4,7 @@
 <%@ taglib prefix="formElement" tagdir="/WEB-INF/tags/responsive/formElement"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
@@ -22,7 +23,7 @@
 	</div>
 
 	<div class="write-review js-review-write">
-		<form:form method="post" action="${productReviewActionUrl}" commandName="reviewForm">
+		<form:form method="post" action="${productReviewActionUrl}" modelAttribute="reviewForm">
 			<div class="form-group">
 				<formElement:formInputBox idKey="review.headline" labelKey="review.headline" path="headline" inputCSS="form-control" mandatory="true"/>
 			</div>
@@ -40,8 +41,6 @@
                         <c:forEach  begin="1" end="10" varStatus="loop">
                             <span class="js-ratingIcon glyphicon glyphicon-star ${loop.index % 2 == 0 ? 'lh' : 'fh'}"></span>
                         </c:forEach>
-
-
 					</div>
 				</div>
 
@@ -55,7 +54,7 @@
 
 	</div>
 
-	<ul id="reviews" class="review-list" data-reviews="${getPageOfReviewsUrl}"  data-allreviews="${getAllReviewsUrl}"></ul>
+	<ul id="reviews" class="review-list" data-reviews="${fn:escapeXml(getPageOfReviewsUrl)}"  data-allreviews="${fn:escapeXml(getAllReviewsUrl)}"></ul>
 
 	<div class="review-pagination-bar">
 

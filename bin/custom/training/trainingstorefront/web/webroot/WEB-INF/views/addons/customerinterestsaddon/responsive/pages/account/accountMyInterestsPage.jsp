@@ -45,7 +45,7 @@
 		            <%-- product image --%>
 		            <div class="item__image">
 			            <ycommerce:testId code="test_searchPage_wholeProduct">
-							<a href="${productUrl}"> 
+							<a href="${fn:escapeXml(productUrl)}"> 
 								<product:productPrimaryImage product="${entry.product}" format="thumbnail" />
 							</a>
 						</ycommerce:testId>
@@ -54,17 +54,17 @@
 		            <%-- product name, code, availability --%>
 		            <div class="item__info">
 						<ycommerce:testId code="searchPage_productName_link_${fn:escapeXml(entry.product.code)}">
-		                    <a href="${productUrl}"><span class="item__name">${fn:escapeXml(entry.product.name)}</span></a>
+		                    <a href="${fn:escapeXml(productUrl)}"><span class="item__name">${fn:escapeXml(entry.product.name)}</span></a>
 		                </ycommerce:testId>
 		
 		                <div class="item__code">
-							<c:set value="${entry.product.code}" var="productCode" />
-		                	<c:out value="${fn:escapeXml(productCode)}" />
+							<c:set value="${entry.product.code}" var="productCodeHtml" />
+		                	<c:out value="${productCodeHtml}" />
 		                </div>
 		
 		                <%-- availability --%>
 		                <div class="item__stock">
-							<ycommerce:testId code="searchPage_productName_link_${entry.product.code}">
+							<ycommerce:testId code="searchPage_productName_link_${fn:escapeXml(entry.product.code)}">
 			                    <c:set var="entryStock" value="${entry.product.stock.stockLevelStatus.code}"/>
 			                    <c:forEach items="${entry.product.baseOptions}" var="option">
 			                        <c:if test="${not empty option.selected and option.selected.url eq entry.product.url}">
@@ -121,36 +121,36 @@
 		            <%-- notification --%>
 		            <div class="item__price">
 						<c:forEach items="${entry.productInterestEntry}" var="productInterest" varStatus="status">
-							<spring:message code="text.${productInterest.interestType}.title" text="Notification" var="title" />
-							<spring:message code="text.${productInterest.interestType}.type.label" text="Notification" var="notificaitonTypeLabel" />
+							<spring:theme code="text.${productInterest.interestType}.title" text="Notification" var="titleHtml" />
+							<spring:theme code="text.${productInterest.interestType}.type.label" text="Notification" var="notificaitonTypeLabelHtml" />
 							<div class="notificaitonPanel">
 								<input type="checkbox" name="notificaiton-checkbox-default" disabled
 									id="notificaiton-checkbox-default${loop.index}${status.index}"
-									class="notificaitonCheckbox" autocomplete="off" checked="${productInterest.enabled}"
-									data-title="${fn:escapeXml(title)}" data-productCode="${fn:escapeXml(productCode)}" data-notificationType="${productInterest.interestType}" />
+									class="notificaitonCheckbox" autocomplete="off" checked="checked"
+									data-title="${titleHtml}" data-productCode="${fn:escapeXml(productCodeHtml)}" data-notificationType="${fn:escapeXml(productInterest.interestType)}" />
 								<div class="btn-group">
 									<label id="notificaiton-checkbox-label${loop.index}${status.index}"
 										class="btn btn-checkbox notificaiton-checkbox btn-notificaiton"
-										data-title="${fn:escapeXml(title)}" data-productCode="${fn:escapeXml(productCode)}"
-										data-notificationType="${productInterest.interestType}">
+										data-title="${titleHtml}" data-productCode="${fn:escapeXml(productCodeHtml)}"
+										data-notificationType="${fn:escapeXml(productInterest.interestType)}">
 										<span class="glyphicon glyphicon-ok"></span>
 										<span></span>
 									</label> 
 									<label id="notificaiton-type-label${loop.index}${status.index}"
 										class="btn btn-label active notificaiton-label btn-notificaiton"
-										data-title="${fn:escapeXml(title)}" data-productCode="${fn:escapeXml(productCode)}"
-										data-notificationType="${productInterest.interestType}">
-										${fn:escapeXml(notificaitonTypeLabel)}
+										data-title="${titleHtml}" data-productCode="${fn:escapeXml(productCodeHtml)}"
+										data-notificationType="${fn:escapeXml(productInterest.interestType)}">
+										${notificaitonTypeLabelHtml}
 									</label>
 								</div>
 							</div>
 						</c:forEach>
 		            </div>
-		
+
 		            <%-- remove icon --%>
 		            <div class="item__remove">
 	                    <button class="btn remove-interests-for-product" id="removeEntry_${loop.index}">
-	                        <span class="glyphicon glyphicon-remove" data-productCode="${fn:escapeXml(productCode)}"></span>
+	                        <span class="glyphicon glyphicon-remove" data-productCode="${fn:escapeXml(productCodeHtml)}"></span>
 	                    </button>
 		            </div>
 		        </li>

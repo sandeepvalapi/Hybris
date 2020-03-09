@@ -26,7 +26,7 @@
 				<c:forEach end="${component.maximumNumberProducts}" items="${productReferences}" var="productReference">
 					<c:url value="${productReference.target.url}/quickView" var="productUrl"/>
 					<div class="item">
-						<a href="${productUrl}" class="js-reference-item" data-quickview-title="<spring:theme code="popup.quick.view.select"/></span>">
+						<a href="${fn:escapeXml(productUrl)}" class="js-reference-item" data-quickview-title="<spring:theme code="popup.quick.view.select"/></span>">
                             <div class="thumb">
                                 <product:productPrimaryReferenceImage product="${productReference.target}" format="product" />
                             </div>

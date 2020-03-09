@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms;
 
@@ -23,7 +16,7 @@ public class LoginForm
 	/**
 	 * @return the j_username
 	 */
-	public String getJ_username() // NOSONAR  NOPMD
+	public String getJ_username() // NOSONAR
 	{
 		return j_username;
 	}
@@ -32,7 +25,7 @@ public class LoginForm
 	 * @param j_username
 	 *           the j_username to set
 	 */
-	public void setJ_username(final String j_username) // NOSONAR NOPMD
+	public void setJ_username(final String j_username) // NOSONAR
 	{
 		this.j_username = j_username;
 	}
@@ -40,7 +33,7 @@ public class LoginForm
 	/**
 	 * @return the j_password
 	 */
-	public String getJ_password() // NOSONAR NOPMD
+	public String getJ_password() // NOSONAR
 	{
 		return j_password;
 	}
@@ -49,7 +42,7 @@ public class LoginForm
 	 * @param j_password
 	 *           the j_password to set
 	 */
-	public void setJ_password(final String j_password) // NOSONAR NOPMD
+	public void setJ_password(final String j_password) // NOSONAR
 	{
 		this.j_password = j_password;
 	}

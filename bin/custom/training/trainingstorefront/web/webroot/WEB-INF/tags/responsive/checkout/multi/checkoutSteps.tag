@@ -10,24 +10,24 @@
 <spring:htmlEscape defaultHtmlEscape="true" />
 
 <ycommerce:testId code="checkoutSteps">
-    <div class="checkout-steps ${cssClass}">
+    <div class="checkout-steps ${fn:escapeXml(cssClass)}">
         <c:forEach items="${checkoutSteps}" var="checkoutStep" varStatus="status">
             <c:url value="${checkoutStep.url}" var="stepUrl"/>
             <c:choose>
                 <c:when test="${progressBarId eq checkoutStep.progressBarId}">
                     <c:set scope="page"  var="activeCheckoutStepNumber"  value="${checkoutStep.stepNumber}"/>
-                    <a href="${stepUrl}" class="step-head js-checkout-step active">
+                    <a href="${fn:escapeXml(stepUrl)}" class="step-head js-checkout-step active">
                         <div class="title"><spring:theme code="checkout.multi.${checkoutStep.progressBarId}"/></div>
                     </a>
                     <div class="step-body"><jsp:doBody/></div>
                 </c:when>
                 <c:when test="${checkoutStep.stepNumber > activeCheckoutStepNumber}">
-                    <a href="${stepUrl}" class="step-head js-checkout-step ">
+                    <a href="${fn:escapeXml(stepUrl)}" class="step-head js-checkout-step ">
                         <div class="title"><spring:theme code="checkout.multi.${checkoutStep.progressBarId}"/></div>
                     </a>
                 </c:when>
                 <c:otherwise>
-                    <a href="${stepUrl}" class="step-head js-checkout-step ">
+                    <a href="${fn:escapeXml(stepUrl)}" class="step-head js-checkout-step ">
                         <div class="title"><spring:theme code="checkout.multi.${checkoutStep.progressBarId}"/></div>
                         <div class="edit">
                             <span class="glyphicon glyphicon-pencil"></span>

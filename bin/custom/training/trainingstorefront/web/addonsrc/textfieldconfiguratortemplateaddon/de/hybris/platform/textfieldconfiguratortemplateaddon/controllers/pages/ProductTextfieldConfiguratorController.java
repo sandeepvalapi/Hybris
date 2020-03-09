@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.textfieldconfiguratortemplateaddon.controllers.pages;
 
@@ -54,6 +47,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -79,26 +73,27 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 	private static final String MODEL_ATTR_RETURN_DOCUMENT_TYPE = "returnDocumentType";
 	private static final String MODEL_ATTR_ENTRY_NUMBER = "entryNumber";
 
+	private static final Logger LOGGER = Logger.getLogger(ProductTextfieldConfiguratorController.class);
 
-	@Resource
+	@Resource(name = "productFacade")
 	private ProductFacade productFacade;
 
-	@Resource
+	@Resource(name = "cartFacade")
 	private CartFacade cartFacade;
 
-	@Resource
+	@Resource(name = "quoteFacade")
 	private QuoteFacade quoteFacade;
 
-	@Resource
+	@Resource(name = "orderFacade")
 	private OrderFacade orderFacade;
 
-	@Resource
+	@Resource(name = "saveCartFacade")
 	private SaveCartFacade saveCartFacade;
 
 	@Resource(name = "productBreadcrumbBuilder")
 	private ProductBreadcrumbBuilder productBreadcrumbBuilder;
 
-	@Resource
+	@Resource(name = "textFieldConfigurationValidator")
 	private TextFieldConfigurationValidator textFieldConfigurationValidator;
 
 	@InitBinder
@@ -130,8 +125,8 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 		boolean err = false;
 		if (bindingErrors.hasErrors())
 		{
-			bindingErrors.getAllErrors().forEach(error -> GlobalMessages.addFlashMessage(
-					redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER, error.getCode()));
+			bindingErrors.getAllErrors().forEach(
+					error -> GlobalMessages.addFlashMessage(redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER, error.getCode()));
 			err = true;
 		}
 		else
@@ -154,23 +149,21 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 				if (cartModification.getQuantityAdded() == 0L)
 				{
 					err = true;
-					GlobalMessages.addFlashMessage(
-							redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER,
+					GlobalMessages.addFlashMessage(redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER,
 							"basket.information.quantity.noItemsAdded." + cartModification.getStatusCode());
 				}
 				else if (cartModification.getQuantityAdded() < qty)
 				{
 					err = true;
-					GlobalMessages.addFlashMessage(
-							redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER,
+					GlobalMessages.addFlashMessage(redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER,
 							"basket.information.quantity.reducedNumberOfItemsAdded." + cartModification.getStatusCode());
 				}
 			}
 			catch (final CommerceCartModificationException ex)
 			{
+				LOGGER.error(ex.getMessage(), ex);
 				err = true;
-				GlobalMessages.addFlashMessage(
-						redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER, "basket.error.occurred");
+				GlobalMessages.addFlashMessage(redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER, "basket.error.occurred");
 			}
 		}
 
@@ -184,8 +177,8 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 	}
 
 	@RequestMapping(value = "/cart/{entryNumber}/configuration/" + TEXTFIELDCONFIGURATOR_TYPE)
-	public String editConfigurationInEntry(@PathVariable(MODEL_ATTR_ENTRY_NUMBER) final int entryNumber, final Model model) throws
-			CMSItemNotFoundException, CommerceCartModificationException
+	public String editConfigurationInEntry(@PathVariable(MODEL_ATTR_ENTRY_NUMBER) final int entryNumber, final Model model)
+			throws CMSItemNotFoundException, CommerceCartModificationException
 	{
 		final CartData cart = cartFacade.getSessionCart();
 		final OrderEntryData entry = getAbstractOrderEntry(entryNumber, cart);
@@ -196,22 +189,20 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 
 	@RequestMapping(value = "/cart/{entryNumber}/configuration/" + TEXTFIELDCONFIGURATOR_TYPE, method = RequestMethod.POST)
 	public String updateConfigurationInEntry(@PathVariable(MODEL_ATTR_ENTRY_NUMBER) final int entryNumber, final Model model,
-			@ModelAttribute("foo") @Valid final TextFieldConfigurationForm form,
-			final BindingResult bindingErrors,
+			@ModelAttribute("foo") @Valid final TextFieldConfigurationForm form, final BindingResult bindingErrors,
 			final HttpServletRequest request, final RedirectAttributes redirectModel) throws CommerceCartModificationException
 	{
 		if (bindingErrors.hasErrors())
 		{
-			bindingErrors.getAllErrors().forEach(error -> GlobalMessages.addFlashMessage(
-					redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER, error.getCode()));
+			bindingErrors.getAllErrors().forEach(
+					error -> GlobalMessages.addFlashMessage(redirectModel, GlobalMessages.ERROR_MESSAGES_HOLDER, error.getCode()));
 			return REDIRECT_PREFIX + request.getServletPath();
 		}
 		final CartData cart = cartFacade.getSessionCart();
 		final OrderEntryData entry = getAbstractOrderEntry(entryNumber, cart);
 		cartFacade.updateCartEntry(enrichOrderEntryWithConfigurationData(form, entry));
-		model.addAttribute("product",
-				productFacade
-						.getProductForCodeAndOptions(entry.getProduct().getCode(), Collections.singletonList(ProductOption.BASIC)));
+		model.addAttribute("product", productFacade.getProductForCodeAndOptions(entry.getProduct().getCode(),
+				Collections.singletonList(ProductOption.BASIC)));
 		model.addAttribute("quantity", entry.getQuantity());
 		model.addAttribute("entry", entry);
 		return REDIRECT_PREFIX + "/cart";
@@ -280,7 +271,8 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 		model.addAttribute("configurations", configuration);
 	}
 
-	protected OrderEntryData getAbstractOrderEntry(final int entryNumber, final AbstractOrderData abstractOrder) throws CommerceCartModificationException
+	protected OrderEntryData getAbstractOrderEntry(final int entryNumber, final AbstractOrderData abstractOrder)
+			throws CommerceCartModificationException
 	{
 		final List<OrderEntryData> entries = abstractOrder.getEntries();
 		if (entries == null)
@@ -289,13 +281,11 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 		}
 		try
 		{
-			return entries.stream()
-					.filter(e -> e != null)
-					.filter(e -> e.getEntryNumber() == entryNumber)
-					.findAny().get();
+			return entries.stream().filter(e -> e != null).filter(e -> e.getEntryNumber() == entryNumber).findAny().get();
 		}
 		catch (final NoSuchElementException e)
 		{
+			LOGGER.error(e.getMessage(), e);
 			throw new CommerceCartModificationException("Cart entry #" + entryNumber + " does not exist");
 		}
 	}
@@ -308,9 +298,8 @@ public class ProductTextfieldConfiguratorController extends AbstractPageControll
 		{
 			for (final Map.Entry<ConfiguratorType, Map<String, String>> item : form.getConfigurationsKeyValueMap().entrySet())
 			{
-				item.getValue().entrySet().stream().map(formEntry ->
-				{
-					ConfigurationInfoData configurationInfoData = new ConfigurationInfoData();
+				item.getValue().entrySet().stream().map(formEntry -> {
+					final ConfigurationInfoData configurationInfoData = new ConfigurationInfoData();
 					configurationInfoData.setConfigurationLabel(formEntry.getKey());
 					configurationInfoData.setConfigurationValue(formEntry.getValue());
 					configurationInfoData.setConfiguratorType(item.getKey());

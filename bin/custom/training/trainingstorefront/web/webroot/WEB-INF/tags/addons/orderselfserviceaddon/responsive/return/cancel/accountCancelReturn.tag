@@ -1,6 +1,6 @@
  <%--[y] hybris Platform--%>
 
- <%--Copyright (c) 2000-2017 SAP SE--%>
+ <%--Copyright (c) 2000-2018 SAP SE--%>
  <%--All rights reserved.--%>
 
  <%--This software is the confidential and proprietary information of SAP--%>
@@ -22,7 +22,7 @@
 
 <form:form action="${request.contextPath}/my-account/returns/${fn:escapeXml(returnRequestData.code)}/cancel/submit"
            id="submitcancelreturnform"
-           commandName="returnRequestData"
+           modelAttribute="returnRequestData"
            class="account-cancel-return">
     <ul class="item__list cart__list return__list">
 

@@ -1,17 +1,6 @@
 <%@ tag body-content="empty" trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
-<%--
-~ [y] hybris Platform
-~
-~  Copyright (c) 2000-2011 hybris AG
-~  All rights reserved.
-~
-~  This software is the confidential and proprietary information of hybris
-~  ("Confidential Information"). You shall not disclose such Confidential
-~  Information and shall use it only in accordance with the terms of the
-~  license agreement you entered into with hybris.
---%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%-- Debug footer. Not for production. Outputs in an HTML comment --%>
 
@@ -20,36 +9,36 @@
 
 DEBUG INFO
 
-cmsPageName=${cmsPage.name}
-cmsSiteUid=${cmsSite.uid}
-secure=${request.secure}
-contextPath=${request.contextPath}
+cmsPageName=${fn:escapeXml(cmsPage.name)}
+cmsSiteUid=${fn:escapeXml(cmsSite.uid)}
+secure=${fn:escapeXml(request.secure)}
+contextPath=${fn:escapeXml(request.contextPath)}
 siteRootPath=<c:url value="/"/>
 
-siteResourcePath=${siteResourcePath}
-themeResourcePath=${themeResourcePath}
-commonResourcePath=${commonResourcePath}
-requestURI=${request.requestURI}
+siteResourcePath=${fn:escapeXml(siteResourcePath)}
+themeResourcePath=${fn:escapeXml(themeResourcePath)}
+commonResourcePath=${fn:escapeXml(commonResourcePath)}
+requestURI=${fn:escapeXml(request.requestURI)}
 
 
 Jalo Session details:
 
-${storefrontDebugJaloSessionAttributes}
+${fn:escapeXml(storefrontDebugJaloSessionAttributes)}
 
 
 UiExperienceLevel:
 
-uiExperienceLevel=${uiExperienceLevel}
-uiExperienceOverride=${uiExperienceOverride}
-detectedUiExperienceCode=${detectedUiExperienceCode}
-overrideUiExperienceCode=${overrideUiExperienceCode}
+uiExperienceLevel=${fn:escapeXml(uiExperienceLevel)}
+uiExperienceOverride=${fn:escapeXml(uiExperienceOverride)}
+detectedUiExperienceCode=${fn:escapeXml(detectedUiExperienceCode)}
+overrideUiExperienceCode=${fn:escapeXml(overrideUiExperienceCode)}
 
 
 Detected Browser:
 
-detectedDeviceId=${detectedDevice.id}
-detectedDeviceUserAgent=${detectedDevice.userAgent}
-detectedDeviceCapabilities=${detectedDevice.capabilities}
+detectedDeviceId=${fn:escapeXml(detectedDevice.id)}
+detectedDeviceUserAgent=${fn:escapeXml(detectedDevice.userAgent)}
+detectedDeviceCapabilities=${fn:escapeXml(detectedDevice.capabilities)}
 
 -->
 </c:if>

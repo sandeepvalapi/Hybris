@@ -1,40 +1,24 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.interceptors.beforeview;
 
 import de.hybris.platform.acceleratorfacades.device.DeviceDetectionFacade;
 import de.hybris.platform.acceleratorfacades.device.data.DeviceData;
-import de.hybris.platform.acceleratorservices.addonsupport.RequiredAddOnsNameProvider;
-import de.hybris.platform.acceleratorservices.config.SiteConfigService;
 import de.hybris.platform.acceleratorservices.uiexperience.UiExperienceService;
-import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.interceptors.BeforeViewHandler;
 import de.hybris.platform.cms2.model.site.CMSSiteModel;
 import de.hybris.platform.cms2.servicelayer.services.CMSSiteService;
-import de.hybris.platform.commerceservices.enums.SiteTheme;
 import de.hybris.platform.commerceservices.enums.UiExperienceLevel;
 import de.hybris.platform.commerceservices.i18n.CommerceCommonI18NService;
 import de.hybris.platform.core.model.c2l.LanguageModel;
-import com.hybris.training.storefront.web.view.UiExperienceViewResolver;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.hybris.training.storefront.util.UiThemeUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -50,33 +34,21 @@ public class UiThemeResourceBeforeViewHandler implements BeforeViewHandler
 
 	protected static final String COMMON = "common";
 	protected static final String SHARED = "shared";
-	protected static final String RESOURCE_TYPE_JAVASCRIPT = "javascript";
-	protected static final String RESOURCE_TYPE_CSS = "css";
-
-	private static final String PATHS = ".paths.";
 
 	@Resource(name = "cmsSiteService")
 	private CMSSiteService cmsSiteService;
 
-	@Resource(name = "uiExperienceService")
-	private UiExperienceService uiExperienceService;
-
 	@Resource(name = "deviceDetectionFacade")
 	private DeviceDetectionFacade deviceDetectionFacade;
-
-	@Resource(name = "siteConfigService")
-	private SiteConfigService siteConfigService;
-
-	@Resource(name = "reqAddOnsNameProvider")
-	private RequiredAddOnsNameProvider requiredAddOnsNameProvider;
 
 	@Resource(name = "commerceCommonI18NService")
 	private CommerceCommonI18NService commerceCommonI18NService;
 
-	@Resource(name = "viewResolver")
-	private UiExperienceViewResolver uiExperienceViewResolver;
+	@Resource(name = "uiThemeUtils")
+	private UiThemeUtils uiThemeUtils;
 
-	private String defaultThemeName;
+	@Resource(name = "uiExperienceService")
+	private UiExperienceService uiExperienceService;
 
 	@Override
 	public void beforeView(final HttpServletRequest request, final HttpServletResponse response, final ModelAndView modelAndView)
@@ -84,15 +56,11 @@ public class UiThemeResourceBeforeViewHandler implements BeforeViewHandler
 		final CMSSiteModel currentSite = cmsSiteService.getCurrentSite();
 
 		final String siteName = currentSite.getUid();
-		final String themeName = getThemeNameForSite(currentSite);
+		final String themeName = uiThemeUtils.getThemeNameForCurrentSite();
 		final String uiExperienceCode = uiExperienceService.getUiExperienceLevel().getCode();
-		final String uiExperienceCodeLower = uiExperienceViewResolver.getUiExperienceViewPrefix().isEmpty()
-				? uiExperienceCode.toLowerCase()
-				: StringUtils.remove(
-						uiExperienceViewResolver.getUiExperienceViewPrefix().get(uiExperienceService.getUiExperienceLevel()), "/");
-		final Object urlEncodingAttributes = request.getAttribute(WebConstants.URL_ENCODING_ATTRIBUTES);
-		final String contextPath = StringUtils.remove(request.getContextPath(),
-				urlEncodingAttributes != null ? urlEncodingAttributes.toString() : "");
+		final String uiExperienceCodeLower = uiThemeUtils.getUiExperience();
+
+		final String contextPath = uiThemeUtils.getContextPathFromRequest(request);
 
 		final String siteRootUrl = contextPath + "/_ui/" + uiExperienceCodeLower;
 		final String sharedResourcePath = contextPath + "/_ui/" + SHARED;
@@ -130,99 +98,8 @@ public class UiThemeResourceBeforeViewHandler implements BeforeViewHandler
 		final DeviceData currentDetectedDevice = deviceDetectionFacade.getCurrentDetectedDevice();
 		modelAndView.addObject("detectedDevice", currentDetectedDevice);
 
-		final List<String> dependantAddOns = requiredAddOnsNameProvider
-				.getAddOns(request.getServletContext().getServletContextName());
-
-		modelAndView.addObject("addOnCommonCssPaths", getAddOnCommonCSSPaths(contextPath, uiExperienceCodeLower, dependantAddOns));
-		modelAndView.addObject("addOnThemeCssPaths",
-				getAddOnThemeCSSPaths(contextPath, themeName, uiExperienceCodeLower, dependantAddOns));
-		modelAndView.addObject("addOnJavaScriptPaths",
-				getAddOnJSPaths(contextPath, siteName, uiExperienceCodeLower, dependantAddOns));
-
+		modelAndView.addObject("addOnCommonCssPaths", uiThemeUtils.getAddOnCommonCSSPaths(request));
+		modelAndView.addObject("addOnThemeCssPaths", uiThemeUtils.getAddOnThemeCSSPaths(request));
+		modelAndView.addObject("addOnJavaScriptPaths", uiThemeUtils.getAddOnJSPaths(request));
 	}
-
-	protected List getAddOnCommonCSSPaths(final String contextPath, final String uiExperience, final List<String> addOnNames)
-	{
-		final String[] propertyNames = new String[]
-		{ RESOURCE_TYPE_CSS + ".paths", //
-				RESOURCE_TYPE_CSS + PATHS + uiExperience //
-		};
-
-		return getAddOnResourcePaths(contextPath, addOnNames, propertyNames);
-	}
-
-	protected List getAddOnThemeCSSPaths(final String contextPath, final String themeName, final String uiExperience,
-			final List<String> addOnNames)
-	{
-		final String[] propertyNames = new String[]
-		{ RESOURCE_TYPE_CSS + PATHS + uiExperience + "." + themeName };
-
-		return getAddOnResourcePaths(contextPath, addOnNames, propertyNames);
-	}
-
-	protected List getAddOnJSPaths(final String contextPath, final String siteName, final String uiExperience,
-			final List<String> addOnNames)
-	{
-		final String[] propertyNames = new String[]
-		{ RESOURCE_TYPE_JAVASCRIPT + ".paths", //
-				RESOURCE_TYPE_JAVASCRIPT + PATHS + uiExperience //
-		};
-
-		return getAddOnResourcePaths(contextPath, addOnNames, propertyNames);
-	}
-
-
-	protected List getAddOnResourcePaths(final String contextPath, final List<String> addOnNames, final String[] propertyNames)
-	{
-		final List<String> addOnResourcePaths = new ArrayList<String>();
-
-		for (final String addon : addOnNames)
-		{
-			for (final String propertyName : propertyNames)
-			{
-				addAddOnResourcePaths(contextPath, addOnResourcePaths, addon, propertyName);
-			}
-		}
-		return addOnResourcePaths;
-	}
-
-	protected void addAddOnResourcePaths(final String contextPath, final List<String> addOnResourcePaths, final String addon,
-			final String propertyName)
-	{
-		final String addOnResourcePropertyValue = siteConfigService.getProperty(addon + "." + propertyName);
-		if (addOnResourcePropertyValue != null)
-		{
-			final String[] propertyPaths = addOnResourcePropertyValue.split(";");
-			for (final String propertyPath : propertyPaths)
-			{
-				addOnResourcePaths.add(contextPath + "/_ui/addons/" + addon + propertyPath);
-			}
-		}
-	}
-
-	protected String getThemeNameForSite(final CMSSiteModel site)
-	{
-		final SiteTheme theme = site.getTheme();
-		if (theme != null)
-		{
-			final String themeCode = theme.getCode();
-			if (themeCode != null && !themeCode.isEmpty())
-			{
-				return themeCode;
-			}
-		}
-		return getDefaultThemeName();
-	}
-
-	protected String getDefaultThemeName()
-	{
-		return defaultThemeName;
-	}
-
-	@Required
-	public void setDefaultThemeName(final String defaultThemeName)
-	{
-		this.defaultThemeName = defaultThemeName;
-	}
-
 }

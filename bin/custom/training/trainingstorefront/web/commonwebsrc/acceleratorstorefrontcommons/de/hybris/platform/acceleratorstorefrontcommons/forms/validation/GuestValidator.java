@@ -1,18 +1,16 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.forms.validation;
 
+import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.GuestForm;
+import de.hybris.platform.servicelayer.config.ConfigurationService;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -26,7 +24,8 @@ import org.springframework.validation.Validator;
 @Component("guestValidator")
 public class GuestValidator implements Validator
 {
-	public static final Pattern EMAIL_REGEX = Pattern.compile("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b");
+	@Resource(name = "configurationService")
+	private ConfigurationService configurationService;
 
 	@Override
 	public boolean supports(final Class<?> aClass)
@@ -44,9 +43,16 @@ public class GuestValidator implements Validator
 		{
 			errors.rejectValue("email", "profile.email.invalid");
 		}
-		else if (StringUtils.length(email) > 255 || !EMAIL_REGEX.matcher(email).matches())
+		else if (StringUtils.length(email) > 255 || !validateEmailAddress(email))
 		{
 			errors.rejectValue("email", "profile.email.invalid");
 		}
+	}
+
+	protected boolean validateEmailAddress(final String email)
+	{
+		final Matcher matcher = Pattern.compile(configurationService.getConfiguration().getString(WebConstants.EMAIL_REGEX))
+				.matcher(email);
+		return matcher.matches();
 	}
 }

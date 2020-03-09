@@ -18,7 +18,7 @@
         <ycommerce:testId code="addToCartButton">
             <input type="hidden" name="productCodePost" value="${fn:escapeXml(product.code)}"/>
             <input type="hidden" name="productNamePost" value="${fn:escapeXml(product.name)}"/>
-            <input type="hidden" name="productPostPrice" value="${product.price.value}"/>
+            <input type="hidden" name="productPostPrice" value="${fn:escapeXml(product.price.value)}"/>
 
             <c:choose>
                 <c:when test="${product.stock.stockLevelStatus.code eq 'outOfStock' }">
@@ -46,7 +46,7 @@
                 </c:when>
                 <c:otherwise>
                     <button id="configureProduct" type="button" class="btn btn-primary btn-block js-enable-btn" disabled="disabled"
-                            onclick="location.href='${configureProductUrl}'">
+                            onclick="location.href='${fn:escapeXml(configureProductUrl)}'">
                         <spring:theme code="basket.configure.product"/>
                     </button>
                 </c:otherwise>

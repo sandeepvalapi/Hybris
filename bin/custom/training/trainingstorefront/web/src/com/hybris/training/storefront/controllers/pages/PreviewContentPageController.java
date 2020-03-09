@@ -1,18 +1,12 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages;
 
 import de.hybris.platform.acceleratorstorefrontcommons.breadcrumb.impl.ContentPageBreadcrumbBuilder;
 import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
 import de.hybris.platform.acceleratorstorefrontcommons.controllers.pages.AbstractPageController;
+import de.hybris.platform.cms2.data.PagePreviewCriteriaData;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
 import de.hybris.platform.cms2.model.pages.AbstractPageModel;
 import de.hybris.platform.cms2.model.pages.ContentPageModel;
@@ -42,11 +36,15 @@ public class PreviewContentPageController extends AbstractPageController
 	{ "uid" })
 	public String get(@RequestParam(value = "uid") final String cmsPageUid, final Model model) throws CMSItemNotFoundException
 	{
-		final AbstractPageModel pageForRequest = getCmsPageService().getPageForId(cmsPageUid);
-		storeCmsPageInModel(model, getCmsPageService().getPageForId(cmsPageUid));
+
+		final PagePreviewCriteriaData pagePreviewCriteriaData = getCmsPreviewService().getPagePreviewCriteria();
+
+		final AbstractPageModel pageForRequest = getCmsPageService().getPageForId(cmsPageUid, pagePreviewCriteriaData);
+		storeCmsPageInModel(model, pageForRequest);
 		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(cmsPageUid));
 		model.addAttribute(WebConstants.BREADCRUMBS_KEY,
 				contentPageBreadcrumbBuilder.getBreadcrumbs((ContentPageModel) pageForRequest));
 		return getViewForPage(pageForRequest);
 	}
+
 }

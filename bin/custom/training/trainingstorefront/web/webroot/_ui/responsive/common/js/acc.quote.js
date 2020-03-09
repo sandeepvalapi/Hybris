@@ -1,23 +1,22 @@
 ACC.quote = {
-
 	_autoload : [
-		[ "bindAddComment", $("#js-quote-comments").length != 0 ],
-		[ "bindAddEntryComment", $(".js-quote-entry-comments").length != 0],
-		[ "toggleMoreComments", $("#js-quote-comments").length != 0 ],
-		[ "toggleLessComments", $("#js-quote-comments").length != 0 ],
-		[ "displayLessComments", $("#js-quote-comments").length != 0 ],
-		[ "quoteDetailsNavigation", $(".js-quote-actions").length != 0],
-		[ "bindQuoteButtons", $(".js-btn-quote").length != 0 ],
-		[ "bindEditQuoteButton", $(".js-quote-edit-btn").length != 0 ],
-		[ "bindSubmitConfirmation", $(".js-quote-submit-btn").length != 0],
-		[ "bindCancelConfirmation", $(".js-quote-cancel-btn").length != 0],
-		[ "bindName" , $("#js-quote-name").length != 0],
-		[ "bindDescription" , $("#js-quote-description").length != 0],
-		[ "bindExpirationTime", $("#js-quote-expiration-time").length != 0],
-		[ "bindCheckoutConfirmation", $(".js-quote-checkout-btn").length != 0],
-		[ "bindEditConfirmation", $(".js-quote-warning-btn").length != 0],
-		[ "bindQuoteDiscount", $(".js-quote-discount-link").length != 0],
-		[ "bindNewCartClick", $(".new__cart--link").length != 0]
+		[ "bindAddComment", $("#js-quote-comments").length !== 0 ],
+		[ "bindAddEntryComment", $(".js-quote-entry-comments").length !== 0],
+		[ "toggleMoreComments", $("#js-quote-comments").length !== 0 ],
+		[ "toggleLessComments", $("#js-quote-comments").length !== 0 ],
+		[ "displayLessComments", $("#js-quote-comments").length !== 0 ],
+		[ "quoteDetailsNavigation", $(".js-quote-actions").length !== 0],
+		[ "bindQuoteButtons", $(".js-btn-quote").length !== 0 ],
+		[ "bindEditQuoteButton", $(".js-quote-edit-btn").length !== 0 ],
+		[ "bindSubmitConfirmation", $(".js-quote-submit-btn").length !== 0],
+		[ "bindCancelConfirmation", $(".js-quote-cancel-btn").length !== 0],
+		[ "bindName" , $("#js-quote-name").length !== 0],
+		[ "bindDescription" , $("#js-quote-description").length !== 0],
+		[ "bindExpirationTime", $("#js-quote-expiration-time").length !== 0],
+		[ "bindCheckoutConfirmation", $(".js-quote-checkout-btn").length !== 0],
+		[ "bindEditConfirmation", $(".js-quote-warning-btn").length !== 0],
+		[ "bindQuoteDiscount", $(".js-quote-discount-link").length !== 0],
+		[ "bindNewCartClick", $(".new__cart--link").length !== 0]
 	],
 
 	bindEditQuoteButton: function(){
@@ -39,8 +38,8 @@ ACC.quote = {
 				var key = event.keyCode;
 
 				// If the user has pressed enter
-				if (key == 13) {
-					if($('#comment').val().trim() == '') {
+				if (key === 13) {
+					if($('#comment').val().trim() === '') {
 						return false;
 					}
 					event.preventDefault();
@@ -60,7 +59,7 @@ ACC.quote = {
 			function (event) {
 				var key = event.keyCode;
 
-				if (key == 13) {
+				if (key === 13) {
 					event.preventDefault();
 					ACC.quote.quoteEntryCommentSubmit($(this).val(), $(this).data("entry-number"));
 					return false;
@@ -121,7 +120,7 @@ ACC.quote = {
 			success: function () {
 				ACC.quote.onEntryCommentSuccess(entryNumber);
 			}
-		})
+		});
 	},
 
 	onCommentSuccess : function(showAllComments) {
@@ -131,11 +130,12 @@ ACC.quote = {
 	},
 
 	onEntryCommentSuccess: function (entryNumber) {
-		$("#entryCommentListDiv_" + entryNumber).load(location.href + " #entryCommentListDiv_" + entryNumber, function () {
-			ACC.quote.displayEntryComments(entryNumber);
+        var entryNumberHtml = ACC.common.encodeHtml(entryNumber);
+		$("#entryCommentListDiv_" + entryNumberHtml).load(location.href + " #entryCommentListDiv_" + entryNumberHtml, function () {
+			ACC.quote.displayEntryComments(entryNumberHtml);
 		});
 
-		$("#entryComment_" + entryNumber).val("");
+		$("#entryComment_" + entryNumberHtml).val("");
 	},
 
 	toggleMoreComments : function() {
@@ -159,7 +159,7 @@ ACC.quote = {
 	},
 
 	displayLessComments : function(e) {
-		if (e != undefined) {
+		if (e !== undefined) {
 			e.preventDefault();
 		}
 		ACC.quote.displayComments("false");
@@ -203,8 +203,9 @@ ACC.quote = {
 	},
 
 	displayEntryComments: function (entryNumber, showAll) {
-		var quoteEntryComments = $("#entryCommentListDiv_" + entryNumber);
-		var comments = quoteEntryComments.find('[id^="entryComment_' + entryNumber + '"]');
+		var entryNumberHtml = ACC.common.encodeHtml(entryNumber);
+		var quoteEntryComments = $("#entryCommentListDiv_" + entryNumberHtml);
+		var comments = quoteEntryComments.find('[id^="entryComment_' + entryNumberHtml + '"]');
 
 		showAll = showAll || "" + quoteEntryComments.data("show-all-entry-comments");
 
@@ -292,17 +293,18 @@ ACC.quote = {
 	},
 
 	handleConfirmationModal: function(options) {
-		$(options.actionButtonSelector).click(function(e) {
+        var $actionButtonSelector = $(document).find(options.actionButtonSelector);
+        $actionButtonSelector.click(function(e) {
 			e.preventDefault();
 
-			var modalWindow = $(options.modalWindowSelector);
+            var modalWindow = $(document).find(options.modalWindowSelector);
 			var title = modalWindow.data(options.modalTitleDataAttributeName);
 
 			if (options.initializeCallback) {
 				options.initializeCallback();
 			}
 
-			ACC.colorbox.open(title, {
+			ACC.colorbox.open(ACC.common.encodeHtml(title), {
 				inline: true,
 				href: modalWindow,
 				width: "480px",
@@ -314,15 +316,17 @@ ACC.quote = {
 			});
 		});
 
-		$(options.cancelButtonSelector).click(function(e) {
+        var $cancelButtonSelector = $(document).find(options.cancelButtonSelector);
+		$cancelButtonSelector.click(function(e) {
 			e.preventDefault();
 			ACC.colorbox.close();
 		});
 
-		$(options.confirmButtonSelector).click(function(e) {
+        var $confirmButtonSelector = $(document).find(options.confirmButtonSelector);
+        $confirmButtonSelector.click(function(e) {
 			e.preventDefault();
 			ACC.colorbox.close();
-			var sUrl = $(options.actionButtonSelector).data("quoteEditUrl");
+			var sUrl = $actionButtonSelector.data("quoteEditUrl");
 			window.location = sUrl;
 		});
 	},
@@ -335,17 +339,17 @@ ACC.quote = {
 			modalTotalDataAttributeName: "quote-modal-total",
 			modalQuoteDiscountDataAttributeName: "quote-modal-quote-discount",
 			modalCurrencyDataAttributeName: "quote-modal-currency",
-			cancelButtonSelector: "#js-quote-discount-modal #cancelButton",
+			cancelButtonSelector: "#js-quote-discount-modal #cancelButton"
 		});
 	},
 
 	handleDiscountModal: function(options) {
-		var modalWindow = $(options.modalWindowSelector);
+        var modalWindow = $(document).find(options.modalWindowSelector);
 		var total = parseFloat(modalWindow.data(options.modalTotalDataAttributeName));
 		var quoteDiscount = parseFloat(modalWindow.data(options.modalQuoteDiscountDataAttributeName));
 		var currency = modalWindow.data(options.modalCurrencyDataAttributeName);
 
-		$(options.actionButtonSelector).click(function(e) {
+        $(document).find(options.actionButtonSelector).click(function(e) {
 			e.preventDefault();
 
 			var title = modalWindow.data(options.modalTitleDataAttributeName);
@@ -354,7 +358,7 @@ ACC.quote = {
 				options.initializeCallback();
 			}
 
-			ACC.colorbox.open(title, {
+			ACC.colorbox.open(ACC.common.encodeHtml(title), {
 				inline: true,
 				href: modalWindow,
 				width: "480px",
@@ -369,7 +373,7 @@ ACC.quote = {
 			});
 		});
 
-		$(options.cancelButtonSelector).click(function(e) {
+        $(document).find(options.cancelButtonSelector).click(function(e) {
 			e.preventDefault();
 			ACC.colorbox.close();
 		});
@@ -417,28 +421,30 @@ ACC.quote = {
 		
 		function reset()
 		{
-	        var per=$('#js-quote-discount-by-percentage').val();
-	        var amt=$('#js-quote-discount-by-amount').val();
-	        var tot=$('#js-quote-discount-adjust-total').val();
-	        if(per=='')
+	        var per = $('#js-quote-discount-by-percentage').val();
+	        var amt = $('#js-quote-discount-by-amount').val();
+	        var tot = $('#js-quote-discount-adjust-total').val();
+	        if(per === '')
 	        	$('#js-quote-discount-by-percentage').val('0.00');
-	        if(amt=='')
+	        if(amt === '')
 	        	$('#js-quote-discount-by-amount').val('0.00');
-	        if(tot==''|| tot==0.00)
+	        if(tot === '' || tot === 0.00)
 	        	$('#js-quote-discount-adjust-total').val(total);
 		}
 		
 		function holdPreviousValue(event)
 		{
 		    var $this = $(this);
-		    if ((event.which != 46 || $this.val().indexOf('.') != -1) &&
-		       ((event.which < 48 || event.which > 57) &&
-		       (event.which != 0 && event.which != 8))) {
-		           event.preventDefault();
+		    if((event.which !== 46 || $this.val().indexOf('.') !== -1))
+		    {
+		    	if (((event.which < 48 || event.which > 57) &&
+		    		 (event.which !== 0 && event.which !== 8))) {
+		    		event.preventDefault();
+		    	}
 		    }
 
 		    var text = $(this).val();
-		    if ((event.which == 46) && (text.indexOf('.') == -1)) {
+		    if ((event.which === 46) && (text.indexOf('.') === -1)) {
 		        setTimeout(function() {
 		            if ($this.val().substring($this.val().indexOf('.')).length > 3) {
 		                $this.val($this.val().substring(0, $this.val().indexOf('.') + 3));
@@ -446,13 +452,14 @@ ACC.quote = {
 		         }, 1);
 		    }
 
-		    if ((text.indexOf('.') != -1) &&
-		        (text.substring(text.indexOf('.')).length > 2) &&
-		        (event.which != 0 && event.which != 8) &&
-		        ($(this)[0].selectionStart >= text.length - 2)) {
-		            event.preventDefault();
-		    }    
-
+		    if((text.indexOf('.') !== -1))
+		    {
+		    	if ((text.substring(text.indexOf('.')).length > 2) &&
+				        (event.which !== 0 && event.which !== 8) &&
+				        ($(this)[0].selectionStart >= text.length - 2)) {
+				            event.preventDefault();
+				    }
+		    }
 		}	    
 
 		function updateByAmount()

@@ -15,7 +15,6 @@ function addASMHandlers() {
     addCustomer360Handler();
     addGenericCustomer360Handler();
 
-
     if ($("#sessionTimer").length && $('#asmLogoutForm').length ) {
         startTimer();
     }
@@ -30,13 +29,13 @@ function addASMHandlers() {
     if (placeholderNotAvailable()) {
         $('[placeholder]').focus(function() {
             var input = $(this);
-            if (input.val() == input.attr('placeholder')) {
+            if (input.val() === input.attr('placeholder')) {
                 input.val('');
                 input.removeClass('placeholder');
             }
         }).blur(function() {
                 var input = $(this);
-                if (input.val() == '' || input.val() == input.attr('placeholder')) {
+                if (input.val() === '' || input.val() === input.attr('placeholder')) {
                     input.addClass('placeholder');
                     input.val(input.attr('placeholder'));
                 }
@@ -45,10 +44,8 @@ function addASMHandlers() {
 
     $('[placeholder]').blur(function() {
         var input = $(this);
-        if (input.val() == '') {
-            if (input.attr("name")) {
-                toggleBind(false);
-            }
+        if ((input.val() === '') && (input.attr("name"))) {
+            toggleBind(false);
         }
     });
 
@@ -80,7 +77,7 @@ function addASMHandlers() {
 
     $("#asmLoginForm input[name='username'], #asmLoginForm input[name='password']").keyup(function () {
         var min = 1;
-        var parentNode = $(this.parentNode)
+        var parentNode = $(this.parentNode);
 
         if (this.value.length >= (min) ) {
             parentNode.addClass('checked');
@@ -94,6 +91,7 @@ function addASMHandlers() {
 
     /* start session validation */
     $("input[name='customerName']").keyup(function (e) {
+        $("input[name='customerId']").val("");
         validateNewAccount(this);
         $(this).removeData( "hover" );
         removeAsmHover();
@@ -121,13 +119,13 @@ function addASMHandlers() {
    		    if ($('.ASM_alert')) {
    		        $('.ASM_alert').remove();
    		    }
-    	    if ($(this).val() == "") {
+    	    if ($(this).val() === "") {
     		    $("input[name='cartId']").removeClass('ASM-input-error');
     		    toggleStartSessionButton ($("input[name='cartId']"), true);
     		    $("input[name='customerId']").val("");
     	    }
     	}
-    	if ($(this).val() == "") { 
+    	if ($(this).val() ==="") {
     		    $("input[name='cartId']").val("");
     		    $( "#asmAutoCompleteCartId" ).empty();
    	    }
@@ -176,7 +174,6 @@ function addASMHandlers() {
         }
     );
 
-
     $("#_asmPersonifyForm input[name='cartId']").autocomplete({
         source: function( request, response ) {
             response(carts);
@@ -185,7 +182,7 @@ function addASMHandlers() {
         autoFocus: true,
         minLength: 0,
         select: function( event, ui ) {
-            if (ui.item.value == "") {
+            if (ui.item.value === "") {
                 event.preventDefault();
             }
             toggleStartSessionButton (this, true);
@@ -201,19 +198,28 @@ function addASMHandlers() {
             source: function( request, response ) {
                 $.ajax({
                     url: ACC.config.encodedContextPath + "/assisted-service/autocomplete",
-                    dataType: "jsonp",
+                    dataType: "json",
                     data: {
                         customerId: request.term
                     },
                     success: function( data ) {
-                        response( data );
+                        response( $.map( data, function( item )
+                        {
+                            return{
+                                email: item.email,
+                                date: item.date,
+                                card: item.card,
+                                value: item.value,
+                                carts: item.carts
+                            };
+                        }));
                     }
                 });
             },
             minLength: 3,
             appendTo: "#asmAutoComplete",
             select: function( event, ui ) {
-                if (ui.item.value == "") {
+                if (ui.item.value === null) {
                     event.preventDefault();
                     return;
                 }
@@ -224,10 +230,10 @@ function addASMHandlers() {
                 $("input[name='customerId']").val(ui.item.email);
 
                 carts = ui.item.carts;
-                if ($("input[name='cartId']").attr("orig_value") == null) {
+                if ($("input[name='cartId']").attr("orig_value") === null) {
                 	$("input[name='cartId']").val('');
-                	if (carts != null) {
-		                if (carts.length == 1) {
+                	if (carts !== null) {
+		                if (carts.length === 1) {
 		                    $("input[name='cartId']").val(carts[0]);
 		                } else {
 		                    $("input[name='cartId']").autocomplete('search', '');
@@ -239,12 +245,11 @@ function addASMHandlers() {
 		                $("input[name='cartId']").focus();
 		            }
                 }
-
-                toggleBind(true);
+                checkCartIdFieldAndToggleBind($("input[name='cartId']")[0]);
 
             }
         }).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-            if (item.value == "") {
+            if (item.value === null) {
                 toggleCreateAccount(true);
                 return $( "<li></li>" ).data( "item.autocomplete", item ).append($('<span class=noresult>').text(ASM_MESSAGES.customerIdNotFound))
                     .appendTo( ul );
@@ -260,29 +265,26 @@ function addASMHandlers() {
 
     if ($("#_asmBindForm").length) {
         var customerId = $("input[name='customerName']").attr('readonly');
-        var cartId = $(".cartId input").attr('disabled');
 
         if(customerId === "readonly"){
             $(".ASM_icon-chain").removeClass('invisible').addClass('ASM_chain-bind');
 
-            if ($("#_asmBindForm input[name='customerId']").val() != undefined && $("#_asmBindForm input[name='customerId']").val() != "") {
+            if ($("#_asmBindForm input[name='customerId']").val() !== undefined && $("#_asmBindForm input[name='customerId']").val() !== "") {
                 $(".js-customer360").removeAttr('disabled');
             }
         }
     }
-
-    if ($(".add_to_cart_form").length && $("#_asm input[name='cartId']").val() == "") {
+    if ($(".add_to_cart_form").length && $("#_asm input[name='cartId']").val() === "") {
     	$( ".add_to_cart_form" ).submit(function( event ) {
     		setTimeout(function () {
     			var url = ACC.config.encodedContextPath + "/assisted-service/add-to-cart";
         		$.post(url, function( data ) {
         			$("#_asm").replaceWith(data);
                     addASMHandlers();
-            	})
+            	});
     	    }, 400);
     	});	
     }
-    
     enableAsmPanelButtons();
 }
 
@@ -297,36 +299,31 @@ $( document ).ready(function() {
 
     $(document).on("click",".js-asm-store-finder-details-back",function(e){
         $("#colorbox .js-pickup-component").removeClass("show-store");
-    })
-     
+    });
 });
 
 function addASMFormHandler() {
-    if ($) {
-        if ($(".asmForm").length) {
-            $(".asmForm").each(function () {
-                $(this).submit(function() {
-
-                    $(this).find('[placeholder]').each(function() {
-                        var input = $(this);
-                        if (input.val() == input.attr('placeholder')) {
-                            input.val('');
-                        }
-                    })
-
-                    $.ajax({
-                        type: "POST",
-                        url: $(this).attr('action'),
-                        data: $(this).serialize(),
-                        success: function(data) {
-                            $("#_asm").replaceWith(data);
-                            addASMHandlers();
-                        }
-                    });
-                    return false;
+    if (($) && ($(".asmForm").length)) {
+        $(".asmForm").each(function () {
+            $(this).submit(function() {
+                $(this).find('[placeholder]').each(function() {
+                    var input = $(this);
+                    if (input.val() === input.attr('placeholder')) {
+                        input.val('');
+                    }
                 });
+                $.ajax({
+                    type: "POST",
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        $("#_asm").replaceWith(data);
+                        addASMHandlers();
+                    }
+                });
+                return false;
             });
-        }
+        });
     }
 }
 
@@ -398,13 +395,13 @@ function finishASMagentSession() {
 }
 
 function isStartEmulateButtonPresent() {
-	return $(".ASM-btn-start-session").length == 1;
+	return $(".ASM-btn-start-session").length === 1;
 }
 
 function enableAsmPanelButtons() {
     $('div[id="_asm"] button').not(".js-customer360, .ASM-btn-start-session, .ASM-btn-create-account, .ASM-btn-login").removeAttr('disabled');
     if (isStartEmulateButtonPresent()) {
-	    if ($("#_asmPersonifyForm input[name='customerId']").val() != "") {
+	    if ($("#_asmPersonifyForm input[name='customerId']").val() !== "") {
 	    	$("#_asmPersonifyForm input[name='customerId']").parent().addClass("checked");
 	    }
         formValidate($("#_asmPersonifyForm input[name='cartId']")[0], 8, true, 8);
@@ -459,12 +456,14 @@ function checkStartSessionButton (el) {
 }
 
 function checkCartIdFieldAndToggleBind(cartIdField) {
-	if( !$(cartIdField).hasClass('placeholder') &&  $("input[name='customerId']").val().length > 0) {
-        if (!isNaN(cartIdField.value) && (cartIdField.value.length == 8) && (cartIdField.value != cartIdField.getAttribute('orig_value'))) {
-            $("#_asmBindForm button[type='submit']").removeClass('hidden');
-            $(".ASM_icon-chain").removeClass('invisible');
-            return;
-        }
+	if ( !$(cartIdField).hasClass('placeholder')
+	        && ($("input[name='customerName']").val().length > 0)
+            && ($("input[name='customerId']").val().length > 0)
+            && !isNaN(cartIdField.value)
+            && (cartIdField.value.length === 8)) {
+        $("#_asmBindForm button[type='submit']").removeClass('hidden');
+        $(".ASM_icon-chain").removeClass('invisible');
+        return;
     }
     $("#_asmBindForm button[type='submit']").addClass('hidden');
     $(".ASM_icon-chain").addClass('invisible');
@@ -504,15 +503,12 @@ function formValidate (el, min, number, max ) {
     		toggleStartSessionButton (el, false);
     		return false;
     	}
-        if (number !== false) {
-            if (isNaN(el.value)) {
-                toggleStartSessionButton (el, false);
-                return false;
-            }
+        if ((number !== false) && isNaN(el.value)) {
+            toggleStartSessionButton (el, false);
+            return false;
         }
         if (el.value.length >= (min) ) {
             toggleStartSessionButton (el, true);
-
             if ( max !== undefined && el.value.length > (max) ) {
                 toggleStartSessionButton (el, false);
             }
@@ -533,9 +529,13 @@ function validateEmail(mailAddress) {
     return ($('<input>').attr({ type: 'email', required:'required' }).val(mailAddress))[0].checkValidity() && (mailAddress.indexOf(".") > 0);
 }
 
-function validateName(name){
-    var regEx = /^[a-zA-Z-]+\s[a-zA-Z-]+$/;
-    return (name != '' && regEx.test(name));
+function validateName(name) {
+    var split = name.trim().split(/\s+/);
+    return !isBlank(split[0]) && !isBlank(split[1]);
+}
+
+function isBlank(str) {
+    return (!str || 0 === str.length);
 }
 
 function validateNewAccount(el) {
@@ -571,8 +571,10 @@ function revertAutocompleteNormalize() {
 	 * But we want to send empty values for NO_FOUND case */
 	$.ui.autocomplete.prototype._normalize =  function(a){
 		if ( a.length && a[ 0 ].label && a[ 0 ].value ) {return a; }
-		return $.map( a, function( b ) {if ( typeof b === "string" ) { return {label: b,value: b};}
-			return $.extend({label: b.label || b.value, value: b.value || b.label}, b );});
+		return $.map( a, function( b ) {
+		    if ( typeof b === "string" ) { return {label: b,value: b};}
+            return $.extend({label: b.label || b.value, value: b.value || b.label}, b );
+        });
 	};
 }
 
@@ -583,7 +585,6 @@ function isErrorDisplayed() {
 
 function addCustomerListBtnHandler() {
     $(".js-customer-list-btn").removeClass('disabled');
-
     $(document).on("click", ".js-customer-list-btn", function (e) {
         e.preventDefault();
         populateCustomerListModal($(this).data('actionurl'), '.js-customer-list-modal-content', addCustomerListSelect);
@@ -612,7 +613,7 @@ function openCustomer360Colorbox (colorboxTarget){
 }
 
 function colorboxResize(){
-    $.colorbox.resize() 
+    $.colorbox.resize();
 }
 
 function addCustomer360Handler() {
@@ -680,13 +681,12 @@ function asmAifSectionClickHandler() {
             aifSelectSection($(this).index());
         }
     });
-};
-
+}
 function aifSelectLastSection() {
     var index = 0;
     if (sessionStorage.getItem("lastSection")) {
         var lastSection = JSON.parse(sessionStorage.getItem("lastSection"));
-        if (getCurrentEmulatedCustomerId() == lastSection.userId) {
+        if (getCurrentEmulatedCustomerId() === lastSection.userId) {
             index = lastSection.sectionId;
         }
     }
@@ -726,14 +726,12 @@ function getCustomerListSearchUrl() {
     var query = $("#ASM_customer-list-queryInput").val();
     var uriEncodedquery = encodeURIComponent(query);
     targetUrl += '&query=' + uriEncodedquery;
-
     return targetUrl;
 }
 
 function customerListModalHandler() {
     $(document).on("click", ".ASM_customer-list-modal .pagination a", function (e) {
         e.preventDefault();
-
         populateCustomerListModal($(this).attr('href'),".asm-account-section",replaceCustomerListTable);
     });
 
@@ -741,7 +739,7 @@ function customerListModalHandler() {
         e.preventDefault();
         var selectedOption = $(this).data('value');
         var previouslySelectedOption = $(".ASM_customer-list-modal .sort-refine-bar .form-control").val();
-        if (selectedOption != previouslySelectedOption)
+        if (selectedOption !== previouslySelectedOption)
         {
             $(".ASM_customer-list-modal .sort-refine-bar .form-control").val(selectedOption);
             var targetUrl = getCustomerListSearchUrl();
@@ -750,7 +748,7 @@ function customerListModalHandler() {
     });
 
     $(document).on("keypress", "#ASM_customer-list-queryInput", function(event) {
-        if (event.keyCode == 13) {
+        if (event.keyCode === 13) {
             $("#ASM_customer-list-searchButton").click();
             return false;
         }
@@ -761,7 +759,7 @@ function customerListModalHandler() {
 
     $(document).on("click", "#ASM_customer-list-searchButton", function (e) {
         e.preventDefault();
-        var targetUrl = getCustomerListSearchUrl()
+        var targetUrl = getCustomerListSearchUrl();
         populateCustomerListModal(targetUrl,".asm-account-section",replaceCustomerListTable);
     });
 
@@ -774,11 +772,8 @@ function customerListModalHandler() {
 
     $(document).on("change", ".js-customer-list-select", function (e) {
         e.preventDefault();
-
-
         var targetUrl = $(this).data('search-url');
         targetUrl += $(this).val();
-
         var request = populateCustomerListModal(targetUrl,".asm-account-section",replaceCustomerListTable);
         request.done(function(){
             $.colorbox.resize();
@@ -787,12 +782,9 @@ function customerListModalHandler() {
 }
 
 function addCustomerListSelect(componentToUpdate,data) {
-	
 	var selector=$(data).find('.js-customer-list-select');
-	
     $(componentToUpdate).html(data);
-    searchUrl = $(data).find('.js-customer-list-select').data('search-url');
-
+    var searchUrl = $(data).find('.js-customer-list-select').data('search-url');
     if(selector[0].options.length >0)
 	{
 		searchUrl+= selector[0].options[0].value;
@@ -842,8 +834,7 @@ function populateCustomerListModal(targetUrl,componentToUpdate, callFunction) {
             document.location.reload();
         }
     });
-};
-
+}
 function getAifTablePageSize() {
     var pagesNumber = 5; // number
     if ($(window).width() < 668) {
@@ -883,71 +874,8 @@ function addRatesTableSorterParser() {
 
 function removeAsmAlert(delay) {
     setTimeout(function() {$(".ASM_alert").fadeOut("slow");}, delay);
-};
-
+}
 ACC.assistedservicestorefront = {
-    drawDoughnutChart: function(id, labels, values) {
-        console.log("Labels", labels);
-        var ctx = document.getElementById(id);
-        var chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: ["#61A9DC", "#5F7084", "#DB6580",  "#E89C17"],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                //circumference: 1.0 * Math.PI,
-                //startAngle: -1.0 * Math.PI,
-                //rotation: -1.0 * Math.PI,
-                animation : false,
-                responsive: true,
-                legend: {
-                    position: "right"
-                },
-                showLabel: true,
-                tooltips: {
-                    backgroundColor: "#7F90A4",
-                    yAlign: "bottom"
-                }
-            }
-        });
-    },
-
-    drawPolarAreaChart: function(id, colorLabels, colorCodes, values) {
-        var ctx = document.getElementById(id);
-
-        var chart = new Chart(ctx, {
-            type: 'polarArea',
-            data: {
-                labels: colorLabels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: colorCodes,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                animation: false,
-                responsive: true,
-                legend: {
-                    position: "right"
-                },
-                tooltips: {
-                    backgroundColor: "#7F90A4",
-                    yAlign: "bottom"
-                },
-                scale: {
-                    ticks: {
-                        display: false
-                    }
-                }
-            }
-        });
-    },
 
     buildArrayValues: function(variableArray, value) {
         variableArray.push(value);
@@ -968,9 +896,7 @@ $(function(){
                 $("#_asm").addClass("asm-collapsed");
             }
         }
-
         $("#_asm").show();
-
         //init drag of the button
         $(".js-ASM-collapseBtn").draggable({
             cancel : '.no-drag',
@@ -980,15 +906,15 @@ $(function(){
             distance: 10,
             opacity: 0.8,
             start: function() {
-                onDragging = true
+                onDragging = true;
                 $(".js-ASM-collapseBtn-wrapper").addClass("active");
 
             },
             stop: function() {
-                onDragging = false
+                onDragging = false;
                 $(".js-ASM-collapseBtn-wrapper").removeClass("active");
                 //save values to cookie
-                saveCollapseBtn()
+                saveCollapseBtn();
             }
         });
 
@@ -1000,20 +926,18 @@ $(function(){
                 }else{
                    $("#_asm").addClass("asm-collapsed");
                 } 
-
                 //save values to cookie
-                saveCollapseBtn()
+                saveCollapseBtn();
             }
-        })  
+        });
 
         function saveCollapseBtn(){
-            var pos = $(".js-ASM-collapseBtn").offset().left
+            var pos = $(".js-ASM-collapseBtn").offset().left;
             var parentWidth =  $(".js-ASM-collapseBtn-wrapper").width();
             var obj = {
                 position: pos/(parentWidth/100),
                 state: $("#_asm").hasClass("asm-collapsed")
             };
-
             document.cookie = "ASMcollapseBtn=" + encodeURIComponent(JSON.stringify(obj))+"; path=/";
         }
 
@@ -1022,13 +946,13 @@ $(function(){
             var ca = document.cookie.split(';');
             for (var i = 0; i < ca.length; i++) {
                 var c = ca[i];
-                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-                if (c.indexOf(nameEQ) === 0) return jQuery.parseJSON(decodeURIComponent(c.substring(nameEQ.length, c.length)));
+                while (c.charAt(0) === ' ') {c = c.substring(1, c.length);}
+                if (c.indexOf(nameEQ) === 0) {return jQuery.parseJSON(decodeURIComponent(c.substring(nameEQ.length, c.length)));}
             }
             return null;
         }
     }
-})
+});
 
 // dropdown
 $(function(){
@@ -1041,9 +965,8 @@ $(function(){
              $e.addClass("open");
         }
     });
-
     $(document).on("click",".js-customer-360-tab",function(e){
         e.preventDefault();
         $(this).parent().addClass("active").siblings().removeClass("active");
     });
-})
+});

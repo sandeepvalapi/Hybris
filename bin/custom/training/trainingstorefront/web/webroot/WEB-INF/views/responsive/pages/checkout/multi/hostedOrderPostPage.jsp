@@ -9,7 +9,7 @@
 
 <template:page pageTitle="${pageTitle}" hideHeaderLinks="true">
 
-	<input type="hidden" id="hopDebugMode" data-hop-debug-mode="${hopDebugMode}" />
+	<input type="hidden" id="hopDebugMode" data-hop-debug-mode="${fn:escapeXml(hopDebugMode)}" />
 
 	<div id="item_container_holder">
 
@@ -17,7 +17,7 @@
 			<div>
 				<h3>
 					<spring:theme code="checkout.multi.hostedOrderPostPage.header.wait"/>
-					<img src="${commonResourcePath}/images/spinner.gif" />
+					<img src="${fn:escapeXml(commonResourcePath)}/images/spinner.gif" />
 				</h3>
 				<hr/>
 			</div>
@@ -41,11 +41,11 @@
 						<c:forEach items="${hostedOrderPageData.parameters}" var="entry" varStatus="status">
 							<c:choose>
 								<c:when test="${hopDebugMode}">
-									<dt><label for="${entry.key}" class="required"><c:out value="${entry.key}"/></label></dt>
-									<dd><input type="text" id="${entry.key}" name="${entry.key}" value="${fn:escapeXml(entry.value)}" tabindex="${status.count + 1}"/></dd>
+									<dt><label for="${fn:escapeXml(entry.key)}" class="required"><c:out value="${entry.key}"/></label></dt>
+									<dd><input type="text" id="${fn:escapeXml(entry.key)}" name="${fn:escapeXml(entry.key)}" value="${fn:escapeXml(entry.value)}" tabindex="${status.count + 1}"/></dd>
 								</c:when>
 								<c:otherwise>
-									<input type="hidden" id="${entry.key}" name="${entry.key}" value="${fn:escapeXml(entry.value)}" />
+									<input type="hidden" id="${fn:escapeXml(entry.key)}" name="${fn:escapeXml(entry.key)}" value="${fn:escapeXml(entry.value)}" />
 								</c:otherwise>
 							</c:choose>
 						</c:forEach>
@@ -53,8 +53,8 @@
 				</div>
 				<c:if test="${hopDebugMode}">
 					<div class="rightcol">
-						<spring:theme code="checkout.multi.hostedOrderPostPage.button.submit" var="submitButtonLabel"/>
-						<input id="button.submit" class="submitButtonText" type="submit" title="${submitButtonLabel}" value="${submitButtonLabel}"/>
+						<spring:theme code="checkout.multi.hostedOrderPostPage.button.submit" var="submitButtonLabelHtml"/>
+						<input id="button.submit" class="submitButtonText" type="submit" title="${submitButtonLabelHtml}" value="${submitButtonLabelHtml}"/>
 					</div>
 				</c:if>
 			</form:form>

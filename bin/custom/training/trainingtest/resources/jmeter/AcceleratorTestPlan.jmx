@@ -353,7 +353,7 @@
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="CSRF Token Extractor" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">csrf-token</stringProp>
-              <stringProp name="RegexExtractor.regex">ACC.config.CSRFToken = &quot;(.+?)&quot;</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;CSRFToken&quot; value=&quot;(.+?)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default"></stringProp>
               <stringProp name="RegexExtractor.match_number">1</stringProp>
@@ -2229,6 +2229,13 @@
                     <stringProp name="Argument.name">CSRFToken</stringProp>
                     <stringProp name="Argument.desc">false</stringProp>
                   </elementProp>
+                  <elementProp name="termsCheck" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">true</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                    <stringProp name="Argument.name">termsCheck</stringProp>
+                  </elementProp>
                 </collectionProp>
               </elementProp>
               <stringProp name="HTTPSampler.domain"></stringProp>
@@ -2329,7 +2336,7 @@
                 <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="CSRF Token Extractor" enabled="true">
                   <stringProp name="RegexExtractor.useHeaders">false</stringProp>
                   <stringProp name="RegexExtractor.refname">csrf-token</stringProp>
-                  <stringProp name="RegexExtractor.regex">ACC.config.CSRFToken = &quot;(.+?)&quot;</stringProp>
+                  <stringProp name="RegexExtractor.regex">name=&quot;CSRFToken&quot; value=&quot;(.+?)&quot;</stringProp>
                   <stringProp name="RegexExtractor.template">$1$</stringProp>
                   <stringProp name="RegexExtractor.default"></stringProp>
                   <stringProp name="RegexExtractor.match_number">1</stringProp>
@@ -2597,21 +2604,21 @@
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="orderPage_receiptResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_receiptResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_declineResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_declineResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_cancelResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_cancelResponseURL</stringProp>
@@ -2863,21 +2870,21 @@
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="orderPage_receiptResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_receiptResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_declineResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_declineResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_cancelResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_cancelResponseURL</stringProp>
@@ -3256,6 +3263,13 @@
                     <stringProp name="Argument.name">CSRFToken</stringProp>
                     <stringProp name="Argument.desc">false</stringProp>
                   </elementProp>
+                  <elementProp name="termsCheck" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">true</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                    <stringProp name="Argument.name">termsCheck</stringProp>
+                  </elementProp>
                 </collectionProp>
               </elementProp>
               <stringProp name="HTTPSampler.domain"></stringProp>
@@ -3374,7 +3388,7 @@
                 <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="CSRF Token Extractor" enabled="true">
                   <stringProp name="RegexExtractor.useHeaders">false</stringProp>
                   <stringProp name="RegexExtractor.refname">csrf-token</stringProp>
-                  <stringProp name="RegexExtractor.regex">ACC.config.CSRFToken = &quot;(.+?)&quot;</stringProp>
+                  <stringProp name="RegexExtractor.regex">name=&quot;CSRFToken&quot; value=&quot;(.+?)&quot;</stringProp>
                   <stringProp name="RegexExtractor.template">$1$</stringProp>
                   <stringProp name="RegexExtractor.default"></stringProp>
                   <stringProp name="RegexExtractor.match_number">1</stringProp>
@@ -3505,21 +3519,21 @@
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="orderPage_receiptResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_receiptResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_declineResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_declineResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_cancelResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_cancelResponseURL</stringProp>
@@ -3780,21 +3794,21 @@
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="orderPage_receiptResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_receiptResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_declineResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_declineResponseURL</stringProp>
                   </elementProp>
                   <elementProp name="orderPage_cancelResponseURL" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">http://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
+                    <stringProp name="Argument.value">https://${server}:${securePort}${path}/checkout/multi/sop-response</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                     <stringProp name="Argument.name">orderPage_cancelResponseURL</stringProp>
@@ -4166,9 +4180,62 @@
         </hashTree>
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Find My Store" enabled="true"/>
         <hashTree>
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSVUsers" enabled="true">
+            <stringProp name="filename">${inputDataFolder}userInputData.csv</stringProp>
+            <stringProp name="fileEncoding"></stringProp>
+            <stringProp name="variableNames">titleCode,firstName,lastName,line1,townCity,state,postcode,countryIso,email,pwd,phone</stringProp>
+            <stringProp name="delimiter">,</stringProp>
+            <boolProp name="quotedData">false</boolProp>
+            <boolProp name="recycle">true</boolProp>
+            <boolProp name="stopThread">false</boolProp>
+            <stringProp name="shareMode">shareMode.all</stringProp>
+          </CSVDataSet>
+          <hashTree/>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Storefinder Page" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${path}/store-finder</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="thinkTime" enabled="true">
+              <stringProp name="ConstantTimer.delay">${__property(delayOffset)}</stringProp>
+              <stringProp name="RandomTimer.range">${__property(thinkTime)}</stringProp>
+            </UniformRandomTimer>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Storefinder Query" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="q" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">${postcode}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">q</stringProp>
+                </elementProp>
+                <elementProp name="page" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">0</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">page</stringProp>
+                </elementProp>
+              </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain"></stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>

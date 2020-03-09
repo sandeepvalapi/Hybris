@@ -1,14 +1,10 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.constants;
+
+import de.hybris.platform.commercefacades.constants.CommerceFacadesConstants;
+
 
 /**
  * Constants used in the Web tier
@@ -43,13 +39,33 @@ public final class WebConstants
 
 	public static final String ANONYMOUS_CONSENT_COOKIE = "anonymous-consents";
 
-	public static final String USER_CONSENTS = "user-consents";
+	/**
+	 * @deprecated Use {@link CommerceFacadesConstants#USER_CONSENTS} instead
+	 */
+	@Deprecated(since = "1905")
+	public static final String USER_CONSENTS = CommerceFacadesConstants.USER_CONSENTS;
 
-	public static final String CONSENT_GIVEN = "GIVEN";
+	/**
+	 * @deprecated Use {@link CommerceFacadesConstants#CONSENT_GIVEN} instead
+	 */
+	@Deprecated(since = "1905")
+	public static final String CONSENT_GIVEN = CommerceFacadesConstants.CONSENT_GIVEN;
 
-	public static final String CONSENT_WITHDRAWN = "WITHDRAWN";
+	/**
+	 * @deprecated Use {@link CommerceFacadesConstants#CONSENT_WITHDRAWN} instead
+	 */
+	@Deprecated(since = "1905")
+	public static final String CONSENT_WITHDRAWN = CommerceFacadesConstants.CONSENT_WITHDRAWN;
+
+	/**
+	 * @deprecated Use {@link CommerceFacadesConstants#CONSENT_TEMPLATES} instead
+	 */
+	@Deprecated(since = "1905")
+	public static final String CONSENT_TEMPLATES = CommerceFacadesConstants.CONSENT_TEMPLATES;
 
 	public static final String CLOSE_ACCOUNT = "closeAcc";
+
+	public static final String EMAIL_REGEX = "email.regex";
 
 	private WebConstants()
 	{

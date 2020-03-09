@@ -3,6 +3,7 @@
 <%@ taglib prefix="format" tagdir="/WEB-INF/tags/shared/format"%>
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"  %>
 
 <spring:htmlEscape defaultHtmlEscape="true" />
 
@@ -15,10 +16,10 @@
 <c:url value="/cart" var="cartUrl"/>
 
 <div class="nav-cart">
-	<a 	href="${cartUrl}"
+	<a 	href="${fn:escapeXml(cartUrl)}"
 		class="mini-cart-link js-mini-cart-link"
-		data-mini-cart-url="${rolloverPopupUrl}"
-		data-mini-cart-refresh-url="${refreshMiniCartUrl}"
+		data-mini-cart-url="${fn:escapeXml(rolloverPopupUrl)}"
+		data-mini-cart-refresh-url="${fn:escapeXml(refreshMiniCartUrl)}"
 		data-mini-cart-name="<spring:theme code="text.cart"/>"
 		data-mini-cart-empty-name="<spring:theme code="popup.cart.empty"/>"
 		data-mini-cart-items-text="<spring:theme code="basket.items"/>"
@@ -41,7 +42,7 @@
 					<format:price priceData="${totalNoDelivery}" />
 				</c:if>
 			</div>
-			<div class="mini-cart-count js-mini-cart-count"><span class="nav-items-total">${totalItems lt 100 ? totalItems : "99+"}<span class="items-desktop hidden-xs">&nbsp;<spring:theme code="basket.items"/></span></span></div>
+			<div class="mini-cart-count js-mini-cart-count"><span class="nav-items-total">${totalItems lt 100 ? fn:escapeXml(totalItems) : "99+"}<span class="items-desktop hidden-xs">&nbsp;<spring:theme code="basket.items"/></span></span></div>
 		</ycommerce:testId>
 
 	</a>

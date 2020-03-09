@@ -32,7 +32,7 @@
 						<div class="legend">
 							<spring:theme code="popup.cart.showing" arguments="${numberShowing},${numberItemsInCart}"/>
 							<c:if test="${numberItemsInCart > numberShowing}">
-								<a href="${cartUrl}"><spring:theme code="popup.cart.showall"/></a>
+								<a href="${fn:escapeXml(cartUrl)}"><spring:theme code="popup.cart.showall"/></a>
 							</c:if>
 						</div>
 
@@ -47,13 +47,13 @@
 									</div>
 									<div class="details">
 										<a class="name" href="${entryProductUrl}">${fn:escapeXml(entry.product.name)}</a>
-										<div class="qty"><spring:theme code="popup.cart.quantity"/>: ${entry.quantity}</div>
+										<div class="qty"><spring:theme code="popup.cart.quantity"/>: ${fn:escapeXml(entry.quantity)}</div>
 										<c:forEach items="${entry.product.baseOptions}" var="baseOptions">
 											<c:forEach items="${baseOptions.selected.variantOptionQualifiers}" var="baseOptionQualifier">
 												<c:if test="${baseOptionQualifier.qualifier eq 'style' and not empty baseOptionQualifier.image.url}">
 													<div class="itemColor">
 														<span class="label"><spring:theme code="product.variants.colour"/></span>
-														<img src="${baseOptionQualifier.image.url}" alt="${fn:escapeXml(baseOptionQualifier.value)}" title="${fn:escapeXml(baseOptionQualifier.value)}"/>
+														<img src="${fn:escapeXml(baseOptionQualifier.image.url)}" alt="${fn:escapeXml(baseOptionQualifier.value)}" title="${fn:escapeXml(baseOptionQualifier.value)}"/>
 													</div>
 												</c:if>
 												<c:if test="${baseOptionQualifier.qualifier eq 'size'}">
@@ -81,7 +81,7 @@
 							<div class="key"><spring:theme code="popup.cart.total"/></div>
 							<div class="value"><format:price priceData="${cartData.totalPrice}"/></div>
 						</div>
-						<a href="${cartUrl}" class="btn btn-primary btn-block mini-cart-checkout-button">
+						<a href="${fn:escapeXml(cartUrl)}" class="btn btn-primary btn-block mini-cart-checkout-button">
 							<spring:theme code="${miniCartProceed }" />
 						</a>
 						<a href="" class="btn btn-default btn-block js-mini-cart-close-button">
@@ -105,5 +105,3 @@
 		</div>
 	</ycommerce:testId>
 </div>
-
-

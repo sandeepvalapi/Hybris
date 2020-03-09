@@ -22,31 +22,31 @@
 			<c:choose>
 			  <c:when test="${cartData.quoteDiscounts.value > 0 && cartData.quoteDiscountsType == 'PERCENT'}">
 			     <fmt:formatNumber var="formattedQuoteDiscountsRate" value="${cartData.quoteDiscountsRate}" maxFractionDigits="2" minFractionDigits="2"/>
-			  	 <spring:theme var="quotePercentDiscountLink" code="basket.page.quote.discounts.link.percent.off" argumentSeparator=";" arguments="${formattedQuoteDiscountsRate}"/>
-			    <c:set var="quoteDiscountLink" value="${quotePercentDiscountLink}"/>
+			  	 <spring:theme var="quotePercentDiscountLinkHtml" code="basket.page.quote.discounts.link.percent.off" argumentSeparator=";" arguments="${formattedQuoteDiscountsRate}"/>
+			    <c:set var="quoteDiscountLinkHtml" value="${quotePercentDiscountLinkHtml}"/>
 			  </c:when>
 			  <c:when test="${cartData.quoteDiscounts.value > 0 && (cartData.quoteDiscountsType == 'ABSOLUTE' || cartData.quoteDiscountsType == 'TARGET')}">
-			  	 <spring:theme var="quoteAbsoluteDiscountLink" code="basket.page.quote.discounts.link.absolute.off" argumentSeparator=";" arguments="${cartData.quoteDiscounts.formattedValue}"/>
-			    <c:set var="quoteDiscountLink" value="${quoteAbsoluteDiscountLink}"/>
+			  	 <spring:theme var="quoteAbsoluteDiscountLinkHtml" code="basket.page.quote.discounts.link.absolute.off" argumentSeparator=";" arguments="${cartData.quoteDiscounts.formattedValue}"/>
+			    <c:set var="quoteDiscountLinkHtml" value="${quoteAbsoluteDiscountLinkHtml}"/>
 			  </c:when>
 			  <c:otherwise>
-			  	 <spring:theme var="quoteDiscountTextLink" code="basket.page.quote.discounts.link" />
-			    <c:set var="quoteDiscountLink" value="${quoteDiscountTextLink}"/>
+			  	 <spring:theme var="quoteDiscountTextLinkHtml" code="basket.page.quote.discounts.link" />
+			    <c:set var="quoteDiscountLinkHtml" value="${quoteDiscountTextLinkHtml}"/>
 			  </c:otherwise>
 			</c:choose>
 			<%--Get quote discount link. END --%>
-			<a href="#" class="js-quote-discount-link <c:if test="${cartData.quoteDiscounts.value > 0}">quote-discount-link</c:if>">${quoteDiscountLink}</a>
+			<a href="#" class="js-quote-discount-link <c:if test="${cartData.quoteDiscounts.value > 0}">quote-discount-link</c:if>">${quoteDiscountLinkHtml}</a>
 			<div style="display: none">
-				<spring:theme code="text.quote.discount.modal.title" arguments="${fn:escapeXml(quoteData.code)}" var="discountModalTitle" />
+				<spring:theme code="text.quote.discount.modal.title" arguments="${quoteData.code}" var="discountModalTitleHtml" />
 				<div id="js-quote-discount-modal"
-					data-quote-modal-title="${discountModalTitle}"
-					data-quote-modal-total="${cartData.subTotalWithoutQuoteDiscounts.value}"
-					data-quote-modal-quote-discount="${cartData.quoteDiscounts.value}"
+					data-quote-modal-title="${discountModalTitleHtml}"
+					data-quote-modal-total="${fn:escapeXml(cartData.subTotalWithoutQuoteDiscounts.value)}"
+					data-quote-modal-quote-discount="${fn:escapeXml(cartData.quoteDiscounts.value)}"
 					data-quote-modal-currency="${fn:escapeXml(currentCurrency.symbol)}">
 					<div class="quote-discount__modal">
 						<form:form id="quoteDiscountForm"
 							action="${quoteDiscountApplyAction}" method="post"
-							commandName="quoteDiscountForm">
+							modelAttribute="quoteDiscountForm">
 							<div class="row">
 								<div class="col-xs-6 col-sm-7">
 									<label class="quote-discount__modal--label text-left"> <spring:theme code="text.quote.discount.by.percentage" /></label>
@@ -106,7 +106,7 @@
 							</div>
 
 							<form:input type="hidden" name="quote-discount-rate" id="js-quote-discount-rate" value="${cartData.quoteDiscountsRate}" maxlength="10" path="discountRate" />
-							<form:input type="hidden" name="quote-discount-type" id="js-quote-discount-type" value="${fn:escapeXml(cartData.quoteDiscountsType)}" maxlength="10" path="discountType" />
+							<form:input type="hidden" name="quote-discount-type" id="js-quote-discount-type" value="${cartData.quoteDiscountsType}" maxlength="10" path="discountType" />
 
                             <button type="submit" class="btn btn-primary btn-block" id="submitButton">
                                 <spring:theme code="text.quote.done.button.label" />

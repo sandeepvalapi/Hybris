@@ -21,7 +21,7 @@
 	</p>
 </c:if>
 
-<form:form action="${action}" method="post" commandName="loginForm">
+<form:form action="${action}" method="post" modelAttribute="loginForm">
 	<c:if test="${not empty message}">
 		<span class="has-error"> <spring:theme code="${message}" />
 		</span>

@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.tags;
 
@@ -21,8 +14,8 @@ import org.owasp.html.Sanitizers;
 public class HTMLSanitizer
 {
 	protected static final PolicyFactory POLICY = new HtmlPolicyBuilder()
-			.allowElements("pre", "address", "em", "hr")
-			.allowAttributes("class").onElements("em")
+			.allowElements("pre", "address", "em", "hr", "a")
+			.allowAttributes("class").onElements("em", "a")
 			.toFactory()
 			.and(Sanitizers.BLOCKS)
 			.and(Sanitizers.FORMATTING)

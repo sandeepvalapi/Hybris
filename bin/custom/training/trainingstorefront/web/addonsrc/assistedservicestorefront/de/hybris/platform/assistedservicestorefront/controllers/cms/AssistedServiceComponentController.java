@@ -1,8 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
- * All rights reserved.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
  * ("Confidential Information"). You shall not disclose such Confidential
@@ -20,22 +19,16 @@ import de.hybris.platform.assistedservicestorefront.security.AssistedServiceAgen
 import de.hybris.platform.assistedservicestorefront.security.impl.AssistedServiceAgentLoginStrategy;
 import de.hybris.platform.assistedservicestorefront.security.impl.AssistedServiceAgentLogoutStrategy;
 import de.hybris.platform.assistedservicestorefront.security.impl.AssistedServiceAuthenticationToken;
+import de.hybris.platform.assistedservicefacades.user.data.AutoSuggestionCustomerData;
 import de.hybris.platform.assistedservicestorefront.util.SubscriptionFacadeReflectionWrapper;
-import de.hybris.platform.commercefacades.order.data.CartData;
-import de.hybris.platform.commercefacades.user.data.CustomerData;
 import de.hybris.platform.core.model.order.CartModel;
-import de.hybris.platform.core.model.order.payment.CreditCardPaymentInfoModel;
-import de.hybris.platform.core.model.user.CustomerModel;
 import de.hybris.platform.core.model.user.UserGroupModel;
 import de.hybris.platform.core.model.user.UserModel;
 import de.hybris.platform.jalo.JaloSession;
 import de.hybris.platform.order.CartService;
 import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.servicelayer.user.UserService;
-import de.hybris.platform.util.Config;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +41,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -74,7 +68,9 @@ public class AssistedServiceComponentController extends AbstractController
 	private static final String ASM_REDIRECT_URL_ATTRIBUTE = "redirect_url";
 	private static final String ASM_ALERT_CLASS = "asm_alert_class";
 	private static final String ENABLE_360_VIEW = "enable360View";
-	
+	private static final String CUSTOMER_ID = "customerId";
+	private static final String CUSTOMER_NAME = "customerName";
+
 	private static final Logger LOG = Logger.getLogger(AssistedServiceComponentController.class);
 
 	@Resource(name = "assistedServiceFacade")
@@ -155,8 +151,8 @@ public class AssistedServiceComponentController extends AbstractController
 	}
 
 	@RequestMapping(value = "/personify-customer", method = RequestMethod.POST)
-	public String emulateCustomer(final Model model, @RequestParam("customerId") final String customerId,
-			@RequestParam("customerName") final String customerName, @RequestParam("cartId") final String cartId)
+	public String emulateCustomer(final Model model, @RequestParam(CUSTOMER_ID) final String customerId,
+			@RequestParam(CUSTOMER_NAME) final String customerName, @RequestParam("cartId") final String cartId)
 	{
 		try
 		{
@@ -168,9 +164,9 @@ public class AssistedServiceComponentController extends AbstractController
 		{
 			model.addAttribute(ASM_MESSAGE_ATTRIBUTE, e.getMessageCode());
 			model.addAttribute(ASM_ALERT_CLASS, e.getAlertClass());
-			model.addAttribute("customerId", this.encodeValue(customerId));
+			model.addAttribute(CUSTOMER_ID, this.encodeValue(customerId));
 			model.addAttribute("cartId", this.encodeValue(cartId));
-			model.addAttribute("customerName", this.encodeValue(customerName));
+			model.addAttribute(CUSTOMER_NAME, this.encodeValue(customerName));
 			LOG.debug(e.getMessage(), e);
 		}
 		model.addAllAttributes(assistedServiceFacade.getAssistedServiceSessionAttributes());
@@ -179,7 +175,7 @@ public class AssistedServiceComponentController extends AbstractController
 
 	@RequestMapping(value = "/emulate", method = RequestMethod.GET)
 	public String emulateCustomerByLink(final RedirectAttributes redirectAttrs,
-			@RequestParam(value = "customerId", required = false) final String customerId,
+			@RequestParam(value = CUSTOMER_ID, required = false) final String customerId,
 			@RequestParam(value = "cartId", required = false) final String cartId,
 			@RequestParam(value = "orderId", required = false) final String orderId,
 			@RequestParam(value = "fwd", required = false) final String fwd,
@@ -203,7 +199,7 @@ public class AssistedServiceComponentController extends AbstractController
 			}
 
 			//only set the flash attribute if this value is true and will only happen in case 360 view is initiated from customer list
-			if (false != enable360View)
+			if (enable360View)
 			{
 				redirectAttrs.addFlashAttribute(ENABLE_360_VIEW, Boolean.valueOf(enable360View));
 			}
@@ -220,8 +216,8 @@ public class AssistedServiceComponentController extends AbstractController
 			LOG.debug(e.getMessage(), e);
 			redirectAttrs.addFlashAttribute(ASM_MESSAGE_ATTRIBUTE, e.getMessageCode());
 			redirectAttrs.addFlashAttribute(ASM_ALERT_CLASS, e.getAlertClass());
-			redirectAttrs.addFlashAttribute("customerId", this.encodeValue(customerId));
-			redirectAttrs.addFlashAttribute("customerName", this.encodeValue(customerId));
+			redirectAttrs.addFlashAttribute(CUSTOMER_ID, this.encodeValue(customerId));
+			redirectAttrs.addFlashAttribute(CUSTOMER_NAME, this.encodeValue(customerId));
 			redirectAttrs.addFlashAttribute("cartId", this.encodeValue(cartId));
 			assistedServiceFacade.getAsmSession().setForwardUrl(fwd);
 		}
@@ -229,8 +225,8 @@ public class AssistedServiceComponentController extends AbstractController
 	}
 
 	@RequestMapping(value = "/create-account", method = RequestMethod.POST)
-	public String createCustomer(final Model model, @RequestParam("customerId") final String customerId,
-			@RequestParam("customerName") final String customerName)
+	public String createCustomer(final Model model, @RequestParam(CUSTOMER_ID) final String customerId,
+			@RequestParam(CUSTOMER_NAME) final String customerName)
 	{
 		String redirectTo = ASSISTED_SERVICE_COMPONENT;
 		try
@@ -250,15 +246,7 @@ public class AssistedServiceComponentController extends AbstractController
 			{
 				redirectTo = emulateCustomer(model, customerIdLowerCased, null, null);
 			}
-			try
-			{
-				subscriptionFacadeWrapper.updateProfile(new HashMap<String, String>());
-			}
-			catch (final Exception ex)
-			{
-				LOG.error("Subscription profile updating failed", ex);
-				throw new AssistedServiceException("Subscription profile updating failed", ex);
-			}
+			subscriptionFacadeWrapper.updateProfile(new HashMap<String, String>());
 		}
 		catch (final AssistedServiceException e)
 		{
@@ -271,8 +259,8 @@ public class AssistedServiceComponentController extends AbstractController
 			{
 				model.addAttribute(ASM_MESSAGE_ATTRIBUTE, "asm.createCustomer.error");
 			}
-			model.addAttribute("customerId", this.encodeValue(customerId));
-			model.addAttribute("customerName", this.encodeValue(customerName + ", " + customerId));
+			model.addAttribute(CUSTOMER_ID, this.encodeValue(customerId));
+			model.addAttribute(CUSTOMER_NAME, this.encodeValue(customerName + ", " + customerId));
 			LOG.debug(e.getMessage(), e);
 		}
 		model.addAllAttributes(assistedServiceFacade.getAssistedServiceSessionAttributes());
@@ -297,75 +285,15 @@ public class AssistedServiceComponentController extends AbstractController
 		return;
 	}
 
-	@RequestMapping(value = "/autocomplete", method = RequestMethod.GET)
+	@RequestMapping(value = "/autocomplete", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String autocomplete(@RequestParam("customerId") final String customerId,
-			@RequestParam("callback") final String callback)
+	public List<AutoSuggestionCustomerData> autocomplete(@RequestParam(CUSTOMER_ID) final String customerId)
 	{
-		final StringBuilder autocompleteResult = new StringBuilder();
-		try
-		{
-			final List<CustomerData> customers = assistedServiceFacade.getSuggestedCustomerList(customerId);
-
-			// because of jsonp callback parameter - I have to construct JSON manually (
-			autocompleteResult.append(this.encodeValue(callback)).append("([");
-			if (CollectionUtils.isNotEmpty(customers))
-			{
-				for (final CustomerData customer : customers)
-				{
-					final CustomerModel customerModel = (CustomerModel) userService.getUserForUID(customer.getUid()); // TODO REFACTOR THAT
-					try
-					{
-						autocompleteResult.append(getCustomerJSON(customerModel));
-					}
-					catch (final UnsupportedEncodingException e)
-					{
-						LOG.error("Error occured during encoding customer data: " + customer.getUid(), e);
-					}
-					final Collection<CartData> carts = assistedServiceFacade.getCartListForCustomer(customerModel);
-					if (CollectionUtils.isNotEmpty(carts))
-					{
-						autocompleteResult.append(", carts:[");
-						final Collection<CartData> cartsForCustomer = carts;
-						for (final CartData cart : cartsForCustomer)
-						{
-							autocompleteResult.append("\"").append(cart.getCode()).append("\",");
-						}
-						autocompleteResult.deleteCharAt(autocompleteResult.length() - 1);
-						autocompleteResult.append("]");
-					}
-					autocompleteResult.append("},");
-				}
-				autocompleteResult.deleteCharAt(autocompleteResult.length() - 1);
-			}
-			else
-			{
-				autocompleteResult.append("{label:\"No results found\", value: \"\" }");
-			}
-			autocompleteResult.append("])");
-		}
-		catch (final AssistedServiceException e)
-		{
-			// just do nothing and return empty string
-			LOG.debug(e.getMessage(), e);
-		}
-		return autocompleteResult.toString();
-	}
-
-	protected String getCustomerJSON(final CustomerModel customer) throws UnsupportedEncodingException
-	{
-		final String cardNumber = customer.getDefaultPaymentInfo() instanceof CreditCardPaymentInfoModel
-				? ((CreditCardPaymentInfoModel) customer.getDefaultPaymentInfo()).getNumber() : null;
-		final String last4Digits = cardNumber == null ? "----"
-				: cardNumber.subSequence(cardNumber.length() >= 4 ? cardNumber.length() - 4 : 0, cardNumber.length()).toString();
-		final String formattedCreationDate = customer.getCreationtime() != null
-				? new SimpleDateFormat("dd/MM/YYYY").format(customer.getCreationtime()) : "--/--/----";
-		return String.format("{email:'%s',value:'%s',date:'%s',card:'%s'", XSSEncoder.encodeJavaScript(customer.getUid()),
-				XSSEncoder.encodeJavaScript(customer.getName()), formattedCreationDate, last4Digits);
+		return assistedServiceFacade.getSuggestedCustomerData(customerId);
 	}
 
 	@RequestMapping(value = "/bind-cart", method = RequestMethod.POST)
-	public String bindCart(@RequestParam(value = "customerId", required = false) final String customerId,
+	public String bindCart(@RequestParam(value = CUSTOMER_ID, required = false) final String customerId,
 			@RequestParam(value = "cartId", required = false) final String cartId, final Model model)
 	{
 		try
@@ -377,7 +305,7 @@ public class AssistedServiceComponentController extends AbstractController
 		catch (final AssistedServiceException e)
 		{
 			model.addAttribute(ASM_MESSAGE_ATTRIBUTE, e.getMessage());
-			model.addAttribute("customerId", this.encodeValue(customerId));
+			model.addAttribute(CUSTOMER_ID, this.encodeValue(customerId));
 			LOG.debug(e.getMessage(), e);
 		}
 		model.addAllAttributes(assistedServiceFacade.getAssistedServiceSessionAttributes());

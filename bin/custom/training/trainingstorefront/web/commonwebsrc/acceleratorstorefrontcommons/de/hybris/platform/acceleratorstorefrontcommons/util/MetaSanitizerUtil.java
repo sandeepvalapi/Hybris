@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package de.hybris.platform.acceleratorstorefrontcommons.util;
 
@@ -32,10 +25,10 @@ public final class MetaSanitizerUtil
 	}
 
 	/**
-	 * Takes a List of keyword Strings and returns a comma separated list of keywords as String.
+	 * Takes a Collection of keyword Strings and returns a comma separated list of keywords as String.
 	 *
 	 * @param keywords
-	 *           List of KeywordModel objects
+	 *           Collection of keyword Strings
 	 * @return String of comma separated keywords
 	 */
 	public static String sanitizeKeywords(final Collection<String> keywords)

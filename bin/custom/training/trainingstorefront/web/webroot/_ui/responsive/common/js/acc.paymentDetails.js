@@ -10,7 +10,7 @@ ACC.paymentDetails = {
 			var paymentId = $(this).data("paymentId");
 			var popupTitle = $(this).data("popupTitle");
 
-			ACC.colorbox.open(popupTitle,{
+			ACC.colorbox.open(ACC.common.encodeHtml(popupTitle),{
 				inline: true,
 				href: "#popup_confirm_payment_removal_" + paymentId,
 				onComplete: function ()

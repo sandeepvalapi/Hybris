@@ -22,7 +22,7 @@
 </c:if>
 
 <c:if test="${empty addressFormEnabled or addressFormEnabled}">
-	<form:form method="post" commandName="addressForm">
+	<form:form method="post" modelAttribute="addressForm">
 		<form:hidden path="addressId" class="add_edit_delivery_address_id"
 			status="${not empty suggestedAddresses ? 'hasSuggestedAddresses' : ''}" />
 		<input type="hidden" name="bill_state" id="address.billstate" />
@@ -88,7 +88,7 @@
 							<div class="col-sm-6 col-sm-pull-6 accountButtons">
 								<ycommerce:testId code="editAddress_cancelAddress_button">
 									<c:url value="${cancelUrl}" var="cancel"/>
-									<a class="btn btn-block btn-default" href="${cancel}">
+									<a class="btn btn-block btn-default" href="${fn:escapeXml(cancel)}">
 										<spring:theme code="text.button.cancel" />
 									</a>
 								</ycommerce:testId>

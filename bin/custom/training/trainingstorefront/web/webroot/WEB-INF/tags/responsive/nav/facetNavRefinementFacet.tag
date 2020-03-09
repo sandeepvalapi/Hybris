@@ -25,6 +25,7 @@
 						<li>
 							<c:if test="${facetData.multiSelect}">
 								<form action="#" method="get">
+								<!-- facetValue.query.query.value and searchPageData.freeTextSearch are html output encoded in the backend -->
 									<input type="hidden" name="q" value="${facetValue.query.query.value}"/>
 									<input type="hidden" name="text" value="${searchPageData.freeTextSearch}"/>
 									<label>
@@ -44,7 +45,8 @@
 							<c:if test="${not facetData.multiSelect}">
 								<c:url value="${facetValue.query.url}" var="facetValueQueryUrl"/>
 								<span class="facet__text">
-									<a href="${facetValueQueryUrl}&amp;text=${fn:escapeXml(searchPageData.freeTextSearch)}">${fn:escapeXml(facetValue.name)}</a>&nbsp;
+								<!-- searchPageData.freeTextSearch is html output encoded in the backend -->
+									<a href="${fn:escapeXml(facetValueQueryUrl)}&amp;text=${searchPageData.freeTextSearch}">${fn:escapeXml(facetValue.name)}</a>&nbsp;
 									<ycommerce:testId code="facetNav_count">
 										<span class="facet__value__count"><spring:theme code="search.nav.facetValueCount" arguments="${facetValue.count}"/></span>
 									</ycommerce:testId>
@@ -60,6 +62,7 @@
 						<c:if test="${facetData.multiSelect}">
 							<ycommerce:testId code="facetNav_selectForm">
 							<form action="#" method="get">
+							<!-- facetValue.query.query.value and searchPageData.freeTextSearch are html output encoded in the backend -->
 								<input type="hidden" name="q" value="${facetValue.query.query.value}"/>
 								<input type="hidden" name="text" value="${searchPageData.freeTextSearch}"/>
 								<label>
@@ -80,7 +83,7 @@
 						<c:if test="${not facetData.multiSelect}">
 							<c:url value="${facetValue.query.url}" var="facetValueQueryUrl"/>
 							<span class="facet__text">
-								<a href="${facetValueQueryUrl}">${fn:escapeXml(facetValue.name)}</a>
+								<a href="${fn:escapeXml(facetValueQueryUrl)}">${fn:escapeXml(facetValue.name)}</a>
 								<ycommerce:testId code="facetNav_count">
 									<span class="facet__value__count"><spring:theme code="search.nav.facetValueCount" arguments="${facetValue.count}"/></span>
 								</ycommerce:testId>

@@ -1,8 +1,7 @@
 /*
  * [y] hybris Platform
  *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.
- * All rights reserved.
+ * Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
  *
  * This software is the confidential and proprietary information of SAP
  * ("Confidential Information"). You shall not disclose such Confidential
@@ -16,7 +15,7 @@ package de.hybris.platform.assistedservicestorefront.controllers;
 import de.hybris.platform.assistedservicestorefront.model.AsmDevicesUsedComponentModel;
 import de.hybris.platform.assistedservicestorefront.model.AsmFavoriteColorsComponentModel;
 
-
+@SuppressWarnings("squid:S1214")
 public interface AssistedservicestorefrontControllerConstants
 {
 	String ADDON_PREFIX = "addon:/assistedservicestorefront/";
@@ -31,8 +30,8 @@ public interface AssistedservicestorefrontControllerConstants
 
 			interface CustomerListComponent
 			{
-				String ASMCustomerListPopup = ADDON_PREFIX + "fragments/asmCustomerListComponent";
-				String ASMCustomerListTable = ADDON_PREFIX + "fragments/asmCustomerListTable";
+				String ASM_CUSTOMER_LIST_POPUP = ADDON_PREFIX + "fragments/asmCustomerListComponent";
+				String ASM_CUSTOMER_LIST_TABLE = ADDON_PREFIX + "fragments/asmCustomerListTable";
 			}
 
 		}

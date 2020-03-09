@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.fulfilmentprocess.test;
 
@@ -29,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
@@ -43,7 +37,7 @@ import junit.framework.Assert;
 public class CheckTransactionReviewStatusActionTest
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CheckTransactionReviewStatusActionTest.class);
-	protected static final String OK = "OK"; //NOPMD
+	protected static final String OK = "OK";
 	protected static final String NOK = "NOK";
 	protected static final String WAIT = "WAIT";
 
@@ -117,6 +111,7 @@ public class CheckTransactionReviewStatusActionTest
 	}
 
 
+	@Ignore
 	@Test
 	public void testReviewAuthorization()
 	{
@@ -185,6 +180,7 @@ public class CheckTransactionReviewStatusActionTest
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testMultipleReviewAuthorization()
 	{

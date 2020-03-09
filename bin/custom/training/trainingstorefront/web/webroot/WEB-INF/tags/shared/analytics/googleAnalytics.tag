@@ -4,7 +4,7 @@
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 
 <c:if test="${not empty googleAnalyticsTrackingId}">
-<script type="text/javascript">
+<script>
 /* Google Analytics */
 
 var googleAnalyticsTrackingId = '${ycommerce:encodeJavaScript(googleAnalyticsTrackingId)}';
@@ -26,7 +26,7 @@ _gaq.push(['_setAccount', googleAnalyticsTrackingId]);
 				<c:if test="${not empty searchPageData.breadcrumbs}">
 					<c:forEach items="${searchPageData.breadcrumbs}" var="breadcrumb">
 						<c:set var="pageName" value="${pageType == 'CATEGORY' ? 'category' : 'facet'}"/>
-						_gaq.push(['_trackEvent', '${pageName}', '${ycommerce:encodeJavaScript(breadcrumb.facetName)}', '${ycommerce:encodeJavaScript(breadcrumb.facetValueName)}']);
+						_gaq.push(['_trackEvent', '${ycommerce:encodeJavaScript(pageName)}', '${ycommerce:encodeJavaScript(breadcrumb.facetName)}', '${ycommerce:encodeJavaScript(breadcrumb.facetValueName)}']);
 					</c:forEach>
 				</c:if>
 			</c:when>
@@ -45,9 +45,9 @@ _gaq.push(['_setAccount', googleAnalyticsTrackingId]);
 	 		 '_addTrans',
 	 		 '${orderCode}',
 	 		 '${ycommerce:encodeJavaScript(siteName)}',
-	 		 '${orderData.totalPrice.value}',
-	 		 '${orderData.totalTax.value}',
-	 		 '${orderData.deliveryCost.value}',
+	 		 '${ycommerce:encodeJavaScript(orderData.totalPrice.value)}',
+	 		 '${ycommerce:encodeJavaScript(orderData.totalTax.value)}',
+	 		 '${ycommerce:encodeJavaScript(orderData.deliveryCost.value)}',
 	 		 '${ycommerce:encodeJavaScript(orderData.deliveryAddress.town)}',
 	 		 '${ycommerce:encodeJavaScript(orderData.deliveryAddress.postalCode)}',
 	 		 '${ycommerce:encodeJavaScript(orderData.deliveryAddress.country.name)}'
@@ -66,8 +66,8 @@ _gaq.push(['_setAccount', googleAnalyticsTrackingId]);
 		 				'',
 		 			</c:otherwise>
 	 			</c:choose>
-	 			'${entry.product.price.value}',
-	 			'${entry.quantity}'
+	 			'${ycommerce:encodeJavaScript(entry.product.price.value)}',
+	 			'${ycommerce:encodeJavaScript(entry.quantity)}'
 	 		]);
 	 	</c:forEach>
 	 	_gaq.push(['_trackTrans']);

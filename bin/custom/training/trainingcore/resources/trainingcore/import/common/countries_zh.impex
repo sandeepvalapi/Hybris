@@ -1,12 +1,5 @@
 # -----------------------------------------------------------------------
-# [y] hybris Platform
-#
-# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-#
-# This software is the confidential and proprietary information of SAP
-# ("Confidential Information"). You shall not disclose such Confidential
-# Information and shall use it only in accordance with the terms of the
-# license agreement you entered into with SAP.
+# Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 # -----------------------------------------------------------------------
 #
 # Import Countries
@@ -165,7 +158,7 @@ UPDATE Country;isocode[unique=true];name[lang=$lang]
  ;ML;"马里"
  ;MM;"缅甸"
  ;MN;"蒙古"
- ;MO;"澳门"
+ ;MO;"中国澳门"
  ;MP;"北马里亚纳群岛"
  ;MQ;"马提尼克"
  ;MR;"毛里塔尼亚"

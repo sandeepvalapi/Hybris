@@ -1,12 +1,5 @@
 /*
- * [y] hybris Platform
- *
- * Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
- *
- * This software is the confidential and proprietary information of SAP
- * ("Confidential Information"). You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the
- * license agreement you entered into with SAP.
+ * Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
  */
 package com.hybris.training.storefront.controllers.pages;
 
@@ -21,6 +14,7 @@ import de.hybris.platform.acceleratorstorefrontcommons.forms.QuoteForm;
 import de.hybris.platform.acceleratorstorefrontcommons.forms.VoucherForm;
 import de.hybris.platform.acceleratorstorefrontcommons.tags.Functions;
 import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
+import de.hybris.platform.cms2.model.pages.ContentPageModel;
 import de.hybris.platform.commercefacades.comment.data.CommentData;
 import de.hybris.platform.commercefacades.order.QuoteFacade;
 import de.hybris.platform.commercefacades.order.SaveCartFacade;
@@ -129,7 +123,7 @@ public class QuoteController extends AbstractCartPageController
 	@Resource(name = "saveCartFacade")
 	private SaveCartFacade saveCartFacade;
 
-	@Resource
+	@Resource(name = "validator")
 	private SmartValidator smartValidator;
 
 	@Resource(name = "priceDataFactory")
@@ -291,8 +285,9 @@ public class QuoteController extends AbstractCartPageController
 		prepareQuotePageElements(model, cartData, true);
 
 		createProductEntryList(model, cartData);
-		storeCmsPageInModel(model, getContentPageForLabelOrId(QUOTE_EDIT_CMS_PAGE));
-		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(QUOTE_EDIT_CMS_PAGE));
+		final ContentPageModel quoteEditPage = getContentPageForLabelOrId(QUOTE_EDIT_CMS_PAGE);
+		storeCmsPageInModel(model, quoteEditPage);
+		setUpMetaDataForContentPage(model, quoteEditPage);
 
 		sortComments(cartData);
 		continueUrl(model);
@@ -865,14 +860,20 @@ public class QuoteController extends AbstractCartPageController
 		final String statusMessageKey = String.format("text.account.quote.status.display.%s", exception.getQuoteState());
 		final String actionMessageKey = String.format("text.account.quote.action.display.%s", exception.getQuoteAction());
 
-		GlobalMessages.addFlashMessage(
-				currentFlashScope,
-				GlobalMessages.ERROR_MESSAGES_HOLDER,
-				"text.quote.illegal.state.error",
-				new Object[]
-				{ getMessageSource().getMessage(actionMessageKey, null, getI18nService().getCurrentLocale()),
-						exception.getQuoteCode(),
-						getMessageSource().getMessage(statusMessageKey, null, getI18nService().getCurrentLocale()) });
+		final String actionMessage = getMessageSource().getMessage(actionMessageKey, null, getI18nService().getCurrentLocale());
+		final String statusMessage = getMessageSource().getMessage(statusMessageKey, null, getI18nService().getCurrentLocale());
+		if (exception.hasLocalizedMessage())
+		{
+			GlobalMessages.addFlashMessage(currentFlashScope, GlobalMessages.ERROR_MESSAGES_HOLDER,
+					"text.quote.illegal.state.error.reason", new Object[]
+					{ actionMessage, exception.getQuoteCode(), statusMessage, exception.getMessage() });
+		}
+		else
+		{
+			GlobalMessages.addFlashMessage(currentFlashScope, GlobalMessages.ERROR_MESSAGES_HOLDER, "text.quote.illegal.state.error",
+					new Object[]
+					{ actionMessage, exception.getQuoteCode(), statusMessage });
+		}
 
 		return REDIRECT_QUOTE_LIST_URL;
 	}

@@ -14,15 +14,23 @@
 
 <div class="ui-front">
 	<form name="search_form_${fn:escapeXml(component.uid)}" method="get"
-		action="${searchUrl}">
+		action="${fn:escapeXml(searchUrl)}">
 		<div class="input-group">
-			<spring:theme code="search.placeholder" var="searchPlaceholder" />
+			<spring:theme code="search.placeholder" var="searchPlaceholderHtml" />
 
 			<ycommerce:testId code="header_search_input">
+				<c:set var="optionsJson">
+					{
+						"autocompleteUrl" : "${ycommerce:encodeJSON(autocompleteUrl)}",
+						"minCharactersBeforeRequest" : "${ycommerce:encodeJSON(component.minCharactersBeforeRequest)}",
+						"waitTimeBeforeRequest" : "${ycommerce:encodeJSON(component.waitTimeBeforeRequest)}",
+						"displayProductImages" : "${ycommerce:encodeJSON(component.displayProductImages)}"
+					}
+				</c:set>
 				<input type="text" id="js-site-search-input"
 					class="form-control js-site-search-input" name="text" value=""
-                    maxlength="100" placeholder="${searchPlaceholder}"
-					data-options='{"autocompleteUrl" : "${autocompleteUrl}","minCharactersBeforeRequest" : "${component.minCharactersBeforeRequest}","waitTimeBeforeRequest" : "${component.waitTimeBeforeRequest}","displayProductImages" : ${component.displayProductImages}}'>
+                    maxlength="100" placeholder="${searchPlaceholderHtml}"
+					data-options="${fn:escapeXml(optionsJson)}">
 			</ycommerce:testId>
 
 			<span class="input-group-btn"> <ycommerce:testId code="header_search_button">

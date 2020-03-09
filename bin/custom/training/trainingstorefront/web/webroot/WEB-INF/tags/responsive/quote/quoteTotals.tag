@@ -5,21 +5,6 @@
 <%@ taglib prefix="ycommerce" uri="http://hybris.com/tld/ycommercetags" %>
 <%@ taglib prefix="format" tagdir="/WEB-INF/tags/shared/format" %>
 
-<%--
-    ~ /*
-    ~  * [y] hybris Platform
-    ~  *
-    ~  * Copyright (c) 2000-2017 SAP SE or an SAP affiliate company.
-    ~  * All rights reserved.
-    ~  *
-    ~  * This software is the confidential and proprietary information of SAP
-    ~  * ("Confidential Information"). You shall not disclose such Confidential
-    ~  * Information and shall use it only in accordance with the terms of the
-    ~  * license agreement you entered into with SAP.
-    ~  *
-    ~  */
---%>
-
 <spring:htmlEscape defaultHtmlEscape="true" />
 
 <div class="orderTotal">

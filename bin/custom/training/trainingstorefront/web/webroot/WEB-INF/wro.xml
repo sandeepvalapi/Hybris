@@ -1,12 +1,5 @@
 <!--
- [y] hybris Platform
-
- Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
-
- This software is the confidential and proprietary information of SAP
- ("Confidential Information"). You shall not disclose such Confidential
- Information and shall use it only in accordance with the terms of the
- license agreement you entered into with SAP.
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
 -->
 <groups xmlns="http://www.isdc.ro/wro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
@@ -29,6 +22,7 @@
 		<!-- plugins -->
 		<js minimize="false">/_ui/responsive/common/js/enquire.min.js</js>
 		<js>/_ui/responsive/common/js/Imager.min.js</js>
+		<js minimize="false">/_ui/responsive/common/js/purify.min.js</js>
 		<js>/_ui/responsive/common/js/jquery.blockUI-2.66.js</js>
 		<js minimize="false">/_ui/responsive/common/js/jquery.colorbox-min.js</js>
 		<js minimize="false">/_ui/responsive/common/js/jquery.form.min.js</js>
@@ -49,7 +43,6 @@
 		<js>/_ui/responsive/common/js/acc.cart.js</js>
 		<js>/_ui/responsive/common/js/acc.cartitem.js</js>
 		<js>/_ui/responsive/common/js/acc.checkout.js</js>
-		<js>/_ui/responsive/common/js/acc.checkoutaddress.js</js>
 		<js>/_ui/responsive/common/js/acc.checkoutsteps.js</js>
 		<js>/_ui/responsive/common/js/acc.cms.js</js>
 		<js>/_ui/responsive/common/js/acc.colorbox.js</js>
