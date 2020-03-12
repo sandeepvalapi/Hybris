@@ -8,7 +8,7 @@ pipeline {
             steps { 
                 sh 'echo $JAVA_HOME' 
                 sh 'cd /home/SW_HYBRIS/COMM_1905/hybris/bin/platform'
-                sh '. ./setantenv.sh'
+                sh '../setantenv.sh'
                 sh 'cd /var/jenkins_home/workspace/Training/bin/custom'
                 sh 'zip -r training.zip .'
             }
