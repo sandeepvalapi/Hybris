@@ -64,7 +64,7 @@
     	
     <property location="${ext.trainingstorefront.path}/web/webroot/WEB-INF/lib/lessc-rhino-1.7.3.js" name="tool.lessc"/>
     	
-<!--    <property location="${ext.trainingstorefront.path}/web/webroot/WEB-INF/lib/rhino-1.7.7.jar" name="tool.rhino"/>-->
+    <property location="${ext.trainingstorefront.path}/web/webroot/WEB-INF/lib/rhino-1.7.7.jar" name="tool.rhino"/>
     	
     <property location="${ext.trainingstorefront.path}" name="ext.trainingstorefront.mapperToPath"/>
     	
@@ -380,7 +380,7 @@
                 				
                 <arg value="-jar"/>
                 				
-<!--                <arg path="${tool.rhino}"/>-->
+                <arg path="${tool.rhino}"/>
                 				
                 <arg value="-f"/>
                 				
