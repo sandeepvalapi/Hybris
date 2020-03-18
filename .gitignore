@@ -24,6 +24,7 @@ temp/
 bin/ext*
 data/
 roles/
+**/jalo/**
 
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
@@ -31,8 +32,9 @@ hs_err_pid*
 .DS_Store
 .idea
 .metadata
-gensrc
+gensrc/
 **/jalo/**
+/gensrc/
 bin/custom/**/idea-module-files
 bin/platform
 .DS_Store
