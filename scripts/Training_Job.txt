@@ -1,0 +1,116 @@
+Training Job
+
+
+
+
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This job helps in building the package</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.5">
+      <projectUrl>https://github.com/sandeepvalapi/Hybris/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.2.2">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/sandeepvalapi/Hybris.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo &quot;**********setting ant environment*********&quot;
+
+echo $JAVA_HOME
+cd /usr/local/sandeep/hybris/bin/platform
+
+
+echo &quot;======ANT ======&quot;
+#!/bin/sh
+OWN_NAME=setantenv.sh
+BASENAME=&quot;$(basename -- &quot;$0&quot;)&quot;
+
+SOURCED=0
+if [ -n &quot;$ZSH_EVAL_CONTEXT&quot; ]; then
+    [[ $ZSH_EVAL_CONTEXT =~ :file$ ]] &amp;&amp; SOURCED=1
+elif [ -n &quot;$BASH_VERSION&quot; ]; then
+    [[ $0 != $BASH_SOURCE ]] &amp;&amp; SOURCED=1
+elif [ &quot;$OWN_NAME&quot; != &quot;$BASENAME&quot; ]; then
+    SOURCED=1
+fi
+
+if [ &quot;$SOURCED&quot; -ne 1 ]; then
+    echo &quot;* Please call as &apos;. ./$OWN_NAME&apos;, not &apos;./$OWN_NAME&apos; !!!---&quot;
+    echo &quot;* Also please DO NOT set back the executable attribute&quot;
+    echo &quot;* On this file. It was cleared on purpose.&quot;
+
+    chmod -x ./$OWN_NAME
+    exit
+fi
+
+export PLATFORM_HOME
+PLATFORM_HOME=$(pwd)
+export ANT_OPTS=&quot;-Xmx2g -Dfile.encoding=UTF-8 -Djdk.util.jar.enableMultiRelease=force&quot;
+export ANT_HOME=&quot;$PLATFORM_HOME/apache-ant&quot;
+chmod +x &quot;$ANT_HOME/bin/ant&quot;
+chmod +x &quot;$PLATFORM_HOME/license.sh&quot;
+case &quot;$PATH&quot; in
+    *$ANT_HOME/bin:*) ;;
+    *) export PATH=$ANT_HOME/bin:$PATH ;;
+esac
+
+ant -version
+echo &quot;ant home: ${ANT_HOME}&quot;
+echo &quot;ant opts: ${ANT_OPTS}&quot;
+
+echo &quot;==== ANT END ====&quot;
+
+
+echo &quot;****** switching to custom location for ziping training **********&quot;
+cd /var/jenkins_home/workspace/Training/bin/custom
+
+zip -r training.zip .
+
+echo &quot;****** copying training zip to Local hybris *************&quot;
+
+rm -rf /usr/local/sandeep/hybris/bin/custom
+mkdir -p /usr/local/sandeep/hybris/bin/custom
+cp training.zip /usr/local/sandeep/hybris/bin/custom/
+
+cd /usr/local/sandeep/hybris/bin/custom/
+unzip training.zip
+rm training.zip
+
+cp /var/jenkins_home/workspace/Training/config/local.properties /usr/local/sandeep/hybris/config
+cp /var/jenkins_home/workspace/Training/config/localextensions.xml /usr/local/sandeep/hybris/config
+
+cd /usr/local/sandeep/hybris/bin/platform
+echo &quot;cursor at &quot; 
+pwd
+ant -version
+ant clean all
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>

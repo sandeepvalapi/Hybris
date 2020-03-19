@@ -69,3 +69,142 @@ pwd
 ant -version
 ant clean all
 
+
+
+
+
+----
+
+Bubbles
+
+pipeline {
+   agent any
+
+   stages {
+      stage('Checkout') {
+         steps {
+            checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog'], [$class: 'WipeWorkspace']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/sandeepvalapi/Hybris.git']]])
+         }
+      } 
+       
+      stage('System Check') { 
+            steps { 
+                
+                sh 'echo $JAVA_HOME'
+                sh 'cd /usr/local/sandeep/hybris/bin/platform'
+
+
+                echo "======ANT ======"
+                
+                sh 'sleep 14s'
+                sh 'echo $JAVA_HOME' 
+                sh 'cd /var/jenkins_home/workspace/Bubble/bin/custom'
+                sh 'cd /var/jenkins_home/workspace/Bubble/bin/custom'
+                sh 'echo wait'
+                sh 'pwd'
+                sh 'cd /bin/custom'
+                sh 'ls -ltr'
+                sh 'sleep 14s'
+                sh 'zip -r training.zip .'
+                sh 'ls -ltr'
+                sh 'sleep 5s'
+                sh 'rm -rf /usr/local/sandeep/hybris/bin/custom'
+                sh 'mkdir -p /usr/local/sandeep/hybris/bin/custom'
+                sh 'cp training.zip /usr/local/sandeep/hybris/bin/custom/'
+            }
+        }
+        
+         stage('Copying artifacts'){
+            steps {
+                sh 'cd /usr/local/sandeep/hybris/bin/custom/'
+                sh 'ls -ltr'
+                sh 'unzip training.zip'
+                sh 'rm training.zip'
+                sh 'cp /var/jenkins_home/workspace/Bubble/config/local.properties /usr/local/sandeep/hybris/config'
+                sh 'cp /var/jenkins_home/workspace/Bubble/config/localextensions.xml /usr/local/sandeep/hybris/config'
+
+                sh 'cd /usr/local/sandeep/hybris/bin/platform'
+                sh 'ant -version'
+                sh 'ant clean all'
+
+
+            }
+        }
+       
+     
+   }
+}
+
+
+----------
+
+stage('Copying artifacts'){
+            steps {
+                sh 'cd /usr/local/sandeep/hybris/bin/backup/'
+                sh 'pwd'
+                sh 'sleep 5s'
+                sh 'ls -ltr'
+                sh 'unzip training.zip'
+                sh 'ls -ltr'
+                sh 'sleep 10s'
+                sh 'cp -a /usr/local/sandeep/hybris/bin/backup/bin/custom/ /usr/local/sandeep/hybris/bin/custom/'
+               
+                sh 'cp /usr/local/sandeep/hybris/bin/backup/config/local.properties /usr/local/sandeep/hybris/config'
+                sh 'cp /usr/local/sandeep/hybris/bin/backup/config/localextensions.xml /usr/local/sandeep/hybris/config'
+
+                sh 'cd /usr/local/sandeep/hybris/bin/platform'
+                sh 'rm -rf /usr/local/sandeep/hybris/bin/backup/'
+                sh 'ant -version'
+                sh 'ant clean all'
+
+
+            }
+        }
+
+        ------
+
+
+        pipeline {
+   agent any
+
+   stages {
+      stage('Checkout') {
+         steps {
+            checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog'], [$class: 'WipeWorkspace']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/sandeepvalapi/Hybris.git']]])
+         }
+      } 
+       
+      stage('System Check') { 
+            steps { 
+                sh '#!/bin/sh'
+                sh 'echo $JAVA_HOME'
+                
+                dir('/var/jenkins_home/workspace/Bubble/bin/custom'){
+                    sh "$PWD"
+                    sh 'zip -r training.zip .'
+                    sh 'ls -ltr'
+                    sh 'sleep 5s'
+                    dir('/usr/local/sandeep/hybris/bin/custom'){
+                        deleteDir()
+                    }
+                sh 'mkdir -p /usr/local/sandeep/hybris/bin/backup'
+                sh 'cp training.zip /usr/local/sandeep/hybris/bin/backup/'
+                sh 'mkdir -p /usr/local/sandeep/hybris/bin/custom'
+                }
+             
+                
+                
+                
+                
+                
+                
+            }
+        }
+        
+         
+       
+     
+   }
+}
+
+
