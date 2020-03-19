@@ -46,9 +46,31 @@ pipeline {
             }
         }
 
+        stage('Sonar Check') { 
+            steps { 
+               dir('/usr/local/sandeep/hybris/bin/platform') {
+                  sh label: '', script: '. ./setantenv.sh'
+                  withAnt {
+                      sh label: '', script: '/usr/local/sandeep/hybris/bin/platform/apache-ant/bin/ant sonarcheck'
+                  }
+               }
+            }
+        }
+
+        stage("Quality Gate"){
+            steps{
+               timeout(time: 1, unit: 'HOURS') {   
+               sh label: '', script: 'def qg = waitForQualityGate()'
+                  sh label: '', script: 'if (qg.status != \'OK\')  {'
+                     slackSend baseUrl: 'https://hooks.slack.com/services/', channel: 'build-team', color: 'danger', iconEmoji: ':child:', message: 'Jenkins Build failed', teamDomain: 'sdevelopersworkspace', tokenCredentialId: 'slack-login', username: 'Jenkins Job'    
+                 sh label: '', script: '}'
+               }
+           }
+         }        
+
         stage('Slack Notification') { 
             steps { 
-               slackSend baseUrl: 'https://hooks.slack.com/services/', channel: 'build-team', color: 'good', iconEmoji: ':child:', message: 'Jenkins Build', teamDomain: 'sdevelopersworkspace', tokenCredentialId: 'slack-login', username: 'Jenkins Job'    
+               slackSend baseUrl: 'https://hooks.slack.com/services/', channel: 'build-team', color: 'good', iconEmoji: ':child:', message: 'Jenkins Build completed', teamDomain: 'sdevelopersworkspace', tokenCredentialId: 'slack-login', username: 'Jenkins Job'    
             }
          }
    }
