@@ -1,7 +1,7 @@
 /*
  * ----------------------------------------------------------------
  * --- WARNING: THIS FILE IS GENERATED AND WILL BE OVERWRITTEN! ---
- * --- Generated at 18-Mar-2020, 11:24:39 PM                    ---
+ * --- Generated at 19-Mar-2020, 11:49:07 AM                    ---
  * ----------------------------------------------------------------
  */
 package com.hybris.training.fulfilmentprocess.jalo;

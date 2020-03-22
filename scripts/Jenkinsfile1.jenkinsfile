@@ -60,7 +60,7 @@ pipeline {
         stage("Quality Gate"){
             steps{
                timeout(time: 1, unit: 'HOURS') {   
-               sh label: '', script: 'def qg = waitForQualityGate()'
+                  sh label: '', script: 'def qg = waitForQualityGate()'
                   sh label: '', script: 'if (qg.status != \'OK\')  {'
                      slackSend baseUrl: 'https://hooks.slack.com/services/', channel: 'build-team', color: 'danger', iconEmoji: ':child:', message: 'Jenkins Build failed', teamDomain: 'sdevelopersworkspace', tokenCredentialId: 'slack-login', username: 'Jenkins Job'    
                  sh label: '', script: '}'

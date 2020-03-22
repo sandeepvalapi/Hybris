@@ -46,3 +46,4 @@ bin/custom/training/trainingbackoffice/.externalToolBuilders
 bin/platform
 bin/custom/training/.idea/
 bin/custom/training/.idea/runConfigurations/Remote_debug.xml
+.scannerwork
