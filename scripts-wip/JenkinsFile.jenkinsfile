@@ -1,0 +1,81 @@
+pipeline {
+   agent any
+
+   stages {
+      stage('SCM Checkout') {
+         steps {
+            checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/sandeepvalapi/Hybris.git']]])
+         }
+      } 
+       
+      stage('System Health') { 
+            steps { 
+               dir('/var/jenkins_home/workspace/Bubble/bin/custom') {
+                  pwd()
+                  sh label: '', script: 'zip -r training.zip .'
+                  dir('/usr/local/sandeep/hybris/bin/custom'){
+                        deleteDir()
+                  }
+                  sh label: '', script: 'mkdir -p /usr/local/sandeep/hybris/bin/custom'  
+                  sh label: '', script: 'cp training.zip /usr/local/sandeep/hybris/bin/custom/'
+               }
+               dir('/usr/local/sandeep/hybris/bin/custom/') {
+                  sh label: '', script: 'unzip training.zip'
+                  sh label: '', script: 'rm training.zip'
+                  sh label: '', script: 'cp /var/jenkins_home/workspace/Bubble/config/docker/local.properties /usr/local/sandeep/hybris/config'
+                  sh label: '', script: 'cp /var/jenkins_home/workspace/Bubble/config/docker/localextensions.xml /usr/local/sandeep/hybris/config'
+               }
+               dir('/usr/local/sandeep/hybris/bin/platform') {
+                  sh label: '', script: '. ./setantenv.sh'
+                  withAnt {
+                      sh label: '', script: '/usr/local/sandeep/hybris/bin/platform/apache-ant/bin/ant -version'
+                  }
+               }
+            }
+        }
+
+        stage('Build Project') { 
+            steps { 
+               dir('/usr/local/sandeep/hybris/bin/platform') {
+                  sh label: '', script: '. ./setantenv.sh'
+                  withAnt {
+                      sh label: '', script: '/usr/local/sandeep/hybris/bin/platform/apache-ant/bin/ant -version'
+                      sh label: '', script: '/usr/local/sandeep/hybris/bin/platform/apache-ant/bin/ant clean all'
+                  }
+               }
+            }
+        }
+
+        stage("SonarQube analysis") {
+          steps {
+              withSonarQubeEnv('sonar_siri') {
+                 dir('/usr/local/sandeep/hybris/bin/platform') {
+                  sh label: '', script: '. ./setantenv.sh'
+                  withAnt {
+                      sh label: '', script: '/usr/local/sandeep/hybris/bin/platform/apache-ant/bin/ant sonarcheck'
+                  }
+               }
+              }    
+          }
+        }
+  
+        stage("Quality Gate"){
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    script{
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            slackSend baseUrl: 'https://hooks.slack.com/services/', channel: 'build-team', color: 'danger', iconEmoji: ':child:', message: 'Jenkins Build failed', teamDomain: 'sdevelopersworkspace', tokenCredentialId: 'slack-login', username: 'Jenkins Job'
+                        }
+                    }
+                }
+            }   
+        }     
+
+        stage('Slack Notification') { 
+            steps { 
+               slackSend baseUrl: 'https://hooks.slack.com/services/', channel: 'build-team', color: 'good', iconEmoji: ':child:', message: 'Jenkins Build completed', teamDomain: 'sdevelopersworkspace', tokenCredentialId: 'slack-login', username: 'Jenkins Job'    
+            }
+         }
+   }
+}
