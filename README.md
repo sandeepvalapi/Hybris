@@ -19,10 +19,10 @@ Below docker images are essential if you want to setup a full scale automated sy
 Jenkins
 Sonarqube
 
-|       #        |Docker Images                          |Ports                         
-|----------------|-------------------------------|-----------------------------|
-|1|          Jenkins  |8080            |
-|2          |Sonarqube           |9000            |
+|# |Docker Images|Ports|
+|--|-------------|-----|
+|1 |Jenkins      |8080 |
+|2 |Sonarqube    |9000 |
 
 ## Visual Studio Code Plugin
 
